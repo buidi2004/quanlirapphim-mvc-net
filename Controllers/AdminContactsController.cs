@@ -17,25 +17,34 @@ public class AdminContactsController(IDbConnection db) : Controller
         return View("~/Views/Admin/Contacts/Index.cshtml", contacts);
     }
 
+    [HttpGet("details/{id}")]
+    public async Task<IActionResult> Details(int id)
+    {
+        var contact = await db.QuerySingleOrDefaultAsync<dynamic>(
+            "SELECT * FROM contacts WHERE id = @Id", new { Id = id });
+        if (contact == null)
+        {
+            return NotFound();
+        }
+        return View("~/Views/Admin/Contacts/Details.cshtml", contact);
+    }
+
     [HttpPost("reply")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Reply(int id, string replyMessage)
     {
         try
         {
-            var sql = "UPDATE contacts SET status = 'replied', reply_message = @ReplyMessage, replied_at = @RepliedAt WHERE id = @Id";
-            await db.ExecuteAsync(sql, new { ReplyMessage = replyMessage, RepliedAt = DateTime.Now, Id = id });
+            var sql = "UPDATE contacts SET status = 'replied', reply_message = @ReplyMessage, replied_at = @RepliedAt, is_read = 1 WHERE id = @Id";
+            await db.ExecuteAsync(sql, new { ReplyMessage = replyMessage, RepliedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), Id = id });
             
-            // Here you would typically send an email to the user using an email service
-            // e.g. await _emailService.SendEmailAsync(contact.Email, "Trả lời liên hệ", replyMessage);
-
             TempData["Success"] = "Đã lưu phản hồi thành công!";
         }
         catch (Exception ex)
         {
             TempData["Error"] = "Lỗi: " + ex.Message;
         }
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction(nameof(Details), new { id = id });
     }
 
     [HttpPost("delete")]

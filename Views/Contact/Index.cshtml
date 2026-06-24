@@ -27,15 +27,20 @@
                 @Html.AntiForgeryToken()
 
                 <div class="row g-3">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label text-secondary small">Họ và tên *</label>
                         <input type="text" name="name" class="form-control bg-light border-light text-dark"
                                placeholder="Nguyễn Văn A" required>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label text-secondary small">Email *</label>
                         <input type="email" name="email" class="form-control bg-light border-light text-dark"
                                placeholder="you@example.com" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-secondary small">Số điện thoại</label>
+                        <input type="tel" name="phone" class="form-control bg-light border-light text-dark"
+                               placeholder="0901234567">
                     </div>
                     <div class="col-12">
                         <label class="form-label text-secondary small">Chủ đề</label>

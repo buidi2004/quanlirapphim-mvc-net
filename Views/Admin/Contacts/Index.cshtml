@@ -57,10 +57,13 @@
                             </td>
                             <td>@Convert.ToDateTime(c.created_at).ToString("dd/MM/yyyy HH:mm")</td>
                             <td class="text-end">
-                                <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#replyContactModal-@c.id">
+                                <a href="/admin/contacts/details/@c.id" class="btn btn-sm btn-outline-primary" title="Xem chi tiết">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-info ms-1" data-bs-toggle="modal" data-bs-target="#replyContactModal-@c.id" title="Trả lời nhanh">
                                     <i class="bi bi-reply"></i>
                                 </button>
-                                <button type="button" class="btn btn-sm btn-outline-danger ms-1" data-bs-toggle="modal" data-bs-target="#deleteContactModal-@c.id">
+                                <button type="button" class="btn btn-sm btn-outline-danger ms-1" data-bs-toggle="modal" data-bs-target="#deleteContactModal-@c.id" title="Xóa">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </td>

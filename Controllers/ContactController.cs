@@ -18,7 +18,7 @@ public class ContactController(IDbConnection db) : Controller
     // POST /contact
     [HttpPost("")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Submit(string name, string email, string? subject, string message)
+    public async Task<IActionResult> Submit(string name, string email, string? phone, string? subject, string message)
     {
         if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(message))
         {
@@ -26,19 +26,42 @@ public class ContactController(IDbConnection db) : Controller
             return RedirectToAction(nameof(Index));
         }
 
+        int contactId = 0;
         try
         {
-            await db.ExecuteAsync(@"
-                INSERT INTO contacts (name, email, subject, message)
-                VALUES (@name, @email, @subject, @message)",
-                new { name = name.Trim(), email = email.Trim(), subject = subject?.Trim(), message = message.Trim() });
+            contactId = await db.QuerySingleAsync<int>(@"
+                INSERT INTO contacts (name, email, phone, subject, message, status)
+                VALUES (@name, @email, @phone, @subject, @message, 'pending');
+                SELECT last_insert_rowid();",
+                new { 
+                    name = name.Trim(), 
+                    email = email.Trim(), 
+                    phone = phone?.Trim(), 
+                    subject = subject?.Trim(), 
+                    message = message.Trim() 
+                });
+            TempData["Success"] = "Gửi yêu cầu hỗ trợ thành công! Bạn có thể xem chi tiết bên dưới.";
         }
-        catch
+        catch (Exception ex)
         {
-            // Table might not exist yet — show success anyway
+            TempData["Error"] = "Lỗi khi lưu thông tin: " + ex.Message;
+            return RedirectToAction(nameof(Index));
         }
 
-        TempData["Success"] = "Gửi yêu cầu hỗ trợ thành công! Chúng tôi sẽ phản hồi trong 24h.";
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction(nameof(Details), new { id = contactId });
+    }
+
+    // GET /contact/details/{id}
+    [HttpGet("details/{id}")]
+    public async Task<IActionResult> Details(int id)
+    {
+        var contact = await db.QuerySingleOrDefaultAsync<dynamic>(
+            "SELECT * FROM contacts WHERE id = @Id", new { Id = id });
+        if (contact == null)
+        {
+            return NotFound();
+        }
+        ViewBag.PageTitle = $"Chi tiết yêu cầu hỗ trợ #{id} — CinemaX";
+        return View(contact);
     }
 }

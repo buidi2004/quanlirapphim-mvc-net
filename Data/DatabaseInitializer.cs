@@ -136,15 +136,24 @@ public static class DatabaseInitializer
 
         db.Execute("""
             CREATE TABLE IF NOT EXISTS contacts (
-                id         INTEGER PRIMARY KEY AUTOINCREMENT,
-                name       TEXT    NOT NULL,
-                email      TEXT    NOT NULL,
-                subject    TEXT,
-                message    TEXT    NOT NULL,
-                is_read    INTEGER NOT NULL DEFAULT 0,
-                created_at TEXT    NOT NULL DEFAULT (datetime('now'))
+                id            INTEGER PRIMARY KEY AUTOINCREMENT,
+                name          TEXT    NOT NULL,
+                email         TEXT    NOT NULL,
+                phone         TEXT,
+                subject       TEXT,
+                message       TEXT    NOT NULL,
+                is_read       INTEGER NOT NULL DEFAULT 0,
+                status        TEXT    NOT NULL DEFAULT 'pending',
+                reply_message TEXT,
+                replied_at    TEXT,
+                created_at    TEXT    NOT NULL DEFAULT (datetime('now'))
             );
         """);
+
+        try { db.Execute("ALTER TABLE contacts ADD COLUMN phone TEXT;"); } catch {}
+        try { db.Execute("ALTER TABLE contacts ADD COLUMN status TEXT NOT NULL DEFAULT 'pending';"); } catch {}
+        try { db.Execute("ALTER TABLE contacts ADD COLUMN reply_message TEXT;"); } catch {}
+        try { db.Execute("ALTER TABLE contacts ADD COLUMN replied_at TEXT;"); } catch {}
 
         db.Execute("""
             CREATE TABLE IF NOT EXISTS food_beverages (
