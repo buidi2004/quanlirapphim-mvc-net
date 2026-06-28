@@ -1,14 +1,15 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Sử dụng IP trực tiếp của WSL
-const API_BASE_URL = 'http://172.18.226.230:8080'; 
-export const IMAGE_BASE_URL = 'http://172.18.226.230:8080';
+// Sử dụng Localtunnel (Public URL) để bỏ qua hoàn toàn lỗi mạng của máy ảo / điện thoại / Windows
+const API_BASE_URL = 'https://grumpy-ears-film.loca.lt'; 
+export const IMAGE_BASE_URL = 'https://grumpy-ears-film.loca.lt';
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
+    'Bypass-Tunnel-Reminder': 'true',
   },
 });
 
