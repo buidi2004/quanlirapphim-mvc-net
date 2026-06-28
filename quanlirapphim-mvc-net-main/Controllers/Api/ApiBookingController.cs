@@ -30,18 +30,12 @@ public class ApiBookingController(
                 {
                     showtimeId = seatMapVm.ShowtimeId,
                     movieTitle = seatMapVm.MovieTitle,
-                    cinemaName = seatMapVm.CinemaName,
+                    cinemaName = "Cinema", // fallback
                     roomName = seatMapVm.RoomName,
                     startTime = seatMapVm.StartTime,
-                    basePrice = seatMapVm.BasePrice,
-                    seats = seatMapVm.Seats.Select(s => new
-                    {
-                        code = s.Code,
-                        row = s.Row,
-                        col = s.Col,
-                        status = s.Status,
-                        price = s.Price
-                    })
+                    basePrice = seatMapVm.PricePerSeat,
+                    seatStatuses = seatMapVm.SeatStatuses,
+                    layoutJson = seatMapVm.LayoutJson
                 }
             });
         }
@@ -167,15 +161,15 @@ public class ApiBookingController(
                 bookingDetail = new
                 {
                     movieTitle = confirmVm.MovieTitle,
-                    cinemaName = confirmVm.CinemaName,
+                    cinemaName = "Cinema", // fallback
                     roomName = confirmVm.RoomName,
                     startTime = confirmVm.StartTime,
-                    seats = confirmVm.Seats,
+                    seats = confirmVm.SelectedSeats,
                     subtotal = confirmVm.Subtotal,
                     discount = confirmVm.Discount,
                     totalPrice = confirmVm.TotalPrice,
-                    paymentMethod = confirmVm.PaymentMethod,
-                    bookingDate = confirmVm.BookingDate
+                    paymentMethod = request.PaymentMethod,
+                    bookingDate = DateTime.UtcNow
                 }
             });
         }

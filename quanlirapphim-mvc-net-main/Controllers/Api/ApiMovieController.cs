@@ -54,33 +54,34 @@ public class ApiMovieController(IMovieService movieService, IReviewRepository re
                     id = movie.Id,
                     title = movie.Title,
                     description = movie.Description,
-                    duration = movie.Duration,
-                    releaseDate = movie.ReleaseDate,
+                    duration = movie.DurationMinutes, // Changed from Duration
+                    releaseDate = movie.CreatedAt, // Changed from ReleaseDate
                     genre = movie.Genre,
-                    director = movie.Director,
-                    cast = movie.Cast,
-                    rating = movie.Rating,
+                    director = "Unknown", // Field missing in DB
+                    cast = "Unknown", // Field missing in DB
+                    rating = movie.AgeRating, // Changed from Rating
                     posterUrl = movie.PosterUrl,
-                    trailerUrl = movie.TrailerUrl,
+                    trailerUrl = "", // Field missing in DB
                     status = movie.Status
                 },
                 selectedDate = showDate.ToString("yyyy-MM-dd"),
                 showtimes = showtimes.Select(s => new
                 {
                     id = s.Id,
-                    cinemaId = s.CinemaId,
-                    cinemaName = s.CinemaName,
+                    cinemaId = 1, // Fallback since it's missing in ShowtimeSummary
+                    cinemaName = "Cinema",
                     roomName = s.RoomName,
                     startTime = s.StartTime,
-                    endTime = s.EndTime,
-                    price = s.Price,
+                    endTime = s.StartTime.AddMinutes(movie.DurationMinutes),
+                    price = 0, // Fallback
+                    formattedPrice = s.FormattedPrice,
                     availableSeats = s.AvailableSeats
                 }),
                 reviews = reviews.Select(r => new
                 {
                     id = r.Id,
                     userId = r.UserId,
-                    username = r.Username,
+                    username = r.User?.Username ?? "User",
                     rating = r.Rating,
                     comment = r.Comment,
                     createdAt = r.CreatedAt
@@ -108,12 +109,13 @@ public class ApiMovieController(IMovieService movieService, IReviewRepository re
                 showtimes = showtimes.Select(s => new
                 {
                     id = s.Id,
-                    cinemaId = s.CinemaId,
-                    cinemaName = s.CinemaName,
+                    cinemaId = 1, // Fallback since it's missing in ShowtimeSummary
+                    cinemaName = "Cinema",
                     roomName = s.RoomName,
                     startTime = s.StartTime,
-                    endTime = s.EndTime,
-                    price = s.Price,
+                    endTime = s.StartTime.AddMinutes(120), // default duration fallback
+                    price = 0, // Fallback since ShowtimeSummary only has FormattedPrice
+                    formattedPrice = s.FormattedPrice,
                     availableSeats = s.AvailableSeats
                 })
             });

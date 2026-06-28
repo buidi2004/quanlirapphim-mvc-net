@@ -92,7 +92,7 @@ public class ApiCinemaController(ICinemaService cinemaService) : ControllerBase
                 {
                     id = g.Key.Id,
                     title = g.Key.Title,
-                    duration = g.Key.Duration,
+                    duration = g.Key.DurationMinutes, // Changed from Duration
                     genre = g.Key.Genre,
                     posterUrl = g.Key.PosterUrl
                 },
@@ -101,7 +101,7 @@ public class ApiCinemaController(ICinemaService cinemaService) : ControllerBase
                     id = s.Id,
                     roomName = s.Room?.Name ?? "",
                     startTime = s.StartTime,
-                    endTime = s.EndTime,
+                    endTime = s.StartTime.AddMinutes(g.Key.DurationMinutes), // Calculated
                     price = s.Price
                 })
             });
