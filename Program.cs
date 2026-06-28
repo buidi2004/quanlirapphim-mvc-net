@@ -6,6 +6,9 @@ using CinemaXNet.Models.Services.Implementations;
 using CinemaXNet.Models.Services.Interfaces;
 using CinemaXNet.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using Microsoft.Data.Sqlite;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,9 +43,33 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     {
         options.AppId = builder.Configuration["Authentication:Facebook:AppId"] ?? "mock-app-id";
         options.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"] ?? "mock-app-secret";
+    })
+    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+    {
+        var jwtSettings = builder.Configuration.GetSection("Jwt");
+        var secretKey = jwtSettings["Key"] ?? throw new InvalidOperationException("JWT Secret Key is not configured.");
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings["Issuer"] ?? "CinemaX",
+            ValidAudience = jwtSettings["Audience"] ?? "CinemaXUsers",
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+        };
     });
 
 builder.Services.AddAuthorization();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy => policy.SetIsOriginAllowed(_ => true)
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials());
+});
 
 // ── Database (Dapper + SQLite) ────────────────────────────────────
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
@@ -50,6 +77,7 @@ builder.Services.AddScoped<IDbConnection>(_ => new SqliteConnection(connectionSt
 
 // Initialize SQLite database schema and seed data
 DatabaseInitializer.Initialize(connectionString);
+Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 Dapper.SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
 Dapper.SqlMapper.AddTypeHandler(new TimeOnlyTypeHandler());
 
@@ -71,6 +99,7 @@ builder.Services.AddScoped<ITicketService,    TicketService>();
 builder.Services.AddScoped<IPaymentService,   PaymentService>();
 builder.Services.AddScoped<IPromotionService, PromotionService>();
 builder.Services.AddScoped<ICinemaService,    CinemaService>();
+builder.Services.AddScoped<IJwtService,       JwtService>();
 
 // ── Background Service (thay cron job PHP) ────────────────────────────────
 builder.Services.AddHostedService<HoldExpiryBackgroundService>();
@@ -92,6 +121,8 @@ app.UseStatusCodePagesWithReExecute("/error/{0}");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+
+app.UseCors("AllowAll");
 
 app.UseSession();
 app.UseAuthentication();
