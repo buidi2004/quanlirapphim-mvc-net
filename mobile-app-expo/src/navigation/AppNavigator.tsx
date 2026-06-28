@@ -21,23 +21,42 @@ const PlaceholderScreen = ({ name }: { name: string }) => (
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
+import { Ionicons } from '@expo/vector-icons';
+
 const TabNavigator = () => {
   return (
     <Tab.Navigator
-      screenOptions={{
+      screenOptions={({ route }) => ({
         headerShown: false,
         tabBarStyle: {
           backgroundColor: Theme.colors.surface,
           borderTopColor: '#070101',
+          paddingBottom: 4,
+          paddingTop: 4,
         },
         tabBarActiveTintColor: Theme.colors.accent,
         tabBarInactiveTintColor: Theme.colors.textMuted,
-      }}
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName: keyof typeof Ionicons.glyphMap = 'home';
+
+          if (route.name === 'HomeTab') {
+            iconName = focused ? 'home' : 'home-outline';
+          } else if (route.name === 'CinemasTab') {
+            iconName = focused ? 'film' : 'film-outline';
+          } else if (route.name === 'TicketsTab') {
+            iconName = focused ? 'ticket' : 'ticket-outline';
+          } else if (route.name === 'ProfileTab') {
+            iconName = focused ? 'person' : 'person-outline';
+          }
+
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+      })}
     >
       <Tab.Screen name="HomeTab" component={HomeScreen} options={{ tabBarLabel: 'Trang chủ' }} />
       <Tab.Screen name="CinemasTab" children={() => <PlaceholderScreen name="Rạp chiếu" />} options={{ tabBarLabel: 'Rạp' }} />
       <Tab.Screen name="TicketsTab" children={() => <PlaceholderScreen name="Vé của tôi" />} options={{ tabBarLabel: 'Vé xem phim' }} />
-      <Tab.Screen name="ProfileTab" children={() => <PlaceholderScreen name="Tài khoản" />} options={{ tabBarLabel: 'Trang cá nhân' }} />
+      <Tab.Screen name="ProfileTab" children={() => <PlaceholderScreen name="Tài khoản" />} options={{ tabBarLabel: 'Cá nhân' }} />
     </Tab.Navigator>
   );
 };
