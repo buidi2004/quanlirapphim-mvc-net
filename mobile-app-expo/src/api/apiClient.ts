@@ -2,8 +2,8 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Sử dụng adb reverse nên localhost của Android sẽ nối thẳng tới localhost của Windows
-const API_BASE_URL = 'http://127.0.0.1:5062'; 
-export const IMAGE_BASE_URL = 'http://127.0.0.1:5062';
+const API_BASE_URL = 'http://127.0.0.1:8080'; 
+export const IMAGE_BASE_URL = 'http://127.0.0.1:8080';
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
