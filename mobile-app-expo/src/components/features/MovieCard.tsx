@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, Pressable, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Dimensions } from 'react-native';
+import { Image } from 'expo-image';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { Movie } from '../../models/Movie';
 import { Theme } from '../../theme/tokens';
@@ -31,11 +32,12 @@ export const MovieCard: React.FC<Props> = ({ movie, onPress }) => {
       onPressOut={() => scale.value = withTiming(1, { duration: 150 })}
     >
       <View style={styles.imageContainer}>
-        {/* Ảnh Poster với Placeholder background */}
+        {/* Ảnh Poster dùng expo-image siêu mượt, tự handle cache & lỗi */}
         <Image 
           source={{ uri: movie.posterUrl?.startsWith('http') ? movie.posterUrl : `${IMAGE_BASE_URL}${movie.posterUrl}` }} 
           style={styles.poster}
-          resizeMode="cover"
+          contentFit="cover"
+          transition={200}
         />
         {/* Badge Cảnh báo & Trạng thái nằm đè lên góc trái */}
         <View style={[styles.badge, movie.status === 'now_showing' ? styles.badgeNow : styles.badgeSoon]}>

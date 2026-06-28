@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ImageBackground, ScrollView, ActivityIndicator, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity, FlatList } from 'react-native';
+import { ImageBackground } from 'expo-image';
+import { IMAGE_BASE_URL } from '../../api/apiClient';
 import { MovieService } from '../../services/MovieService';
 import { MovieDetailResponse, ShowtimeSummary } from '../../models/Movie';
 import { styles } from './styles';
@@ -51,7 +53,12 @@ export const MovieDetailScreen = ({ route, navigation }: any) => {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent} bounces={false}>
-        <ImageBackground source={{ uri: movie.posterUrl?.startsWith('http') ? movie.posterUrl : `http://172.18.226.230:8080${movie.posterUrl}` }} style={styles.posterHeader}>
+        <ImageBackground 
+          source={{ uri: movie.posterUrl?.startsWith('http') ? movie.posterUrl : `${IMAGE_BASE_URL}${movie.posterUrl}` }} 
+          style={styles.posterHeader}
+          contentFit="cover"
+          transition={200}
+        >
           <View style={styles.posterOverlay} />
           <View style={styles.infoContainer}>
             <Text style={styles.title}>{movie.title}</Text>
