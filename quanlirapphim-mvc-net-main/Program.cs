@@ -129,6 +129,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 // ── Routes ─────────────────────────────────────────────────────────────────
+app.MapControllers();
+
 // Attribute routes (defined in controllers with [Route] and [HttpGet/Post]) take priority.
 // Default MVC route as fallback:
 app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
