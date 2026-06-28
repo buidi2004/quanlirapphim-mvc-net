@@ -1,9 +1,9 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Sử dụng adb reverse nên localhost của Android sẽ nối thẳng tới localhost của Windows
-const API_BASE_URL = 'http://127.0.0.1:8080'; 
-export const IMAGE_BASE_URL = 'http://127.0.0.1:8080';
+// Sử dụng IP mạng LAN của máy tính Windows (192.168.1.5) để hỗ trợ cả máy ảo và điện thoại thật qua Expo Go
+const API_BASE_URL = 'http://192.168.1.5:8080'; 
+export const IMAGE_BASE_URL = 'http://192.168.1.5:8080';
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
