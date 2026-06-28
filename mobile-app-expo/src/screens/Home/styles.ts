@@ -1,10 +1,11 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Platform, StatusBar } from 'react-native';
 import { Theme } from '../../theme/tokens';
 
 export const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: Theme.colors.background,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   centerContainer: {
     flex: 1,
@@ -23,6 +24,18 @@ export const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '900',
     letterSpacing: 1,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  iconButton: {
+    padding: 4,
+  },
+  avatarButton: {
+    padding: 0,
+    marginLeft: -4,
   },
   sectionContainer: {
     marginBottom: Theme.spacing.lg * 1.5,

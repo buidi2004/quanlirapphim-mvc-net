@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, ActivityIndicator, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, StatusBar, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { MovieService } from '../../services/MovieService';
 import { Movie } from '../../models/Movie';
 import { MovieCard, MOVIE_CARD_WIDTH } from '../../components/features/MovieCard';
@@ -66,10 +68,24 @@ export const HomeScreen = ({ navigation }: any) => {
     // SafeAreaView bảo vệ nội dung khỏi tai thỏ (Notch)
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor={Theme.colors.background} />
-      
-      {/* Header Logo */}
+
+
+
+
+      {/* Header Logo & Icons */}
       <View style={styles.header}>
         <Text style={styles.logo}>CinemaX</Text>
+        <View style={styles.headerActions}>
+          <TouchableOpacity style={styles.iconButton}>
+            <Ionicons name="search" size={24} color={Theme.colors.textPrimary} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.iconButton}>
+            <Ionicons name="notifications-outline" size={24} color={Theme.colors.textPrimary} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.avatarButton}>
+            <Ionicons name="person-circle" size={32} color={Theme.colors.textPrimary} />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Fallback & Loading States */}
@@ -90,10 +106,13 @@ export const HomeScreen = ({ navigation }: any) => {
           showsVerticalScrollIndicator={false}
           data={[
             { id: 'now', title: 'Phim Đang Chiếu', data: nowShowing },
+            
             { id: 'soon', title: 'Phim Sắp Chiếu', data: comingSoon }
           ]}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => renderSection(item.title, item.data)}
+          
+
         />
       )}
     </SafeAreaView>

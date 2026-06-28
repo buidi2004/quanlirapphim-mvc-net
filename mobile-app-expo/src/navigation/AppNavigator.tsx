@@ -28,7 +28,7 @@ const TabNavigator = () => {
         headerShown: false,
         tabBarStyle: {
           backgroundColor: Theme.colors.surface,
-          borderTopColor: '#333',
+          borderTopColor: '#070101',
         },
         tabBarActiveTintColor: Theme.colors.accent,
         tabBarInactiveTintColor: Theme.colors.textMuted,
@@ -36,8 +36,8 @@ const TabNavigator = () => {
     >
       <Tab.Screen name="HomeTab" component={HomeScreen} options={{ tabBarLabel: 'Trang chủ' }} />
       <Tab.Screen name="CinemasTab" children={() => <PlaceholderScreen name="Rạp chiếu" />} options={{ tabBarLabel: 'Rạp' }} />
-      <Tab.Screen name="TicketsTab" children={() => <PlaceholderScreen name="Vé của tôi" />} options={{ tabBarLabel: 'Vé' }} />
-      <Tab.Screen name="ProfileTab" children={() => <PlaceholderScreen name="Tài khoản" />} options={{ tabBarLabel: 'Cá nhân' }} />
+      <Tab.Screen name="TicketsTab" children={() => <PlaceholderScreen name="Vé của tôi" />} options={{ tabBarLabel: 'Vé xem phim' }} />
+      <Tab.Screen name="ProfileTab" children={() => <PlaceholderScreen name="Tài khoản" />} options={{ tabBarLabel: 'Trang cá nhân' }} />
     </Tab.Navigator>
   );
 };
@@ -52,7 +52,7 @@ export const AppNavigator = () => {
         background: Theme.colors.background,
         card: Theme.colors.surface,
         text: Theme.colors.textPrimary,
-        border: '#333',
+        border: '#070101',
         notification: Theme.colors.accent,
       }
     }}>
