@@ -1,0 +1,62 @@
+@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "Báo Cáo Doanh Thu";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var reports = Model?.ToList() ?? new List<dynamic>();
+    var totalRevenue = ViewBag.TotalRevenue ?? 0m;
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-light">
+    <h1 class="h2 text-warning fw-bold">Báo Cáo Doanh Thu</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="/admin/reports/export" class="btn btn-sm btn-outline-success fw-bold">
+            <i class="bi bi-file-earmark-arrow-down me-1"></i> Xuất CSV
+        </a>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-white border border-warning shadow">
+            <div class="card-body">
+                <h5 class="card-title text-secondary">Tổng Doanh Thu</h5>
+                <h2 class="text-warning fw-bold">@string.Format("{0:N0}₫", totalRevenue)</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card bg-white border border-light rounded shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-dark table-hover mb-0 align-middle">
+            <thead class="text-uppercase" style="background-color: #111;">
+                <tr>
+                    <th scope="col">Tên Phim</th>
+                    <th scope="col">Số vé đã bán</th>
+                    <th scope="col" class="text-end">Doanh thu</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!reports.Any())
+                {
+                    <tr>
+                        <td colspan="3" class="text-center py-4 text-secondary fst-italic">
+                            Chưa có dữ liệu báo cáo.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var r in reports)
+                    {
+                        <tr>
+                            <td><strong class="text-dark">@r.MovieTitle</strong></td>
+                            <td>@r.TotalTickets vé</td>
+                            <td class="text-end text-success fw-bold">@string.Format("{0:N0}₫", r.TotalRevenue)</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

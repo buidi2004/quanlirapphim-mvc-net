@@ -1,0 +1,94 @@
+@model IEnumerable<CinemaXNet.Models.Domain.Movie>
+
+<div class="card bg-white border-0 shadow-lg mb-5 rounded-4 overflow-hidden quick-book-bar" data-aos="fade-up" data-aos-delay="200" style="border: 1px solid rgba(255,193,7,0.3) !important; margin-top: 2rem; position: relative; z-index: 10;">
+    <div class="card-body p-4">
+        <form action="/booking/quick" method="GET" class="row g-3 align-items-end" id="quickBookingForm">
+            <div class="col-md-3">
+                <label class="form-label text-warning fw-bold small"><i class="bi bi-film me-1"></i>Chọn Phim</label>
+                <select name="movieId" id="qb-movie" class="form-select bg-light border-0 text-dark rounded-pill" required>
+                    <option value="">-- Chọn phim --</option>
+                    @foreach (var m in Model) {
+                        <option value="@m.Id">@m.Title</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-warning fw-bold small"><i class="bi bi-geo-alt me-1"></i>Chọn Rạp</label>
+                <select name="cinemaId" id="qb-cinema" class="form-select bg-light border-0 text-dark rounded-pill" disabled required>
+                    <option value="">-- Chọn rạp --</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label text-warning fw-bold small"><i class="bi bi-calendar3 me-1"></i>Ngày chiếu</label>
+                <select name="date" id="qb-date" class="form-select bg-light border-0 text-dark rounded-pill" disabled required>
+                    <option value="">-- Chọn ngày --</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label text-warning fw-bold small"><i class="bi bi-clock me-1"></i>Suất chiếu</label>
+                <select name="showtimeId" id="qb-showtime" class="form-select bg-light border-0 text-dark rounded-pill" disabled required>
+                    <option value="">-- Chọn suất --</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" id="qb-submit" class="btn btn-warning w-100 rounded-pill fw-bold" disabled><i class="bi bi-ticket-perforated me-1"></i>ĐẶT VÉ</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const movieSel = document.getElementById('qb-movie');
+    const cinemaSel = document.getElementById('qb-cinema');
+    const dateSel = document.getElementById('qb-date');
+    const showtimeSel = document.getElementById('qb-showtime');
+    const btnSubmit = document.getElementById('qb-submit');
+
+    if(!movieSel) return;
+
+    movieSel.addEventListener('change', async () => {
+        cinemaSel.disabled = true; dateSel.disabled = true; showtimeSel.disabled = true; btnSubmit.disabled = true;
+        cinemaSel.innerHTML = '<option value="">-- Chọn rạp --</option>';
+        if(!movieSel.value) return;
+        
+        const res = await fetch(`/api/quickbooking/cinemas?movieId=${movieSel.value}`);
+        const data = await res.json();
+        data.forEach(c => cinemaSel.add(new Option(c.name, c.id)));
+        cinemaSel.disabled = false;
+    });
+
+    cinemaSel.addEventListener('change', async () => {
+        dateSel.disabled = true; showtimeSel.disabled = true; btnSubmit.disabled = true;
+        dateSel.innerHTML = '<option value="">-- Chọn ngày --</option>';
+        if(!cinemaSel.value) return;
+        
+        const res = await fetch(`/api/quickbooking/dates?movieId=${movieSel.value}&cinemaId=${cinemaSel.value}`);
+        const data = await res.json();
+        data.forEach(d => dateSel.add(new Option(d.formatted, d.value)));
+        dateSel.disabled = false;
+    });
+
+    dateSel.addEventListener('change', async () => {
+        showtimeSel.disabled = true; btnSubmit.disabled = true;
+        showtimeSel.innerHTML = '<option value="">-- Chọn suất --</option>';
+        if(!dateSel.value) return;
+        
+        const res = await fetch(`/api/quickbooking/showtimes?movieId=${movieSel.value}&cinemaId=${cinemaSel.value}&date=${dateSel.value}`);
+        const data = await res.json();
+        data.forEach(s => showtimeSel.add(new Option(s.time, s.id)));
+        showtimeSel.disabled = false;
+    });
+
+    showtimeSel.addEventListener('change', () => {
+        btnSubmit.disabled = !showtimeSel.value;
+    });
+
+    document.getElementById('quickBookingForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        if(showtimeSel.value) {
+            window.location.href = `/booking/${showtimeSel.value}`;
+        }
+    });
+});
+</script>

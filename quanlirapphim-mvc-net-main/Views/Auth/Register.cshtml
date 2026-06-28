@@ -1,0 +1,66 @@
+@model CinemaXNet.ViewModels.RegisterViewModel
+@{
+    ViewData["Title"] = "Đăng ký";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row justify-content-center py-5">
+    <div class="col-md-6 col-lg-5 col-xl-4">
+        <div class="card bg-white border border-light p-4 rounded shadow-lg">
+            <h2 class="text-center text-warning fw-bold mb-4">ĐĂNG KÝ</h2>
+
+            @if (!string.IsNullOrEmpty(Model.GeneralError))
+            {
+                <div class="alert alert-danger border-0 p-2 text-center mb-3" style="background-color: #3b171c; color: #f8d7da;">
+                    <small>@Model.GeneralError</small>
+                </div>
+            }
+
+            <form method="post" action="/register">
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    <label class="form-label text-dark">Tên người dùng</label>
+                    <input type="text" name="Username"
+                           class="form-control bg-light text-dark border-light @(ViewData.ModelState["Username"]?.Errors.Count > 0 ? "is-invalid" : "")"
+                           placeholder="Nhập tên người dùng..."
+                           value="@Model.Username" required>
+                    <span asp-validation-for="Username" class="invalid-feedback"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-dark">Email</label>
+                    <input type="email" name="Email"
+                           class="form-control bg-light text-dark border-light @(ViewData.ModelState["Email"]?.Errors.Count > 0 ? "is-invalid" : "")"
+                           placeholder="name@example.com"
+                           value="@Model.Email" required>
+                    <span asp-validation-for="Email" class="invalid-feedback"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-dark">Mật khẩu</label>
+                    <input type="password" name="Password"
+                           class="form-control bg-light text-dark border-light @(ViewData.ModelState["Password"]?.Errors.Count > 0 ? "is-invalid" : "")"
+                           placeholder="Tối thiểu 6 ký tự" required>
+                    <span asp-validation-for="Password" class="invalid-feedback"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label text-dark">Xác nhận mật khẩu</label>
+                    <input type="password" name="ConfirmPassword"
+                           class="form-control bg-light text-dark border-light @(ViewData.ModelState["ConfirmPassword"]?.Errors.Count > 0 ? "is-invalid" : "")"
+                           placeholder="Xác nhận mật khẩu" required>
+                    <span asp-validation-for="ConfirmPassword" class="invalid-feedback"></span>
+                </div>
+
+                <button type="submit" class="btn btn-warning w-100 fw-bold py-2 shadow mb-3">
+                    ĐĂNG KÝ
+                </button>
+
+                <p class="text-center text-secondary small mb-0">
+                    Đã có tài khoản? <a href="/login" class="text-warning text-decoration-none fw-semibold">Đăng nhập ngay</a>
+                </p>
+            </form>
+        </div>
+    </div>
+</div>

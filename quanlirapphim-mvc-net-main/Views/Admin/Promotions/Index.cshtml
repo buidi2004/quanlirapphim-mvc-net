@@ -1,0 +1,202 @@
+@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "Quản Lý Khuyến Mãi";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var promos = Model?.ToList() ?? new List<dynamic>();
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-light">
+    <h1 class="h2 text-warning fw-bold">Quản Lý Khuyến Mãi</h1>
+    <button type="button" class="btn btn-warning fw-bold btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#addPromoModal">
+        <i class="bi bi-plus-lg"></i> Thêm mã mới
+    </button>
+</div>
+
+<div class="card bg-white border border-light rounded shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-dark table-hover mb-0 align-middle">
+            <thead class="text-uppercase" style="background-color: #111;">
+                <tr>
+                    <th scope="col">Mã Code</th>
+                    <th scope="col">Tiêu đề</th>
+                    <th scope="col">Mức giảm (%)</th>
+                    <th scope="col">Thời hạn</th>
+                    <th scope="col">Trạng thái</th>
+                    <th scope="col" class="text-end">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!promos.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-secondary fst-italic">
+                            Chưa có khuyến mãi nào.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var p in promos)
+                    {
+                        <tr>
+                            <td><strong class="text-warning">@p.code</strong></td>
+                            <td>@p.title</td>
+                            <td>@p.discount_percent %</td>
+                            <td>
+                                <div><small class="text-secondary">Từ:</small> @Convert.ToDateTime(p.valid_from).ToString("dd/MM/yyyy")</div>
+                                <div><small class="text-secondary">Đến:</small> @Convert.ToDateTime(p.valid_to).ToString("dd/MM/yyyy")</div>
+                            </td>
+                            <td>
+                                @if (p.is_active == 1 || p.is_active == true)
+                                {
+                                    <span class="badge bg-success">Đang hoạt động</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Đã tắt</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#editPromoModal-@p.id">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deletePromoModal-@p.id">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Edit Modal -->
+                        <div class="modal fade" id="editPromoModal-@p.id" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content bg-light text-dark border border-light shadow-lg">
+                                    <div class="modal-header bg-white border-bottom border-light">
+                                        <h5 class="modal-title text-warning fw-bold">Sửa Mã: @p.code</h5>
+                                        <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form method="post" action="/admin/promotions/update">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@p.id" />
+                                        <div class="modal-body p-4 text-start">
+                                            <div class="mb-3">
+                                                <label class="form-label text-dark fw-bold">Mã Code (Tối đa 20 ký tự)</label>
+                                                <input type="text" name="code" value="@p.code" class="form-control bg-white text-dark border-light" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-dark fw-bold">Tiêu đề</label>
+                                                <input type="text" name="title" value="@p.title" class="form-control bg-white text-dark border-light" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-dark fw-bold">Phần trăm giảm (vd: 10, 20)</label>
+                                                <input type="number" step="0.01" name="discountPercent" value="@p.discount_percent" class="form-control bg-white text-dark border-light" required>
+                                            </div>
+                                            <div class="row g-3 mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label text-dark fw-bold">Từ ngày</label>
+                                                    <input type="date" name="validFrom" value="@Convert.ToDateTime(p.valid_from).ToString("yyyy-MM-dd")" class="form-control bg-white text-dark border-light" required>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label text-dark fw-bold">Đến ngày</label>
+                                                    <input type="date" name="validTo" value="@Convert.ToDateTime(p.valid_to).ToString("yyyy-MM-dd")" class="form-control bg-white text-dark border-light" required>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-dark fw-bold">Mô tả chi tiết</label>
+                                                <textarea name="description" rows="3" class="form-control bg-white text-dark border-light">@p.description</textarea>
+                                            </div>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" name="isActive" value="true" @(p.is_active == 1 || p.is_active == true ? "checked" : "")>
+                                                <label class="form-check-label text-dark">Đang hoạt động</label>
+                                                <!-- Fallback value if checkbox is unchecked -->
+                                                <input type="hidden" name="isActive" value="false">
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer bg-white border-top border-light">
+                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                                            <button type="submit" class="btn btn-info fw-bold">Cập nhật</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Delete Modal -->
+                        <div class="modal fade" id="deletePromoModal-@p.id" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content bg-light text-dark border border-light shadow-lg">
+                                    <div class="modal-header bg-white border-bottom border-light">
+                                        <h5 class="modal-title text-danger fw-bold">Xác Nhận Xóa</h5>
+                                        <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body p-4 text-start">
+                                        Bạn có chắc chắn muốn xóa mã <strong>@p.code</strong>?
+                                    </div>
+                                    <div class="modal-footer bg-white border-top border-light">
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                                        <form method="post" action="/admin/promotions/delete">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@p.id" />
+                                            <button type="submit" class="btn btn-danger fw-bold">Xóa</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addPromoModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-light text-dark border border-light shadow-lg">
+            <div class="modal-header bg-white border-bottom border-light">
+                <h5 class="modal-title text-warning fw-bold">Thêm Mã Khuyến Mãi</h5>
+                <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="/admin/promotions">
+                @Html.AntiForgeryToken()
+                <div class="modal-body p-4 text-start">
+                    <div class="mb-3">
+                        <label class="form-label text-dark fw-bold">Mã Code (Tối đa 20 ký tự)</label>
+                        <input type="text" name="code" class="form-control bg-white text-dark border-light" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-dark fw-bold">Tiêu đề</label>
+                        <input type="text" name="title" class="form-control bg-white text-dark border-light" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-dark fw-bold">Phần trăm giảm (vd: 10, 20)</label>
+                        <input type="number" step="0.01" name="discountPercent" class="form-control bg-white text-dark border-light" required>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-dark fw-bold">Từ ngày</label>
+                            <input type="date" name="validFrom" class="form-control bg-white text-dark border-light" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-dark fw-bold">Đến ngày</label>
+                            <input type="date" name="validTo" class="form-control bg-white text-dark border-light" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-dark fw-bold">Mô tả chi tiết</label>
+                        <textarea name="description" rows="3" class="form-control bg-white text-dark border-light"></textarea>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="isActive" value="true" checked>
+                        <label class="form-check-label text-dark">Đang hoạt động</label>
+                        <input type="hidden" name="isActive" value="false">
+                    </div>
+                </div>
+                <div class="modal-footer bg-white border-top border-light">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-warning fw-bold">Thêm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

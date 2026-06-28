@@ -1,0 +1,163 @@
+@{
+    ViewData["Title"] = "Hệ thống rạp";
+    var cinemas          = ViewBag.Cinemas   as IEnumerable<CinemaXNet.Models.Domain.Cinema> ?? [];
+    var provinces        = ViewBag.Provinces as IEnumerable<string> ?? [];
+    var selectedProvince = ViewBag.SelectedProvince as string;
+}
+
+<div class="mb-5">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h4 text-warning border-start border-warning border-4 ps-3 fw-bold mb-0">
+            <i class="bi bi-geo-alt-fill me-2"></i>HỆ THỐNG RẠP CINEMAX
+        </h1>
+        <!-- Filter by province -->
+        <form method="get" action="/cinemas" class="d-flex gap-2">
+            <select name="province" class="form-select form-select-sm bg-light border-light text-dark"
+                    onchange="this.form.submit()" style="min-width: 180px;">
+                <option value="">-- Tất cả tỉnh thành --</option>
+                @foreach (var p in provinces)
+                {
+                    if (p == selectedProvince)
+                    {
+                        <option value="@p" selected="selected">@p</option>
+                    }
+                    else
+                    {
+                        <option value="@p">@p</option>
+                    }
+                }
+            </select>
+        </form>
+    </div>
+
+    <!-- Find nearest button -->
+    <div class="mb-4">
+        <button id="btnFindNearest" class="btn btn-outline-warning btn-sm">
+            <i class="bi bi-crosshair me-1"></i>Tìm rạp gần tôi nhất
+        </button>
+        <div id="nearestResult" class="mt-3 d-none"></div>
+    </div>
+
+    @if (!cinemas.Any())
+    {
+        <div class="alert alert-secondary border-0">
+            <i class="bi bi-info-circle me-2"></i>Không tìm thấy rạp nào.
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var cinema in cinemas)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card bg-white border border-light h-100 cinema-card shadow"
+                         style="transition: transform .2s, box-shadow .2s; cursor: pointer;"
+                         onclick="location.href='/cinemas/@cinema.Slug'">
+                        <div class="position-relative" style="height:200px; overflow:hidden;">
+                            <img src="@cinema.GetImageUrl()" class="w-100 h-100"
+                                 style="object-fit:cover;" alt="@cinema.Name"
+                                 onerror="this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=800'">
+                            <div class="position-absolute bottom-0 start-0 end-0 p-2"
+                                 style="background:linear-gradient(transparent,rgba(0,0,0,.8));">
+                                <span class="badge bg-warning text-dark me-1">@cinema.Province</span>
+                                @if (cinema.Distance.HasValue)
+                                {
+                                    <span class="badge bg-info text-dark">
+                                        <i class="bi bi-geo-alt me-1"></i>@cinema.Distance?.ToString("0.0") km
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title text-dark fw-bold mb-1">@cinema.Name</h5>
+                            <p class="text-secondary small mb-2">
+                                <i class="bi bi-geo-alt me-1"></i>@cinema.GetFullAddress()
+                            </p>
+                            @if (cinema.Phone != null)
+                            {
+                                <p class="text-secondary small mb-2">
+                                    <i class="bi bi-telephone me-1"></i>@cinema.Phone
+                                </p>
+                            }
+                            <p class="text-secondary small mb-3">
+                                <i class="bi bi-clock me-1"></i>@cinema.OpeningHours
+                            </p>
+                            <div class="d-flex flex-wrap gap-1">
+                                @foreach (var facility in cinema.GetFacilityList().Take(4))
+                                {
+                                    <span class="badge bg-secondary text-dark" style="font-size:.7rem;">@facility</span>
+                                }
+                                @if (cinema.GetFacilityList().Count > 4)
+                                {
+                                    <span class="badge bg-light border border-light text-secondary" style="font-size:.7rem;">
+                                        +@(cinema.GetFacilityList().Count - 4)
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-light">
+                            <a href="/cinemas/@cinema.Slug" class="btn btn-outline-warning btn-sm w-100">
+                                <i class="bi bi-info-circle me-1"></i>Xem chi tiết
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+<script>
+document.getElementById('btnFindNearest').addEventListener('click', function() {
+    if (!navigator.geolocation) {
+        alert('Trình duyệt không hỗ trợ GPS.');
+        return;
+    }
+    this.disabled = true;
+    this.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Đang tìm...';
+    const btn = this;
+
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+        try {
+            const res  = await fetch(`/api/cinemas/nearest?lat=${pos.coords.latitude}&lng=${pos.coords.longitude}`);
+            const data = await res.json();
+            const el   = document.getElementById('nearestResult');
+
+            if (data.success && data.data.length > 0) {
+                el.innerHTML = `<h6 class="text-warning mb-3"><i class="bi bi-geo-alt-fill me-1"></i>Rạp gần bạn nhất:</h6>
+                <div class="row g-3">${data.data.map(c => `
+                    <div class="col-md-4">
+                        <div class="card bg-light border-warning border-opacity-50 p-3 h-100">
+                            <h6 class="text-dark mb-1">${c.name}</h6>
+                            <p class="text-secondary small mb-1">${c.address}</p>
+                            <span class="badge bg-warning text-dark"><i class="bi bi-geo-alt me-1"></i>${c.distance} km</span>
+                            <a href="/cinemas/${c.slug}" class="btn btn-outline-warning btn-sm mt-2">Xem chi tiết</a>
+                        </div>
+                    </div>`).join('')}</div>`;
+                el.classList.remove('d-none');
+            } else {
+                el.innerHTML = '<p class="text-secondary">Không tìm thấy rạp gần bạn.</p>';
+                el.classList.remove('d-none');
+            }
+        } catch (e) {
+            alert('Lỗi khi tìm rạp gần nhất.');
+        }
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-crosshair me-1"></i>Tìm rạp gần tôi nhất';
+    }, () => {
+        alert('Không thể lấy vị trí của bạn. Vui lòng cấp quyền truy cập GPS.');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-crosshair me-1"></i>Tìm rạp gần tôi nhất';
+    });
+});
+</script>
+}
+
+<style>
+.cinema-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(255,193,7,.2) !important;
+}
+</style>

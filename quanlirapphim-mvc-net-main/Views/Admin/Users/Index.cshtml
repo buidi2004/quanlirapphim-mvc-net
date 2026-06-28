@@ -1,0 +1,96 @@
+@model CinemaXNet.ViewModels.PaginatedList<dynamic>
+@{
+    ViewData["Title"] = "Quản Lý Người Dùng";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var users = Model?.Items ?? new List<dynamic>();
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-light">
+    <h1 class="h2 text-warning fw-bold">Quản Lý Người Dùng</h1>
+</div>
+
+<div class="card bg-white border border-light rounded shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-dark table-hover mb-0 align-middle">
+            <thead class="text-uppercase" style="background-color: #111;">
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Họ tên</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Số điện thoại</th>
+                    <th scope="col">Ngày đăng ký</th>
+                    <th scope="col">Phân quyền</th>
+                    <th scope="col" class="text-end">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!users.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-secondary fst-italic">
+                            Chưa có người dùng nào.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var u in users)
+                    {
+                        <tr>
+                            <td>@u.id</td>
+                            <td><strong class="text-dark">@u.full_name</strong></td>
+                            <td>@u.email</td>
+                            <td>@u.phone</td>
+                            <td>@u.created_at</td>
+                            <td>
+                                @if (u.role == "admin")
+                                {
+                                    <span class="badge bg-danger">Quản trị viên</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Khách hàng</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#editUserRoleModal-@u.id">
+                                    <i class="bi bi-person-gear"></i> Phân quyền
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Edit Role Modal -->
+                        <div class="modal fade" id="editUserRoleModal-@u.id" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content bg-light text-dark border border-light shadow-lg">
+                                    <div class="modal-header bg-white border-bottom border-light">
+                                        <h5 class="modal-title text-warning fw-bold">Phân Quyền Người Dùng</h5>
+                                        <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form method="post" action="/admin/users/update-role">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@u.id" />
+                                        <div class="modal-body p-4 text-start">
+                                            <div class="mb-3">
+                                                <label class="form-label text-dark fw-bold">Phân quyền cho: @u.full_name</label>
+                                                <select name="role" class="form-select bg-white text-dark border-light">
+                                                    <option value="customer" selected="@(u.role == "customer")">Khách hàng</option>
+                                                    <option value="admin" selected="@(u.role == "admin")">Quản trị viên (Admin)</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer bg-white border-top border-light">
+                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                                            <button type="submit" class="btn btn-warning fw-bold">Cập nhật</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    @await Html.PartialAsync("_Pagination", Model)
+</div>

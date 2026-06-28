@@ -1,0 +1,187 @@
+@{
+    ViewData["Title"] = ViewBag.PageTitle;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-gray-800"><i class="bi bi-qr-code-scan me-2 text-primary"></i>Soát vé / Check-in</h1>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">Quét mã QR trên vé</h6>
+                <button class="btn btn-sm btn-outline-primary" id="btnToggleScanner" onclick="toggleScanner()">
+                    <i class="bi bi-camera me-1"></i>Bật Camera
+                </button>
+            </div>
+            <div class="card-body text-center">
+                <!-- Vùng chứa camera quét QR -->
+                <div id="reader" style="width: 100%; display: none;" class="mb-3"></div>
+                
+                <div id="scannerPlaceholder" class="py-5 bg-light rounded mb-3 border">
+                    <i class="bi bi-qr-code display-1 text-muted"></i>
+                    <p class="text-muted mt-3">Nhấn "Bật Camera" để quét vé</p>
+                </div>
+
+                <hr>
+                
+                <form id="manualScanForm" class="d-flex" onsubmit="event.preventDefault(); scanTicketManual();">
+                    <input type="text" id="manualTicketId" class="form-control me-2" placeholder="Hoặc nhập mã vé thủ công (ID)" required>
+                    <button type="submit" class="btn btn-primary px-4"><i class="bi bi-check2-circle"></i></button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Kết quả quét -->
+    <div class="col-md-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Kết quả soát vé</h6>
+            </div>
+            <div class="card-body" id="scanResultArea">
+                <div class="text-center py-5 text-muted" id="waitingState">
+                    <i class="bi bi-hourglass-split display-4 mb-3 d-block"></i>
+                    Chờ quét vé...
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Thư viện quét QR Code -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    
+    <script>
+        let html5QrcodeScanner = null;
+        let isScannerRunning = false;
+
+        function toggleScanner() {
+            const readerDiv = document.getElementById('reader');
+            const placeholder = document.getElementById('scannerPlaceholder');
+            const btn = document.getElementById('btnToggleScanner');
+
+            if (!isScannerRunning) {
+                readerDiv.style.display = 'block';
+                placeholder.style.display = 'none';
+                
+                html5QrcodeScanner = new Html5QrcodeScanner(
+                    "reader", { fps: 10, qrbox: {width: 250, height: 250} }, /* verbose= */ false);
+                
+                html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+                isScannerRunning = true;
+                btn.innerHTML = '<i class="bi bi-camera-video-off me-1"></i>Tắt Camera';
+                btn.classList.replace('btn-outline-primary', 'btn-outline-danger');
+            } else {
+                if (html5QrcodeScanner) {
+                    html5QrcodeScanner.clear();
+                }
+                readerDiv.style.display = 'none';
+                placeholder.style.display = 'block';
+                isScannerRunning = false;
+                btn.innerHTML = '<i class="bi bi-camera me-1"></i>Bật Camera';
+                btn.classList.replace('btn-outline-danger', 'btn-outline-primary');
+            }
+        }
+
+        function onScanSuccess(decodedText, decodedResult) {
+            // Tạm dừng quét để tránh quét liên tục cùng 1 mã
+            if (html5QrcodeScanner) {
+                html5QrcodeScanner.pause();
+            }
+            
+            // Xử lý gửi mã vé lên server
+            processTicketScan(decodedText);
+            
+            // Tiếp tục quét sau 3 giây
+            setTimeout(() => {
+                if (html5QrcodeScanner && isScannerRunning) {
+                    html5QrcodeScanner.resume();
+                }
+            }, 3000);
+        }
+
+        function onScanFailure(error) {
+            // Không làm gì, tiếp tục dò
+        }
+
+        function scanTicketManual() {
+            const input = document.getElementById('manualTicketId');
+            if (input.value.trim()) {
+                processTicketScan(input.value.trim());
+                input.value = '';
+            }
+        }
+
+        async function processTicketScan(ticketCode) {
+            const resultArea = document.getElementById('scanResultArea');
+            resultArea.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-3">Đang kiểm tra...</p></div>';
+
+            try {
+                const res = await fetch('/admin/scanner/api/scan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ticketId: ticketCode })
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    // Success UI
+                    resultArea.innerHTML = `
+                        <div class="text-center">
+                            <i class="bi bi-check-circle-fill text-success display-1 mb-3"></i>
+                            <h4 class="text-success mb-4">${data.message}</h4>
+                            <ul class="list-group list-group-flush text-start border rounded">
+                                <li class="list-group-item"><strong>Mã vé:</strong> #${ticketCode}</li>
+                                <li class="list-group-item"><strong>Phim:</strong> <span class="text-primary fw-bold">${data.detail.movie}</span></li>
+                                <li class="list-group-item"><strong>Phòng:</strong> ${data.detail.room}</li>
+                                <li class="list-group-item"><strong>Suất chiếu:</strong> ${data.detail.time}</li>
+                                <li class="list-group-item"><strong>Ghế:</strong> <span class="badge bg-primary fs-6">${data.detail.seat}</span></li>
+                            </ul>
+                        </div>
+                    `;
+                    playSuccessSound();
+                } else {
+                    // Error UI
+                    resultArea.innerHTML = `
+                        <div class="text-center">
+                            <i class="bi bi-x-circle-fill text-danger display-1 mb-3"></i>
+                            <h4 class="text-danger mb-4">Kiểm tra thất bại</h4>
+                            <div class="alert alert-danger">${data.error || 'Lỗi không xác định'}</div>
+                            <p class="text-muted">Mã vé vừa quét: <strong>${ticketCode}</strong></p>
+                        </div>
+                    `;
+                    playErrorSound();
+                }
+            } catch (error) {
+                console.error(error);
+                resultArea.innerHTML = `
+                    <div class="text-center">
+                        <i class="bi bi-exclamation-triangle-fill text-warning display-1 mb-3"></i>
+                        <h4 class="text-warning mb-4">Lỗi kết nối</h4>
+                        <p>Không thể kết nối đến máy chủ. Vui lòng thử lại.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Optional: Hiệu ứng âm thanh khi quét
+        function playSuccessSound() {
+            try {
+                const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3');
+                audio.play();
+            } catch(e){}
+        }
+
+        function playErrorSound() {
+            try {
+                const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-system-beep-buzzer-fail-2964.mp3');
+                audio.play();
+            } catch(e){}
+        }
+    </script>
+}

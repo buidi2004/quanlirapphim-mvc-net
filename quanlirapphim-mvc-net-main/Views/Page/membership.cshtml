@@ -1,0 +1,99 @@
+@{
+    ViewData["Title"] = "Chương trình Thành viên — CinemaX";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <!-- Hero Section -->
+    <div class="text-center mb-5 pb-4 border-bottom border-light">
+        <span class="badge bg-warning text-dark px-3 py-2 fw-bold rounded-pill mb-3">
+            <i class="bi bi-star-fill me-2"></i>CINEMAX CLUB
+        </span>
+        <h1 class="display-4 fw-bold text-warning mb-3">Đặc Quyền Hội Viên</h1>
+        <p class="fs-5 text-secondary mx-auto" style="max-width: 700px;">
+            Trở thành hội viên của CinemaX ngay hôm nay để tận hưởng vô vàn đặc quyền độc quyền, tích điểm dễ dàng và đổi quà hấp dẫn.
+        </p>
+    </div>
+
+    <!-- Tiers -->
+    <div class="row g-4 justify-content-center mb-5">
+        <!-- Bronze -->
+        <div class="col-md-4">
+            <div class="card bg-white border border-light shadow-sm rounded-4 h-100 p-4 text-center group-hover transition-all">
+                <div class="mb-4">
+                    <i class="bi bi-person-badge text-secondary" style="font-size: 3.5rem;"></i>
+                </div>
+                <h3 class="text-dark fw-bold mb-1">BRONZE</h3>
+                <p class="text-secondary small mb-4">Mức thẻ mặc định khi đăng ký</p>
+                <ul class="list-unstyled text-start small text-dark mx-auto" style="max-width: 250px;">
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Tích lũy <strong>3%</strong> điểm thưởng</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Tham gia ưu đãi Thứ 4 Vui Vẻ</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Gold -->
+        <div class="col-md-4">
+            <div class="card bg-white border border-warning shadow rounded-4 h-100 p-4 text-center group-hover transition-all position-relative" style="box-shadow: 0 0 20px rgba(255,193,7,0.3) !important; transform: scale(1.05); z-index: 2;">
+                <span class="position-absolute top-0 start-50 translate-middle badge rounded-pill bg-danger px-3 py-2 shadow">PHỔ BIẾN NHẤT</span>
+                <div class="mb-4 mt-2">
+                    <i class="bi bi-award-fill text-warning" style="font-size: 4rem;"></i>
+                </div>
+                <h3 class="text-warning fw-bold mb-1">GOLD</h3>
+                <p class="text-secondary small mb-4">Tổng chi tiêu trên 2,000,000 VNĐ</p>
+                <ul class="list-unstyled text-start small text-dark mx-auto" style="max-width: 250px;">
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Tích lũy <strong>5%</strong> điểm thưởng</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Tặng <strong>1 Bắp ngọt</strong> tháng sinh nhật</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Giảm 10% các suất chiếu Sớm</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Platinum -->
+        <div class="col-md-4">
+            <div class="card bg-white border border-info shadow-sm rounded-4 h-100 p-4 text-center group-hover transition-all">
+                <div class="mb-4">
+                    <i class="bi bi-gem text-info" style="font-size: 3.5rem;"></i>
+                </div>
+                <h3 class="text-info fw-bold mb-1">PLATINUM</h3>
+                <p class="text-secondary small mb-4">Tổng chi tiêu trên 5,000,000 VNĐ</p>
+                <ul class="list-unstyled text-start small text-dark mx-auto" style="max-width: 250px;">
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Tích lũy <strong>10%</strong> điểm thưởng</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Tặng <strong>2 Vé 2D</strong> tháng sinh nhật</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Sử dụng phòng chờ <strong>VIP Lounge</strong> miễn phí</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Quầy phục vụ ưu tiên (Fast-track)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- How to Earn Points -->
+    <div class="bg-dark p-5 rounded-4 border border-light shadow-lg">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <h3 class="text-warning fw-bold mb-3">Tích & Đổi Điểm Thưởng</h3>
+                <p class="text-light mb-4">
+                    Với mỗi giao dịch mua vé và bắp nước tại rạp hoặc trực tuyến, bạn sẽ tích lũy điểm tương ứng với hạng thẻ.
+                    <strong>1 Điểm thưởng = 1 VNĐ</strong>. Bạn có thể sử dụng điểm này để thanh toán trực tiếp cho các giao dịch sau.
+                </p>
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-warning text-dark rounded-circle p-3 me-3"><i class="bi bi-ticket-perforated fs-4"></i></div>
+                    <div class="text-light">
+                        <h6 class="fw-bold mb-0">Đổi Vé Miễn Phí</h6>
+                        <small class="text-secondary">Từ 90,000 điểm</small>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-warning text-dark rounded-circle p-3 me-3"><i class="bi bi-cup-hot fs-4"></i></div>
+                    <div class="text-light">
+                        <h6 class="fw-bold mb-0">Đổi Bắp Nước</h6>
+                        <small class="text-secondary">Từ 45,000 điểm</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <img src="https://images.unsplash.com/photo-1542204165-65bf26472b9b?q=80&w=800&auto=format&fit=crop" class="img-fluid rounded-4 shadow-sm" alt="Loyalty Program">
+            </div>
+        </div>
+    </div>
+</div>

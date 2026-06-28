@@ -1,0 +1,85 @@
+@{
+    ViewData["Title"] = ViewBag.PageTitle ?? "Trải nghiệm";
+    var item     = ViewBag.Item;
+    var allItems = ViewBag.AllItems as List<dynamic> ?? [];
+}
+
+<!-- Hero -->
+<div class="position-relative rounded-3 overflow-hidden mb-5 shadow-lg" style="height:380px;">
+    <img src="@item?.Image" class="w-100 h-100" style="object-fit:cover; filter:brightness(.35);">
+    <div class="position-absolute inset-0 d-flex flex-column align-items-center justify-content-center text-center p-4">
+        <i class="bi @item?.Icon text-warning mb-3" style="font-size:3rem;"></i>
+        <span class="badge @item?.BadgeColor px-3 py-2 mb-3" style="font-size:.9rem;">CinemaX</span>
+        <h1 class="text-white fw-bold display-5 mb-2">@item?.Name</h1>
+        <p class="text-secondary fs-5 fst-italic">@item?.Slogan</p>
+    </div>
+</div>
+
+<div class="row g-5">
+    <div class="col-md-8">
+        <!-- Description -->
+        <p class="text-dark fs-5 mb-4">@item?.Desc</p>
+
+        <!-- Features -->
+        <h2 class="h5 text-warning mb-4">Điểm nổi bật</h2>
+        <div class="row g-4 mb-5">
+            @if (item?.Features != null)
+            {
+                @foreach (var feature in item.Features)
+                {
+                    <div class="col-md-4">
+                        <div class="card bg-light border-light h-100 p-4 text-center"
+                             style="transition:.2s;" onmouseover="this.style.borderColor='#ffc107'"
+                             onmouseout="this.style.borderColor='#6c757d'">
+                            <i class="bi @feature.Icon text-info mb-3" style="font-size:2rem;"></i>
+                            <h6 class="text-white mb-2">@feature.Title</h6>
+                            <p class="text-secondary small mb-0">@feature.Desc</p>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+
+        <!-- Note -->
+        @if (item?.Note != null)
+        {
+            <div class="alert border-warning border bg-transparent text-dark p-4">
+                <i class="bi bi-star-fill text-warning me-2"></i>@item.Note
+            </div>
+        }
+
+        <div class="text-center mt-5">
+            <a href="/movies" class="btn btn-warning btn-lg fw-bold px-5 rounded-pill">
+                <i class="bi bi-ticket-perforated me-2"></i>ĐẶT VÉ NGAY
+            </a>
+        </div>
+    </div>
+
+    <!-- Sidebar: Other experiences -->
+    <div class="col-md-4">
+        <h5 class="text-warning mb-3">Trải nghiệm khác</h5>
+        <div class="d-flex flex-column gap-3">
+            @foreach (var exp in allItems)
+            {
+                if (exp.Slug == item?.Slug) continue;
+                <a href="/experiences/@exp.Slug" class="text-decoration-none">
+                    <div class="card bg-white border-light p-3 d-flex flex-row gap-3"
+                         style="transition:.2s;" onmouseover="this.style.borderColor='#ffc107'"
+                         onmouseout="this.style.borderColor='#6c757d'">
+                        <i class="bi @exp.Icon text-warning" style="font-size:1.5rem; width:30px;"></i>
+                        <div>
+                            <strong class="text-dark d-block small">@exp.Name</strong>
+                            <small class="text-secondary">@exp.Slogan</small>
+                        </div>
+                    </div>
+                </a>
+            }
+        </div>
+
+        <div class="card bg-white border-light mt-4 p-3">
+            <h6 class="text-warning mb-2"><i class="bi bi-geo-alt me-1"></i>Rạp có trải nghiệm này</h6>
+            <p class="text-secondary small mb-2">Kiểm tra danh sách rạp CinemaX có trang bị công nghệ này.</p>
+            <a href="/cinemas" class="btn btn-outline-warning btn-sm">Xem hệ thống rạp</a>
+        </div>
+    </div>
+</div>

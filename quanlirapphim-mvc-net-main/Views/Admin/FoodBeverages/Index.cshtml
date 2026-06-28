@@ -1,0 +1,177 @@
+@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "Quản Lý Bắp Nước";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var items = Model?.ToList() ?? new List<dynamic>();
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-light">
+    <h1 class="h2 text-warning fw-bold">Quản Lý Bắp Nước</h1>
+    <button type="button" class="btn btn-warning fw-bold btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#addFoodModal">
+        <i class="bi bi-plus-lg"></i> Thêm bắp nước
+    </button>
+</div>
+
+<div class="card bg-white border border-light rounded shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-dark table-hover mb-0 align-middle">
+            <thead class="text-uppercase" style="background-color: #111;">
+                <tr>
+                    <th scope="col" style="width: 80px;">Ảnh</th>
+                    <th scope="col">Tên Combo</th>
+                    <th scope="col">Mô tả</th>
+                    <th scope="col">Giá tiền</th>
+                    <th scope="col">Tồn kho</th>
+                    <th scope="col" class="text-end">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!items.Any())
+                {
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-secondary fst-italic">
+                            Chưa có sản phẩm nào.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in items)
+                    {
+                        <tr>
+                            <td>
+                                <img src="@(item.image_url ?? "https://placehold.co/100x100/111/fff?text=No+Image")"
+                                     alt="Image" class="img-thumbnail bg-light border-light rounded shadow-sm"
+                                     style="width: 60px; height: 60px; object-fit: cover;">
+                            </td>
+                            <td><strong class="text-dark">@item.name</strong></td>
+                            <td><small class="text-secondary">@item.description</small></td>
+                            <td class="text-success fw-bold">@string.Format("{0:N0}₫", item.price)</td>
+                            <td>
+                                @if (item.stock_quantity > 0) {
+                                    <span class="badge bg-info">@item.stock_quantity</span>
+                                } else {
+                                    <span class="badge bg-danger">Hết hàng</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#editFoodModal-@item.id">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteFoodModal-@item.id">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Edit Modal -->
+                        <div class="modal fade" id="editFoodModal-@item.id" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content bg-light text-dark border border-light shadow-lg">
+                                    <div class="modal-header bg-white border-bottom border-light">
+                                        <h5 class="modal-title text-warning fw-bold">Sửa Bắp Nước</h5>
+                                        <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form method="post" action="/admin/food-beverages/update" enctype="multipart/form-data">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.id" />
+                                        <div class="modal-body p-4 text-start">
+                                            <div class="mb-3">
+                                                <label class="form-label text-dark fw-bold">Tên Combo</label>
+                                                <input type="text" name="name" value="@item.name" class="form-control bg-white text-dark border-light" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-dark fw-bold">Giá bán</label>
+                                                <input type="number" name="price" value="@item.price" class="form-control bg-white text-dark border-light" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-dark fw-bold">Mô tả chi tiết</label>
+                                                <textarea name="description" rows="3" class="form-control bg-white text-dark border-light">@item.description</textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-dark fw-bold">Tồn kho</label>
+                                                <input type="number" name="stockQuantity" value="@item.stock_quantity" class="form-control bg-white text-dark border-light" required min="0">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-dark fw-bold">Ảnh sản phẩm mới (để trống nếu giữ cũ)</label>
+                                                <input type="file" name="image" class="form-control bg-white text-dark border-light" accept="image/*">
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer bg-white border-top border-light">
+                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                                            <button type="submit" class="btn btn-info fw-bold">Cập nhật</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Delete Modal -->
+                        <div class="modal fade" id="deleteFoodModal-@item.id" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content bg-light text-dark border border-light shadow-lg">
+                                    <div class="modal-header bg-white border-bottom border-light">
+                                        <h5 class="modal-title text-danger fw-bold">Xác Nhận Xóa</h5>
+                                        <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body p-4 text-start">
+                                        Bạn có chắc chắn muốn xóa sản phẩm <strong>@item.name</strong>?
+                                    </div>
+                                    <div class="modal-footer bg-white border-top border-light">
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                                        <form method="post" action="/admin/food-beverages/delete">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.id" />
+                                            <button type="submit" class="btn btn-danger fw-bold">Xóa</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addFoodModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-light text-dark border border-light shadow-lg">
+            <div class="modal-header bg-white border-bottom border-light">
+                <h5 class="modal-title text-warning fw-bold">Thêm Bắp Nước Mới</h5>
+                <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="/admin/food-beverages" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <div class="modal-body p-4 text-start">
+                    <div class="mb-3">
+                        <label class="form-label text-dark fw-bold">Tên Combo</label>
+                        <input type="text" name="name" class="form-control bg-white text-dark border-light" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-dark fw-bold">Giá bán</label>
+                        <input type="number" name="price" class="form-control bg-white text-dark border-light" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-dark fw-bold">Mô tả chi tiết</label>
+                        <textarea name="description" rows="3" class="form-control bg-white text-dark border-light"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-dark fw-bold">Tồn kho</label>
+                        <input type="number" name="stockQuantity" class="form-control bg-white text-dark border-light" required min="0" value="0">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-dark fw-bold">Ảnh sản phẩm</label>
+                        <input type="file" name="image" class="form-control bg-white text-dark border-light" accept="image/*">
+                    </div>
+                </div>
+                <div class="modal-footer bg-white border-top border-light">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-warning fw-bold">Thêm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

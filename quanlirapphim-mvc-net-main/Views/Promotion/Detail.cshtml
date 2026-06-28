@@ -1,0 +1,87 @@
+@model CinemaXNet.ViewModels.PromotionItemViewModel
+
+@{
+    ViewData["Title"] = $"Khuyến mãi {Model.Code}";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card bg-white border-warning shadow-lg">
+            <!-- Hero image -->
+            <div class="position-relative" style="height:250px; overflow:hidden;">
+                <img src="@(Model.ImageUrl ?? "https://images.unsplash.com/photo-1595769816263-9b910be24d5f?q=80&w=800")"
+                     class="w-100 h-100" style="object-fit:cover; filter:brightness(.5);">
+                <div class="position-absolute inset-0 d-flex align-items-center justify-content-center flex-column">
+                    <div class="badge bg-warning text-dark px-4 py-2 mb-3" style="font-size:1.5rem;">
+                        @Model.GetDiscountText()
+                    </div>
+                    <h1 class="text-white fw-bold" style="letter-spacing:4px;">@Model.Code</h1>
+                </div>
+            </div>
+
+            <div class="card-body p-4">
+                <div class="row g-3 text-center mb-4">
+                    <div class="col-4">
+                        <div class="bg-light rounded p-3">
+                            <i class="bi bi-calendar3 text-warning d-block mb-1" style="font-size:1.3rem;"></i>
+                            <small class="text-secondary d-block">HSD</small>
+                            <strong class="text-dark small">@Model.ExpiresAt</strong>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="bg-light rounded p-3">
+                            <i class="bi bi-people text-warning d-block mb-1" style="font-size:1.3rem;"></i>
+                            <small class="text-secondary d-block">Đã dùng</small>
+                            <strong class="text-dark small">@Model.UsedCount lượt</strong>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="bg-light rounded p-3">
+                            <i class="bi bi-check-circle text-warning d-block mb-1" style="font-size:1.3rem;"></i>
+                            <small class="text-secondary d-block">Còn lại</small>
+                            <strong class="text-dark small">
+                                @(Model.MaxUses.HasValue ? (Model.MaxUses - Model.UsedCount) + " lượt" : "Không giới hạn")
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group mb-4">
+                    <input type="text" value="@Model.Code" id="promoCodeInput"
+                           class="form-control bg-light border-warning text-warning fw-bold text-center"
+                           style="letter-spacing:3px; font-size:1.2rem;" readonly>
+                    <button class="btn btn-warning fw-bold" onclick="copyPromoCode()">
+                        <i class="bi bi-clipboard me-1"></i>Sao chép
+                    </button>
+                </div>
+
+                <a href="/movies" class="btn btn-outline-warning w-100">
+                    <i class="bi bi-ticket-perforated me-2"></i>Dùng khi đặt vé ngay
+                </a>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <a href="/promotions" class="text-secondary text-decoration-none small">
+                <i class="bi bi-arrow-left me-1"></i>Quay lại tất cả khuyến mãi
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+function copyPromoCode() {
+    const code = document.getElementById('promoCodeInput').value;
+    navigator.clipboard.writeText(code).then(() => {
+        const btn = event.currentTarget;
+        btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Đã sao chép!';
+        btn.classList.replace('btn-warning', 'btn-success');
+        setTimeout(() => {
+            btn.innerHTML = '<i class="bi bi-clipboard me-1"></i>Sao chép';
+            btn.classList.replace('btn-success', 'btn-warning');
+        }, 2000);
+    });
+}
+</script>
+}

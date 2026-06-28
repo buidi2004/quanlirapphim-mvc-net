@@ -1,0 +1,115 @@
+@{
+    ViewData["Title"] = "Careers";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .page-hero {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        padding: 6rem 0 4rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .page-hero::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: radial-gradient(circle at 50% 0%, rgba(255,193,7,0.15) 0%, transparent 60%);
+        pointer-events: none;
+    }
+    .glass-card {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 1rem;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .glass-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        border-color: rgba(255,193,7,0.3);
+    }
+    .section-title {
+        color: #ffc107;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        display: inline-block;
+        position: relative;
+    }
+    .section-title::after {
+        content: "";
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 50%;
+        height: 2px;
+        background: #ffc107;
+    }
+    .content-text {
+        color: #d1d5db;
+        line-height: 1.8;
+        font-size: 1.1rem;
+        text-align: justify;
+    }
+</style>
+
+<!-- Hero Section -->
+<div class="page-hero text-center">
+    <div class="container" data-aos="fade-down" data-aos-duration="1000">
+        <h1 class="display-4 fw-bold text-white mb-3">
+            <span class="text-warning">|</span> Tuyển dụng
+        </h1>
+        <p class="lead text-secondary opacity-75">Gia nhập đội ngũ CinemaX, nơi đam mê điện ảnh hội tụ.</p>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="glass-card" data-aos="fade-up" data-aos-delay="0">
+                <h3 class="section-title">01. Phần Mở Rộng 1</h3>
+                <p class="content-text mb-3">Chúng tôi tự hào xây dựng một hệ sinh thái đối tác đa dạng, từ các nhà phân phối phim hàng đầu thế giới đến các thương hiệu F&B nổi tiếng. Sự hợp tác bền chặt này giúp CinemaX liên tục cập nhật những bom tấn điện ảnh mới nhất và mang đến những combo ẩm thực phong phú, góp phần tạo nên một buổi tối trọn vẹn cho bạn và gia đình.</p>
+                <p class="content-text">Đội ngũ nhân sự của CinemaX là những người trẻ, nhiệt huyết và đam mê điện ảnh. Chúng tôi tin rằng một môi trường làm việc cởi mở, sáng tạo và tôn trọng sự khác biệt sẽ là bệ phóng vững chắc cho mọi tài năng. CinemaX luôn chào đón những ứng viên sẵn sàng cống hiến và phát triển sự nghiệp cùng chúng tôi trong ngành công nghiệp giải trí đầy năng động này.</p>
+            </div>
+            <div class="glass-card" data-aos="fade-up" data-aos-delay="100">
+                <h3 class="section-title">02. Phần Mở Rộng 2</h3>
+                <p class="content-text mb-3">Mọi thắc mắc, khiếu nại hoặc góp ý xin vui lòng liên hệ với bộ phận Chăm sóc khách hàng của chúng tôi qua đường dây nóng hoặc email chính thức. Đội ngũ hỗ trợ hoạt động 24/7, sẵn sàng giải quyết mọi vấn đề của bạn trong thời gian sớm nhất, với thái độ tận tâm và chuyên nghiệp nhất.</p>
+                <p class="content-text">Trải nghiệm điện ảnh không chỉ là việc thưởng thức một bộ phim, mà là sự đắm chìm vào một thế giới khác. Với hệ thống âm thanh vòm đỉnh cao, màn hình cong siêu nét và thiết kế ghế ngồi tiện thái học, CinemaX tự tin đánh thức mọi giác quan của bạn, mang đến những khoảnh khắc thăng hoa cùng nghệ thuật thứ bảy.</p>
+            </div>
+            <div class="glass-card" data-aos="fade-up" data-aos-delay="200">
+                <h3 class="section-title">03. Phần Mở Rộng 3</h3>
+                <p class="content-text mb-3">Trải nghiệm điện ảnh không chỉ là việc thưởng thức một bộ phim, mà là sự đắm chìm vào một thế giới khác. Với hệ thống âm thanh vòm đỉnh cao, màn hình cong siêu nét và thiết kế ghế ngồi tiện thái học, CinemaX tự tin đánh thức mọi giác quan của bạn, mang đến những khoảnh khắc thăng hoa cùng nghệ thuật thứ bảy.</p>
+                <p class="content-text">Khách hàng vui lòng tuân thủ các hướng dẫn từ nhân viên rạp chiếu để đảm bảo trật tự và an toàn chung. Việc sử dụng thiết bị ghi hình, ghi âm trong phòng chiếu là hành vi bị nghiêm cấm theo quy định của pháp luật về sở hữu trí tuệ. Bất kỳ vi phạm nào cũng có thể dẫn đến việc từ chối cung cấp dịch vụ và xử lý theo quy định hiện hành.</p>
+            </div>
+            <div class="glass-card" data-aos="fade-up" data-aos-delay="0">
+                <h3 class="section-title">04. Phần Mở Rộng 4</h3>
+                <p class="content-text mb-3">Bảo mật thông tin và tính toàn vẹn của dữ liệu là nền tảng trong mọi giao dịch tại CinemaX. Hệ thống của chúng tôi được trang bị các tiêu chuẩn mã hóa tiên tiến nhất, giúp mọi thông tin cá nhân và dữ liệu thanh toán của bạn luôn được bảo vệ nghiêm ngặt khỏi các rủi ro an ninh mạng. Quý khách hoàn toàn có thể yên tâm khi trải nghiệm các dịch vụ trực tuyến của chúng tôi.</p>
+                <p class="content-text">Mọi thắc mắc, khiếu nại hoặc góp ý xin vui lòng liên hệ với bộ phận Chăm sóc khách hàng của chúng tôi qua đường dây nóng hoặc email chính thức. Đội ngũ hỗ trợ hoạt động 24/7, sẵn sàng giải quyết mọi vấn đề của bạn trong thời gian sớm nhất, với thái độ tận tâm và chuyên nghiệp nhất.</p>
+            </div>
+            <div class="glass-card" data-aos="fade-up" data-aos-delay="100">
+                <h3 class="section-title">05. Phần Mở Rộng 5</h3>
+                <p class="content-text mb-3">Chúng tôi tự hào xây dựng một hệ sinh thái đối tác đa dạng, từ các nhà phân phối phim hàng đầu thế giới đến các thương hiệu F&B nổi tiếng. Sự hợp tác bền chặt này giúp CinemaX liên tục cập nhật những bom tấn điện ảnh mới nhất và mang đến những combo ẩm thực phong phú, góp phần tạo nên một buổi tối trọn vẹn cho bạn và gia đình.</p>
+                <p class="content-text">Tại CinemaX, chúng tôi cam kết mang đến những trải nghiệm vượt trội không chỉ qua màn ảnh rộng mà còn qua chất lượng dịch vụ đẳng cấp. Mọi quy định và chính sách được thiết lập nhằm bảo vệ quyền lợi tối đa của khách hàng, đảm bảo một môi trường giải trí an toàn, minh bạch và chuyên nghiệp. Chúng tôi luôn lắng nghe và không ngừng cải tiến để phục vụ bạn tốt hơn mỗi ngày.</p>
+            </div>
+            <div class="glass-card" data-aos="fade-up" data-aos-delay="200">
+                <h3 class="section-title">06. Phần Mở Rộng 6</h3>
+                <p class="content-text mb-3">Mọi thắc mắc, khiếu nại hoặc góp ý xin vui lòng liên hệ với bộ phận Chăm sóc khách hàng của chúng tôi qua đường dây nóng hoặc email chính thức. Đội ngũ hỗ trợ hoạt động 24/7, sẵn sàng giải quyết mọi vấn đề của bạn trong thời gian sớm nhất, với thái độ tận tâm và chuyên nghiệp nhất.</p>
+                <p class="content-text">Chúng tôi tự hào xây dựng một hệ sinh thái đối tác đa dạng, từ các nhà phân phối phim hàng đầu thế giới đến các thương hiệu F&B nổi tiếng. Sự hợp tác bền chặt này giúp CinemaX liên tục cập nhật những bom tấn điện ảnh mới nhất và mang đến những combo ẩm thực phong phú, góp phần tạo nên một buổi tối trọn vẹn cho bạn và gia đình.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action -->
+<div class="container pb-5 mb-5" data-aos="zoom-in" data-aos-duration="800">
+    <div class="glass-card text-center py-5 border-warning" style="background: rgba(255,193,7,0.05);">
+        <h2 class="text-white mb-3">Bạn cần thêm thông tin?</h2>
+        <p class="text-secondary mb-4">Đội ngũ hỗ trợ của CinemaX luôn sẵn sàng giải đáp mọi thắc mắc của bạn.</p>
+        <a href="/contact" class="btn btn-warning btn-lg rounded-pill px-5 fw-bold shadow">
+            <i class="bi bi-headset me-2"></i>Liên Hệ Ngay
+        </a>
+    </div>
+</div>

@@ -1,0 +1,131 @@
+@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "Quản Lý Liên Hệ";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var contacts = Model?.ToList() ?? new List<dynamic>();
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-light">
+    <h1 class="h2 text-warning fw-bold">Quản Lý Liên Hệ</h1>
+</div>
+
+<div class="card bg-white border border-light rounded shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-dark table-hover mb-0 align-middle">
+            <thead class="text-uppercase" style="background-color: #111;">
+                <tr>
+                    <th scope="col">Khách hàng</th>
+                    <th scope="col">Tiêu đề</th>
+                    <th scope="col">Nội dung</th>
+                    <th scope="col">Trạng thái</th>
+                    <th scope="col">Ngày gửi</th>
+                    <th scope="col" class="text-end">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!contacts.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-secondary fst-italic">
+                            Chưa có liên hệ nào.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var c in contacts)
+                    {
+                        <tr>
+                            <td>
+                                <div><strong class="text-dark">@c.name</strong></div>
+                                <div><small class="text-secondary">@c.email</small></div>
+                                <div><small class="text-secondary">@c.phone</small></div>
+                            </td>
+                            <td><strong class="text-info">@c.subject</strong></td>
+                            <td style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                @c.message
+                            </td>
+                            <td>
+                                @if (c.status == "replied")
+                                {
+                                    <span class="badge bg-success">Đã trả lời</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">Chờ xử lý</span>
+                                }
+                            </td>
+                            <td>@Convert.ToDateTime(c.created_at).ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="text-end">
+                                <a href="/admin/contacts/details/@c.id" class="btn btn-sm btn-outline-primary" title="Xem chi tiết">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-info ms-1" data-bs-toggle="modal" data-bs-target="#replyContactModal-@c.id" title="Trả lời nhanh">
+                                    <i class="bi bi-reply"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger ms-1" data-bs-toggle="modal" data-bs-target="#deleteContactModal-@c.id" title="Xóa">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Reply Modal -->
+                        <div class="modal fade" id="replyContactModal-@c.id" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content bg-light text-dark border border-light shadow-lg">
+                                    <div class="modal-header bg-white border-bottom border-light">
+                                        <h5 class="modal-title text-warning fw-bold">Trả Lời Liên Hệ</h5>
+                                        <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form method="post" action="/admin/contacts/reply">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@c.id" />
+                                        <div class="modal-body p-4 text-start">
+                                            <div class="mb-3">
+                                                <label class="form-label text-secondary fw-bold">Nội dung của khách:</label>
+                                                <div class="p-3 bg-white border border-light rounded text-dark" style="font-size: 0.9rem;">
+                                                    @c.message
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-dark fw-bold">Nội dung trả lời</label>
+                                                <textarea name="replyMessage" rows="5" class="form-control bg-white text-dark border-light" required>@c.reply_message</textarea>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer bg-white border-top border-light">
+                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>
+                                            <button type="submit" class="btn btn-info fw-bold">Gửi trả lời</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Delete Modal -->
+                        <div class="modal fade" id="deleteContactModal-@c.id" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content bg-light text-dark border border-light shadow-lg">
+                                    <div class="modal-header bg-white border-bottom border-light">
+                                        <h5 class="modal-title text-danger fw-bold">Xác Nhận Xóa</h5>
+                                        <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body p-4 text-start">
+                                        Bạn có chắc chắn muốn xóa liên hệ từ <strong>@c.name</strong>?
+                                    </div>
+                                    <div class="modal-footer bg-white border-top border-light">
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                                        <form method="post" action="/admin/contacts/delete">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@c.id" />
+                                            <button type="submit" class="btn btn-danger fw-bold">Xóa</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

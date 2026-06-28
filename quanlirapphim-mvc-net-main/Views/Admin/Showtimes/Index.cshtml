@@ -1,0 +1,203 @@
+@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "Quản Lý Suất Chiếu";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var showtimes = Model?.ToList() ?? new List<dynamic>();
+    var movies = ViewBag.Movies as IEnumerable<CinemaXNet.Models.Domain.Movie> ?? new List<CinemaXNet.Models.Domain.Movie>();
+    var rooms = ViewBag.Rooms as IEnumerable<dynamic> ?? new List<dynamic>();
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-light">
+    <h1 class="h2 text-warning fw-bold">Quản Lý Suất Chiếu</h1>
+    <button type="button" class="btn btn-warning fw-bold btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#addShowtimeModal">
+        <i class="bi bi-plus-lg"></i> Thêm suất chiếu mới
+    </button>
+</div>
+
+<div class="card bg-white border border-light rounded shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-dark table-hover mb-0 align-middle">
+            <thead class="text-uppercase" style="background-color: #111;">
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Phim</th>
+                    <th scope="col">Rạp / Phòng</th>
+                    <th scope="col">Ngày chiếu</th>
+                    <th scope="col">Thời gian</th>
+                    <th scope="col">Giá vé</th>
+                    <th scope="col" class="text-end">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!showtimes.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-secondary fst-italic">
+                            Chưa có suất chiếu nào.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var s in showtimes)
+                    {
+                        <tr>
+                            <td>@s.id</td>
+                            <td><strong class="text-dark">@s.MovieTitle</strong></td>
+                            <td>@s.CinemaName - @s.RoomName</td>
+                            <td>@Convert.ToDateTime(s.show_date).ToString("dd/MM/yyyy")</td>
+                            <td><span class="badge bg-secondary">@s.start_time - @s.end_time</span></td>
+                            <td>@string.Format("{0:N0}₫", s.price)</td>
+                            <td class="text-end">
+                                <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#editShowtimeModal-@s.id">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteShowtimeModal-@s.id">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Edit Modal -->
+                        <div class="modal fade" id="editShowtimeModal-@s.id" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content bg-light text-dark border border-light shadow-lg">
+                                    <div class="modal-header bg-white border-bottom border-light">
+                                        <h5 class="modal-title text-warning fw-bold">Sửa Suất Chiếu</h5>
+                                        <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form method="post" action="/admin/showtimes/update">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@s.id" />
+                                        <div class="modal-body p-4 text-start">
+                                            <div class="mb-3">
+                                                <label class="form-label text-dark fw-bold">Phim</label>
+                                                <select name="movieId" class="form-select bg-white text-dark border-light" required>
+                                                    @foreach(var m in movies) {
+                                                        <option value="@m.Id" selected="@(m.Id == (int)s.movie_id)">@m.Title</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-dark fw-bold">Phòng chiếu</label>
+                                                <select name="roomId" class="form-select bg-white text-dark border-light" required>
+                                                    @foreach(var r in rooms) {
+                                                        <option value="@r.id" selected="@(r.id == (int)s.room_id)">@r.CinemaName - @r.name</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="row g-3 mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label text-dark fw-bold">Ngày chiếu</label>
+                                                    <input type="date" name="showDate" value="@s.show_date" class="form-control bg-white text-dark border-light" required>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label text-dark fw-bold">Giá vé</label>
+                                                    <input type="number" name="price" value="@s.price" class="form-control bg-white text-dark border-light" required>
+                                                </div>
+                                            </div>
+                                            <div class="row g-3 mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label text-dark fw-bold">Giờ bắt đầu</label>
+                                                    <input type="time" name="startTime" value="@s.start_time" class="form-control bg-white text-dark border-light" required>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label text-dark fw-bold">Giờ kết thúc</label>
+                                                    <input type="time" name="endTime" value="@s.end_time" class="form-control bg-white text-dark border-light" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer bg-white border-top border-light">
+                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                                            <button type="submit" class="btn btn-info fw-bold">Cập nhật</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Delete Modal -->
+                        <div class="modal fade" id="deleteShowtimeModal-@s.id" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content bg-light text-dark border border-light shadow-lg">
+                                    <div class="modal-header bg-white border-bottom border-light">
+                                        <h5 class="modal-title text-danger fw-bold">Xác Nhận Xóa</h5>
+                                        <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body p-4 text-start">
+                                        Bạn có chắc chắn muốn xóa suất chiếu này? Hành động này có thể ảnh hưởng đến vé đã đặt.
+                                    </div>
+                                    <div class="modal-footer bg-white border-top border-light">
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                                        <form method="post" action="/admin/showtimes/delete">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@s.id" />
+                                            <button type="submit" class="btn btn-danger fw-bold">Xóa</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addShowtimeModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-light text-dark border border-light shadow-lg">
+            <div class="modal-header bg-white border-bottom border-light">
+                <h5 class="modal-title text-warning fw-bold">Thêm Suất Chiếu Mới</h5>
+                <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="/admin/showtimes">
+                @Html.AntiForgeryToken()
+                <div class="modal-body p-4 text-start">
+                    <div class="mb-3">
+                        <label class="form-label text-dark fw-bold">Phim</label>
+                        <select name="movieId" class="form-select bg-white text-dark border-light" required>
+                            @foreach(var m in movies) {
+                                <option value="@m.Id">@m.Title</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-dark fw-bold">Phòng chiếu</label>
+                        <select name="roomId" class="form-select bg-white text-dark border-light" required>
+                            @foreach(var r in rooms) {
+                                <option value="@r.id">@r.CinemaName - @r.name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-dark fw-bold">Ngày chiếu</label>
+                            <input type="date" name="showDate" class="form-control bg-white text-dark border-light" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-dark fw-bold">Giá vé</label>
+                            <input type="number" name="price" value="85000" class="form-control bg-white text-dark border-light" required>
+                        </div>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-dark fw-bold">Giờ bắt đầu</label>
+                            <input type="time" name="startTime" class="form-control bg-white text-dark border-light" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-dark fw-bold">Giờ kết thúc</label>
+                            <input type="time" name="endTime" class="form-control bg-white text-dark border-light" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-white border-top border-light">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-warning fw-bold">Thêm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

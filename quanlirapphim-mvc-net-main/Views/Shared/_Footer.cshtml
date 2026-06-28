@@ -1,0 +1,106 @@
+@using System.Data
+@using Dapper
+@inject IDbConnection Db
+@{
+    var rows = await Db.QueryAsync<dynamic>("SELECT setting_key, setting_value FROM settings");
+    var appSettings = new Dictionary<string, string>();
+    foreach (var r in rows) {
+        appSettings[(string)r.setting_key] = (string)r.setting_value;
+    }
+    string GetVal(string key, string def = "") => appSettings.ContainsKey(key) && !string.IsNullOrEmpty(appSettings[key]) ? appSettings[key] : def;
+}
+<footer class="custom-footer mt-auto">
+    <div class="footer-brands-bar border-top border-bottom py-2">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 text-muted" style="font-size: 0.85rem; font-weight: 700; font-family: 'Arial', sans-serif;">
+                <span style="color: #bbb;">4DX</span>
+                <span class="text-primary" style="font-style: italic;">IMAX</span>
+                <span style="color: #e5a720;">STARIUM</span>
+                <span style="color: #b59b58;">GOLD CLASS</span>
+                <span style="font-family: serif; font-style: italic;">L'AMOUR</span>
+                <span class="text-danger">SWEETBOX</span>
+                <span class="text-danger">PREMIUM CINEMA</span>
+                <span style="color: #ccc;">SCREENX</span>
+                <span>CINE &amp; FOR&Ecirc;T</span>
+                <span>CINE &amp; LIVING ROOM</span>
+                <span style="letter-spacing: 1px;">CINE SUITE</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer-main py-5">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <h6 class="footer-heading">CinemaX Việt Nam</h6>
+                    <ul class="footer-links list-unstyled">
+                        <li><a href="/cinemas">Hệ thống rạp</a></li>
+                        <li><a href="/promotions">Khuyến mãi</a></li>
+                        <li><a href="/news">Tin tức</a></li>
+                        <li><a href="/contact">Liên hệ</a></li>
+                        <li><a href="/careers">Tuyển Dụng</a></li>
+                        <li><a href="/partners">Dành cho đối tác</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h6 class="footer-heading">Điều khoản sử dụng</h6>
+                    <ul class="footer-links list-unstyled">
+                        <li><a href="/terms">Điều Khoản Chung</a></li>
+                        <li><a href="/terms-transaction">Điều Khoản Giao Dịch</a></li>
+                        <li><a href="/payment-policy">Chính Sách Thanh Toán</a></li>
+                        <li><a href="/privacy-policy">Chính Sách Bảo Mật</a></li>
+                        <li><a href="/cinema-rules">Những Quy Định Tại Rạp Phim</a></li>
+                        <li><a href="/faq">Câu Hỏi Thường Gặp</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h6 class="footer-heading">Kết nối với chúng tôi</h6>
+                    <div class="footer-social mb-3">
+                        @if(!string.IsNullOrEmpty(GetVal("facebook_url"))) {
+                            <a href="@GetVal("facebook_url")" class="social-icon bi bi-facebook text-primary fs-2 me-2" target="_blank"></a>
+                        }
+                        @if(!string.IsNullOrEmpty(GetVal("youtube_url"))) {
+                            <a href="@GetVal("youtube_url")" class="social-icon bi bi-youtube text-danger fs-2 me-2" target="_blank"></a>
+                        }
+                        @if(!string.IsNullOrEmpty(GetVal("instagram_url"))) {
+                            <a href="@GetVal("instagram_url")" class="social-icon bi bi-instagram text-warning fs-2 me-2" target="_blank"></a>
+                        }
+                    </div>
+                    <div class="footer-cert mt-3">
+                        <img src="/assets/images/logo_bct.png" alt="Đã thông báo bộ công thương" style="width: 140px;">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <h6 class="footer-heading">Chăm sóc khách hàng</h6>
+                    <ul class="footer-contact list-unstyled">
+                        <li>Hotline: <strong>@GetVal("contact_phone", "1900 6017")</strong></li>
+                        <li>Email hỗ trợ: @GetVal("contact_email", "hoidap@cinemax.vn")</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer-company py-4">
+        <div class="container d-flex flex-column flex-md-row align-items-md-center">
+            <div class="company-logo me-4 mb-3 mb-md-0 text-center">
+                @if (!string.IsNullOrEmpty(GetVal("site_logo")))
+                {
+                    <img src="@GetVal("site_logo")" alt="Logo" style="max-height: 50px;">
+                }
+                else
+                {
+                    <span class="fs-1 fw-bold" style="color: #333; letter-spacing: -1px; font-family: 'Arial Black', sans-serif;">CJ<span style="color: #e25b22;">CGV</span></span>
+                }
+            </div>
+            <div class="company-info">
+                <h6 class="fw-bold mb-1">@GetVal("site_name", "CÔNG TY TNHH CJ CGV VIETNAM")</h6>
+                <p class="mb-0">Địa chỉ: @GetVal("address", "Lầu 2, số 7/28, đường Thành Thái, phường Diên Hồng, Thành phố Hồ Chí Minh, Việt Nam")</p>
+                <p class="mb-0">Đường dây nóng (Hotline): @GetVal("contact_phone", "1900 6017")</p>
+                <p class="mb-0">@GetVal("footer_text", "COPYRIGHT 2026 CJ CGV VIETNAM CO., LTD. ALL RIGHTS RESERVED")</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer-bricks" style="height: 48px; width: 100%; display: block; background-color: #e25b22; background-image: url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'80\' height=\'32\'%3E%3Crect width=\'80\' height=\'32\' fill=\'%23e25b22\'/%3E%3Cpath d=\'M0 16h80M40 0v16M0 16v16\' stroke=\'%23fdfcf0\' stroke-width=\'1.5\'/%3E%3C/svg%3E'); border-top: 2px solid #ccc;"></div>
+</footer>

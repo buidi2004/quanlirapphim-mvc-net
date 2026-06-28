@@ -1,0 +1,161 @@
+@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "Quản Lý Tin Tức";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var news = Model?.ToList() ?? new List<dynamic>();
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-light">
+    <h1 class="h2 text-warning fw-bold">Quản Lý Tin Tức</h1>
+    <button type="button" class="btn btn-warning fw-bold btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#addNewsModal">
+        <i class="bi bi-plus-lg"></i> Thêm bài viết
+    </button>
+</div>
+
+<div class="card bg-white border border-light rounded shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-dark table-hover mb-0 align-middle">
+            <thead class="text-uppercase" style="background-color: #111;">
+                <tr>
+                    <th scope="col" style="width: 80px;">Ảnh</th>
+                    <th scope="col">Tiêu đề</th>
+                    <th scope="col">Slug</th>
+                    <th scope="col">Ngày đăng</th>
+                    <th scope="col" class="text-end">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!news.Any())
+                {
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-secondary fst-italic">
+                            Chưa có bài viết nào.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var n in news)
+                    {
+                        <tr>
+                            <td>
+                                <img src="@(n.image_url ?? "https://placehold.co/100x60/111/fff?text=No+Image")"
+                                     alt="Image" class="img-thumbnail bg-light border-light rounded shadow-sm"
+                                     style="width: 80px; height: 50px; object-fit: cover;">
+                            </td>
+                            <td><strong class="text-dark">@n.title</strong></td>
+                            <td><span class="badge bg-secondary">@n.slug</span></td>
+                            <td>@Convert.ToDateTime(n.created_at).ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="text-end">
+                                <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#editNewsModal-@n.id">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteNewsModal-@n.id">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Edit Modal -->
+                        <div class="modal fade" id="editNewsModal-@n.id" tabindex="-1">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content bg-light text-dark border border-light shadow-lg">
+                                    <div class="modal-header bg-white border-bottom border-light">
+                                        <h5 class="modal-title text-warning fw-bold">Sửa Bài Viết</h5>
+                                        <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form method="post" action="/admin/news/update" enctype="multipart/form-data">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@n.id" />
+                                        <div class="modal-body p-4 text-start">
+                                            <div class="mb-3">
+                                                <label class="form-label text-dark fw-bold">Tiêu đề bài viết</label>
+                                                <input type="text" name="title" value="@n.title" class="form-control bg-white text-dark border-light" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-dark fw-bold">Tóm tắt (Excerpt)</label>
+                                                <textarea name="excerpt" rows="2" class="form-control bg-white text-dark border-light" required>@n.excerpt</textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-dark fw-bold">Nội dung chi tiết</label>
+                                                <textarea name="content" rows="6" class="form-control bg-white text-dark border-light" required>@n.content</textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-dark fw-bold">Ảnh đại diện mới (để trống nếu giữ nguyên)</label>
+                                                <input type="file" name="image" class="form-control bg-white text-dark border-light" accept="image/*">
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer bg-white border-top border-light">
+                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                                            <button type="submit" class="btn btn-info fw-bold">Cập nhật</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Delete Modal -->
+                        <div class="modal fade" id="deleteNewsModal-@n.id" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content bg-light text-dark border border-light shadow-lg">
+                                    <div class="modal-header bg-white border-bottom border-light">
+                                        <h5 class="modal-title text-danger fw-bold">Xác Nhận Xóa</h5>
+                                        <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body p-4 text-start">
+                                        Bạn có chắc chắn muốn xóa bài viết <strong>@n.title</strong>?
+                                    </div>
+                                    <div class="modal-footer bg-white border-top border-light">
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                                        <form method="post" action="/admin/news/delete">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@n.id" />
+                                            <button type="submit" class="btn btn-danger fw-bold">Xóa</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addNewsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content bg-light text-dark border border-light shadow-lg">
+            <div class="modal-header bg-white border-bottom border-light">
+                <h5 class="modal-title text-warning fw-bold">Đăng Bài Viết Mới</h5>
+                <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="/admin/news" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <div class="modal-body p-4 text-start">
+                    <div class="mb-3">
+                        <label class="form-label text-dark fw-bold">Tiêu đề bài viết</label>
+                        <input type="text" name="title" class="form-control bg-white text-dark border-light" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-dark fw-bold">Tóm tắt (Excerpt)</label>
+                        <textarea name="excerpt" rows="2" class="form-control bg-white text-dark border-light" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-dark fw-bold">Nội dung chi tiết</label>
+                        <textarea name="content" rows="6" class="form-control bg-white text-dark border-light" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-dark fw-bold">Ảnh đại diện</label>
+                        <input type="file" name="image" class="form-control bg-white text-dark border-light" accept="image/*">
+                    </div>
+                </div>
+                <div class="modal-footer bg-white border-top border-light">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-warning fw-bold">Đăng bài</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,103 @@
+@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "Quản Lý Đánh Giá";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var reviews = Model?.ToList() ?? new List<dynamic>();
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-light">
+    <h1 class="h2 text-warning fw-bold">Quản Lý Đánh Giá</h1>
+</div>
+
+<div class="card bg-white border border-light rounded shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-dark table-hover mb-0 align-middle">
+            <thead class="text-uppercase" style="background-color: #111;">
+                <tr>
+                    <th scope="col">Người dùng</th>
+                    <th scope="col">Phim</th>
+                    <th scope="col">Đánh giá</th>
+                    <th scope="col">Nội dung</th>
+                    <th scope="col">Ngày đăng</th>
+                    <th scope="col">Trạng thái</th>
+                    <th scope="col" class="text-end">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!reviews.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-secondary fst-italic">
+                            Chưa có đánh giá nào.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var r in reviews)
+                    {
+                        <tr>
+                            <td><strong class="text-dark">@r.full_name</strong></td>
+                            <td><strong class="text-info">@r.movie_title</strong></td>
+                            <td class="text-warning">
+                                @for (int i = 0; i < Convert.ToInt32(r.rating); i++)
+                                {
+                                    <i class="bi bi-star-fill"></i>
+                                }
+                            </td>
+                            <td style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                @r.comment
+                            </td>
+                            <td>@Convert.ToDateTime(r.created_at).ToString("dd/MM/yyyy")</td>
+                            <td>
+                                @if (r.is_approved == 1 || r.is_approved == true || r.is_approved == "1")
+                                {
+                                    <span class="badge bg-success">Đã duyệt</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Chờ duyệt</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <form method="post" action="/admin/reviews/toggle" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@r.id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-warning" title="Duyệt / Ẩn">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </form>
+                                <button type="button" class="btn btn-sm btn-outline-danger ms-1" data-bs-toggle="modal" data-bs-target="#deleteReviewModal-@r.id">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Delete Modal -->
+                        <div class="modal fade" id="deleteReviewModal-@r.id" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content bg-light text-dark border border-light shadow-lg">
+                                    <div class="modal-header bg-white border-bottom border-light">
+                                        <h5 class="modal-title text-danger fw-bold">Xác Nhận Xóa</h5>
+                                        <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body p-4 text-start">
+                                        Bạn có chắc chắn muốn xóa đánh giá của <strong>@r.full_name</strong> cho phim <strong>@r.movie_title</strong>?
+                                    </div>
+                                    <div class="modal-footer bg-white border-top border-light">
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                                        <form method="post" action="/admin/reviews/delete">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@r.id" />
+                                            <button type="submit" class="btn btn-danger fw-bold">Xóa</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

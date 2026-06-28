@@ -1,0 +1,182 @@
+@model CinemaXNet.ViewModels.SeatMapViewModel
+@using System.Text.Json
+@using CinemaXNet.ViewModels
+
+@* Partial: _SeatMap.cshtml — được nhúng vào SeatMap.cshtml *@
+
+<style>
+    /* CSS Grid cho Seat Map */
+    .seat-grid-container {
+        display: grid;
+        gap: 8px;
+        justify-content: center;
+        margin: 0 auto;
+        overflow-x: auto;
+        padding-bottom: 20px;
+    }
+
+    .seat-cell-render {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px; 
+        height: 38px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        transition: transform 0.1s;
+        border: 1px solid transparent;
+    }
+
+    .seat-cell-render:hover:not(:disabled) {
+        transform: scale(1.1);
+        cursor: pointer;
+    }
+
+    .seat-type-standard { background-color: transparent; border-color: #198754; color: #198754; }
+    .seat-type-standard:hover:not(:disabled) { background-color: #198754; color: white; }
+    
+    .seat-type-vip { background-color: transparent; border-color: #ffc107; color: #ffc107; border-width: 2px; }
+    .seat-type-vip:hover:not(:disabled) { background-color: #ffc107; color: black; }
+    
+    .seat-type-couple { background-color: transparent; border-color: #e83e8c; color: #e83e8c; width: 84px; grid-column: span 2; }
+    .seat-type-couple:hover:not(:disabled) { background-color: #e83e8c; color: white; }
+
+    .seat-status-holding { background-color: #ffc107 !important; color: black !important; opacity: 0.6; cursor: not-allowed; border-color: #ffc107; }
+    .seat-status-paid { background-color: #dc3545 !important; color: white !important; opacity: 0.5; cursor: not-allowed; border-color: #dc3545; }
+    .seat-status-broken { background-color: #dc3545 !important; color: white !important; opacity: 0.5; cursor: not-allowed; }
+    
+    .seat-selected { background-color: #198754 !important; color: white !important; border-color: #198754 !important; box-shadow: 0 0 8px rgba(25,135,84,0.6); }
+
+    .seat-hidden-cell {
+        visibility: hidden;
+    }
+</style>
+
+<!-- Chú thích màu ghế -->
+<div class="seat-legend-bar d-flex gap-4 justify-content-center mb-4 flex-wrap">
+    <div class="d-flex align-items-center gap-2">
+        <div style="width:22px; height:22px; border:2px solid #198754; border-radius:4px;"></div>
+        <small class="text-white">Trống (Thường)</small>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <div style="width:22px; height:22px; border:2px solid #ffc107; border-radius:4px;"></div>
+        <small class="text-white">VIP</small>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <div style="width:44px; height:22px; border:2px solid #e83e8c; border-radius:4px;"></div>
+        <small class="text-white">Couple</small>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <div style="width:22px; height:22px; background:#198754; border-radius:4px; box-shadow: 0 0 8px rgba(25,135,84,0.6);"></div>
+        <small class="text-white">Đang chọn</small>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <div style="width:22px; height:22px; background:#ffc107; border-radius:4px; opacity:0.6;"></div>
+        <small class="text-white">Đang giữ</small>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <div style="width:22px; height:22px; background:#dc3545; border-radius:4px; opacity:0.5;"></div>
+        <small class="text-white">Đã bán/Hỏng</small>
+    </div>
+</div>
+
+<!-- Màn chiếu -->
+<div class="text-center mb-5">
+    <div class="cinema-screen"></div>
+    <small class="cinema-screen-label">MÀN CHIẾU</small>
+</div>
+
+<!-- Sơ đồ ghế -->
+<div class="seat-map-container overflow-auto p-4 rounded shadow-lg" style="background-color: #111;">
+    @{
+        bool hasLayout = !string.IsNullOrWhiteSpace(Model.LayoutJson);
+    }
+
+    @if (hasLayout)
+    {
+        List<List<SeatLayoutItem>> layout = new();
+        try {
+            layout = JsonSerializer.Deserialize<List<List<SeatLayoutItem>>>(Model.LayoutJson) ?? new();
+        } catch {}
+
+        <div class="seat-grid-container" style="grid-template-columns: repeat(@Model.SeatsPerRow, auto);">
+            @for (int r = 0; r < layout.Count; r++)
+            {
+                var rowLabel = (char)('A' + r);
+                @for (int c = 0; c < layout[r].Count; c++)
+                {
+                    var seat = layout[r][c];
+                    if (seat.type == "couple_right") { continue; }
+
+                    if (seat.type == "hidden")
+                    {
+                        <div class="seat-hidden-cell" style="width:38px; height:38px;"></div>
+                    }
+                    else
+                    {
+                        var status = Model.GetSeatStatus(seat.id);
+                        string statusClass = "";
+                        string disabled = "";
+                        string dataAttr = "";
+
+                        if (status == "paid") { statusClass = "seat-status-paid"; disabled = "disabled"; }
+                        else if (status == "holding") { statusClass = "seat-status-holding"; disabled = "disabled"; }
+                        else if (seat.type == "broken") { statusClass = "seat-status-broken"; disabled = "disabled"; }
+                        else { dataAttr = $"data-seat=\"{seat.id}\""; }
+
+                        string typeClass = seat.type == "vip" ? "seat-type-vip" : seat.type == "couple" ? "seat-type-couple" : "seat-type-standard";
+
+                        <button type="button"
+                                class="seat-cell-render @typeClass @statusClass seat-btn"
+                                @disabled
+                                @Html.Raw(dataAttr)
+                                title="Ghế @seat.id">
+                            @seat.id
+                        </button>
+                    }
+                }
+            }
+        </div>
+    }
+    else
+    {
+        <!-- Fallback old rendering if no JSON -->
+        @for (int row = 0; row < Model.TotalRows; row++)
+        {
+            var rowLabel = (char)('A' + row);
+            <div class="d-flex justify-content-center align-items-center gap-2 mb-2">
+                <span class="text-secondary fw-bold" style="width: 20px;">@rowLabel</span>
+
+                @for (int col = 1; col <= Model.SeatsPerRow; col++)
+                {
+                    var seatCode = $"{rowLabel}{col}";
+                    var status   = Model.GetSeatStatus(seatCode);
+
+                    var baseClass = row == Model.TotalRows - 1 ? "seat-sweetbox"
+                        : row <= 3 ? "btn-outline-success"
+                        : "seat-vip";
+
+                    string btnClass, disabled, dataAttr;
+                    if (status == "paid")        { btnClass = "seat-sold";    disabled = "disabled"; dataAttr = ""; }
+                    else if (status == "holding") { btnClass = "seat-holding"; disabled = "disabled"; dataAttr = ""; }
+                    else                          { btnClass = baseClass;      disabled = "";         dataAttr = $"data-seat=\"{seatCode}\""; }
+
+                    <button type="button"
+                            class="btn btn-sm seat-btn @btnClass"
+                            @disabled
+                            @Html.Raw(dataAttr)
+                            title="Ghế @seatCode"
+                            style="width: 38px; height: 38px; padding: 0; font-size: 0.75rem;">
+                        @seatCode
+                    </button>
+                }
+                <span class="text-secondary fw-bold ms-2" style="width: 20px;">@rowLabel</span>
+            </div>
+        }
+    }
+</div>
+
+<script>
+    // JS Logic for selection remains the same as it binds to .seat-btn and data-seat
+</script>

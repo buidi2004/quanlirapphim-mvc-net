@@ -1,0 +1,200 @@
+@{
+    ViewData["Title"] = ViewBag.PageTitle;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var movies = ViewBag.Movies as IEnumerable<CinemaXNet.Models.Domain.Movie>;
+    var cinemas = ViewBag.Cinemas as IEnumerable<CinemaXNet.Models.Domain.Cinema>;
+}
+
+<div class="container py-4">
+    <h2 class="text-warning fw-bold mb-4"><i class="bi bi-lightning-charge-fill me-2"></i>ĐẶT VÉ NHANH</h2>
+
+    <div class="row g-0 rounded-4 overflow-hidden border border-secondary border-opacity-25 shadow-lg bg-dark">
+        <!-- Bước 1: Chọn Phim -->
+        <div class="col-md-3 border-end border-secondary border-opacity-25 matrix-col">
+            <div class="bg-dark p-3 border-bottom border-secondary border-opacity-25 text-center">
+                <h5 class="text-white mb-0 fw-bold">1. CHỌN PHIM</h5>
+            </div>
+            <div class="list-group list-group-flush custom-scroll" style="height: 500px; overflow-y: auto;">
+                @foreach (var m in movies)
+                {
+                    <button class="list-group-item list-group-item-action bg-dark text-light border-0 py-3 movie-item" data-id="@m.Id">
+                        <div class="d-flex align-items-center">
+                            <img src="@m.PosterUrl" class="rounded me-3" style="width: 40px; height: 60px; object-fit: cover;">
+                            <div>
+                                <h6 class="mb-1 fw-bold">@m.Title</h6>
+                                <small class="text-secondary"><span class="badge bg-danger me-1">@m.AgeRating</span> @m.DurationMinutes phút</small>
+                            </div>
+                        </div>
+                    </button>
+                }
+            </div>
+        </div>
+
+        <!-- Bước 2: Chọn Rạp -->
+        <div class="col-md-3 border-end border-secondary border-opacity-25 matrix-col">
+            <div class="bg-dark p-3 border-bottom border-secondary border-opacity-25 text-center">
+                <h5 class="text-white mb-0 fw-bold">2. CHỌN RẠP</h5>
+            </div>
+            <div class="list-group list-group-flush custom-scroll" id="cinema-list" style="height: 500px; overflow-y: auto;">
+                <div class="p-4 text-center text-secondary fst-italic">
+                    <i class="bi bi-arrow-left-circle fs-3 d-block mb-2"></i>
+                    Vui lòng chọn Phim trước
+                </div>
+            </div>
+        </div>
+
+        <!-- Bước 3: Chọn Ngày -->
+        <div class="col-md-3 border-end border-secondary border-opacity-25 matrix-col">
+            <div class="bg-dark p-3 border-bottom border-secondary border-opacity-25 text-center">
+                <h5 class="text-white mb-0 fw-bold">3. CHỌN NGÀY</h5>
+            </div>
+            <div class="list-group list-group-flush custom-scroll" id="date-list" style="height: 500px; overflow-y: auto;">
+                <div class="p-4 text-center text-secondary fst-italic">
+                    <i class="bi bi-arrow-left-circle fs-3 d-block mb-2"></i>
+                    Vui lòng chọn Rạp trước
+                </div>
+            </div>
+        </div>
+
+        <!-- Bước 4: Chọn Giờ -->
+        <div class="col-md-3 matrix-col">
+            <div class="bg-dark p-3 border-bottom border-secondary border-opacity-25 text-center">
+                <h5 class="text-white mb-0 fw-bold">4. CHỌN SUẤT</h5>
+            </div>
+            <div class="p-3 custom-scroll" id="time-list" style="height: 500px; overflow-y: auto;">
+                <div class="p-4 text-center text-secondary fst-italic">
+                    <i class="bi bi-arrow-left-circle fs-3 d-block mb-2"></i>
+                    Vui lòng chọn Ngày trước
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .matrix-col { transition: all 0.3s ease; }
+    .custom-scroll::-webkit-scrollbar { width: 6px; }
+    .custom-scroll::-webkit-scrollbar-track { background: #212529; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #495057; border-radius: 4px; }
+    .list-group-item.active { background-color: #333 !important; border-left: 4px solid #ffc107 !important; color: #fff !important; }
+    .list-group-item:hover:not(.active) { background-color: rgba(255,193,7,0.1) !important; cursor: pointer; }
+    .time-btn { transition: all 0.2s; }
+    .time-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(255,193,7,0.2); }
+</style>
+
+@section Scripts {
+    <script>
+        let selectedMovie = null;
+        let selectedCinema = null;
+        let selectedDate = null;
+
+        // Xử lý Chọn Phim
+        document.querySelectorAll('.movie-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.movie-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+                selectedMovie = this.getAttribute('data-id');
+                
+                // Reset các cột sau
+                selectedCinema = null;
+                selectedDate = null;
+                resetList('date-list', 'Vui lòng chọn Rạp trước');
+                resetList('time-list', 'Vui lòng chọn Ngày trước');
+                
+                loadCinemas(selectedMovie);
+            });
+        });
+
+        function resetList(id, msg) {
+            document.getElementById(id).innerHTML = `<div class="p-4 text-center text-secondary fst-italic"><i class="bi bi-arrow-left-circle fs-3 d-block mb-2"></i>${msg}</div>`;
+        }
+
+        async function loadCinemas(movieId) {
+            const list = document.getElementById('cinema-list');
+            list.innerHTML = '<div class="text-center p-4 text-warning"><div class="spinner-border spinner-border-sm"></div> Đang tải...</div>';
+            
+            try {
+                const res = await fetch(`/api/quickbooking/cinemas?movieId=${movieId}`);
+                const data = await res.json();
+                
+                if(data.length === 0) {
+                    resetList('cinema-list', 'Không có rạp nào chiếu phim này');
+                    return;
+                }
+
+                list.innerHTML = '';
+                data.forEach(c => {
+                    const btn = document.createElement('button');
+                    btn.className = 'list-group-item list-group-item-action bg-dark text-light border-0 py-3 cinema-item';
+                    btn.innerHTML = `<i class="bi bi-building me-2 text-warning"></i>${c.name}`;
+                    btn.onclick = () => {
+                        document.querySelectorAll('.cinema-item').forEach(i => i.classList.remove('active'));
+                        btn.classList.add('active');
+                        selectedCinema = c.id;
+                        selectedDate = null;
+                        resetList('time-list', 'Vui lòng chọn Ngày trước');
+                        loadDates(movieId, c.id);
+                    };
+                    list.appendChild(btn);
+                });
+            } catch(e) {
+                resetList('cinema-list', 'Lỗi kết nối');
+            }
+        }
+
+        async function loadDates(movieId, cinemaId) {
+            const list = document.getElementById('date-list');
+            list.innerHTML = '<div class="text-center p-4 text-warning"><div class="spinner-border spinner-border-sm"></div> Đang tải...</div>';
+            
+            try {
+                const res = await fetch(`/api/quickbooking/dates?movieId=${movieId}&cinemaId=${cinemaId}`);
+                const data = await res.json();
+                
+                list.innerHTML = '';
+                data.forEach(d => {
+                    const btn = document.createElement('button');
+                    btn.className = 'list-group-item list-group-item-action bg-dark text-light border-0 py-3 date-item';
+                    btn.innerHTML = `<i class="bi bi-calendar-event me-2 text-warning"></i>${d.formatted}`;
+                    btn.onclick = () => {
+                        document.querySelectorAll('.date-item').forEach(i => i.classList.remove('active'));
+                        btn.classList.add('active');
+                        selectedDate = d.value;
+                        loadShowtimes(movieId, cinemaId, d.value);
+                    };
+                    list.appendChild(btn);
+                });
+            } catch(e) {
+                resetList('date-list', 'Lỗi kết nối');
+            }
+        }
+
+        async function loadShowtimes(movieId, cinemaId, date) {
+            const list = document.getElementById('time-list');
+            list.innerHTML = '<div class="text-center p-4 text-warning"><div class="spinner-border spinner-border-sm"></div> Đang tải...</div>';
+            
+            try {
+                const res = await fetch(`/api/quickbooking/showtimes?movieId=${movieId}&cinemaId=${cinemaId}&date=${date}`);
+                const data = await res.json();
+                
+                if(data.length === 0) {
+                    resetList('time-list', 'Không có suất chiếu nào');
+                    return;
+                }
+
+                list.innerHTML = '<div class="d-flex flex-wrap gap-2"></div>';
+                const container = list.querySelector('.d-flex');
+                
+                data.forEach(st => {
+                    const a = document.createElement('a');
+                    a.href = `/booking/seats?showtimeId=${st.id}`;
+                    a.className = 'btn btn-outline-warning time-btn fw-bold';
+                    a.style.width = 'calc(50% - 0.25rem)';
+                    a.innerHTML = st.time;
+                    container.appendChild(a);
+                });
+            } catch(e) {
+                resetList('time-list', 'Lỗi kết nối');
+            }
+        }
+    </script>
+}

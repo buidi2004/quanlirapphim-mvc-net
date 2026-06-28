@@ -1,0 +1,212 @@
+<nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-warning fs-3" href="/">
+            <i class="bi bi-film"></i> CinemaX
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navMenu">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <!-- Mega Menu: Phim -->
+                <li class="nav-item dropdown position-static">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMovies" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Phim
+                    </a>
+                    <div class="dropdown-menu w-100 shadow border-0 rounded-0 mt-0 bg-dark" aria-labelledby="navbarDropdownMovies" style="border-top: 2px solid #ffc107 !important;">
+                        <div class="container p-4">
+                            <div class="row w-100">
+                                <div class="col-md-3">
+                                    <h6 class="text-warning fw-bold mb-3 border-bottom border-secondary pb-2">THỂ LOẠI</h6>
+                                    <ul class="list-unstyled">
+                                        <li><a href="/movies" class="text-light text-decoration-none d-block py-1 custom-hover">Phim Đang Chiếu</a></li>
+                                        <li><a href="/movies?status=coming_soon" class="text-light text-decoration-none d-block py-1 custom-hover">Phim Sắp Chiếu</a></li>
+                                        <li><a href="/movies?genre=Hành động" class="text-light text-decoration-none d-block py-1 custom-hover">Hành Động</a></li>
+                                        <li><a href="/movies?genre=Khoa học viễn tưởng" class="text-light text-decoration-none d-block py-1 custom-hover">Viễn Tưởng</a></li>
+                                        <li><a href="/movies?genre=Kinh dị" class="text-light text-decoration-none d-block py-1 custom-hover">Kinh Dị</a></li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-9">
+                                    <h6 class="text-warning fw-bold mb-3 border-bottom border-secondary pb-2">PHIM ĐANG HOT</h6>
+                                    <div class="row g-3">
+                                        <!-- Hardcoded trending for demo to avoid DB hit on every page load -->
+                                        <div class="col-3">
+                                            <div class="card bg-transparent border-0 position-relative group-hover overflow-hidden rounded">
+                                                <img src="https://upload.wikimedia.org/wikipedia/en/5/52/Dune_Part_Two_poster.jpeg" class="img-fluid rounded" alt="Dune">
+                                                <div class="position-absolute w-100 h-100 top-0 start-0 bg-dark bg-opacity-50 opacity-0 d-flex align-items-center justify-content-center transition-all" style="backdrop-filter: blur(2px);">
+                                                    <a href="/booking/fast" class="btn btn-warning btn-sm fw-bold">Mua Vé</a>
+                                                </div>
+                                            </div>
+                                            <p class="text-light text-center small mt-2 fw-bold text-truncate">Dune: Part Two</p>
+                                        </div>
+                                        <div class="col-3">
+                                            <div class="card bg-transparent border-0 position-relative group-hover overflow-hidden rounded">
+                                                <img src="https://upload.wikimedia.org/wikipedia/en/4/4a/Oppenheimer_%28film%29.jpg" class="img-fluid rounded" alt="Oppenheimer">
+                                                <div class="position-absolute w-100 h-100 top-0 start-0 bg-dark bg-opacity-50 opacity-0 d-flex align-items-center justify-content-center transition-all" style="backdrop-filter: blur(2px);">
+                                                    <a href="/booking/fast" class="btn btn-warning btn-sm fw-bold">Mua Vé</a>
+                                                </div>
+                                            </div>
+                                            <p class="text-light text-center small mt-2 fw-bold text-truncate">Oppenheimer</p>
+                                        </div>
+                                        <div class="col-3">
+                                            <div class="card bg-transparent border-0 position-relative group-hover overflow-hidden rounded">
+                                                <img src="https://placehold.co/400x600/1a1a2e/ffc107?text=The+Nighthawk" class="img-fluid rounded" alt="Nighthawk">
+                                                <div class="position-absolute w-100 h-100 top-0 start-0 bg-dark bg-opacity-50 opacity-0 d-flex align-items-center justify-content-center transition-all" style="backdrop-filter: blur(2px);">
+                                                    <a href="/movies/3" class="btn btn-outline-light btn-sm fw-bold">Chi Tiết</a>
+                                                </div>
+                                            </div>
+                                            <p class="text-light text-center small mt-2 fw-bold text-truncate">The Nighthawk</p>
+                                        </div>
+                                        <div class="col-3 d-flex align-items-center justify-content-center">
+                                            <a href="/movies" class="text-warning text-decoration-none d-flex flex-column align-items-center">
+                                                <div class="bg-warning text-dark rounded-circle p-3 mb-2 shadow">
+                                                    <i class="bi bi-arrow-right fs-4"></i>
+                                                </div>
+                                                <span class="small fw-bold">Xem Tất Cả</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link text-warning fw-bold" href="/booking/fast">
+                        <i class="bi bi-lightning-charge-fill me-1"></i>Đặt Vé Nhanh
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/cinemas">
+                        <i class="bi bi-geo-alt me-1"></i>Hệ thống rạp
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/promotions">
+                        <i class="bi bi-tag me-1"></i>Ưu đãi
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/news">
+                        <i class="bi bi-newspaper me-1"></i>Tin tức
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Search mini -->
+            <form class="d-flex me-3 d-none d-lg-flex" action="/search" method="GET">
+                <div class="input-group input-group-sm">
+                    <input type="text" name="q" class="form-control" placeholder="Tìm phim..." style="width: 160px;">
+                    <button type="submit" class="btn btn-outline-warning btn-sm"><i class="bi bi-search"></i></button>
+                </div>
+            </form>
+
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+                <!-- Theme Toggle -->
+                <li class="nav-item me-2">
+                    <button id="themeToggleBtn" class="btn btn-sm btn-outline-secondary" title="Đổi giao diện">
+                        <i class="bi bi-moon-stars"></i>
+                    </button>
+                </li>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <!-- Notifications -->
+                    <li class="nav-item dropdown me-2 d-flex align-items-center">
+                        <a class="nav-link position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Thông báo">
+                            <i class="bi bi-bell fs-5"></i>
+                            <span class="position-absolute top-25 start-75 translate-middle p-1 bg-danger border border-light rounded-circle" style="margin-top: 5px;">
+                                <span class="visually-hidden">New alerts</span>
+                            </span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow" style="width: 320px;">
+                            <li><h6 class="dropdown-header fw-bold">Thông báo mới</h6></li>
+                            <li>
+                                <a class="dropdown-item py-2 text-wrap" href="#">
+                                    <div class="d-flex align-items-start">
+                                        <div class="bg-warning text-dark rounded-circle p-2 me-3 mt-1"><i class="bi bi-ticket-perforated"></i></div>
+                                        <div>
+                                            <p class="mb-0 fw-bold small">Nhắc lịch xem phim</p>
+                                            <p class="mb-0 small text-secondary" style="font-size: 0.8rem;">Dune: Part Two sẽ chiếu trong 2 giờ nữa tại Landmark 81.</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item py-2 text-wrap" href="#">
+                                    <div class="d-flex align-items-start">
+                                        <div class="bg-info text-white rounded-circle p-2 me-3 mt-1"><i class="bi bi-star"></i></div>
+                                        <div>
+                                            <p class="mb-0 fw-bold small">Điểm thưởng cập nhật</p>
+                                            <p class="mb-0 small text-secondary" style="font-size: 0.8rem;">Bạn vừa được cộng 5,000 điểm từ giao dịch gần nhất.</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-center small text-primary fw-bold" href="#">Xem tất cả thông báo</a></li>
+                        </ul>
+                    </li>
+
+                    @if (User.IsInRole("admin"))
+                    {
+                        <li class="nav-item d-flex align-items-center">
+                            <a class="nav-link text-warning fw-semibold me-2" href="/admin/dashboard">
+                                <i class="bi bi-speedometer2"></i> Admin Panel
+                            </a>
+                        </li>
+                    }
+
+                    <!-- User Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="https://api.dicebear.com/7.x/initials/svg?seed=@User.Identity.Name"
+                                 class="rounded-circle" width="28" height="28" style="object-fit: cover;"
+                                 alt="avatar">
+                            <span class="d-none d-lg-inline">@User.Identity.Name</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="/profile">
+                                    <i class="bi bi-person me-2"></i>Hồ sơ
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/my-tickets">
+                                    <i class="bi bi-ticket-perforated me-2"></i>Vé của tôi
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/profile/transactions">
+                                    <i class="bi bi-receipt me-2"></i>Lịch sử giao dịch
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form method="POST" action="/logout">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a class="nav-link me-3" href="/login">Đăng nhập</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-sm btn-warning fw-semibold" href="/register">Đăng ký</a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</nav>

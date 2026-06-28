@@ -1,0 +1,170 @@
+@{
+    ViewData["Title"] = "Hồ sơ";
+    var user          = ViewBag.User  as CinemaXNet.Models.Domain.User;
+    var stats         = ViewBag.Stats;
+    var recentTickets = ViewBag.RecentTickets as IEnumerable<dynamic> ?? [];
+    var levelProgress = (double)(ViewBag.LevelProgress ?? 0);
+    var nextLevel     = ViewBag.NextLevel as string ?? "";
+    var pointsToNext  = (decimal)(ViewBag.PointsToNextLevel ?? 0);
+}
+
+<div class="row g-4">
+    <!-- Left: User Card -->
+    <div class="col-md-4">
+        <!-- Virtual Loyalty Card -->
+        <div class="card border-0 text-white mb-4 shadow-lg loyalty-card" style="background: linear-gradient(135deg, #1a1a2e, #000000); border-radius: 15px; overflow: hidden; position: relative;">
+            <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(255,193,7,0.1); border-radius: 50%;"></div>
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-4">
+                    <div>
+                        <h6 class="text-warning fw-bold mb-0" style="letter-spacing: 2px;">CINEMAX REWARDS</h6>
+                        <span class="small text-light">Thành viên @user?.GetMemberLevelLabel()</span>
+                    </div>
+                    <i class="bi bi-award-fill text-warning fs-2 shadow-sm"></i>
+                </div>
+                
+                <div class="d-flex align-items-center mb-4">
+                    <img src="@user?.GetAvatarUrl()" class="rounded-circle me-3 border border-2 border-warning" style="width:60px; height:60px; object-fit:cover;" alt="Avatar">
+                    <div>
+                        <h5 class="mb-0 fw-bold text-white">@user?.GetDisplayName()</h5>
+                        <p class="mb-0 small text-secondary font-monospace">ID: @(user?.Id.ToString("D8"))</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-2 rounded text-center mb-2 mx-auto" style="width: fit-content;">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=CXN-@user?.Id" alt="Membership QR" width="80" height="80">
+                </div>
+                <p class="text-center small text-secondary mb-0">Đưa mã này cho nhân viên để tích điểm</p>
+            </div>
+        </div>
+
+        <div class="card bg-white border-light shadow text-center p-4 mb-4">
+
+            <!-- Level progress -->
+            <div class="mb-3">
+                <div class="d-flex justify-content-between text-secondary small mb-1">
+                    <span>@user?.MemberLevel</span>
+                    <span>@nextLevel</span>
+                </div>
+                <div class="progress" style="height:6px; background:#333;">
+                    <div class="progress-bar bg-warning" style="width:@levelProgress.ToString("0")%"></div>
+                </div>
+                @if (pointsToNext > 0)
+                {
+                    <small class="text-secondary">Còn @pointsToNext.ToString("N0")đ để lên @nextLevel</small>
+                }
+            </div>
+
+            <div class="row g-2 text-center">
+                <div class="col-6">
+                    <div class="bg-light rounded p-2">
+                        <div class="text-warning fw-bold">@stats?.TotalTickets</div>
+                        <small class="text-secondary">Vé đã mua</small>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="bg-light rounded p-2">
+                        <div class="text-warning fw-bold">@stats?.TotalMovies</div>
+                        <small class="text-secondary">Phim đã xem</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick links -->
+        <div class="card bg-white border-light">
+            <div class="list-group list-group-flush bg-transparent">
+                <a href="/profile" class="list-group-item list-group-item-action bg-transparent text-dark border-light">
+                    <i class="bi bi-person me-2 text-warning"></i>Hồ sơ của tôi
+                </a>
+                <a href="/profile/edit" class="list-group-item list-group-item-action bg-transparent text-dark border-light">
+                    <i class="bi bi-pencil me-2 text-warning"></i>Chỉnh sửa hồ sơ
+                </a>
+                <a href="/my-tickets" class="list-group-item list-group-item-action bg-transparent text-dark border-light">
+                    <i class="bi bi-ticket me-2 text-warning"></i>Vé của tôi
+                </a>
+                <a href="/profile/transactions" class="list-group-item list-group-item-action bg-transparent text-dark border-light">
+                    <i class="bi bi-clock-history me-2 text-warning"></i>Lịch sử giao dịch
+                </a>
+                <a href="/profile/change-password" class="list-group-item list-group-item-action bg-transparent text-dark border-light">
+                    <i class="bi bi-shield-lock me-2 text-warning"></i>Đổi mật khẩu
+                </a>
+                <form method="post" action="/logout">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="list-group-item list-group-item-action bg-transparent text-danger border-light w-100 text-start border-0">
+                        <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right: Recent tickets + Info -->
+    <div class="col-md-8">
+        <!-- Info details -->
+        <div class="card bg-white border-light mb-4">
+            <div class="card-body">
+                <h5 class="text-warning mb-3"><i class="bi bi-info-circle me-2"></i>Thông tin tài khoản</h5>
+                <dl class="row small mb-0">
+                    <dt class="col-sm-4 text-secondary">Email</dt>
+                    <dd class="col-sm-8 text-dark">@user?.Email</dd>
+                    @if (user?.Phone != null)
+                    {
+                        <dt class="col-sm-4 text-secondary">Điện thoại</dt>
+                        <dd class="col-sm-8 text-dark">@user.Phone</dd>
+                    }
+                    @if (user?.City != null)
+                    {
+                        <dt class="col-sm-4 text-secondary">Thành phố</dt>
+                        <dd class="col-sm-8 text-dark">@user.City</dd>
+                    }
+                    <dt class="col-sm-4 text-secondary">Tổng chi tiêu</dt>
+                    <dd class="col-sm-8 text-warning fw-bold">@user?.TotalSpent.ToString("N0")đ</dd>
+                </dl>
+            </div>
+        </div>
+
+        <!-- Recent tickets -->
+        <div class="card bg-white border-light">
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-3">
+                    <h5 class="text-warning mb-0"><i class="bi bi-ticket-perforated me-2"></i>Vé gần đây</h5>
+                    <a href="/my-tickets" class="btn btn-outline-warning btn-sm">Xem tất cả</a>
+                </div>
+                @if (!recentTickets.Any())
+                {
+                    <p class="text-secondary small fst-italic">Chưa có vé nào.</p>
+                }
+                else
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var ticket in recentTickets)
+                        {
+                            <div class="list-group-item bg-transparent border-light py-3">
+                                <div class="d-flex gap-3">
+                                    <img src="@(ticket.PosterUrl ?? "https://placehold.co/60x80/111/fff?text=?")"
+                                         style="width:45px;height:65px;object-fit:cover;" class="rounded">
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between">
+                                            <strong class="text-dark small">@ticket.MovieTitle</strong>
+                                            @{
+                                                var badgeCls = ticket.status == "paid" ? "bg-success" :
+                                                               ticket.status == "holding" ? "bg-warning text-dark" : "bg-secondary";
+                                                var statusLbl = ticket.status == "paid" ? "Đã thanh toán" :
+                                                                ticket.status == "holding" ? "Đang giữ" : "Đã hủy";
+                                            }
+                                            <span class="badge @badgeCls">@statusLbl</span>
+                                        </div>
+                                        <small class="text-secondary">
+                                            @ticket.ShowDate @ticket.StartTime · @ticket.RoomName · Ghế @ticket.SeatCode
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

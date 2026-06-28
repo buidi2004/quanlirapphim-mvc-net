@@ -1,0 +1,70 @@
+@model Dictionary<string, string>
+@{
+    ViewData["Title"] = "Cấu Hình Hệ Thống";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    string GetVal(string key, string def = "") => Model.ContainsKey(key) ? Model[key] : def;
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-light">
+    <h1 class="h2 text-warning fw-bold">Cấu Hình Hệ Thống</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card bg-white border border-light shadow-sm">
+            <div class="card-body p-4">
+                <form method="post" action="/admin/settings/save" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+
+                    <h5 class="text-info fw-bold mb-3 border-bottom border-light pb-2">Thông tin chung</h5>
+                    <div class="mb-3">
+                        <label class="form-label text-dark fw-bold">Tên Website</label>
+                        <input type="text" name="site_name" value="@GetVal("site_name", "CinemaX")" class="form-control bg-light text-dark border-light">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-dark fw-bold">Email liên hệ</label>
+                        <input type="email" name="contact_email" value="@GetVal("contact_email")" class="form-control bg-light text-dark border-light">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-dark fw-bold">Số điện thoại</label>
+                        <input type="text" name="contact_phone" value="@GetVal("contact_phone")" class="form-control bg-light text-dark border-light">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label text-dark fw-bold">Địa chỉ trụ sở</label>
+                        <input type="text" name="address" value="@GetVal("address")" class="form-control bg-light text-dark border-light">
+                    </div>
+
+                    <h5 class="text-info fw-bold mb-3 border-bottom border-light pb-2">Logo & Giao diện</h5>
+                    <div class="mb-4">
+                        <label class="form-label text-dark fw-bold">Logo trang web</label>
+                        @if (!string.IsNullOrEmpty(GetVal("site_logo")))
+                        {
+                            <div class="mb-2">
+                                <img src="@GetVal("site_logo")" alt="Logo" class="bg-light p-2 rounded border border-light" style="max-height: 50px;">
+                            </div>
+                        }
+                        <input type="file" name="site_logo" class="form-control bg-light text-dark border-light" accept="image/*">
+                    </div>
+
+                    <h5 class="text-info fw-bold mb-3 border-bottom border-light pb-2">Mạng xã hội</h5>
+                    <div class="mb-3">
+                        <label class="form-label text-dark fw-bold">Facebook URL</label>
+                        <input type="url" name="facebook_url" value="@GetVal("facebook_url")" class="form-control bg-light text-dark border-light">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-dark fw-bold">Instagram URL</label>
+                        <input type="url" name="instagram_url" value="@GetVal("instagram_url")" class="form-control bg-light text-dark border-light">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label text-dark fw-bold">YouTube URL</label>
+                        <input type="url" name="youtube_url" value="@GetVal("youtube_url")" class="form-control bg-light text-dark border-light">
+                    </div>
+
+                    <div class="text-end border-top border-light pt-3">
+                        <button type="submit" class="btn btn-warning fw-bold px-4">Lưu cấu hình</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
