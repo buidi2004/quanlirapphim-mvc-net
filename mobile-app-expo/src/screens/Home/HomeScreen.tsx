@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, ActivityIndicator, StatusBar, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { MovieService } from '../../services/MovieService';
 import { Movie } from '../../models/Movie';
@@ -9,6 +9,7 @@ import { Theme } from '../../theme/tokens';
 import { styles } from './styles';
 
 export const HomeScreen = ({ navigation }: any) => {
+  const insets = useSafeAreaInsets();
   const [nowShowing, setNowShowing] = useState<Movie[]>([]);
   const [comingSoon, setComingSoon] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
@@ -65,15 +66,12 @@ export const HomeScreen = ({ navigation }: any) => {
   );
 
   return (
-    // SafeAreaView bảo vệ nội dung khỏi tai thỏ (Notch)
-    <SafeAreaView style={styles.safeArea}>
+    // Đổi từ SafeAreaView thành View thường, vì ta sẽ tự đẩy khoảng cách bằng insets!
+    <View style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor={Theme.colors.background} />
 
-
-
-
-      {/* Header Logo & Icons */}
-      <View style={styles.header}>
+      {/* Header Logo & Icons với paddingTop bằng độ cao tai thỏ + 16px */}
+      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
         <Text style={styles.logo}>CinemaX</Text>
         <View style={styles.headerActions}>
           <TouchableOpacity style={styles.iconButton}>
@@ -115,6 +113,6 @@ export const HomeScreen = ({ navigation }: any) => {
 
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 };

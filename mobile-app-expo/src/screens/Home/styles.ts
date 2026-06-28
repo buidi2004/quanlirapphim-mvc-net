@@ -5,7 +5,6 @@ export const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: Theme.colors.background,
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   centerContainer: {
     flex: 1,
