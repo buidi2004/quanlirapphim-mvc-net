@@ -1,0 +1,167 @@
+@model CinemaXNet.Models.Domain.Cinema
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<!-- Hero -->
+<div class="position-relative mb-5 rounded-3 overflow-hidden shadow-lg" style="height:320px;">
+    <img src="@Model.GetImageUrl()" class="w-100 h-100" style="object-fit:cover; filter:brightness(.45);" alt="@Model.Name">
+    <div class="position-absolute inset-0 d-flex flex-column justify-content-end p-4 p-md-5">
+        <span class="badge bg-warning text-dark mb-2" style="width:fit-content;">@Model.Province</span>
+        <h1 class="text-white fw-bold display-6 mb-2">@Model.Name</h1>
+        <p class="text-secondary mb-0">
+            <i class="bi bi-geo-alt me-1"></i>@Model.GetFullAddress()
+        </p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Info Column -->
+    <div class="col-md-4">
+        <div class="card bg-white border-light mb-3">
+            <div class="card-body">
+                <h5 class="text-warning mb-3"><i class="bi bi-info-circle me-2"></i>Thông tin</h5>
+                <ul class="list-unstyled text-secondary small">
+                    @if (Model.Phone != null)
+                    {
+                        <li class="mb-2"><i class="bi bi-telephone me-2 text-warning"></i>@Model.Phone</li>
+                    }
+                    @if (Model.Email != null)
+                    {
+                        <li class="mb-2"><i class="bi bi-envelope me-2 text-warning"></i>@Model.Email</li>
+                    }
+                    <li class="mb-2"><i class="bi bi-clock me-2 text-warning"></i>@Model.OpeningHours</li>
+                    <li class="mb-2"><i class="bi bi-geo-alt me-2 text-warning"></i>@Model.GetFullAddress()</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Facilities -->
+        @if (Model.GetFacilityList().Any())
+        {
+            <div class="card bg-white border-light mb-3">
+                <div class="card-body">
+                    <h5 class="text-warning mb-3"><i class="bi bi-stars me-2"></i>Tiện ích</h5>
+                    <div class="d-flex flex-wrap gap-2">
+                        @foreach (var f in Model.GetFacilityList())
+                        {
+                            <span class="badge bg-secondary text-dark px-3 py-2">@f</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Map placeholder -->
+        @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+        {
+            <div class="card bg-white border-light">
+                <div class="card-body p-0 rounded">
+                    <a href="https://maps.google.com/?q=@Model.Latitude,@Model.Longitude"
+                       target="_blank" class="d-block text-center py-4 text-decoration-none">
+                        <i class="bi bi-map text-warning" style="font-size:2rem;"></i>
+                        <p class="text-secondary small mt-2 mb-0">Mở Google Maps</p>
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Description & CTA -->
+    <div class="col-md-8">
+        @if (!string.IsNullOrEmpty(Model.Description))
+        {
+            <div class="card bg-white border-light mb-4">
+                <div class="card-body">
+                    <h5 class="text-warning mb-3"><i class="bi bi-building me-2"></i>Giới thiệu</h5>
+                    <p class="text-secondary">@Model.Description</p>
+                </div>
+            </div>
+        }
+
+        <!-- Experiences at this cinema -->
+        <div class="card bg-white border-light mb-4">
+            <div class="card-body">
+                <h5 class="text-warning mb-3"><i class="bi bi-collection-play me-2"></i>Trải nghiệm tại rạp</h5>
+                <div class="row g-3">
+                    @foreach (var exp in new[] {
+                        ("dolby-atmos", "Dolby Atmos", "bi-speaker", "bg-success"),
+                        ("imax",        "IMAX",         "bi-display",  "bg-primary"),
+                        ("sweetbox",    "Sweetbox",    "bi-heart-fill","bg-danger"),
+                    })
+                    {
+                        <div class="col-4">
+                            <a href="/experiences/@exp.Item1" class="text-decoration-none">
+                                <div class="card bg-light border-light text-center p-3 h-100"
+                                     style="transition:.2s;" onmouseover="this.style.borderColor='#ffc107'"
+                                     onmouseout="this.style.borderColor='#6c757d'">
+                                    <i class="bi @exp.Item3 text-warning mb-2" style="font-size:1.5rem;"></i>
+                                    <small class="text-dark">@exp.Item2</small>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Showtimes -->
+        <div class="text-center p-4 rounded-3 border border-warning border-opacity-25"
+             style="background:rgba(255,193,7,.05);">
+            <h5 class="text-white mb-2">Lịch chiếu tại @Model.Name</h5>
+            
+            <div class="d-flex justify-content-center flex-wrap gap-2 mb-4 mt-3">
+                @for (int i = 0; i < 7; i++)
+                {
+                    var d = DateOnly.FromDateTime(DateTime.Today).AddDays(i);
+                    var isSelected = d == ViewBag.ShowDate;
+                    <a href="?date=@d.ToString("yyyy-MM-dd")" class="btn btn-sm @(isSelected ? "btn-warning fw-bold text-dark" : "btn-outline-secondary text-white")">
+                        @d.ToString("dd/MM")
+                    </a>
+                }
+            </div>
+
+            @{
+                var showtimesGroups = ViewBag.Showtimes as List<IGrouping<CinemaXNet.Models.Domain.Movie, CinemaXNet.Models.Domain.Showtime>>;
+            }
+
+            @if (showtimesGroups == null || !showtimesGroups.Any())
+            {
+                <p class="text-secondary small mb-0">Không có suất chiếu nào được lên lịch vào ngày này.</p>
+            }
+            else
+            {
+                <div class="text-start">
+                    @foreach (var group in showtimesGroups)
+                    {
+                        var movie = group.Key;
+                        <div class="mb-4 bg-dark p-3 rounded border border-secondary border-opacity-25 shadow-sm">
+                            <h6 class="text-warning fw-bold mb-3 d-flex align-items-center">
+                                @movie.Title 
+                                @if(movie.AgeRating != null) {
+                                    <span class="badge bg-danger ms-2">@movie.AgeRating</span>
+                                }
+                            </h6>
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach (var st in group)
+                                {
+                                    <a href="/booking/seats?showtimeId=@st.Id" class="btn btn-outline-warning btn-sm shadow-sm">
+                                        <div class="fw-bold">@st.StartTime</div>
+                                        <small class="text-light" style="font-size: 0.7rem;">@string.Format("{0:N0}đ", st.Price)</small>
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="/cinemas" class="text-secondary text-decoration-none">
+        <i class="bi bi-arrow-left me-1"></i>Quay lại danh sách rạp
+    </a>
+</div>

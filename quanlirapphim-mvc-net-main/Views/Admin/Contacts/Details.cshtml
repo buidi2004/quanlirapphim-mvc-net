@@ -1,0 +1,136 @@
+@model dynamic
+@{
+    ViewData["Title"] = "Chi Tiết Liên Hệ & Hỗ Trợ";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    string statusText = Model.status == "replied" ? "Đã trả lời" : "Chờ xử lý";
+    string statusBadgeClass = Model.status == "replied" ? "bg-success" : "bg-warning text-dark";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-light">
+    <h1 class="h2 text-warning fw-bold">Chi Tiết Yêu Cầu Hỗ Trợ #@Model.id</h1>
+    <div>
+        <a href="/admin/contacts" class="btn btn-outline-light btn-sm fw-bold">
+            <i class="bi bi-arrow-left me-1"></i> Quay lại
+        </a>
+        <button type="button" class="btn btn-outline-danger btn-sm fw-bold ms-1" data-bs-toggle="modal" data-bs-target="#deleteContactModal">
+            <i class="bi bi-trash me-1"></i> Xóa liên hệ
+        </button>
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success border-0 mb-4">
+        <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger border-0 mb-4">
+        <i class="bi bi-exclamation-triangle me-2"></i>@TempData["Error"]
+    </div>
+}
+
+<div class="row g-4">
+    <!-- Left Column: Details -->
+    <div class="col-md-7">
+        <div class="card bg-white text-dark border-light rounded shadow-sm mb-4">
+            <div class="card-header bg-white border-bottom border-light py-3">
+                <h5 class="card-title text-warning fw-bold mb-0">
+                    <i class="bi bi-envelope-open me-2"></i>Nội Dung Gửi Đến
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6">
+                        <span class="text-secondary small d-block">Khách hàng</span>
+                        <strong class="text-dark">@Model.name</strong>
+                    </div>
+                    <div class="col-sm-6">
+                        <span class="text-secondary small d-block">Email liên hệ</span>
+                        <a href="mailto:@Model.email" class="text-primary text-decoration-none"><strong>@Model.email</strong></a>
+                    </div>
+                    <div class="col-sm-6">
+                        <span class="text-secondary small d-block">Số điện thoại</span>
+                        <strong class="text-dark">@(string.IsNullOrEmpty(Model.phone) ? "Chưa cung cấp" : Model.phone)</strong>
+                    </div>
+                    <div class="col-sm-6">
+                        <span class="text-secondary small d-block">Thời gian nhận</span>
+                        <strong class="text-dark">@Convert.ToDateTime(Model.created_at).ToString("dd/MM/yyyy HH:mm:ss")</strong>
+                    </div>
+                    <div class="col-12">
+                        <span class="text-secondary small d-block">Chủ đề</span>
+                        <span class="badge bg-info text-dark">@(string.IsNullOrEmpty(Model.subject) ? "Chung" : Model.subject)</span>
+                    </div>
+                </div>
+
+                <div class="mb-2">
+                    <span class="text-secondary small d-block fw-bold mb-1">Nội dung tin nhắn:</span>
+                    <div class="p-3 bg-light text-dark rounded border border-light" style="white-space: pre-line; min-height: 120px; font-size: 0.95rem;">
+                        @Model.message
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Reply / Response Form -->
+    <div class="col-md-5">
+        <div class="card bg-white text-dark border-light rounded shadow-sm">
+            <div class="card-header bg-white border-bottom border-light py-3 d-flex justify-content-between align-items-center">
+                <h5 class="card-title text-warning fw-bold mb-0">
+                    <i class="bi bi-reply-all me-2"></i>Phản Hồi & Giải Quyết
+                </h5>
+                <span class="badge @statusBadgeClass">@statusText</span>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" action="/admin/contacts/reply">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.id" />
+
+                    @if (Model.status == "replied" && !string.IsNullOrEmpty(Model.reply_message))
+                    {
+                        <div class="alert alert-success border-0 py-2 px-3 mb-3 small d-flex align-items-center text-success">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            <div>
+                                Đã phản hồi ngày @(string.IsNullOrEmpty(Model.replied_at) ? "" : Convert.ToDateTime(Model.replied_at).ToString("dd/MM/yyyy HH:mm"))
+                            </div>
+                        </div>
+                    }
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-bold">Nội dung phản hồi *</label>
+                        <textarea name="replyMessage" rows="8" class="form-control bg-white text-dark border-light" placeholder="Nhập câu trả lời gửi đến khách hàng..." required>@Model.reply_message</textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-warning fw-bold w-100">
+                        <i class="bi bi-send me-1"></i> @(Model.status == "replied" ? "Cập nhật câu trả lời" : "Gửi phản hồi")
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteContactModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-light text-dark border border-light shadow-lg">
+            <div class="modal-header bg-white border-bottom border-light">
+                <h5 class="modal-title text-danger fw-bold">Xác Nhận Xóa Yêu Cầu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4 text-start">
+                Bạn có chắc chắn muốn xóa vĩnh viễn yêu cầu hỗ trợ của khách hàng <strong>@Model.name</strong>? Hành động này không thể hoàn tác.
+            </div>
+            <div class="modal-footer bg-white border-top border-light">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                <form method="post" action="/admin/contacts/delete">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.id" />
+                    <button type="submit" class="btn btn-danger fw-bold">Xóa vĩnh viễn</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,192 @@
+@{
+    ViewData["Title"] = ViewBag.PageTitle;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-gray-800"><i class="bi bi-arrow-counterclockwise me-2 text-danger"></i>Quản lý Hoàn / Hủy vé</h1>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Tìm kiếm vé cần xử lý</h6>
+    </div>
+    <div class="card-body bg-light">
+        <form id="searchForm" class="row g-3 align-items-center" onsubmit="event.preventDefault(); searchTickets();">
+            <div class="col-md-8">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" class="form-control" id="searchQuery" placeholder="Nhập Mã vé (ID), Email hoặc Số điện thoại của khách hàng..." required>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary w-100" id="btnSearch">Tìm kiếm vé</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Kết quả tìm kiếm</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle" id="ticketsTable" width="100%" cellspacing="0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Mã Vé</th>
+                        <th>Khách hàng</th>
+                        <th>Phim</th>
+                        <th>Suất chiếu / Phòng</th>
+                        <th>Ghế</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="ticketsTbody">
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">Vui lòng tìm kiếm vé.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Hủy Vé -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="cancelModalLabel"><i class="bi bi-exclamation-triangle me-2"></i>Xác nhận Hủy Vé</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Bạn có chắc chắn muốn hủy vé <strong id="cancelTicketIdDisplay" class="text-danger"></strong>?</p>
+        <p class="text-muted small">Lưu ý: Hành động này sẽ giải phóng ghế để người khác có thể mua. Bạn cần tự tiến hành hoàn tiền cho khách ngoài hệ thống (nếu có).</p>
+        
+        <div class="mb-3">
+            <label for="cancelReason" class="form-label">Lý do hoàn/hủy:</label>
+            <textarea class="form-control" id="cancelReason" rows="3" placeholder="Ví dụ: Khách yêu cầu, Sự cố kỹ thuật..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <input type="hidden" id="cancelTicketId">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" class="btn btn-danger" onclick="confirmCancel()">Xác nhận Hủy</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+    <script>
+        let currentModal = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            currentModal = new bootstrap.Modal(document.getElementById('cancelModal'));
+        });
+
+        function getStatusBadge(status) {
+            switch(status) {
+                case 'paid': return '<span class="badge bg-success">Đã thanh toán</span>';
+                case 'used': return '<span class="badge bg-secondary">Đã sử dụng</span>';
+                case 'cancelled': return '<span class="badge bg-danger">Đã hủy</span>';
+                case 'holding': return '<span class="badge bg-warning text-dark">Đang giữ chỗ</span>';
+                default: return `<span class="badge bg-info">${status}</span>`;
+            }
+        }
+
+        async function searchTickets() {
+            const query = document.getElementById('searchQuery').value.trim();
+            if (!query) return;
+
+            const btn = document.getElementById('btnSearch');
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang tìm...';
+            btn.disabled = true;
+
+            const tbody = document.getElementById('ticketsTbody');
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4"><div class="spinner-border text-primary"></div></td></tr>';
+
+            try {
+                const res = await fetch(`/admin/refunds/api/search?query=${encodeURIComponent(query)}`);
+                const data = await res.json();
+
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-muted">Không tìm thấy vé nào phù hợp.</td></tr>';
+                } else {
+                    let html = '';
+                    data.forEach(t => {
+                        let actionHtml = '';
+                        if (t.Status === 'paid' || t.Status === 'holding') {
+                            actionHtml = `<button class="btn btn-sm btn-outline-danger" onclick="openCancelModal(${t.TicketId})"><i class="bi bi-x-circle me-1"></i>Hủy vé</button>`;
+                        } else {
+                            actionHtml = `<span class="text-muted small">Không thể hủy</span>`;
+                        }
+
+                        html += `
+                            <tr>
+                                <td class="fw-bold">#${t.TicketId}</td>
+                                <td>
+                                    <div>${t.UserName || 'Khách Vãng Lai'}</div>
+                                    <small class="text-muted">${t.UserEmail || ''} - ${t.UserPhone || ''}</small>
+                                </td>
+                                <td class="text-primary fw-bold">${t.MovieTitle}</td>
+                                <td>
+                                    <div>${t.ShowDate} ${t.StartTime.substring(0,5)}</div>
+                                    <small class="text-muted">${t.RoomName}</small>
+                                </td>
+                                <td class="fw-bold text-center">${t.SeatCode}</td>
+                                <td class="text-success fw-bold text-end">${new Intl.NumberFormat('vi-VN').format(t.TotalPrice)}₫</td>
+                                <td class="text-center">${getStatusBadge(t.Status)}</td>
+                                <td class="text-center">${actionHtml}</td>
+                            </tr>
+                        `;
+                    });
+                    tbody.innerHTML = html;
+                }
+            } catch (error) {
+                console.error(error);
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-danger">Lỗi kết nối khi tìm kiếm.</td></tr>';
+            } finally {
+                btn.innerHTML = 'Tìm kiếm vé';
+                btn.disabled = false;
+            }
+        }
+
+        function openCancelModal(ticketId) {
+            document.getElementById('cancelTicketId').value = ticketId;
+            document.getElementById('cancelTicketIdDisplay').innerText = '#' + ticketId;
+            document.getElementById('cancelReason').value = '';
+            currentModal.show();
+        }
+
+        async function confirmCancel() {
+            const ticketId = document.getElementById('cancelTicketId').value;
+            const reason = document.getElementById('cancelReason').value;
+
+            try {
+                const res = await fetch('/admin/refunds/api/cancel', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ticketId: parseInt(ticketId), reason: reason })
+                });
+
+                const result = await res.json();
+
+                if (res.ok && result.success) {
+                    alert(result.message);
+                    currentModal.hide();
+                    searchTickets(); // Refresh
+                } else {
+                    alert('Lỗi: ' + (result.error || 'Hủy vé thất bại'));
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Lỗi kết nối khi hủy vé!');
+            }
+        }
+    </script>
+}

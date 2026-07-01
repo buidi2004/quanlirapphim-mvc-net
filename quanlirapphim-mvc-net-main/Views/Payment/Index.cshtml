@@ -1,0 +1,247 @@
+@model CinemaXNet.ViewModels.BookingConfirmViewModel
+@{
+    ViewData["Title"] = "Xác nhận thanh toán";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var remainingSeconds = (int)Math.Max(0, (Model.HoldExpiryTime - DateTime.UtcNow).TotalSeconds);
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+
+        <!-- Countdown Timer -->
+        <div class="alert alert-warning border-0 shadow-lg d-flex align-items-center mb-4 p-3"
+             role="alert" style="background-color: #382c0f; color: #ffc107;">
+            <i class="bi bi-clock-history me-3 fs-3 animate-pulse"></i>
+            <div class="timer-container ms-auto">
+                <span class="d-block small text-secondary me-2">Thời gian giữ ghế:</span>
+                <strong id="countdown-timer" class="timer-value" data-remaining-seconds="@remainingSeconds">--:--</strong>
+            </div>
+        </div>
+
+        <!-- Thông tin đặt vé -->
+        <div class="card border-0 shadow mb-4" style="background-color: #1a1a2e !important; border: 1px solid #2d2d44 !important;">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#paymentSummaryCollapse" aria-expanded="true" aria-controls="paymentSummaryCollapse" style="cursor: pointer;">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-film me-2 text-warning"></i>Chi tiết đặt vé</h5>
+                <i class="bi bi-chevron-expand d-lg-none text-dark"></i>
+            </div>
+            <div id="paymentSummaryCollapse" class="collapse d-lg-block show">
+                <div class="card-body p-4">
+                    <h4 class="text-warning fw-bold mb-3">@Model.MovieTitle</h4>
+                    <div class="row g-2 mb-3">
+                        <div class="col-sm-6 text-secondary">
+                            <i class="bi bi-calendar3 me-2 text-dark"></i>Ngày chiếu: <span class="text-dark fw-semibold">@Model.ShowDate.ToString("dd/MM/yyyy")</span>
+                        </div>
+                        <div class="col-sm-6 text-secondary">
+                            <i class="bi bi-clock me-2 text-dark"></i>Suất chiếu: <span class="text-dark fw-semibold">@Model.StartTime.ToString("HH:mm")</span>
+                        </div>
+                        <div class="col-sm-6 text-secondary">
+                            <i class="bi bi-door-open me-2 text-dark"></i>Phòng chiếu: <span class="text-dark fw-semibold">@Model.RoomName</span>
+                        </div>
+                        <div class="col-sm-6 text-secondary">
+                            <i class="bi bi-ticket me-2 text-dark"></i>Số lượng: <span class="text-dark fw-semibold">@Model.Quantity vé</span>
+                        </div>
+                    </div>
+                    <hr class="border-light">
+                    <div class="mb-0">
+                        <label class="text-secondary small fw-bold d-block mb-2">Ghế ngồi đã chọn:</label>
+                        @foreach (var seat in Model.SelectedSeats)
+                        {
+                            <span class="badge bg-success fs-6 me-2 shadow-sm">@seat</span>
+                        }
+                    </div>
+                    
+                    @if (ViewBag.Concessions != null)
+                    {
+                        <hr class="border-light">
+                        <div class="mb-0">
+                            <label class="text-secondary small fw-bold d-block mb-2">Bắp/Nước đã chọn:</label>
+                            <ul class="list-unstyled mb-0">
+                            @{
+                                var concessionsList = ViewBag.Concessions as List<CinemaXNet.Controllers.ConcessionCartItem>;
+                                if (concessionsList != null)
+                                {
+                                    foreach (var c in concessionsList)
+                                    {
+                                        <li class="text-light d-flex justify-content-between mb-1">
+                                            <span>@c.qty x @c.name</span>
+                                            <span class="text-warning fw-bold">@((c.qty * c.price).ToString("N0"))₫</span>
+                                        </li>
+                                    }
+                                }
+                            }
+                            </ul>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Mã giảm giá -->
+        <div class="card border-0 shadow mb-4" style="background-color: #1a1a2e !important; border: 1px solid #2d2d44 !important;">
+            <div class="card-body p-4">
+                <label class="form-label text-dark fw-bold">Mã giảm giá (Voucher)</label>
+                <div class="input-group">
+                    <input type="text" id="promo-input"
+                           class="form-control bg-light text-dark border-light py-2"
+                           placeholder="Nhập mã giảm giá (ví dụ: GIAM20)..."
+                           value="@(Model.PromotionCode ?? "")">
+                    <button class="btn btn-warning fw-bold px-4" id="btn-apply-promo" type="button">
+                        Áp dụng
+                    </button>
+                </div>
+                <div id="promo-feedback" class="mt-2 small"></div>
+            </div>
+        </div>
+
+        <!-- Tổng tiền -->
+        <div class="card border-0 shadow mb-4" style="background-color: #1a1a2e !important; border: 1px solid #2d2d44 !important;">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-secondary">Tạm tính (@Model.Quantity vé):</span>
+                    <span class="fw-semibold text-dark">@Model.Subtotal.ToString("N0")₫</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2" id="discount-row"
+                     style="@(Model.Discount > 0 ? "" : "display:none!important")">
+                    <span class="text-success">Giảm giá:</span>
+                    <span class="text-success fw-bold" id="discount-display">-@Model.Discount.ToString("N0")₫</span>
+                </div>
+                <hr class="border-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <strong class="text-dark fs-5">TỔNG THANH TOÁN:</strong>
+                    <strong class="text-warning fs-3" id="total-display">@Model.TotalPrice.ToString("N0")₫</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form thanh toán -->
+        <form method="post" action="/payment/confirm" id="payment-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="totalPrice" id="final-total" value="@Model.TotalPrice">
+            <input type="hidden" name="promotionCode" id="final-promo" value="@(Model.PromotionCode ?? "")">
+
+            <div class="mb-4">
+                <label class="form-label fw-bold text-dark mb-3">Phương thức thanh toán</label>
+                <div class="d-grid gap-3">
+                    <div class="form-check bg-white rounded p-3 border border-light shadow-sm">
+                        <input class="form-check-input ms-0 me-3" type="radio" name="paymentMethod" id="pay-vnpay" value="vnpay" required>
+                        <label class="form-check-label text-dark w-100" for="pay-vnpay" style="cursor: pointer;">
+                            <i class="bi bi-credit-card me-2 text-primary fs-5"></i>
+                            <strong class="fs-6">VNPay</strong>
+                            <small class="text-secondary d-block mt-1">Thẻ ATM nội địa, Internet Banking, Quét mã QR</small>
+                        </label>
+                    </div>
+                    <div class="form-check bg-white rounded p-3 border border-light shadow-sm">
+                        <input class="form-check-input ms-0 me-3" type="radio" name="paymentMethod" id="pay-momo" value="momo">
+                        <label class="form-check-label text-dark w-100" for="pay-momo" style="cursor: pointer;">
+                            <i class="bi bi-phone me-2 text-danger fs-5"></i>
+                            <strong class="fs-6">Ví điện tử MoMo</strong>
+                            <small class="text-secondary d-block mt-1">Thanh toán nhanh qua ứng dụng MoMo</small>
+                        </label>
+                    </div>
+                    <div class="form-check bg-white rounded p-3 border border-light shadow-sm">
+                        <input class="form-check-input ms-0 me-3" type="radio" name="paymentMethod" id="pay-cash" value="cash">
+                        <label class="form-check-label text-dark w-100" for="pay-cash" style="cursor: pointer;">
+                            <i class="bi bi-cash-coin me-2 text-success fs-5"></i>
+                            <strong class="fs-6">Thanh toán tại quầy</strong>
+                            <small class="text-secondary d-block mt-1">Hoàn thành giao dịch trực tiếp tại rạp</small>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-warning w-100 btn-lg fw-bold py-3 shadow mb-4" id="btn-pay-submit">
+                <i class="bi bi-check-circle me-2"></i>XÁC NHẬN THANH TOÁN
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const paymentForm = document.getElementById('payment-form');
+    if (paymentForm) {
+        paymentForm.addEventListener('submit', () => {
+            const btn = document.getElementById('btn-pay-submit');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang xử lý giao dịch...';
+            }
+        });
+    }
+
+    // Timer Logic
+    const timerElement = document.getElementById('countdown-timer');
+    if (timerElement) {
+        let remainingSeconds = parseInt(timerElement.getAttribute('data-remaining-seconds'));
+        if (remainingSeconds > 0) {
+            const updateTimer = () => {
+                const minutes = Math.floor(remainingSeconds / 60);
+                const seconds = remainingSeconds % 60;
+                timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            };
+            updateTimer();
+
+            const timerInterval = setInterval(() => {
+                remainingSeconds--;
+                updateTimer();
+                
+                if (remainingSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    timerElement.textContent = 'Hết hạn';
+                    alert('Thời gian giữ ghế đã hết. Hệ thống sẽ tự động chuyển về trang Đặt vé.');
+                    window.location.href = '/'; 
+                }
+            }, 1000);
+        } else {
+            timerElement.textContent = 'Hết hạn';
+            alert('Thời gian giữ ghế đã hết. Vui lòng đặt lại vé.');
+            window.location.href = '/';
+        }
+    }
+
+    // Promo Logic
+    const btnApplyPromo = document.getElementById('btn-apply-promo');
+    if (btnApplyPromo) {
+        btnApplyPromo.addEventListener('click', () => {
+            const code = document.getElementById('promo-input').value.trim();
+            const feedback = document.getElementById('promo-feedback');
+            const subtotal = @Model.Subtotal;
+
+            if (!code) {
+                feedback.textContent = 'Vui lòng nhập mã giảm giá.';
+                feedback.className = 'mt-2 small text-danger';
+                return;
+            }
+
+            fetch(`/api/promotions/apply?code=${code}&amount=${subtotal}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        feedback.textContent = data.message;
+                        feedback.className = 'mt-2 small text-success';
+                        
+                        document.getElementById('discount-row').style.setProperty('display', 'flex', 'important');
+                        document.getElementById('discount-display').textContent = '-' + new Intl.NumberFormat('vi-VN').format(data.discountAmount) + '₫';
+                        document.getElementById('total-display').textContent = new Intl.NumberFormat('vi-VN').format(data.finalTotal) + '₫';
+                        document.getElementById('final-total').value = data.finalTotal;
+                        document.getElementById('final-promo').value = code;
+                    } else {
+                        feedback.textContent = data.message;
+                        feedback.className = 'mt-2 small text-danger';
+                        
+                        document.getElementById('discount-row').style.setProperty('display', 'none', 'important');
+                        document.getElementById('total-display').textContent = new Intl.NumberFormat('vi-VN').format(subtotal) + '₫';
+                        document.getElementById('final-total').value = subtotal;
+                        document.getElementById('final-promo').value = '';
+                    }
+                })
+                .catch(err => {
+                    feedback.textContent = 'Có lỗi xảy ra, vui lòng thử lại sau.';
+                    feedback.className = 'mt-2 small text-danger';
+                });
+        });
+    }
+});
+</script>
+}

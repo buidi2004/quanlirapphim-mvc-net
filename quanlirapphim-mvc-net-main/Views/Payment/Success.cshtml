@@ -1,0 +1,99 @@
+@model CinemaXNet.ViewModels.BookingConfirmViewModel
+@{
+    var transactionId = ViewBag.TransactionId as string ?? "CXN-" + DateTime.Now.Ticks.ToString();
+    ViewData["Title"] = "Đặt vé thành công!";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row justify-content-center py-5">
+    <div class="col-md-10 text-center">
+        <div class="mb-4">
+            <i class="bi bi-check-circle-fill text-success display-1 shadow-sm animate-bounce-in"></i>
+        </div>
+
+        <h1 class="text-success fw-bold mb-5 animate-pulse-glow d-inline-block px-4 py-2 rounded">
+            ĐẶT VÉ THÀNH CÔNG!
+        </h1>
+
+        <p class="lead text-dark mb-5">
+            Cảm ơn bạn đã lựa chọn CinemaX. Mã vé của bạn đã được ghi nhận trong hệ thống.
+        </p>
+
+        <!-- Vé xem phim lật 3D -->
+        <div class="ticket-flip mb-5" onclick="this.classList.toggle('flipped')">
+            <div class="ticket-inner shadow-lg">
+
+                <!-- Mặt trước -->
+                <div class="ticket-front">
+                    <h5 class="text-warning fw-bold mb-3" style="letter-spacing: 2px;">
+                        <i class="bi bi-film me-2"></i>CINEMAX E-TICKET
+                    </h5>
+                    <div class="text-start w-100 text-light">
+                        <p class="mb-1 text-truncate" title="@Model.MovieTitle"><span class="text-secondary small d-inline-block" style="width: 80px;">Phim:</span> <strong class="fs-5 text-white">@Model.MovieTitle</strong></p>
+                        <p class="mb-1"><span class="text-secondary small d-inline-block" style="width: 80px;">Phòng:</span> <strong>@Model.RoomName</strong></p>
+                        <p class="mb-1"><span class="text-secondary small d-inline-block" style="width: 80px;">Suất:</span> <strong class="text-white">@Model.ShowDate.ToString("dd/MM/yyyy") - @Model.StartTime.ToString("HH:mm")</strong></p>
+                        <p class="mb-1"><span class="text-secondary small d-inline-block" style="width: 80px;">Ghế:</span> <strong class="text-warning fs-5">@(string.Join(", ", Model.SelectedSeats))</strong></p>
+                        <p class="mb-1 mt-2 border-top border-secondary pt-2"><span class="text-secondary small d-inline-block" style="width: 80px;">Mã GD:</span> <strong class="text-info font-monospace">@transactionId</strong></p>
+                        <p class="mb-0 mt-3 text-center text-secondary small animate-pulse">
+                            <i class="bi bi-hand-index-thumb me-1"></i> Chạm để quét mã QR
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Mặt sau -->
+                <div class="ticket-back d-flex flex-column justify-content-center align-items-center">
+                    <p class="fw-bold text-warning mb-2" style="letter-spacing: 1px;">MÃ QR KIỂM VÉ</p>
+                    <div class="bg-white p-2 rounded d-inline-block shadow-sm">
+                        <canvas id="qr-canvas" data-qr-text="@(transactionId)" width="130" height="130"></canvas>
+                    </div>
+                    <p class="font-monospace small mt-3 mb-0 text-dark px-3 py-1 bg-light rounded border border-light">
+                        @transactionId
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex gap-3 justify-content-center mt-5">
+            <a href="/my-tickets" class="btn btn-warning fw-bold px-4 btn-lg shadow">
+                <i class="bi bi-ticket-perforated me-2"></i>Vé của tôi
+            </a>
+            <a href="/" class="btn btn-outline-secondary fw-semibold px-4 btn-lg text-dark">
+                Về trang chủ
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Confetti Effect -->
+<div class="confetti-container" id="confetti-container"></div>
+
+@section Scripts {
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.1/qrcode.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('confetti-container');
+    const colors = ['#ffc107', '#198754', '#dc3545', '#0dcaf0', '#d63384'];
+    for (let i = 0; i < 50; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.left = Math.random() * 100 + 'vw';
+        piece.style.animationDelay = Math.random() * 2 + 's';
+        piece.style.animationDuration = Math.random() * 2 + 2 + 's';
+        container.appendChild(piece);
+    }
+
+    const qrCanvas = document.getElementById('qr-canvas');
+    if (qrCanvas) {
+        const qrText = qrCanvas.getAttribute('data-qr-text');
+        QRCode.toCanvas(qrCanvas, qrText, { 
+            width: 130, 
+            margin: 1,
+            color: { dark: '#000000', light: '#ffffff' }
+        }, function (error) {
+            if (error) console.error(error);
+        });
+    }
+});
+</script>
+}

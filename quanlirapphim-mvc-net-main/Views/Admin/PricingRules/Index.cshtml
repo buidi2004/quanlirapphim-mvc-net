@@ -1,0 +1,64 @@
+@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "Luật Giá Vé";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-light">
+    <h1 class="h2 text-warning fw-bold">Quản Lý Luật Giá Vé (Dynamic Pricing)</h1>
+    <button class="btn btn-warning fw-bold btn-sm shadow-sm" disabled>
+        <i class="bi bi-plus-lg"></i> Thêm luật mới (Sắp ra mắt)
+    </button>
+</div>
+
+<div class="card bg-white border border-light rounded shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-dark table-hover mb-0 align-middle">
+            <thead class="text-uppercase" style="background-color: #111;">
+                <tr>
+                    <th scope="col">Tên Luật</th>
+                    <th scope="col">Điều kiện</th>
+                    <th scope="col">Giá trị</th>
+                    <th scope="col">Loại điều chỉnh</th>
+                    <th scope="col">Mức điều chỉnh</th>
+                    <th scope="col">Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="6" class="text-center text-muted">Chưa có luật giá nào.</td></tr>
+                }
+                else
+                {
+                    foreach (var rule in Model)
+                    {
+                        <tr>
+                            <td><strong class="text-white">@rule.name</strong></td>
+                            <td>
+                                @if(rule.condition_type == "TimeOfDay") { <span class="badge bg-info text-dark">Khung giờ</span> }
+                                else if(rule.condition_type == "DayOfWeek") { <span class="badge bg-primary">Ngày trong tuần</span> }
+                                else { <span class="badge bg-secondary">Khác</span> }
+                            </td>
+                            <td>@rule.condition_value</td>
+                            <td>
+                                @if(rule.adjustment_type == "Percent") { <span>Theo phần trăm (%)</span> }
+                                else { <span>Cộng/Trừ tiền mặt</span> }
+                            </td>
+                            <td class="@(rule.adjustment_value > 0 ? "text-danger" : "text-success fw-bold")">
+                                @(rule.adjustment_value > 0 ? "+" : "")@rule.adjustment_value @(rule.adjustment_type == "Percent" ? "%" : "VND")
+                            </td>
+                            <td>
+                                @if (rule.is_active == 1) {
+                                    <span class="badge bg-success">Đang bật</span>
+                                } else {
+                                    <span class="badge bg-danger">Đã tắt</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

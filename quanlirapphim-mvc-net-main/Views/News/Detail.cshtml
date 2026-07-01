@@ -1,0 +1,65 @@
+@{
+    ViewData["Title"] = ViewBag.Article?.Title ?? "Bài viết";
+    var article = ViewBag.Article as CinemaXNet.ViewModels.NewsItemViewModel;
+    var related  = ViewBag.Related as List<CinemaXNet.ViewModels.NewsItemViewModel> ?? [];
+}
+
+<div class="row g-4">
+    <div class="col-md-8">
+        <!-- Hero image -->
+        <div class="rounded-3 overflow-hidden mb-4 shadow" style="height:300px;">
+            <img src="@(article?.ImageUrl ?? "https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1200")"
+                 class="w-100 h-100" style="object-fit:cover;">
+        </div>
+
+        <span class="badge bg-warning text-dark mb-2">@article?.Category</span>
+        <h1 class="text-white fw-bold mb-2" style="font-size:1.6rem;">@article?.Title</h1>
+        <p class="text-secondary small mb-4">
+            <i class="bi bi-calendar3 me-1"></i>@article?.PublishedAt
+        </p>
+
+        <div class="text-secondary" style="line-height:1.8;">
+            <p>@article?.Summary</p>
+            <p>Đây là nội dung chi tiết của bài viết "<strong class="text-dark">@article?.Title</strong>".
+            Trong một ứng dụng thực tế, nội dung này sẽ được lấy từ cơ sở dữ liệu với đầy đủ định dạng HTML/Markdown.</p>
+            <p>CinemaX luôn cập nhật những tin tức mới nhất từ thế giới điện ảnh, từ các bộ phim bom tấn Hollywood
+            đến những tác phẩm nghệ thuật độc lập. Hãy theo dõi chúng tôi để không bỏ lỡ bất kỳ thông tin nào!</p>
+        </div>
+
+        <div class="mt-4">
+            <a href="/news" class="text-secondary text-decoration-none small">
+                <i class="bi bi-arrow-left me-1"></i>Quay lại tin tức
+            </a>
+        </div>
+    </div>
+
+    <!-- Sidebar: Related -->
+    <div class="col-md-4">
+        <h5 class="text-warning mb-3"><i class="bi bi-bookmark-fill me-2"></i>Bài viết liên quan</h5>
+        <div class="d-flex flex-column gap-3">
+            @foreach (var r in related)
+            {
+                <a href="/news/@r.Slug" class="text-decoration-none">
+                    <div class="card bg-white border-light d-flex flex-row gap-3 p-2 h-100"
+                         style="transition:.2s;" onmouseover="this.style.borderColor='#ffc107'"
+                         onmouseout="this.style.borderColor='#6c757d'">
+                        <img src="@(r.ImageUrl ?? "https://images.unsplash.com/photo-1478720568477-152d9b164e26?q=80&w=200")"
+                             style="width:75px;height:60px;object-fit:cover;" class="rounded flex-shrink-0">
+                        <div>
+                            <span class="badge bg-secondary" style="font-size:.65rem;">@r.Category</span>
+                            <p class="text-dark small mb-0 mt-1" style="line-height:1.3;">@r.Title</p>
+                        </div>
+                    </div>
+                </a>
+            }
+        </div>
+
+        <div class="card bg-white border-light mt-4 p-3 text-center">
+            <h6 class="text-warning mb-2">Đặt vé xem phim</h6>
+            <p class="text-secondary small mb-3">Trải nghiệm điện ảnh đỉnh cao</p>
+            <a href="/movies" class="btn btn-warning btn-sm fw-bold">
+                <i class="bi bi-ticket-perforated me-1"></i>Đặt vé ngay
+            </a>
+        </div>
+    </div>
+</div>

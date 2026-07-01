@@ -1,0 +1,11 @@
+bin/
+obj/
+*.db
+*.db-shm
+*.db-wal
+.DS_Store
+.idea/
+.vs/
+*.user
+appsettings.Development.json
+.agents/

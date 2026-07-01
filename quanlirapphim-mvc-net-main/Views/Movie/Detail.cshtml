@@ -1,0 +1,197 @@
+@model CinemaXNet.ViewModels.MovieDetailViewModel
+@{
+    ViewData["Title"] = Model.Title;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var selectedDate = (DateOnly)(ViewBag.SelectedDate ?? DateOnly.FromDateTime(DateTime.Today));
+    var daysOfWeek = new[] { "Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy" };
+}
+
+<div class="row g-4 mb-5">
+    <!-- Cột trái: Poster với 3D tilt -->
+    <div class="col-md-4 col-lg-3 text-center text-md-start">
+        <div class="movie-card-3d">
+            <img src="@(!string.IsNullOrEmpty(Model.PosterUrl) ? Model.PosterUrl : "https://placehold.co/400x600/111/fff?text=No+Poster")"
+                 class="img-fluid rounded shadow-lg border border-light movie-card"
+                 alt="@Model.Title"
+                 data-tilt
+                 style="max-height: 420px; object-fit: cover; width: 100%;">
+        </div>
+    </div>
+
+    <!-- Cột phải: Thông tin chi tiết -->
+    <div class="col-md-8 col-lg-9">
+        <h1 class="display-5 fw-bold text-dark mb-3">@Model.Title</h1>
+        
+        <div class="d-flex flex-wrap gap-2 mb-4">
+            @if (!string.IsNullOrEmpty(Model.AgeRating))
+            {
+                <span class="badge badge-@Model.AgeRating.ToLower() fs-6 p-2 rounded">
+                    @Model.AgeRating
+                </span>
+            }
+            <span class="badge bg-secondary fs-6 p-2 rounded">
+                <i class="bi bi-clock me-1"></i> @Model.FormattedDuration
+            </span>
+            @if (!string.IsNullOrEmpty(Model.Genre))
+            {
+                <span class="badge bg-secondary fs-6 p-2 rounded">
+                    <i class="bi bi-tag-fill me-1"></i> @Model.Genre
+                </span>
+            }
+            @if (Model.ReviewCount > 0)
+            {
+                <span class="badge bg-dark fs-6 p-2 rounded text-warning border border-warning">
+                    <i class="bi bi-star-fill me-1"></i> @Model.AverageRating.ToString("0.0") / 5 (@Model.ReviewCount)
+                </span>
+            }
+            <span class="badge bg-white shadow-sm border border-light text-warning fs-6 p-2 rounded">
+                @(Model.Status == "now_showing" ? "Đang chiếu" : (Model.Status == "coming_soon" ? "Sắp chiếu" : "Đã kết thúc"))
+            </span>
+        </div>
+
+        <div class="mb-4">
+            <button class="btn btn-outline-warning rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#trailerModal">
+                <i class="bi bi-play-circle me-2"></i>Xem Trailer
+            </button>
+        </div>
+
+        <h5 class="text-warning border-start border-warning border-3 ps-2 mb-2 fw-bold">Mô tả phim</h5>
+        <p class="text-dark-50 lh-lg mb-4" style="text-align: justify; color: #ced4da;">
+            @Html.Raw((!string.IsNullOrEmpty(Model.Description) ? Model.Description.Replace("\n", "<br/>") : "Chưa có thông tin mô tả chi tiết cho bộ phim này."))
+        </p>
+    </div>
+</div>
+
+<!-- Lịch chiếu trượt ngang + Thẻ suất chiếu đẹp -->
+<div class="card bg-white border border-light rounded p-4 shadow-lg">
+    <h3 class="h4 text-warning border-start border-warning border-4 ps-3 fw-bold mb-4">
+        <i class="bi bi-calendar3 me-2"></i>LỊCH CHIẾU & SUẤT CHIẾU
+    </h3>
+
+    <!-- Date slider — Trượt ngang, scrollbar ẩn -->
+    <div class="date-slider mb-4 pb-3 border-bottom border-light">
+        @for (int i = 0; i < 7; i++)
+        {
+            var currentDate = DateOnly.FromDateTime(DateTime.Today.AddDays(i));
+            var dateVal = currentDate.ToString("yyyy-MM-dd");
+            var dayLabel = (i == 0) ? "Hôm nay" : daysOfWeek[(int)DateTime.Today.AddDays(i).DayOfWeek];
+            var dayNumber = currentDate.Day;
+            var monthLabel = "Th" + currentDate.Month;
+            var activeClass = (currentDate == selectedDate) ? "active" : "";
+            
+            <a href="/movies/@Model.Id?date=@dateVal"
+               class="date-item @activeClass">
+                <span class="day-name">@dayLabel</span>
+                <span class="day-number">@dayNumber</span>
+                <span class="day-name">@monthLabel</span>
+            </a>
+        }
+    </div>
+
+    <!-- Showtime cards -->
+    <div class="showtimes-container">
+        @if (Model.Status != "now_showing")
+        {
+            <div class="text-center py-4 text-secondary">
+                <i class="bi bi-calendar-x display-6 mb-2 d-block"></i>
+                Phim hiện không ở trạng thái "Đang chiếu" nên không có suất chiếu.
+            </div>
+        }
+        else if (!Model.Showtimes.Any())
+        {
+            <div class="text-center py-4 text-secondary">
+                <i class="bi bi-clock-history display-6 mb-2 d-block"></i>
+                Không có suất chiếu nào vào ngày @selectedDate.ToString("dd/MM/yyyy"). Vui lòng chọn ngày khác.
+            </div>
+        }
+        else
+        {
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+                @foreach (var showtime in Model.Showtimes)
+                {
+                    <div class="col">
+                        <div class="showtime-card">
+                            <div>
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <span class="room-badge">
+                                        @showtime.RoomName
+                                    </span>
+                                    <span class="seats-left @(showtime.AvailableSeats <= 20 ? "low" : "")">
+                                        <i class="bi bi-people-fill me-1"></i>@showtime.AvailableSeats ghế trống
+                                    </span>
+                                </div>
+                                <div class="time">@showtime.StartTime.ToString("HH:mm")</div>
+                                <div class="price">@showtime.FormattedPrice</div>
+                            </div>
+                            <a href="/booking/@showtime.Id"
+                               class="btn btn-warning w-100 fw-bold btn-select-showtime @(showtime.AvailableSeats == 0 ? "disabled btn-secondary text-muted" : "")">
+                                @(showtime.AvailableSeats == 0 ? "Hết vé" : "Chọn ghế")
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Reviews Section -->
+<div class="card bg-white border border-light rounded p-4 shadow-lg mt-4">
+    <h3 class="h4 text-warning border-start border-warning border-4 ps-3 fw-bold mb-4">
+        <i class="bi bi-star-fill me-2"></i>ĐÁNH GIÁ PHIM
+    </h3>
+
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <form method="POST" asp-controller="Reviews" asp-action="Submit" class="mb-4 bg-white shadow-sm p-3 rounded border border-light">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="MovieId" value="@Model.Id">
+            <div class="mb-3">
+                <label class="form-label text-dark">Đánh giá của bạn</label>
+                <select name="Rating" class="form-select bg-white text-warning border-light" style="width: auto;">
+                    <option value="5">★★★★★ (5 sao) - Tuyệt vời</option>
+                    <option value="4">★★★★☆ (4 sao) - Rất tốt</option>
+                    <option value="3">★★★☆☆ (3 sao) - Khá</option>
+                    <option value="2">★★☆☆☆ (2 sao) - Trung bình</option>
+                    <option value="1">★☆☆☆☆ (1 sao) - Tệ</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <textarea name="Comment" class="form-control bg-white text-dark border-light" rows="3" placeholder="Chia sẻ cảm nghĩ của bạn về bộ phim này..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-warning"><i class="bi bi-send me-1"></i> Gửi đánh giá</button>
+        </form>
+    }
+    else
+    {
+        <div class="alert bg-white shadow-sm text-dark border-light">
+            Vui lòng <a href="/login" class="text-warning text-decoration-none fw-bold">đăng nhập</a> để viết đánh giá cho bộ phim này.
+        </div>
+    }
+
+    <div class="reviews-list mt-4">
+        @if (!Model.Reviews.Any())
+        {
+            <p class="text-secondary text-center py-3"><i class="bi bi-chat-square-text me-2"></i>Chưa có đánh giá nào cho phim này.</p>
+        }
+        else
+        {
+            foreach (var review in Model.Reviews)
+            {
+                <div class="review-item border-bottom border-light pb-3 mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong class="text-dark"><i class="bi bi-person-circle me-2 text-secondary"></i>@review.User?.Username</strong>
+                        <small class="text-muted">@review.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                    </div>
+                    <div class="text-warning mb-2">
+                        @for(int i = 1; i <= 5; i++)
+                        {
+                            <i class="bi bi-star@(i <= review.Rating ? "-fill" : "")"></i>
+                        }
+                    </div>
+                    <p class="text-dark-50 mb-0" style="color: #adb5bd;">@Html.Raw(review.Comment.Replace("\n", "<br/>"))</p>
+                </div>
+            }
+        }
+    </div>
+</div>

@@ -1,0 +1,44 @@
+@{
+    ViewData["Title"] = "CinemaX App — Tải Ứng Dụng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <div class="row align-items-center">
+        <!-- Text content -->
+        <div class="col-md-6 mb-5 mb-md-0 text-center text-md-start">
+            <h1 class="display-4 fw-bold text-warning mb-3">Tải Ứng Dụng CinemaX</h1>
+            <p class="fs-4 text-secondary mb-4">Trải nghiệm điện ảnh đỉnh cao nay nằm gọn trong lòng bàn tay bạn.</p>
+            
+            <ul class="list-unstyled mb-5">
+                <li class="mb-3 fs-5"><i class="bi bi-check-circle-fill text-success me-2"></i> Đặt vé siêu tốc chỉ trong 3 chạm</li>
+                <li class="mb-3 fs-5"><i class="bi bi-check-circle-fill text-success me-2"></i> Nhận vé điện tử (QR Code) không cần xếp hàng</li>
+                <li class="mb-3 fs-5"><i class="bi bi-check-circle-fill text-success me-2"></i> Thông báo lịch chiếu & ưu đãi độc quyền</li>
+                <li class="mb-3 fs-5"><i class="bi bi-check-circle-fill text-success me-2"></i> Quản lý điểm thưởng thẻ thành viên dễ dàng</li>
+            </ul>
+
+            <div class="d-flex flex-column flex-sm-row justify-content-center justify-content-md-start gap-3">
+                <a href="#" onclick="alert('Đang chuyển hướng tới Apple Store...')" class="btn btn-outline-light rounded-pill px-4 py-3 fs-5 border-2 text-decoration-none">
+                    <i class="bi bi-apple me-2"></i>Tải trên App Store
+                </a>
+                <a href="#" onclick="alert('Đang chuyển hướng tới Google Play...')" class="btn btn-outline-light rounded-pill px-4 py-3 fs-5 border-2 text-decoration-none">
+                    <i class="bi bi-google-play me-2"></i>Tải trên Google Play
+                </a>
+            </div>
+            
+            <div class="mt-5 d-flex align-items-center justify-content-center justify-content-md-start gap-4">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://cinemax.vn/app" alt="QR Code" class="bg-white p-2 rounded-3 shadow">
+                <div class="text-start">
+                    <h5 class="fw-bold">Quét để tải nhanh</h5>
+                    <p class="text-secondary small mb-0">Hỗ trợ thiết bị iOS 13.0 và Android 8.0 trở lên.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phone Mockup -->
+        <div class="col-md-6 text-center position-relative">
+            <div class="position-absolute top-50 start-50 translate-middle w-100 h-100 bg-warning rounded-circle opacity-10" style="filter: blur(100px); z-index: 0;"></div>
+            <img src="https://placehold.co/400x800/1a1a2e/ffc107?text=CinemaX+App+UI" alt="CinemaX App Mockup" class="img-fluid rounded-5 shadow-lg border border-secondary position-relative z-1" style="max-height: 700px; transform: rotate(-5deg);">
+        </div>
+    </div>
+</div>

@@ -1,0 +1,838 @@
+/* public/assets/css/app.css */
+/* ═══════════════════════════════════════════════════════════
+   CinemaX — Premium Frontend Styles
+   Implements all 10 techniques from frontend_skills.md
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Base Typography ──────────────────────────────────────── */
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* ══════════════════════════════════════════════════════════
+   #10  HERO BANNER — Trang chủ
+   ══════════════════════════════════════════════════════════ */
+.hero-banner {
+    position: relative;
+    overflow: hidden;
+    padding: 5rem 2rem;
+    text-align: center;
+    border-radius: 16px;
+    background: linear-gradient(
+        135deg,
+        #f8f9fa 0%,
+        #e9ecef 40%,
+        #dee2e6 70%,
+        #ced4da 100%
+    );
+    border: 1px solid #222244;
+}
+.hero-banner::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+        circle at 30% 40%,
+        rgba(255, 193, 7, 0.08) 0%,
+        transparent 50%
+    );
+    pointer-events: none;
+}
+.hero-banner::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    right: -20%;
+    width: 150%;
+    height: 150%;
+    background: radial-gradient(
+        circle at 70% 70%,
+        rgba(255, 193, 7, 0.05) 0%,
+        transparent 40%
+    );
+    pointer-events: none;
+}
+.hero-banner h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: #ffc107;
+    text-shadow: 0 4px 20px rgba(255, 193, 7, 0.3);
+    position: relative;
+    z-index: 1;
+}
+.hero-banner p {
+    color: #ced4da;
+    font-size: 1.15rem;
+    max-width: 500px;
+    margin: 1rem auto;
+    position: relative;
+    z-index: 1;
+}
+.hero-banner .btn {
+    position: relative;
+    z-index: 1;
+}
+
+/* ══════════════════════════════════════════════════════════
+   #3  POSTER PHIM NGHIÊNG 3D — Movie cards
+   ══════════════════════════════════════════════════════════ */
+.movie-card-3d {
+    perspective: 800px;
+}
+.movie-card {
+    cursor: pointer;
+    transition: transform 0.15s ease-out, box-shadow 0.3s ease;
+    transform-style: preserve-3d;
+    border-radius: 12px;
+    overflow: hidden;
+}
+.movie-card:hover {
+    box-shadow: 0 20px 40px rgba(255, 193, 7, 0.2) !important;
+}
+
+/* ══════════════════════════════════════════════════════════
+   #7  LỊCH CHIẾU TRƯỢT NGANG — Date slider
+   ══════════════════════════════════════════════════════════ */
+.date-slider {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    scrollbar-width: none;
+}
+.date-slider::-webkit-scrollbar {
+    display: none;
+}
+.date-item {
+    flex-shrink: 0;
+    min-width: 90px;
+    padding: 0.75rem 0.5rem;
+    border-radius: 12px;
+    text-align: center;
+    border: 1px solid #444;
+    background: transparent;
+    color: #ccc;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+.date-item:hover {
+    border-color: #ffc107;
+    color: #fff;
+}
+.date-item.active {
+    background: #ffc107;
+    color: #000;
+    font-weight: 700;
+    border-color: #ffc107;
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+}
+.date-item .day-name {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    opacity: 0.7;
+}
+.date-item .day-number {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+/* ══════════════════════════════════════════════════════════
+   #8  THẺ SUẤT CHIẾU ĐẸP — Showtime cards
+   ══════════════════════════════════════════════════════════ */
+.showtime-card {
+    background: linear-gradient(135deg, #ced4da, #e9ecef);
+    border: 1px solid #2d2d44;
+    border-radius: 12px;
+    padding: 1.25rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.showtime-card:hover {
+    border-color: #ffc107;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(255, 193, 7, 0.15);
+}
+.showtime-card .time {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+}
+.showtime-card .price {
+    color: #ffc107;
+    font-weight: 600;
+}
+.showtime-card .room-badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    color: #ffc107;
+    font-family: monospace;
+}
+.showtime-card .seats-left {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+.showtime-card .seats-left.low {
+    color: #dc3545;
+    font-weight: 600;
+}
+.showtime-card .btn-select-showtime {
+    margin-top: 1rem;
+}
+
+/* ══════════════════════════════════════════════════════════
+   #1  MÀN CHIẾU PHÁT SÁNG — Cinema screen
+   ══════════════════════════════════════════════════════════ */
+.cinema-screen {
+    width: 80%;
+    height: 8px;
+    margin: 0 auto 0.5rem auto;
+    background: linear-gradient(
+        to right,
+        transparent,
+        #ffffff 20%,
+        #ffffff 80%,
+        transparent
+    );
+    border-radius: 0 0 50% 50% / 0 0 100% 100%;
+    box-shadow:
+        0 4px 20px rgba(255, 255, 255, 0.6),
+        0 8px 40px rgba(255, 193, 7, 0.25),
+        0 16px 80px rgba(255, 193, 7, 0.1);
+}
+.cinema-screen-label {
+    letter-spacing: 6px;
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+/* ══════════════════════════════════════════════════════════
+   #2  HIỆU ỨNG NẢY GHẾ KHI CHỌN — Seat bounce
+   ══════════════════════════════════════════════════════════ */
+@keyframes seat-pop {
+    0%   { transform: scale(1);    }
+    40%  { transform: scale(1.3);  }
+    70%  { transform: scale(0.95); }
+    100% { transform: scale(1);    }
+}
+
+.seat-btn {
+    transition: transform 0.1s ease, background-color 0.15s ease,
+                box-shadow 0.15s ease, border-color 0.15s ease;
+    border-radius: 6px !important;
+    font-weight: 600;
+}
+.seat-btn:not(:disabled):hover {
+    transform: scale(1.15);
+}
+.seat-btn.selected {
+    animation: seat-pop 0.3s ease-out;
+}
+
+/* ── #9  PHÂN BIỆT GHẾ THEO LOẠI ───────────────────────── */
+
+/* Ghế trống — Standard (Xanh lục) */
+.seat-btn.btn-outline-success {
+    border: 2px solid #198754;
+    color: #198754;
+    background: transparent;
+}
+
+/* Ghế đang chọn — Selected (Xanh lục đậm + glow) */
+.seat-btn.btn-success {
+    background-color: #198754;
+    border-color: #198754;
+    color: #fff;
+    box-shadow: 0 0 12px rgba(25, 135, 84, 0.7);
+}
+
+/* Ghế VIP trống */
+.seat-btn.seat-vip {
+    border: 2px solid #fd7e14;
+    color: #fd7e14;
+    background: transparent;
+}
+.seat-btn.seat-vip.selected {
+    background: #fd7e14;
+    color: #fff;
+    box-shadow: 0 0 8px rgba(253, 126, 20, 0.6);
+}
+
+/* Ghế đôi Sweetbox */
+.seat-btn.seat-sweetbox {
+    border: 2px solid #d63384;
+    color: #d63384;
+    background: transparent;
+    width: 80px !important;
+    border-radius: 20px !important;
+}
+.seat-btn.seat-sweetbox.selected {
+    background: #d63384;
+    color: #fff;
+    box-shadow: 0 0 8px rgba(214, 51, 132, 0.6);
+}
+
+/* Ghế đã bán — Đỏ mờ */
+.seat-btn.btn-danger {
+    background: #dc3545;
+    color: #fff;
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Ghế đang giữ — Vàng mờ */
+.seat-btn.btn-warning:disabled {
+    background: #ffc107;
+    color: #000;
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Scrollable seat map on small screens */
+.seat-map-container {
+    max-width: 100%;
+    padding-bottom: 1rem;
+}
+
+/* Seat legend */
+.seat-legend-bar {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid #2d2d44;
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+}
+
+/* ══════════════════════════════════════════════════════════
+   #5  ĐỒNG HỒ ĐẾM NGƯỢC — Timer urgent pulse
+   ══════════════════════════════════════════════════════════ */
+@keyframes timer-pulse {
+    0%   { opacity: 1; transform: scale(1);    }
+    50%  { opacity: 0.5; transform: scale(1.05); }
+    100% { opacity: 1; transform: scale(1);    }
+}
+
+.timer-urgent {
+    color: #dc3545 !important;
+    animation: timer-pulse 0.8s ease-in-out infinite;
+}
+
+.timer-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+.timer-value {
+    font-family: 'Courier New', monospace;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ffc107;
+    letter-spacing: 2px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   #6  THANH CHECKOUT GHIM ĐÁY — Sticky mobile bar
+   ══════════════════════════════════════════════════════════ */
+.sticky-checkout {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1050;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 193, 7, 0.3);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+}
+.sticky-checkout.visible {
+    transform: translateY(0);
+}
+.sticky-checkout .checkout-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 600px;
+    margin: 0 auto;
+}
+.sticky-checkout .total-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ffc107;
+}
+@media (min-width: 992px) {
+    .sticky-checkout {
+        display: none;
+    }
+}
+
+/* ══════════════════════════════════════════════════════════
+   #4  VÉ XEM PHIM LẬT 3D — Ticket flip
+   ══════════════════════════════════════════════════════════ */
+.ticket-flip {
+    width: 320px;
+    height: 200px;
+    perspective: 1000px;
+    cursor: pointer;
+    margin: 0 auto;
+}
+.ticket-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s ease;
+    transform-style: preserve-3d;
+}
+.ticket-flip:hover .ticket-inner,
+.ticket-flip.flipped .ticket-inner {
+    transform: rotateY(180deg);
+}
+.ticket-front,
+.ticket-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.ticket-front {
+    background: linear-gradient(135deg, #e9ecef, #f8f9fa);
+    border: 1px solid #ffc107;
+    color: #fff;
+}
+.ticket-back {
+    background: linear-gradient(135deg, #f8f9fa, #ced4da);
+    border: 1px solid #ffc107;
+    color: #fff;
+    transform: rotateY(180deg);
+}
+
+/* ══════════════════════════════════════════════════════════
+   Custom age rating badges
+   ══════════════════════════════════════════════════════════ */
+.badge-c18 {
+    background-color: #dc3545;
+}
+.badge-c16 {
+    background-color: #fd7e14;
+}
+.badge-c13 {
+    background-color: #ffc107;
+    color: #212529;
+}
+.badge-p {
+    background-color: #198754;
+}
+
+/* ══════════════════════════════════════════════════════════
+   Payment method hover effects
+   ══════════════════════════════════════════════════════════ */
+.hover-border-warning:hover {
+    border-color: #ffc107 !important;
+    transition: border-color 0.2s ease;
+}
+.form-check:has(input:checked) {
+    border-color: #ffc107 !important;
+    background-color: rgba(255, 193, 7, 0.05) !important;
+}
+
+/* ══════════════════════════════════════════════════════════
+   Success page animations
+   ══════════════════════════════════════════════════════════ */
+@keyframes bounce-in {
+    0%   { transform: scale(0.3); opacity: 0; }
+    50%  { transform: scale(1.05); }
+    70%  { transform: scale(0.9);  }
+    100% { transform: scale(1); opacity: 1; }
+}
+@keyframes confetti-fall {
+    0%   { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+.animate-bounce-in {
+    animation: bounce-in 0.8s ease-out forwards;
+}
+
+.confetti-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+}
+.confetti-piece {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    top: -10px;
+    animation: confetti-fall 3s linear forwards;
+}
+
+/* ══════════════════════════════════════════════════════════
+   Utility micro-animations
+   ══════════════════════════════════════════════════════════ */
+@keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 5px rgba(255, 193, 7, 0.3); }
+    50%      { box-shadow: 0 0 20px rgba(255, 193, 7, 0.6); }
+}
+.animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* ══════════════════════════════════════════════════════════
+   Custom CGV-style Footer
+   ══════════════════════════════════════════════════════════ */
+.custom-footer {
+    background-color: #fdfcf0;
+    color: #333;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.custom-footer .footer-brands-bar {
+    border-color: #ccc !important;
+}
+
+.custom-footer .footer-heading {
+    font-weight: bold;
+    color: #444;
+    text-transform: uppercase;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+}
+
+.custom-footer .footer-links a {
+    color: #666;
+    text-decoration: none;
+    font-size: 0.85rem;
+    line-height: 1.8;
+}
+
+.custom-footer .footer-links a:hover {
+    color: #dc3545;
+    text-decoration: underline;
+}
+
+.custom-footer .footer-contact li {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+}
+
+.custom-footer .footer-social .social-icon {
+    text-decoration: none;
+    transition: transform 0.2s ease;
+    display: inline-block;
+}
+
+.custom-footer .footer-social .social-icon:hover {
+    transform: scale(1.1);
+}
+
+.custom-footer .footer-company {
+    border-top: 1px solid #ddd !important;
+    background-color: #f8f8f4;
+}
+
+.custom-footer .company-info {
+    font-size: 0.75rem;
+    color: #666;
+    line-height: 1.5;
+}
+
+.custom-footer .footer-bricks {
+    height: 48px;
+    background-color: #e25b22;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='32'%3E%3Crect width='80' height='32' fill='%23e25b22'/%3E%3Cpath d='M0 16h80M40 0v16M0 16v16' stroke='%23fdfcf0' stroke-width='1.5'/%3E%3C/svg%3E");
+    border-top: 2px solid #ccc;
+}
+
+/* ══════════════════════════════════════════════════════════
+   EXTENDED STYLES — New Screens (07_Extended)
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Glassmorphism Cards ──────────────────────── */
+.profile-main-card,
+.cinema-info-card {
+    background: rgba(26, 26, 46, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 193, 7, 0.15);
+    border-radius: 16px;
+}
+
+/* ── Avatar Glow ──────────────────────────────── */
+.avatar-glow {
+    box-shadow: 0 0 20px rgba(255, 193, 7, 0.4), 0 0 40px rgba(255, 193, 7, 0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.avatar-glow:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(255, 193, 7, 0.6), 0 0 60px rgba(255, 193, 7, 0.25);
+}
+
+/* ── Stat Mini Cards ──────────────────────────── */
+.stat-mini {
+    background: rgba(255, 193, 7, 0.05);
+    border: 1px solid rgba(255, 193, 7, 0.15);
+    transition: all 0.2s ease;
+}
+.stat-mini:hover { background: rgba(255, 193, 7, 0.1); transform: translateY(-2px); }
+
+/* ── Total Spent Card ─────────────────────────── */
+.total-spent-card {
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.05), rgba(255, 193, 7, 0.02));
+    border: 1px solid rgba(255, 193, 7, 0.15);
+}
+
+/* ── Cinema Cards ─────────────────────────────── */
+.cinema-card {
+    cursor: pointer; border-radius: 16px; transition: all 0.3s ease; border: 1px solid transparent;
+}
+.cinema-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 40px rgba(255, 193, 7, 0.2);
+    border-color: rgba(255, 193, 7, 0.3);
+}
+.cinema-card .cinema-img { transition: transform 0.5s ease; }
+.cinema-card:hover .cinema-img { transform: scale(1.05); }
+
+/* ── Cinema Hero ──────────────────────────────── */
+.cinema-hero {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef 40%, #dee2e6 70%, #ced4da);
+    border-radius: 16px; border: 1px solid #222244;
+    position: relative; overflow: hidden;
+}
+.cinema-hero::before {
+    content: ''; position: absolute; top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle at 30% 40%, rgba(255, 193, 7, 0.06), transparent 50%);
+    pointer-events: none;
+}
+
+/* ── Facility Badges ──────────────────────────── */
+.facility-badge {
+    background: rgba(255, 193, 7, 0.1); border: 1px solid rgba(255, 193, 7, 0.25);
+    color: #ffc107; font-size: 0.7rem; font-weight: 600;
+}
+.facility-badge-lg {
+    background: rgba(255, 193, 7, 0.1); border: 1px solid rgba(255, 193, 7, 0.3);
+    color: #ffc107; font-weight: 600; transition: all 0.2s ease;
+}
+.facility-badge-lg:hover { background: rgba(255, 193, 7, 0.2); transform: scale(1.05); }
+
+/* ── Info Items ────────────────────────────────── */
+.info-item {
+    background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.2s ease;
+}
+.info-item:hover { background: rgba(255, 193, 7, 0.05); border-color: rgba(255, 193, 7, 0.15); }
+
+/* ── Province Filter Buttons ──────────────────── */
+.province-btn { transition: all 0.2s ease; }
+.province-btn:hover { transform: scale(1.05); }
+
+/* ── Ticket 3D Flip ───────────────────────────── */
+.ticket-3d-container {
+    width: 100%; max-width: 500px; min-height: 480px;
+    perspective: 1200px; cursor: pointer;
+}
+.ticket-3d-inner {
+    position: relative; width: 100%; min-height: 480px;
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-style: preserve-3d;
+}
+.ticket-3d-container.flipped .ticket-3d-inner { transform: rotateY(180deg); }
+.ticket-3d-front, .ticket-3d-back {
+    position: absolute; width: 100%; min-height: 480px;
+    backface-visibility: hidden; border-radius: 20px; overflow: hidden;
+}
+.ticket-3d-front {
+    background: linear-gradient(145deg, #ced4da, #dee2e6 50%, #ced4da);
+    border: 2px solid rgba(255, 193, 7, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+.ticket-3d-back {
+    background: linear-gradient(145deg, #ced4da, #f8f9fa 50%, #ced4da);
+    border: 2px solid rgba(255, 193, 7, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    transform: rotateY(180deg);
+}
+.ticket-front-content, .ticket-back-content { padding: 2rem; }
+
+/* Tear line */
+.ticket-tear-line {
+    border-top: 2px dashed rgba(255, 193, 7, 0.3); position: relative;
+}
+.ticket-tear-line::before, .ticket-tear-line::after {
+    content: ''; position: absolute; top: -12px;
+    width: 24px; height: 24px; background: #ced4da; border-radius: 50%;
+}
+.ticket-tear-line::before { left: -32px; }
+.ticket-tear-line::after  { right: -32px; }
+
+/* Ticket info block */
+.ticket-info-block {
+    padding: 0.75rem; background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Flip hint */
+.flip-hint { animation: float-hint 2s ease-in-out infinite; }
+@keyframes float-hint {
+    0%, 100% { opacity: 0.5; transform: translateY(0); }
+    50%      { opacity: 1;   transform: translateY(-3px); }
+}
+
+/* ── QR Container ─────────────────────────────── */
+.qr-container { box-shadow: 0 4px 20px rgba(255, 193, 7, 0.3); }
+
+/* ── Ticket Item Hover ────────────────────────── */
+.ticket-item { cursor: pointer; transition: background 0.2s ease; }
+.ticket-item:hover { background: rgba(255, 193, 7, 0.05); }
+
+/* ── Search Bar Glow ──────────────────────────── */
+.search-bar-glow:focus-within { box-shadow: 0 0 20px rgba(255, 193, 7, 0.3); }
+.search-hero {
+    background: linear-gradient(135deg, #f8f9fa, #dee2e6, #ced4da);
+    border-radius: 16px; border: 1px solid #222244; padding: 3rem 2rem;
+}
+
+/* ── Search Result Animation ──────────────────── */
+.search-result-card { animation: fadeInUp 0.4s ease-out backwards; }
+.search-result-card:nth-child(1)  { animation-delay: 0.05s; }
+.search-result-card:nth-child(2)  { animation-delay: 0.10s; }
+.search-result-card:nth-child(3)  { animation-delay: 0.15s; }
+.search-result-card:nth-child(4)  { animation-delay: 0.20s; }
+.search-result-card:nth-child(5)  { animation-delay: 0.25s; }
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Promotion Cards ──────────────────────────── */
+.promo-card {
+    border-radius: 16px; transition: all 0.3s ease;
+    border: 1px solid transparent; position: relative; overflow: hidden;
+}
+.promo-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(255, 193, 7, 0.15);
+    border-color: rgba(255, 193, 7, 0.3);
+}
+.promo-ribbon {
+    position: absolute; top: 12px; right: -35px;
+    background: linear-gradient(135deg, #dc3545, #e74c6f);
+    color: #fff; padding: 4px 40px; font-size: 0.75rem;
+    font-weight: 700; transform: rotate(45deg);
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.4);
+}
+.promo-code-box {
+    background: rgba(255, 193, 7, 0.05);
+    border: 2px dashed rgba(255, 193, 7, 0.3);
+    border-radius: 10px; padding: 0.75rem 1rem;
+}
+
+/* ── News Cards ───────────────────────────────── */
+.news-card {
+    border-radius: 16px; cursor: pointer; transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+.news-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(255, 193, 7, 0.15);
+    border-color: rgba(255, 193, 7, 0.3);
+}
+.featured-news-card {
+    border-radius: 16px; cursor: pointer; transition: all 0.3s ease;
+    border: 1px solid rgba(255, 193, 7, 0.1);
+}
+.featured-news-card:hover {
+    box-shadow: 0 16px 40px rgba(255, 193, 7, 0.2);
+    border-color: rgba(255, 193, 7, 0.3);
+}
+
+/* ── Error Pages ──────────────────────────────── */
+.error-number {
+    text-shadow: 0 4px 40px rgba(255, 193, 7, 0.4);
+    animation: error-pulse 3s ease-in-out infinite;
+}
+@keyframes error-pulse {
+    0%, 100% { text-shadow: 0 4px 40px rgba(255, 193, 7, 0.3); }
+    50%      { text-shadow: 0 4px 60px rgba(255, 193, 7, 0.6); }
+}
+
+/* ── Contact Page ─────────────────────────────── */
+.contact-icon {
+    width: 56px; height: 56px; display: flex;
+    align-items: center; justify-content: center;
+    flex-shrink: 0; transition: transform 0.2s ease;
+}
+.contact-info-item:hover .contact-icon { transform: scale(1.1); }
+
+/* ── Forgot Password Card ─────────────────────── */
+.forgot-pw-card {
+    border-radius: 20px; border: 1px solid rgba(255, 193, 7, 0.15);
+}
+.forgot-icon i { animation: float-hint 3s ease-in-out infinite; }
+
+/* ── Accordion Dark ───────────────────────────── */
+.accordion-button:not(.collapsed) {
+    background: rgba(255, 193, 7, 0.1); color: #ffc107; box-shadow: none;
+}
+.accordion-button::after { filter: invert(1); }
+
+/* ── Smooth Page Transitions ──────────────────── */
+main { animation: pageLoad 0.4s ease-out; }
+@keyframes pageLoad {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Utility ──────────────────────────────────── */
+.cursor-pointer { cursor: pointer; }
+.letter-spacing-2 { letter-spacing: 2px; }
+
+/* ── Responsive ───────────────────────────────── */
+@media (max-width: 768px) {
+    .ticket-3d-container { max-width: 100%; }
+    .cinema-detail-banner { height: 200px !important; }
+    .cinema-detail-banner h1 { font-size: 1.5rem !important; }
+}
+
+/* ?? N�ng c?p Giao di?n ?? */
+.quick-book-bar { backdrop-filter: blur(10px); background-color: rgba(255, 255, 255, 0.9) !important; }
+.experience-card:hover { transform: translateY(-10px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-color: #ffc107 !important; }
+.tier-card-inner { box-shadow: 0 10px 40px rgba(255, 193, 7, 0.2); }
+
+

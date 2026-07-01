@@ -1,0 +1,99 @@
+@model CinemaXNet.ViewModels.PaginatedList<CinemaXNet.Models.Domain.Movie>
+@{
+    ViewData["Title"] = "Danh Sách Phim";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var genre  = ViewBag.Genre as string;
+    var status = (string)(ViewBag.Status ?? "now_showing");
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h3 fw-bold text-dark mb-3">Danh Sách Phim</h1>
+
+        <!-- Filters panel -->
+        <div class="card bg-white border border-light p-3 rounded shadow-sm">
+            <div class="row align-items-center g-3">
+                <!-- Status Tab buttons -->
+                <div class="col-md-6">
+                    <div class="btn-group shadow-sm" role="group">
+                        <a href="/movies?status=now_showing@(genre != null ? "&genre=" + Uri.EscapeDataString(genre) : "")"
+                           class="btn btn-sm @(status == "now_showing" ? "btn-warning fw-bold" : "btn-outline-secondary")">
+                            <i class="bi bi-play-fill"></i> Đang chiếu
+                        </a>
+                        <a href="/movies?status=coming_soon@(genre != null ? "&genre=" + Uri.EscapeDataString(genre) : "")"
+                           class="btn btn-sm @(status == "coming_soon" ? "btn-warning fw-bold" : "btn-outline-secondary")">
+                            <i class="bi bi-calendar-event"></i> Sắp chiếu
+                        </a>
+                        <a href="/movies?status=ended@(genre != null ? "&genre=" + Uri.EscapeDataString(genre) : "")"
+                           class="btn btn-sm @(status == "ended" ? "btn-warning fw-bold" : "btn-outline-secondary")">
+                            <i class="bi bi-stop-fill"></i> Đã dừng chiếu
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Genres dropdown filter -->
+                <div class="col-md-6 text-md-end">
+                    <label class="text-secondary small me-2">Thể loại:</label>
+                    <div class="dropdown d-inline-block">
+                        <button class="btn btn-sm btn-outline-warning dropdown-toggle fw-semibold" type="button" data-bs-toggle="dropdown">
+                            @(genre ?? "Tất cả")
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end border-light bg-white shadow">
+                            <li><a class="dropdown-item" href="/movies?status=@status">Tất cả</a></li>
+                            <li><a class="dropdown-item" href="/movies?status=@status&genre=@Uri.EscapeDataString("Hành động")">Hành động</a></li>
+                            <li><a class="dropdown-item" href="/movies?status=@status&genre=@Uri.EscapeDataString("Hài")">Hài</a></li>
+                            <li><a class="dropdown-item" href="/movies?status=@status&genre=@Uri.EscapeDataString("Kinh dị")">Kinh dị</a></li>
+                            <li><a class="dropdown-item" href="/movies?status=@status&genre=@Uri.EscapeDataString("Tình cảm")">Tình cảm</a></li>
+                            <li><a class="dropdown-item" href="/movies?status=@status&genre=@Uri.EscapeDataString("Viễn tưởng")">Viễn tưởng</a></li>
+                            <li><a class="dropdown-item" href="/movies?status=@status&genre=@Uri.EscapeDataString("Hoạt hình")">Hoạt hình</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (!Model.Items.Any())
+{
+    <div class="text-center py-5">
+        <i class="bi bi-camera-reels text-secondary display-1 mb-3"></i>
+        <p class="text-secondary fs-5 fst-italic">Không tìm thấy phim phù hợp với bộ lọc hiện tại.</p>
+    </div>
+}
+else
+{
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-4">
+        @foreach (var movie in Model.Items)
+        {
+            <div class="col">
+                <div class="card bg-white border border-light h-100 shadow movie-card"
+                     onclick="location.href='/movies/@movie.Id'">
+                    <div class="position-relative">
+                        <img src="@(movie.PosterUrl ?? "https://placehold.co/400x600/111/fff?text=No+Poster")"
+                             class="card-img-top img-fluid rounded-top"
+                             alt="@movie.Title"
+                             style="height: 300px; object-fit: cover;">
+                        @if (movie.AgeRating != null)
+                        {
+                            <span class="badge position-absolute top-0 end-0 m-2 badge-@movie.AgeRating.ToLower()">
+                                @movie.AgeRating
+                            </span>
+                        }
+                    </div>
+                    <div class="card-body p-3 bg-white">
+                        <h6 class="card-title text-dark mb-2 text-truncate fw-bold">@movie.Title</h6>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-secondary">
+                                <i class="bi bi-clock me-1"></i>@movie.GetFormattedDuration()
+                            </small>
+                            <span class="badge bg-warning text-dark font-monospace" style="font-size: 0.75rem;">XEM CHI TIẾT</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    
+    @await Html.PartialAsync("_Pagination", Model)
+}

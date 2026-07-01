@@ -1,0 +1,115 @@
+/* OAuth Buttons Styling */
+
+.oauth-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 1rem 0;
+}
+
+.oauth-divider::before,
+.oauth-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #6c757d;
+}
+
+.oauth-divider span {
+    padding: 0 1rem;
+}
+
+/* Google Button */
+.btn-google {
+    background-color: #ffffff;
+    color: #333333;
+    border: 1px solid #dadce0;
+    transition: all 0.3s ease;
+}
+
+.btn-google:hover {
+    background-color: #f8f9fa;
+    border-color: #c6c9cc;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    color: #333333;
+}
+
+.btn-google svg {
+    color: #4285f4;
+}
+
+/* Zalo Button */
+.btn-zalo {
+    background-color: #0068FF;
+    color: #ffffff;
+    border: 1px solid #0068FF;
+    transition: all 0.3s ease;
+}
+
+.btn-zalo:hover {
+    background-color: #0052CC;
+    border-color: #0052CC;
+    box-shadow: 0 2px 4px rgba(0, 104, 255, 0.3);
+    color: #ffffff;
+}
+
+.btn-zalo svg {
+    color: #ffffff;
+}
+
+/* OAuth Button Container */
+.oauth-buttons {
+    display: grid;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .oauth-buttons a {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+    }
+    
+    .oauth-buttons svg {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+/* Loading state for OAuth buttons */
+.btn-oauth-loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.btn-oauth-loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spinner 0.6s linear infinite;
+}
+
+@keyframes spinner {
+    to { transform: rotate(360deg); }
+}
+
+/* Dark theme compatibility */
+.bg-black .btn-google {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    border-color: #444;
+}
+
+.bg-black .btn-google:hover {
+    background-color: #2a2a2a;
+    border-color: #555;
+}

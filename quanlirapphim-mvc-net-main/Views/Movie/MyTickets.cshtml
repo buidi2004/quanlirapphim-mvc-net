@@ -1,0 +1,71 @@
+@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "Vé Của Tôi";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var tickets = Model?.ToList() ?? new List<dynamic>();
+}
+
+<h1 class="h3 fw-bold text-dark border-start border-warning border-4 ps-3 mb-4">Vé Của Tôi</h1>
+
+@if (!tickets.Any())
+{
+    <div class="text-center py-5 card bg-white border border-light shadow-sm">
+        <div class="card-body py-5 text-secondary">
+            <i class="bi bi-ticket-perforated display-1 mb-3"></i>
+            <p class="fs-5 fst-italic">Bạn chưa mua vé xem phim nào.</p>
+            <a href="/movies" class="btn btn-warning fw-bold mt-2">Đặt Vé Ngay</a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var ticket in tickets)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card bg-white border border-light shadow-sm rounded overflow-hidden h-100"
+                     style="background: linear-gradient(135deg, #0f0f1b 0%, #15152b 100%);">
+                    <div class="card-header bg-white py-3 border-bottom border-light d-flex justify-content-between align-items-center">
+                        <span class="text-warning fw-bold"><i class="bi bi-ticket-perforated-fill me-2"></i>CinemaX Ticket</span>
+                        <span class="badge bg-success">Đã thanh toán</span>
+                    </div>
+                    <div class="card-body p-4">
+                        <h5 class="text-dark fw-bold mb-3">@ticket.movie_title</h5>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6 text-secondary small">
+                                <i class="bi bi-calendar3 me-1 text-dark"></i>Ngày chiếu:
+                                <span class="text-dark d-block fw-semibold mt-1">
+                                    @(((DateOnly)ticket.show_date).ToString("dd/MM/yyyy"))
+                                </span>
+                            </div>
+                            <div class="col-6 text-secondary small">
+                                <i class="bi bi-clock me-1 text-dark"></i>Suất chiếu:
+                                <span class="text-dark d-block fw-semibold mt-1">
+                                    @(((TimeOnly)ticket.start_time).ToString("HH:mm"))
+                                </span>
+                            </div>
+                            <div class="col-6 text-secondary small">
+                                <i class="bi bi-grid-3x3-gap me-1 text-dark"></i>Ghế ngồi:
+                                <span class="text-warning d-block fw-bold mt-1">@ticket.seat_code</span>
+                            </div>
+                            <div class="col-6 text-secondary small">
+                                <i class="bi bi-cash-coin me-1 text-dark"></i>Giá vé:
+                                <span class="text-dark d-block fw-semibold mt-1">@(((decimal)ticket.total_price).ToString("N0"))₫</span>
+                            </div>
+                        </div>
+                        <hr class="border-light mb-3">
+                        <div class="d-flex justify-content-between align-items-center text-secondary small font-monospace mb-3">
+                            <span>Mã vé: #CX@(((int)ticket.id).ToString("D6"))</span>
+                            <span>Mua lúc: @(((DateTime)ticket.booked_at).ToString("dd/MM HH:mm"))</span>
+                        </div>
+                        <div class="mt-2 text-center">
+                            <button class="btn btn-outline-info btn-sm w-100 fw-bold shadow-sm" onclick="alert('Yêu cầu xuất hóa đơn VAT cho vé #CX@(((int)ticket.id).ToString("D6")) đã được tiếp nhận. Hóa đơn sẽ được gửi qua email của bạn trong vòng 24h.')">
+                                <i class="bi bi-receipt me-2"></i>Yêu cầu Hóa đơn VAT
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

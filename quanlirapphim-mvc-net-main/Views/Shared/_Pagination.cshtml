@@ -1,0 +1,54 @@
+@model dynamic
+
+@{
+    if (Model == null) return;
+    int pageIndex = Model.PageIndex;
+    int totalPages = Model.TotalPages;
+    if (totalPages <= 1) return;
+
+    // Use current URL path and query string to generate pagination links
+    var request = ViewContext.HttpContext.Request;
+    var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(request.QueryString.Value);
+    
+    // Function to generate URL for a specific page
+    string GetUrl(int page)
+    {
+        var dict = new Dictionary<string, string?>();
+        foreach (var key in query.Keys)
+        {
+            if (key.ToLower() != "page")
+                dict[key] = query[key];
+        }
+        dict["page"] = page.ToString();
+        return Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString(request.Path, dict);
+    }
+}
+
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center mb-0">
+        <!-- Previous -->
+        <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+            <a class="page-link text-dark shadow-sm" href="@(Model.HasPreviousPage ? GetUrl(pageIndex - 1) : "javascript:void(0)")" tabindex="-1" aria-disabled="@(Model.HasPreviousPage ? "false" : "true")">Trước</a>
+        </li>
+        
+        <!-- Page Numbers -->
+        @for (int i = 1; i <= totalPages; i++)
+        {
+            if (i == 1 || i == totalPages || Math.Abs(i - pageIndex) <= 2)
+            {
+                <li class="page-item @(i == pageIndex ? "active" : "")">
+                    <a class="page-link shadow-sm @(i == pageIndex ? "bg-warning text-dark border-warning fw-bold" : "text-dark")" href="@GetUrl(i)">@i</a>
+                </li>
+            }
+            else if (i == pageIndex - 3 || i == pageIndex + 3)
+            {
+                <li class="page-item disabled"><a class="page-link text-dark border-0 bg-transparent" href="javascript:void(0)">...</a></li>
+            }
+        }
+
+        <!-- Next -->
+        <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+            <a class="page-link text-dark shadow-sm" href="@(Model.HasNextPage ? GetUrl(pageIndex + 1) : "javascript:void(0)")">Sau</a>
+        </li>
+    </ul>
+</nav>

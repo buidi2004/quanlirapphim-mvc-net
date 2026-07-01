@@ -1,0 +1,94 @@
+@model CinemaXNet.ViewModels.ProfileEditViewModel
+@{
+    ViewData["Title"] = "Chỉnh sửa hồ sơ";
+    var user = ViewBag.User as CinemaXNet.Models.Domain.User;
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card bg-white border-light shadow">
+            <div class="card-body p-4">
+                <h1 class="h5 text-warning mb-4">
+                    <i class="bi bi-pencil-square me-2"></i>Chỉnh sửa hồ sơ
+                </h1>
+
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success border-0 small">@TempData["Success"]</div>
+                }
+
+                <form method="post" action="/profile/edit" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+
+                    <!-- Avatar preview -->
+                    <div class="text-center mb-4">
+                        <img src="@user?.GetAvatarUrl()" id="avatarPreview"
+                             class="rounded-circle border border-warning mb-2"
+                             style="width:90px;height:90px;object-fit:cover;">
+                        <div>
+                            <label for="avatar" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-camera me-1"></i>Thay ảnh
+                            </label>
+                            <input type="file" id="avatar" name="avatar" class="d-none"
+                                   accept="image/*" onchange="previewAvatar(this)">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small">Họ và tên</label>
+                        <input type="text" name="FullName" value="@Model.FullName"
+                               class="form-control bg-light border-light text-dark"
+                               placeholder="Nguyễn Văn A">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small">Số điện thoại</label>
+                        <input type="tel" name="Phone" value="@Model.Phone"
+                               class="form-control bg-light border-light text-dark"
+                               placeholder="0901234567">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small">Ngày sinh</label>
+                        <input type="date" name="DateOfBirth" value="@Model.DateOfBirth"
+                               class="form-control bg-light border-light text-dark">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small">Giới tính</label>
+                        <select name="Gender" class="form-select bg-light border-light text-dark">
+                            @if (Model.Gender == "male")   { <option value="male" selected="selected">Nam</option> }
+                            else { <option value="male">Nam</option> }
+                            @if (Model.Gender == "female") { <option value="female" selected="selected">Nữ</option> }
+                            else { <option value="female">Nữ</option> }
+                            @if (Model.Gender == "other")  { <option value="other" selected="selected">Khác</option> }
+                            else { <option value="other">Khác</option> }
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label text-secondary small">Thành phố</label>
+                        <input type="text" name="City" value="@Model.City"
+                               class="form-control bg-light border-light text-dark"
+                               placeholder="Hà Nội, TP. HCM, ...">
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-warning fw-bold flex-grow-1">
+                            <i class="bi bi-check-lg me-1"></i>Lưu thay đổi
+                        </button>
+                        <a href="/profile" class="btn btn-outline-secondary">Hủy</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+function previewAvatar(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => document.getElementById('avatarPreview').src = e.target.result;
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+</script>
+}

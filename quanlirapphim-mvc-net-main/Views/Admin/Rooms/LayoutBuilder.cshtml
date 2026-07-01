@@ -1,0 +1,241 @@
+@model dynamic
+@{
+    ViewData["Title"] = ViewBag.PageTitle;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .seat-builder-grid {
+        display: grid;
+        gap: 5px;
+        justify-content: center;
+        margin: 20px auto;
+        overflow-x: auto;
+        padding-bottom: 20px;
+    }
+    
+    .seat-cell {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: bold;
+        cursor: pointer;
+        user-select: none;
+        transition: transform 0.1s;
+    }
+
+    .seat-cell:hover {
+        transform: scale(1.1);
+    }
+
+    /* Types of seats */
+    .seat-standard { background-color: #6c757d; color: white; }
+    .seat-vip { background-color: #ffc107; color: black; border: 2px solid #e0a800; }
+    .seat-couple { background-color: #e83e8c; color: white; width: 85px; grid-column: span 2; }
+    .seat-hidden { background-color: transparent; border: 1px dashed #dee2e6; color: transparent; pointer-events: auto; }
+    .seat-broken { background-color: #dc3545; color: white; opacity: 0.5; }
+    
+    .screen-curve {
+        height: 40px;
+        background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+        border: 2px solid #dee2e6;
+        border-radius: 50% / 0 0 100% 100%;
+        margin-bottom: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6c757d;
+        font-weight: bold;
+        text-shadow: 1px 1px 0 #fff;
+    }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-gray-800"><i class="bi bi-grid-3x3 me-2 text-primary"></i>Thiết kế Sơ đồ ghế</h1>
+    <a href="/admin/rooms" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i>Quay lại</a>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Thông tin phòng</h6>
+            </div>
+            <div class="card-body">
+                <p><strong>Phòng:</strong> @Model.name</p>
+                <p><strong>Lưới:</strong> <span id="lblRows">@Model.total_rows</span> hàng x <span id="lblCols">@Model.seats_per_row</span> cột</p>
+                
+                <hr>
+                <h6>Chú giải (Click vào ghế để đổi):</h6>
+                <div class="d-flex align-items-center mb-2"><div class="seat-cell seat-standard me-2"></div> Ghế thường</div>
+                <div class="d-flex align-items-center mb-2"><div class="seat-cell seat-vip me-2"></div> Ghế VIP</div>
+                <div class="d-flex align-items-center mb-2"><div class="seat-cell seat-couple me-2" style="width:40px;grid-column: span 1"></div> Ghế Đôi (Couple)</div>
+                <div class="d-flex align-items-center mb-2"><div class="seat-cell seat-broken me-2"></div> Ghế hỏng (Bảo trì)</div>
+                <div class="d-flex align-items-center mb-2"><div class="seat-cell seat-hidden me-2"></div> Khoảng trống (Lối đi)</div>
+                
+                <hr>
+                <button class="btn btn-primary w-100 fw-bold" onclick="saveLayout()" id="btnSave">
+                    <i class="bi bi-save me-1"></i>Lưu Sơ Đồ
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        <div class="card shadow mb-4">
+            <div class="card-body text-center bg-light" style="overflow-x: auto;">
+                <div style="min-width: 600px;">
+                    <div class="screen-curve w-75 mx-auto">MÀN HÌNH</div>
+                    <div id="seatGrid" class="seat-builder-grid">
+                        <!-- Rendered via JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const roomId = @Model.id;
+        const totalRows = parseInt('@Model.total_rows');
+        const seatsPerRow = parseInt('@Model.seats_per_row');
+        const existingLayoutStr = `@Html.Raw(Model.layout_json ?? "")`;
+        
+        // Seat types sequence for toggling
+        const seatTypes = ['standard', 'vip', 'couple', 'hidden', 'broken'];
+        
+        let seatLayout = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initGrid();
+        });
+
+        function initGrid() {
+            if (existingLayoutStr && existingLayoutStr.trim() !== '') {
+                try {
+                    seatLayout = JSON.parse(existingLayoutStr);
+                } catch(e) {
+                    console.error("Invalid layout JSON");
+                    generateDefaultGrid();
+                }
+            } else {
+                generateDefaultGrid();
+            }
+            renderGrid();
+        }
+
+        function generateDefaultGrid() {
+            seatLayout = [];
+            const rowLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            
+            for (let r = 0; r < totalRows; r++) {
+                const rowLabel = r < rowLetters.length ? rowLetters[r] : r.toString();
+                let rowData = [];
+                for (let c = 0; c < seatsPerRow; c++) {
+                    rowData.push({
+                        id: `${rowLabel}${c+1}`,
+                        type: 'standard',
+                        row: r,
+                        col: c
+                    });
+                }
+                seatLayout.push(rowData);
+            }
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('seatGrid');
+            grid.innerHTML = '';
+            
+            // Set CSS Grid columns based on seatsPerRow
+            grid.style.gridTemplateColumns = `repeat(${seatsPerRow}, auto)`;
+            
+            for (let r = 0; r < seatLayout.length; r++) {
+                for (let c = 0; c < seatLayout[r].length; c++) {
+                    const seat = seatLayout[r][c];
+                    
+                    // Nếu là ghế couple và là cột bên phải của ghế đôi, bỏ qua việc render thẻ div riêng biệt
+                    // (ghế couple chiếm 2 ô, ô trái render, ô phải ẩn đi)
+                    if (seat.type === 'couple_right') continue;
+                    
+                    const div = document.createElement('div');
+                    div.className = `seat-cell seat-${seat.type}`;
+                    
+                    // Label
+                    if (seat.type !== 'hidden') {
+                        div.innerText = seat.id;
+                    }
+                    
+                    // Handle Couple styling
+                    if (seat.type === 'couple') {
+                        div.style.gridColumn = 'span 2';
+                    }
+
+                    div.onclick = () => toggleSeatType(r, c);
+                    grid.appendChild(div);
+                }
+            }
+        }
+
+        function toggleSeatType(r, c) {
+            let seat = seatLayout[r][c];
+            let currentTypeIdx = seatTypes.indexOf(seat.type);
+            if (currentTypeIdx === -1) currentTypeIdx = 0;
+            
+            let nextType = seatTypes[(currentTypeIdx + 1) % seatTypes.length];
+            
+            // Logic for Couple seat: requires 2 adjacent cells
+            if (nextType === 'couple') {
+                if (c + 1 < seatsPerRow && seatLayout[r][c+1].type !== 'couple_right') {
+                    // Turn current to couple, next to couple_right
+                    seat.type = 'couple';
+                    seatLayout[r][c+1].type = 'couple_right';
+                } else {
+                    // Cannot make couple here (end of row or next seat is part of another couple), skip to next type
+                    nextType = seatTypes[(seatTypes.indexOf('couple') + 1) % seatTypes.length];
+                    seat.type = nextType;
+                }
+            } else {
+                // If it was previously couple, we must free the next cell
+                if (seat.type === 'couple' && c + 1 < seatsPerRow) {
+                    seatLayout[r][c+1].type = 'standard';
+                }
+                seat.type = nextType;
+            }
+
+            renderGrid();
+        }
+
+        async function saveLayout() {
+            const btn = document.getElementById('btnSave');
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Đang lưu...';
+            btn.disabled = true;
+            
+            try {
+                const res = await fetch(`/admin/rooms/api/builder/${roomId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ LayoutJson: JSON.stringify(seatLayout) })
+                });
+                
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    alert(data.message);
+                } else {
+                    alert('Lỗi: ' + (data.error || 'Không thể lưu sơ đồ'));
+                }
+            } catch(e) {
+                console.error(e);
+                alert('Lỗi kết nối khi lưu!');
+            } finally {
+                btn.innerHTML = '<i class="bi bi-save me-1"></i>Lưu Sơ Đồ';
+                btn.disabled = false;
+            }
+        }
+    </script>
+}

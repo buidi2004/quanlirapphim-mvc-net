@@ -1,0 +1,109 @@
+@model CinemaXNet.ViewModels.SearchViewModel
+
+@{
+    ViewData["Title"] = Model.Query.Length > 0 ? $"Tìm kiếm: {Model.Query}" : "Tìm kiếm";
+    var genres = new[] { "Hành động", "Chính kịch", "Hài", "Kinh dị", "Khoa học viễn tưởng",
+                         "Hoạt hình", "Tình cảm", "Tâm lý", "Gia đình" };
+}
+
+<div class="mb-5">
+    <h1 class="h4 text-warning border-start border-warning border-4 ps-3 fw-bold mb-4">
+        <i class="bi bi-search me-2"></i>TÌM KIẾM PHIM
+    </h1>
+
+    <!-- Search form -->
+    <form method="get" action="/search" class="mb-4">
+        <div class="row g-2">
+            <div class="col-md-7">
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-light text-secondary">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" name="q" value="@Model.Query"
+                           class="form-control bg-light border-light text-dark"
+                           placeholder="Tìm tên phim, thể loại..." autofocus>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select name="genre" class="form-select bg-light border-light text-dark">
+                    <option value="">-- Tất cả thể loại --</option>
+                    @foreach (var g in genres)
+                    {
+                        if (g == Model.Genre)
+                        {
+                            <option value="@g" selected="selected">@g</option>
+                        }
+                        else
+                        {
+                            <option value="@g">@g</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-warning w-100 fw-bold">
+                    Tìm kiếm
+                </button>
+            </div>
+        </div>
+    </form>
+
+    @if (Model.Query.Length == 0)
+    {
+        <div class="text-center py-5 text-secondary">
+            <i class="bi bi-film" style="font-size:3rem;"></i>
+            <p class="mt-3">Nhập từ khóa để tìm kiếm phim yêu thích</p>
+        </div>
+    }
+    else if (!Model.Results.Any())
+    {
+        <div class="text-center py-5 text-secondary">
+            <i class="bi bi-emoji-frown" style="font-size:3rem;"></i>
+            <p class="mt-3">Không tìm thấy phim nào với từ khóa "<strong class="text-dark">@Model.Query</strong>"</p>
+            <a href="/movies" class="btn btn-outline-warning mt-2">Xem tất cả phim</a>
+        </div>
+    }
+    else
+    {
+        <p class="text-secondary small mb-3">
+            Tìm thấy <strong class="text-dark">@Model.Results.Count()</strong> kết quả
+            cho "<span class="text-warning">@Model.Query</span>"
+        </p>
+        <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-4">
+            @foreach (var movie in Model.Results)
+            {
+                <div class="col">
+                    <div class="card bg-white border border-light h-100 shadow movie-card"
+                         onclick="location.href='/movies/@movie.Id'" style="cursor:pointer; transition:.2s;"
+                         onmouseover="this.style.borderColor='#ffc107'"
+                         onmouseout="this.style.borderColor='rgba(255,255,255,.175)'">
+                        <div class="position-relative">
+                            <img src="@(movie.PosterUrl ?? "https://placehold.co/400x600/111/fff?text=No+Poster")"
+                                 class="card-img-top" alt="@movie.Title"
+                                 style="height:250px; object-fit:cover;">
+                            @if (movie.AgeRating != null)
+                            {
+                                <span class="badge position-absolute top-0 end-0 m-2 bg-secondary">@movie.AgeRating</span>
+                            }
+                            @{
+                                var statusBadge = movie.Status == "now_showing"
+                                    ? ("bg-warning text-dark", "Đang chiếu")
+                                    : ("bg-info text-dark", "Sắp chiếu");
+                            }
+                            <span class="badge position-absolute bottom-0 start-0 m-2 @statusBadge.Item1">
+                                @statusBadge.Item2
+                            </span>
+                        </div>
+                        <div class="card-body p-2">
+                            <h6 class="card-title text-dark text-truncate small fw-bold mb-1">@movie.Title</h6>
+                            @if (movie.Genre != null)
+                            {
+                                <small class="text-secondary">@movie.Genre</small>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

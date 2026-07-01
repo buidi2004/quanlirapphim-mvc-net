@@ -1,0 +1,197 @@
+@{
+    ViewData["Title"] = "Chọn Bắp Nước";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4">
+    <h3 class="text-warning fw-bold mb-4"><i class="bi bi-cup-straw me-2"></i>CHỌN BẮP NƯỚC</h3>
+    
+    <div class="row g-4">
+        <!-- Left Column: Concessions List -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm" style="background-color: #1a1a2e !important; border: 1px solid #2d2d44 !important;">
+                <div class="card-body p-4">
+                    <h5 class="text-white mb-4 border-bottom border-secondary pb-2">Danh Sách Combo</h5>
+                    
+                    <!-- Combo 1 -->
+                    <div class="card mb-3 bg-dark border-secondary group-hover overflow-hidden transition-all shadow-sm">
+                        <div class="row g-0 align-items-center">
+                            <div class="col-md-4">
+                                <img src="https://placehold.co/400x300/2a1a1a/e5a720?text=Combo+Couple" class="img-fluid rounded-start h-100 object-fit-cover" alt="Combo Couple">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body d-flex flex-column h-100 p-4">
+                                    <h5 class="card-title text-warning fw-bold">Combo Couple</h5>
+                                    <p class="card-text small text-secondary mb-4">2 Ly nước ngọt (Size M) + 1 Bắp lớn (Size L)</p>
+                                    
+                                    <div class="mt-auto d-flex justify-content-between align-items-end">
+                                        <div class="text-white">
+                                            <div class="text-secondary text-decoration-line-through small">130.000₫</div>
+                                            <div class="fs-4 fw-bold">109.000₫</div>
+                                        </div>
+                                        <div class="input-group input-group-sm" style="width: 120px;">
+                                            <button class="btn btn-outline-warning btn-decrease fs-5" type="button" data-id="combo-couple" data-price="109000" aria-label="Giảm số lượng">-</button>
+                                            <input type="text" class="form-control text-center bg-transparent text-light border-warning qty-input fs-5 fw-bold" value="0" readonly data-id="combo-couple" data-name="Combo Couple" data-price="109000">
+                                            <button class="btn btn-outline-warning btn-increase fs-5" type="button" data-id="combo-couple" data-price="109000" aria-label="Tăng số lượng">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Combo 2 -->
+                    <div class="card mb-3 bg-dark border-secondary group-hover overflow-hidden transition-all shadow-sm">
+                        <div class="row g-0 align-items-center">
+                            <div class="col-md-4">
+                                <img src="https://placehold.co/400x300/2a1a1a/e5a720?text=Combo+Avatar" class="img-fluid rounded-start h-100 object-fit-cover" alt="Combo Avatar">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body d-flex flex-column h-100 p-4">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title text-warning fw-bold mb-0">Combo Avatar TWW</h5>
+                                        <span class="badge bg-danger">LIMITED</span>
+                                    </div>
+                                    <p class="card-text small text-secondary mb-4">1 Ly Avatar Na'vi phiên bản đặc biệt + 1 Bắp (Size L)</p>
+                                    
+                                    <div class="mt-auto d-flex justify-content-between align-items-end">
+                                        <div class="text-white">
+                                            <div class="fs-4 fw-bold">299.000₫</div>
+                                        </div>
+                                        <div class="input-group input-group-sm" style="width: 120px;">
+                                            <button class="btn btn-outline-warning btn-decrease fs-5" type="button" data-id="combo-avatar" data-price="299000" aria-label="Giảm số lượng">-</button>
+                                            <input type="text" class="form-control text-center bg-transparent text-light border-warning qty-input fs-5 fw-bold" value="0" readonly data-id="combo-avatar" data-name="Combo Avatar" data-price="299000">
+                                            <button class="btn btn-outline-warning btn-increase fs-5" type="button" data-id="combo-avatar" data-price="299000" aria-label="Tăng số lượng">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Sticky Cart -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-lg sticky-top" style="top: 80px; background-color: #15152b !important; border: 1px solid #ffc107 !important;">
+                <div class="card-header bg-warning text-dark p-3 d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#orderSummaryCollapse" aria-expanded="true" aria-controls="orderSummaryCollapse" style="cursor: pointer;">
+                    <h5 class="mb-0 fw-bold d-flex align-items-center">
+                        <i class="bi bi-cart me-2"></i>GIỎ HÀNG
+                        <i class="bi bi-chevron-expand d-lg-none ms-2"></i>
+                    </h5>
+                    <div class="text-danger fw-bold badge bg-white fs-6 timer-display" id="global-booking-timer">15:00</div>
+                </div>
+                <div id="orderSummaryCollapse" class="collapse d-lg-block show">
+                    <div class="card-body p-4">
+                        <div id="cart-items" class="mb-3 text-light">
+                            <div class="text-secondary fst-italic text-center py-3">Chưa có sản phẩm nào</div>
+                        </div>
+                        
+                        <hr class="border-secondary">
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <span class="text-secondary fs-6">Tạm tính Bắp Nước:</span>
+                            <span class="text-warning fw-bold fs-3" id="concession-total">0₫</span>
+                        </div>
+
+                        <form method="post" action="/booking/save-concessions" id="concessions-form">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="concessionsData" id="concessionsData" value="">
+                            
+                            <div class="d-flex flex-column gap-2">
+                                <button type="submit" class="btn btn-warning btn-lg fw-bold shadow w-100">
+                                    THANH TOÁN NGAY <i class="bi bi-arrow-right ms-2"></i>
+                                </button>
+                                <a href="/payment" class="btn btn-outline-secondary btn-sm w-100">Bỏ qua bắp nước</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let total = 0;
+            const items = {};
+
+            function updateTotal() {
+                total = 0;
+                for (const key in items) {
+                    total += items[key].qty * items[key].price;
+                }
+                document.getElementById("concession-total").innerText = total.toLocaleString("vi-VN") + "₫";
+                
+                // Render cart items
+                const cartContainer = document.getElementById("cart-items");
+                cartContainer.innerHTML = "";
+                let hasItems = false;
+                
+                for (const key in items) {
+                    if (items[key].qty > 0) {
+                        hasItems = true;
+                        cartContainer.innerHTML += `
+                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom border-secondary border-opacity-25">
+                                <div>
+                                    <div class="fw-bold text-light">${items[key].name}</div>
+                                    <small class="text-warning">${items[key].qty} x ${(items[key].price).toLocaleString("vi-VN")}₫</small>
+                                </div>
+                                <div class="fw-bold text-white">${(items[key].qty * items[key].price).toLocaleString("vi-VN")}₫</div>
+                            </div>
+                        `;
+                    }
+                }
+                
+                if(!hasItems) {
+                    cartContainer.innerHTML = `<div class="text-secondary fst-italic text-center py-3">Chưa có sản phẩm nào</div>`;
+                }
+
+                // Update hidden input
+                const data = [];
+                for (const key in items) {
+                    if (items[key].qty > 0) {
+                        data.push(items[key]);
+                    }
+                }
+                document.getElementById("concessionsData").value = data.length > 0 ? JSON.stringify(data) : "";
+            }
+
+            document.querySelectorAll(".btn-increase").forEach(btn => {
+                btn.addEventListener("click", function() {
+                    const id = this.getAttribute("data-id");
+                    const price = parseInt(this.getAttribute("data-price"));
+                    const input = document.querySelector(`.qty-input[data-id="${id}"]`);
+                    const name = input.getAttribute("data-name");
+                    
+                    let qty = parseInt(input.value) + 1;
+                    input.value = qty;
+                    
+                    items[id] = { id: id, name: name, price: price, qty: qty };
+                    updateTotal();
+                });
+            });
+
+            document.querySelectorAll(".btn-decrease").forEach(btn => {
+                btn.addEventListener("click", function() {
+                    const id = this.getAttribute("data-id");
+                    const input = document.querySelector(`.qty-input[data-id="${id}"]`);
+                    
+                    let qty = parseInt(input.value);
+                    if (qty > 0) {
+                        qty -= 1;
+                        input.value = qty;
+                        
+                        if (items[id]) {
+                            items[id].qty = qty;
+                        }
+                        updateTotal();
+                    }
+                });
+            });
+        });
+    </script>
+}
