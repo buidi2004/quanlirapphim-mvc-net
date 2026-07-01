@@ -28,3 +28,6 @@
 **/web.Release.config
 cinema_db.db-wal
 cinema_db.db-shm
+
+mobile-app-expo/
+quanlirapphim-mvc-net-main/
