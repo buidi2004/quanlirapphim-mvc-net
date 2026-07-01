@@ -1,9 +1,9 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Sử dụng Localtunnel (Public URL) để bỏ qua hoàn toàn lỗi mạng của máy ảo / điện thoại / Windows
-const API_BASE_URL = 'https://grumpy-ears-film.loca.lt'; 
-export const IMAGE_BASE_URL = 'https://grumpy-ears-film.loca.lt';
+// Sử dụng IP WSL trực tiếp để kết nối tới Backend Docker
+const API_BASE_URL = 'http://172.18.226.230:8080'; 
+export const IMAGE_BASE_URL = 'http://172.18.226.230:8080';
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
