@@ -27,7 +27,7 @@ export const styles = StyleSheet.create({
   headerActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    gap: 13,
   },
   iconButton: {
     padding: 4,

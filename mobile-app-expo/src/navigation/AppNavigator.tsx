@@ -32,7 +32,7 @@ const TabNavigator = () => {
           backgroundColor: Theme.colors.surface,
           borderTopColor: '#070101',
           paddingBottom: 4,
-          paddingTop: 4,
+          paddingTop: -5,
         },
         tabBarActiveTintColor: Theme.colors.accent,
         tabBarInactiveTintColor: Theme.colors.textMuted,
@@ -71,7 +71,7 @@ export const AppNavigator = () => {
         background: Theme.colors.background,
         card: Theme.colors.surface,
         text: Theme.colors.textPrimary,
-        border: '#070101',
+        border: '#ffffff',
         notification: Theme.colors.accent,
       }
     }}>

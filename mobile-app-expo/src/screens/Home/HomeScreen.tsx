@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, ActivityIndicator, StatusBar, TouchableOpacity } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { MovieService } from '../../services/MovieService';
 import { Movie } from '../../models/Movie';
@@ -71,8 +71,12 @@ export const HomeScreen = ({ navigation }: any) => {
       <StatusBar barStyle="light-content" backgroundColor={Theme.colors.background} />
 
       {/* Header Logo & Icons với paddingTop bằng độ cao tai thỏ + 16px */}
-      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <Text style={styles.logo}>CinemaX</Text>
+      <View style={[styles.header, { paddingTop: insets.top + -8 }]}>
+        <View>
+          <Text style={styles.logo}>CinemaX</Text>
+          <Text style={{ color: Theme.colors.accent, fontSize: 14, fontWeight: 'bold' }}>Chào mừng bạn đến với CinemaX!</Text>
+        </View>
+
         <View style={styles.headerActions}>
           <TouchableOpacity style={styles.iconButton}>
             <Ionicons name="search" size={24} color={Theme.colors.textPrimary} />
@@ -104,13 +108,10 @@ export const HomeScreen = ({ navigation }: any) => {
           showsVerticalScrollIndicator={false}
           data={[
             { id: 'now', title: 'Phim Đang Chiếu', data: nowShowing },
-            
             { id: 'soon', title: 'Phim Sắp Chiếu', data: comingSoon }
           ]}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => renderSection(item.title, item.data)}
-          
-
         />
       )}
     </View>

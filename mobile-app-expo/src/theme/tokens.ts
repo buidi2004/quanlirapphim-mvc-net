@@ -1,11 +1,11 @@
 export const Theme = {
   colors: {
-    accent: '#e50914',
+    accent: '#ffee05',
     gold: '#FFD700',
-    background: '#111111',
-    surface: '#1a1d23',
-    textPrimary: '#ffffff',
-    textMuted: '#8b949e',
+    background: '#191313',
+    surface: '#ddd9d9',
+    textPrimary: '#1a1515',
+    textMuted: '#0a0e13',
     badgeNow: '#4caf50',
     badgeC18: '#f44336'
   },
