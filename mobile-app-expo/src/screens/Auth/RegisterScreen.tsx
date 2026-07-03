@@ -1,29 +1,36 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, SafeAreaView, ActivityIndicator } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, SafeAreaView, ActivityIndicator, StatusBar } from 'react-native';
+import { Image } from 'expo-image';
+import { Ionicons } from '@expo/vector-icons';
 import { AuthService } from '../../services/AuthService';
 import { styles } from './styles';
-import { Theme } from '../../theme/tokens';
 
 export const RegisterScreen = ({ navigation }: any) => {
-  const [username, setUsername] = useState('');
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleRegister = async () => {
-    if (!username || !email || !password) {
+    if (!name || !email || !phone || !password) {
       setError('Vui lòng nhập đầy đủ thông tin');
       return;
     }
+    if (password !== confirmPassword) {
+      setError('Mật khẩu xác nhận không khớp');
+      return;
+    }
+    
     try {
       setLoading(true);
       setError(null);
-      const res = await AuthService.register(username, email, password);
-      if (res.success && res.token) {
-        await AsyncStorage.setItem('userToken', res.token);
-        navigation.replace('MainTabs');
+      const res = await AuthService.register(name, email, password);
+      if (res.success) {
+        // Tự động chuyển về login hoặc đăng nhập luôn
+        navigation.navigate('Login');
       } else {
         setError(res.error || 'Đăng ký thất bại');
       }
@@ -36,61 +43,98 @@ export const RegisterScreen = ({ navigation }: any) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent={true} />
+      
+      {/* Background Image & Overlay */}
+      <Image 
+        source={{ uri: 'https://image.tmdb.org/t/p/original/8rpDcsfLJypbO6vtecsmEZzDZsn.jpg' }} 
+        style={styles.bgImage} 
+        contentFit="cover" 
+        blurRadius={10}
+      />
+      <View style={styles.overlay} />
+
       <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.keyboardAvoid}
       >
         <View style={styles.container}>
-          <Text style={styles.logo}>Đăng Ký</Text>
+          <Text style={styles.logo}>CinemaX</Text>
+          <Text style={styles.subtitle}>Gia nhập cộng đồng yêu phim</Text>
           
-          {error && <Text style={styles.errorText}>{error}</Text>}
+          <View style={styles.glassCard}>
+            {error && <Text style={styles.errorText}>{error}</Text>}
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Tên đăng nhập</Text>
-            <TextInput 
-              style={styles.input}
-              placeholder="Nhập tên đăng nhập..."
-              placeholderTextColor={Theme.colors.textMuted}
-              value={username}
-              onChangeText={setUsername}
-              autoCapitalize="none"
-            />
+            <View style={styles.inputContainer}>
+              <Ionicons name="person-outline" size={20} color="#888" style={styles.inputIcon} />
+              <TextInput 
+                style={styles.input}
+                placeholder="Họ và tên..."
+                placeholderTextColor="#666"
+                value={name}
+                onChangeText={setName}
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Ionicons name="mail-outline" size={20} color="#888" style={styles.inputIcon} />
+              <TextInput 
+                style={styles.input}
+                placeholder="Email của bạn..."
+                placeholderTextColor="#666"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Ionicons name="call-outline" size={20} color="#888" style={styles.inputIcon} />
+              <TextInput 
+                style={styles.input}
+                placeholder="Số điện thoại..."
+                placeholderTextColor="#666"
+                value={phone}
+                onChangeText={setPhone}
+                keyboardType="phone-pad"
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Ionicons name="lock-closed-outline" size={20} color="#888" style={styles.inputIcon} />
+              <TextInput 
+                style={styles.input}
+                placeholder="Mật khẩu..."
+                placeholderTextColor="#666"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Ionicons name="shield-checkmark-outline" size={20} color="#888" style={styles.inputIcon} />
+              <TextInput 
+                style={styles.input}
+                placeholder="Xác nhận mật khẩu..."
+                placeholderTextColor="#666"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                secureTextEntry
+              />
+            </View>
+
+            <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={loading}>
+              {loading ? <ActivityIndicator color="#000" /> : <Text style={styles.buttonText}>ĐĂNG KÝ</Text>}
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Text style={styles.linkText}>
+                Đã có tài khoản? <Text style={styles.linkAccent}>Đăng nhập ngay</Text>
+              </Text>
+            </TouchableOpacity>
           </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput 
-              style={styles.input}
-              placeholder="Nhập email..."
-              placeholderTextColor={Theme.colors.textMuted}
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Mật khẩu</Text>
-            <TextInput 
-              style={styles.input}
-              placeholder="Nhập mật khẩu..."
-              placeholderTextColor={Theme.colors.textMuted}
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-            />
-          </View>
-
-          <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={loading}>
-            {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Tạo tài khoản</Text>}
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.linkText}>
-              Đã có tài khoản? <Text style={styles.linkAccent}>Đăng nhập</Text>
-            </Text>
-          </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

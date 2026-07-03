@@ -1,7 +1,7 @@
 @{
     ViewData["Title"] = "Tin tức";
-    var featured = ViewBag.Featured as CinemaXNet.ViewModels.NewsItemViewModel;
-    var articles = ViewBag.Articles as List<CinemaXNet.ViewModels.NewsItemViewModel> ?? [];
+    var featured = ViewBag.Featured as CinemaXNet.Application.ViewModels.NewsItemViewModel;
+    var articles = ViewBag.Articles as List<CinemaXNet.Application.ViewModels.NewsItemViewModel> ?? [];
 }
 
 <!-- Featured -->

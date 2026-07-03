@@ -1,4 +1,4 @@
-@model CinemaXNet.Models.Domain.Cinema
+@model CinemaXNet.Domain.Entities.Cinema
 
 @{
     ViewData["Title"] = Model.Name;
@@ -123,7 +123,7 @@
             </div>
 
             @{
-                var showtimesGroups = ViewBag.Showtimes as List<IGrouping<CinemaXNet.Models.Domain.Movie, CinemaXNet.Models.Domain.Showtime>>;
+                var showtimesGroups = ViewBag.Showtimes as List<IGrouping<CinemaXNet.Domain.Entities.Movie, CinemaXNet.Domain.Entities.Showtime>>;
             }
 
             @if (showtimesGroups == null || !showtimesGroups.Any())

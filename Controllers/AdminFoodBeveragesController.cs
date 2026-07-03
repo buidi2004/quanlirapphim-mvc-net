@@ -1,19 +1,21 @@
-using System.Data;
-using Dapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using CinemaXNet.Application.Interfaces;
+using CinemaXNet.Domain.Entities;
 
 namespace CinemaXNet.Controllers;
 
 [Authorize(Roles = "admin,cinema_manager")]
 [Route("admin/food-beverages")]
-public class AdminFoodBeveragesController(IDbConnection db) : Controller
+public class AdminFoodBeveragesController(IFoodBeverageService foodBeverageService) : Controller
 {
     [HttpGet]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int page = 1)
     {
-        var sql = "SELECT * FROM food_beverages ORDER BY id DESC";
-        var items = await db.QueryAsync<dynamic>(sql);
+        int pageSize = 10;
+        var (items, totalCount) = await foodBeverageService.GetPagedAsync(page, pageSize);
+        ViewBag.CurrentPage = page;
+        ViewBag.TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
         return View("~/Views/Admin/FoodBeverages/Index.cshtml", items);
     }
 
@@ -36,13 +38,20 @@ public class AdminFoodBeveragesController(IDbConnection db) : Controller
                 imageUrl = "/uploads/food/" + newName;
             }
 
-            var sql = "INSERT INTO food_beverages (name, description, price, image_url, stock_quantity) VALUES (@Name, @Description, @Price, @ImageUrl, @StockQuantity)";
-            await db.ExecuteAsync(sql, new { Name = name, Description = description, Price = price, ImageUrl = imageUrl, StockQuantity = stockQuantity });
+            var foodBeverage = new FoodBeverage
+            {
+                Name = name,
+                Description = description,
+                Price = price,
+                ImageUrl = imageUrl,
+                StockQuantity = stockQuantity
+            };
+            await foodBeverageService.AddAsync(foodBeverage);
             TempData["Success"] = "Thêm bắp nước thành công!";
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            TempData["Error"] = "Lỗi: " + ex.Message;
+            TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
         return RedirectToAction(nameof(Index));
     }
@@ -66,16 +75,21 @@ public class AdminFoodBeveragesController(IDbConnection db) : Controller
                 imageUrl = "/uploads/food/" + newName;
             }
 
-            var sql = @"UPDATE food_beverages SET 
-                        name = @Name, description = @Description, price = @Price, stock_quantity = @StockQuantity,
-                        image_url = COALESCE(@ImageUrl, image_url) 
-                        WHERE id = @Id";
-            await db.ExecuteAsync(sql, new { Id = id, Name = name, Description = description, Price = price, StockQuantity = stockQuantity, ImageUrl = imageUrl });
+            var foodBeverage = new FoodBeverage
+            {
+                Id = id,
+                Name = name,
+                Description = description,
+                Price = price,
+                ImageUrl = imageUrl,
+                StockQuantity = stockQuantity
+            };
+            await foodBeverageService.UpdateAsync(foodBeverage);
             TempData["Success"] = "Cập nhật bắp nước thành công!";
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            TempData["Error"] = "Lỗi: " + ex.Message;
+            TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
         return RedirectToAction(nameof(Index));
     }
@@ -86,12 +100,12 @@ public class AdminFoodBeveragesController(IDbConnection db) : Controller
     {
         try
         {
-            await db.ExecuteAsync("DELETE FROM food_beverages WHERE id = @Id", new { Id = id });
+            await foodBeverageService.DeleteAsync(id);
             TempData["Success"] = "Xóa bắp nước thành công!";
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            TempData["Error"] = "Lỗi: " + ex.Message;
+            TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
         return RedirectToAction(nameof(Index));
     }

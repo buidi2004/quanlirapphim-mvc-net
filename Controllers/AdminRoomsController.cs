@@ -1,6 +1,5 @@
-using System.Data;
-using CinemaXNet.Models.Domain;
-using Dapper;
+using CinemaXNet.Application.Interfaces;
+using CinemaXNet.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,21 +7,21 @@ namespace CinemaXNet.Controllers;
 
 [Authorize(Roles = "admin,cinema_manager")]
 [Route("admin/rooms")]
-public class AdminRoomsController(IDbConnection db) : Controller
+public class AdminRoomsController(IRoomService roomService) : Controller
 {
     [HttpGet]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int page = 1)
     {
+        int pageSize = 10;
         ViewBag.PageTitle = "Quản lý Phòng chiếu";
-        var sql = """
-            SELECT r.*, c.name AS CinemaName 
-            FROM rooms r 
-            JOIN cinemas c ON r.cinema_id = c.id 
-            ORDER BY r.id DESC
-        """;
-        var rooms = await db.QueryAsync<dynamic>(sql);
-        var cinemas = await db.QueryAsync<Cinema>("SELECT id, name FROM cinemas ORDER BY name");
+        
+        var (rooms, totalCount) = await roomService.GetPagedRoomsAsync(page, pageSize);
+        var cinemas = await roomService.GetAllCinemasAsync();
+        
         ViewBag.Cinemas = cinemas;
+        ViewBag.CurrentPage = page;
+        ViewBag.TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+        
         return View("~/Views/Admin/Rooms/Index.cshtml", rooms);
     }
 
@@ -32,13 +31,13 @@ public class AdminRoomsController(IDbConnection db) : Controller
     {
         try
         {
-            var sql = "INSERT INTO rooms (cinema_id, name, total_rows, seats_per_row) VALUES (@CinemaId, @Name, @TotalRows, @SeatsPerRow)";
-            await db.ExecuteAsync(sql, new { CinemaId = cinemaId, Name = name, TotalRows = totalRows, SeatsPerRow = seatsPerRow });
+            var room = new Room { CinemaId = cinemaId, Name = name, TotalRows = totalRows, SeatsPerRow = seatsPerRow };
+            await roomService.AddAsync(room);
             TempData["Success"] = "Thêm phòng thành công!";
         }
         catch (Exception ex)
         {
-            TempData["Error"] = "Lỗi: " + ex.Message;
+            TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
         return RedirectToAction(nameof(Index));
     }
@@ -49,13 +48,13 @@ public class AdminRoomsController(IDbConnection db) : Controller
     {
         try
         {
-            var sql = "UPDATE rooms SET cinema_id = @CinemaId, name = @Name, total_rows = @TotalRows, seats_per_row = @SeatsPerRow WHERE id = @Id";
-            await db.ExecuteAsync(sql, new { Id = id, CinemaId = cinemaId, Name = name, TotalRows = totalRows, SeatsPerRow = seatsPerRow });
+            var room = new Room { Id = id, CinemaId = cinemaId, Name = name, TotalRows = totalRows, SeatsPerRow = seatsPerRow };
+            await roomService.UpdateAsync(room);
             TempData["Success"] = "Cập nhật phòng thành công!";
         }
         catch (Exception ex)
         {
-            TempData["Error"] = "Lỗi: " + ex.Message;
+            TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
         return RedirectToAction(nameof(Index));
     }
@@ -66,12 +65,12 @@ public class AdminRoomsController(IDbConnection db) : Controller
     {
         try
         {
-            await db.ExecuteAsync("DELETE FROM rooms WHERE id = @Id", new { Id = id });
+            await roomService.DeleteAsync(id);
             TempData["Success"] = "Xóa phòng thành công!";
         }
         catch (Exception ex)
         {
-            TempData["Error"] = "Lỗi: " + ex.Message;
+            TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
         return RedirectToAction(nameof(Index));
     }
@@ -81,10 +80,10 @@ public class AdminRoomsController(IDbConnection db) : Controller
     [HttpGet("builder/{id}")]
     public async Task<IActionResult> LayoutBuilder(int id)
     {
-        var room = await db.QueryFirstOrDefaultAsync<dynamic>("SELECT * FROM rooms WHERE id = @Id", new { Id = id });
+        var room = await roomService.GetByIdAsync(id);
         if (room == null) return NotFound();
 
-        ViewBag.PageTitle = $"Sơ đồ ghế: {room.name}";
+        ViewBag.PageTitle = $"Sơ đồ ghế: {room.Name}";
         return View("~/Views/Admin/Rooms/LayoutBuilder.cshtml", room);
     }
 
@@ -93,7 +92,7 @@ public class AdminRoomsController(IDbConnection db) : Controller
     {
         try
         {
-            await db.ExecuteAsync("UPDATE rooms SET layout_json = @LayoutJson WHERE id = @Id", new { Id = id, LayoutJson = request.LayoutJson });
+            await roomService.UpdateLayoutAsync(id, request.LayoutJson);
             return Json(new { success = true, message = "Đã lưu sơ đồ ghế thành công!" });
         }
         catch (Exception ex)

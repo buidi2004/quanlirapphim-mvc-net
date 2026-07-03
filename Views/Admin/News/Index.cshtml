@@ -123,6 +123,20 @@
     </div>
 </div>
 
+@if (ViewBag.TotalPages > 1)
+{
+    <div class="d-flex justify-content-center mt-4">
+        <ul class="pagination pagination-sm">
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="/admin/news?page=@i">@i</a>
+                </li>
+            }
+        </ul>
+    </div>
+}
+
 <!-- Add Modal -->
 <div class="modal fade" id="addNewsModal" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">

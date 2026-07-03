@@ -1,4 +1,4 @@
-@model dynamic
+@model CinemaXNet.Domain.Entities.Room
 @{
     ViewData["Title"] = ViewBag.PageTitle;
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
@@ -66,8 +66,8 @@
                 <h6 class="m-0 font-weight-bold text-primary">Thông tin phòng</h6>
             </div>
             <div class="card-body">
-                <p><strong>Phòng:</strong> @Model.name</p>
-                <p><strong>Lưới:</strong> <span id="lblRows">@Model.total_rows</span> hàng x <span id="lblCols">@Model.seats_per_row</span> cột</p>
+                <p><strong>Phòng:</strong> @Model.Name</p>
+                <p><strong>Lưới:</strong> <span id="lblRows">@Model.TotalRows</span> hàng x <span id="lblCols">@Model.SeatsPerRow</span> cột</p>
                 
                 <hr>
                 <h6>Chú giải (Click vào ghế để đổi):</h6>
@@ -101,10 +101,10 @@
 
 @section Scripts {
     <script>
-        const roomId = @Model.id;
-        const totalRows = parseInt('@Model.total_rows');
-        const seatsPerRow = parseInt('@Model.seats_per_row');
-        const existingLayoutStr = `@Html.Raw(Model.layout_json ?? "")`;
+        const roomId = @Model.Id;
+        const totalRows = parseInt('@Model.TotalRows');
+        const seatsPerRow = parseInt('@Model.SeatsPerRow');
+        const existingLayoutStr = `@Html.Raw(Model.LayoutJson ?? "")`;
         
         // Seat types sequence for toggling
         const seatTypes = ['standard', 'vip', 'couple', 'hidden', 'broken'];

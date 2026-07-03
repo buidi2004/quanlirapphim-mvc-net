@@ -1,6 +1,5 @@
-using System.Data;
-using CinemaXNet.Models.Domain;
-using Dapper;
+using CinemaXNet.Application.Interfaces;
+using CinemaXNet.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,23 +7,19 @@ namespace CinemaXNet.Controllers;
 
 [Authorize(Roles = "admin,cinema_manager")]
 [Route("admin/showtimes")]
-public class AdminShowtimesController(IDbConnection db) : Controller
+public class AdminShowtimesController(IShowtimeService showtimeService) : Controller
 {
     [HttpGet]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int page = 1)
     {
-        var sql = """
-            SELECT s.*, m.title AS MovieTitle, r.name AS RoomName, c.name AS CinemaName 
-            FROM showtimes s 
-            JOIN movies m ON s.movie_id = m.id 
-            JOIN rooms r ON s.room_id = r.id 
-            JOIN cinemas c ON r.cinema_id = c.id
-            ORDER BY s.show_date DESC, s.start_time DESC
-        """;
-        var showtimes = await db.QueryAsync<dynamic>(sql);
+        int pageSize = 10;
         
-        ViewBag.Movies = await db.QueryAsync<Movie>("SELECT id, title FROM movies ORDER BY id DESC");
-        ViewBag.Rooms = await db.QueryAsync<dynamic>("SELECT r.id, r.name, c.name AS CinemaName FROM rooms r JOIN cinemas c ON r.cinema_id = c.id ORDER BY c.name, r.name");
+        var (showtimes, totalCount) = await showtimeService.GetPagedAsync(page, pageSize);
+        
+        ViewBag.Movies = await showtimeService.GetAllMoviesAsync();
+        ViewBag.Rooms = await showtimeService.GetAllRoomsWithCinemaAsync();
+        ViewBag.CurrentPage = page;
+        ViewBag.TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
         
         return View("~/Views/Admin/Showtimes/Index.cshtml", showtimes);
     }
@@ -35,13 +30,12 @@ public class AdminShowtimesController(IDbConnection db) : Controller
     {
         try
         {
-            var sql = "INSERT INTO showtimes (movie_id, room_id, show_date, start_time, end_time, price) VALUES (@MovieId, @RoomId, @ShowDate, @StartTime, @EndTime, @Price)";
-            await db.ExecuteAsync(sql, new { MovieId = movieId, RoomId = roomId, ShowDate = showDate, StartTime = startTime, EndTime = endTime, Price = price });
+            await showtimeService.AddAsync(movieId, roomId, showDate, startTime, endTime, price);
             TempData["Success"] = "Thêm suất chiếu thành công!";
         }
         catch (Exception ex)
         {
-            TempData["Error"] = "Lỗi: " + ex.Message;
+            TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
         return RedirectToAction(nameof(Index));
     }
@@ -52,13 +46,12 @@ public class AdminShowtimesController(IDbConnection db) : Controller
     {
         try
         {
-            var sql = "UPDATE showtimes SET movie_id = @MovieId, room_id = @RoomId, show_date = @ShowDate, start_time = @StartTime, end_time = @EndTime, price = @Price WHERE id = @Id";
-            await db.ExecuteAsync(sql, new { Id = id, MovieId = movieId, RoomId = roomId, ShowDate = showDate, StartTime = startTime, EndTime = endTime, Price = price });
+            await showtimeService.UpdateAsync(id, movieId, roomId, showDate, startTime, endTime, price);
             TempData["Success"] = "Cập nhật suất chiếu thành công!";
         }
         catch (Exception ex)
         {
-            TempData["Error"] = "Lỗi: " + ex.Message;
+            TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
         return RedirectToAction(nameof(Index));
     }
@@ -69,13 +62,14 @@ public class AdminShowtimesController(IDbConnection db) : Controller
     {
         try
         {
-            await db.ExecuteAsync("DELETE FROM showtimes WHERE id = @Id", new { Id = id });
+            await showtimeService.DeleteAsync(id);
             TempData["Success"] = "Xóa suất chiếu thành công!";
         }
         catch (Exception ex)
         {
-            TempData["Error"] = "Lỗi: " + ex.Message;
+            TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
         return RedirectToAction(nameof(Index));
     }
 }
+

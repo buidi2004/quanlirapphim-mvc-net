@@ -1,5 +1,5 @@
-using CinemaXNet.Core.Exceptions;
-using CinemaXNet.Models.Services.Interfaces;
+using CinemaXNet.Domain.Exceptions;
+using CinemaXNet.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CinemaXNet.Controllers;

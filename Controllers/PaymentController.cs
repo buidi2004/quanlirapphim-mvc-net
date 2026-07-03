@@ -1,6 +1,6 @@
-using CinemaXNet.Core.Exceptions;
-using CinemaXNet.Core.ValueObjects;
-using CinemaXNet.Models.Services.Interfaces;
+using CinemaXNet.Domain.Exceptions;
+using CinemaXNet.Domain.ValueObjects;
+using CinemaXNet.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -69,7 +69,6 @@ public class PaymentController(ITicketService ticketService, IPaymentService pay
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Confirm(
         string paymentMethod,
-        decimal? totalPrice,
         string? promotionCode)
     {
         var ticketIds = GetPendingTicketIds();
@@ -83,10 +82,26 @@ public class PaymentController(ITicketService ticketService, IPaymentService pay
 
         try
         {
+            // BẢO MẬT TỐI ĐA: Backend tự tính toán giá tiền thay vì tin tưởng Client
+            var confirmVm = await ticketService.BuildConfirmViewModelAsync(ticketIds, userId);
+            
+            var concessionsJson = HttpContext.Session.GetString("selected_concessions");
+            decimal concessionTotal = 0;
+            if (!string.IsNullOrEmpty(concessionsJson))
+            {
+                var concessions = JsonSerializer.Deserialize<List<ConcessionCartItem>>(concessionsJson);
+                if (concessions != null)
+                {
+                    foreach(var c in concessions) concessionTotal += c.qty * c.price;
+                }
+            }
+            
+            decimal finalTotalPrice = confirmVm.Subtotal - confirmVm.Discount + concessionTotal;
+
             // Bước 1: Xử lý thanh toán qua Strategy Pattern
             var paymentResult = await paymentService.ProcessAsync(paymentMethod, new PaymentRequest
             {
-                Amount           = totalPrice ?? 0,
+                Amount           = finalTotalPrice,
                 OrderDescription = "Đặt vé xem phim CinemaX",
                 TicketIds        = ticketIds,
                 UserId           = userId
@@ -95,8 +110,8 @@ public class PaymentController(ITicketService ticketService, IPaymentService pay
             if (!paymentResult.Success)
                 throw new BusinessException("Thanh toán không thành công. Vui lòng thử lại.");
 
-            // Bước 2: Xác nhận + Optimistic Locking
-            await ticketService.ConfirmPaymentAsync(ticketIds, userId, paymentMethod, totalPrice, promotionCode);
+            // Bước 2: Xác nhận + Optimistic Locking (Truyền giá trị thực để cộng điểm)
+            await ticketService.ConfirmPaymentAsync(ticketIds, userId, paymentMethod, finalTotalPrice, promotionCode);
 
             // Pass data to success page
             TempData["SuccessTicketIds"] = string.Join(",", ticketIds);

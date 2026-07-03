@@ -1,4 +1,4 @@
-using CinemaXNet.Models.Services.Interfaces;
+using CinemaXNet.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
@@ -8,13 +8,13 @@ namespace CinemaXNet.Controllers;
 
 [Authorize(Roles = "admin,cinema_manager")]
 [Route("admin")]
-public class AdminController(IMovieService movieService, IAuditLogService auditLogService) : Controller
+public class AdminController(IMovieService movieService, IAuditLogService auditLogService, IDashboardService dashboardService) : Controller
 {
     // GET /admin/dashboard
     [HttpGet("dashboard")]
     public async Task<IActionResult> Dashboard()
     {
-        var stats = await movieService.GetDashboardStatsAsync();
+        var stats = await dashboardService.GetDashboardStatsAsync();
         return View(stats);
     }
 
@@ -64,7 +64,7 @@ public class AdminController(IMovieService movieService, IAuditLogService auditL
 
         try
         {
-            var movie = new CinemaXNet.Models.Domain.Movie
+            var movie = new CinemaXNet.Domain.Entities.Movie
             {
                 Title           = title.Trim(),
                 PosterUrl       = posterUrl,
@@ -128,7 +128,7 @@ public class AdminController(IMovieService movieService, IAuditLogService auditL
 
         try
         {
-            var movie = new CinemaXNet.Models.Domain.Movie
+            var movie = new CinemaXNet.Domain.Entities.Movie
             {
                 Title           = title.Trim(),
                 PosterUrl       = posterUrl,
@@ -148,7 +148,7 @@ public class AdminController(IMovieService movieService, IAuditLogService auditL
         }
         catch (Exception ex)
         {
-            TempData["Error"] = "Lỗi hệ thống: " + ex.Message;
+            TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
 
         return RedirectToAction(nameof(Movies));
@@ -170,7 +170,7 @@ public class AdminController(IMovieService movieService, IAuditLogService auditL
         }
         catch (Exception ex)
         {
-            TempData["Error"] = "Lỗi hệ thống: " + ex.Message;
+            TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
 
         return RedirectToAction(nameof(Movies));

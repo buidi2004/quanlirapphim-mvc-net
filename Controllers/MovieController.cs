@@ -1,6 +1,6 @@
-using CinemaXNet.Models.Repository.Interfaces;
-using CinemaXNet.Models.Services.Interfaces;
-using CinemaXNet.ViewModels;
+using CinemaXNet.Application.Interfaces;
+using CinemaXNet.Application.Interfaces;
+using CinemaXNet.Application.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;

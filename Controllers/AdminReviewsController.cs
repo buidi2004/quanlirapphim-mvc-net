@@ -1,26 +1,21 @@
-using System.Data;
-using Dapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using CinemaXNet.Application.Interfaces;
 
 namespace CinemaXNet.Controllers;
 
 [Authorize(Roles = "admin,cinema_manager")]
 [Route("admin/reviews")]
-public class AdminReviewsController(IDbConnection db) : Controller
+public class AdminReviewsController(IReviewService reviewService) : Controller
 {
     [HttpGet]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int page = 1)
     {
-        var sql = """
-            SELECT r.*, u.full_name, m.title AS movie_title
-            FROM reviews r
-            JOIN users u ON r.user_id = u.id
-            JOIN movies m ON r.movie_id = m.id
-            ORDER BY r.created_at DESC
-        """;
-        var reviews = await db.QueryAsync<dynamic>(sql);
-        return View("~/Views/Admin/Reviews/Index.cshtml", reviews);
+        int pageSize = 10;
+        var result = await reviewService.GetAllReviewsAsync(page, pageSize);
+        ViewBag.CurrentPage = page;
+        ViewBag.TotalPages = result.TotalPages;
+        return View("~/Views/Admin/Reviews/Index.cshtml", result.Reviews);
     }
 
     [HttpPost("toggle")]
@@ -29,20 +24,19 @@ public class AdminReviewsController(IDbConnection db) : Controller
     {
         try
         {
-            var review = await db.QuerySingleOrDefaultAsync<dynamic>("SELECT is_approved FROM reviews WHERE id = @Id", new { Id = id });
-            if (review != null)
+            var result = await reviewService.ToggleReviewStatusAsync(id);
+            if (result.Success)
             {
-                // In SQLite, bool is stored as 1/0 or true/false depending on the driver, but typically int 0 or 1.
-                // Assuming it's numeric in this DB:
-                bool currentStatus = review.is_approved == 1 || review.is_approved == true || review.is_approved == "1";
-                bool newStatus = !currentStatus;
-                await db.ExecuteAsync("UPDATE reviews SET is_approved = @NewStatus WHERE id = @Id", new { NewStatus = newStatus, Id = id });
-                TempData["Success"] = newStatus ? "Đã duyệt đánh giá!" : "Đã ẩn đánh giá!";
+                TempData["Success"] = result.Message;
+            }
+            else
+            {
+                TempData["Error"] = result.Message;
             }
         }
         catch (Exception ex)
         {
-            TempData["Error"] = "Lỗi: " + ex.Message;
+            TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
         return RedirectToAction(nameof(Index));
     }
@@ -53,12 +47,12 @@ public class AdminReviewsController(IDbConnection db) : Controller
     {
         try
         {
-            await db.ExecuteAsync("DELETE FROM reviews WHERE id = @Id", new { Id = id });
+            await reviewService.DeleteReviewAsync(id);
             TempData["Success"] = "Đã xóa đánh giá!";
         }
         catch (Exception ex)
         {
-            TempData["Error"] = "Lỗi: " + ex.Message;
+            TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
         return RedirectToAction(nameof(Index));
     }

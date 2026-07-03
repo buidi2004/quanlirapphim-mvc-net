@@ -1,5 +1,5 @@
-using CinemaXNet.Models.Services.Interfaces;
-using CinemaXNet.ViewModels;
+using CinemaXNet.Application.Interfaces;
+using CinemaXNet.Application.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CinemaXNet.Controllers;

@@ -1,27 +1,27 @@
-using System.Data;
-using Dapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using CinemaXNet.Application.Interfaces;
 
 namespace CinemaXNet.Controllers;
 
 [Authorize(Roles = "admin,cinema_manager")]
 [Route("admin/contacts")]
-public class AdminContactsController(IDbConnection db) : Controller
+public class AdminContactsController(IContactService contactService) : Controller
 {
     [HttpGet]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int page = 1)
     {
-        var sql = "SELECT * FROM contacts ORDER BY created_at DESC";
-        var contacts = await db.QueryAsync<dynamic>(sql);
-        return View("~/Views/Admin/Contacts/Index.cshtml", contacts);
+        int pageSize = 10;
+        var result = await contactService.GetAllContactsAsync(page, pageSize);
+        ViewBag.CurrentPage = page;
+        ViewBag.TotalPages = result.TotalPages;
+        return View("~/Views/Admin/Contacts/Index.cshtml", result.Contacts);
     }
 
     [HttpGet("details/{id}")]
     public async Task<IActionResult> Details(int id)
     {
-        var contact = await db.QuerySingleOrDefaultAsync<dynamic>(
-            "SELECT * FROM contacts WHERE id = @Id", new { Id = id });
+        var contact = await contactService.GetContactByIdAsync(id);
         if (contact == null)
         {
             return NotFound();
@@ -35,14 +35,13 @@ public class AdminContactsController(IDbConnection db) : Controller
     {
         try
         {
-            var sql = "UPDATE contacts SET status = 'replied', reply_message = @ReplyMessage, replied_at = @RepliedAt, is_read = 1 WHERE id = @Id";
-            await db.ExecuteAsync(sql, new { ReplyMessage = replyMessage, RepliedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), Id = id });
+            await contactService.ReplyToContactAsync(id, replyMessage);
             
             TempData["Success"] = "Đã lưu phản hồi thành công!";
         }
         catch (Exception ex)
         {
-            TempData["Error"] = "Lỗi: " + ex.Message;
+            TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
         return RedirectToAction(nameof(Details), new { id = id });
     }
@@ -53,12 +52,12 @@ public class AdminContactsController(IDbConnection db) : Controller
     {
         try
         {
-            await db.ExecuteAsync("DELETE FROM contacts WHERE id = @Id", new { Id = id });
+            await contactService.DeleteContactAsync(id);
             TempData["Success"] = "Đã xóa liên hệ!";
         }
         catch (Exception ex)
         {
-            TempData["Error"] = "Lỗi: " + ex.Message;
+            TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
         return RedirectToAction(nameof(Index));
     }

@@ -1,11 +1,10 @@
+using CinemaXNet.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System.Data;
-using Dapper;
 
 namespace CinemaXNet.Controllers;
 
 [Route("contact")]
-public class ContactController(IDbConnection db) : Controller
+public class ContactController(IContactService contactService) : Controller
 {
     // GET /contact
     [HttpGet("")]
@@ -29,17 +28,13 @@ public class ContactController(IDbConnection db) : Controller
         int contactId = 0;
         try
         {
-            contactId = await db.QuerySingleAsync<int>(@"
-                INSERT INTO contacts (name, email, phone, subject, message, status)
-                VALUES (@name, @email, @phone, @subject, @message, 'pending');
-                SELECT last_insert_rowid();",
-                new { 
-                    name = name.Trim(), 
-                    email = email.Trim(), 
-                    phone = phone?.Trim(), 
-                    subject = subject?.Trim(), 
-                    message = message.Trim() 
-                });
+            contactId = await contactService.CreateContactAsync(new { 
+                name = name.Trim(), 
+                email = email.Trim(), 
+                phone = phone?.Trim(), 
+                subject = subject?.Trim(), 
+                message = message.Trim() 
+            });
             TempData["Success"] = "Gửi yêu cầu hỗ trợ thành công! Bạn có thể xem chi tiết bên dưới.";
         }
         catch (Exception ex)
@@ -55,8 +50,7 @@ public class ContactController(IDbConnection db) : Controller
     [HttpGet("details/{id}")]
     public async Task<IActionResult> Details(int id)
     {
-        var contact = await db.QuerySingleOrDefaultAsync<dynamic>(
-            "SELECT * FROM contacts WHERE id = @Id", new { Id = id });
+        var contact = await contactService.GetContactByIdAsync(id);
         if (contact == null)
         {
             return NotFound();

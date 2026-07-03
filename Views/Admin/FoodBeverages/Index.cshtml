@@ -1,8 +1,10 @@
-@model IEnumerable<dynamic>
+@model IEnumerable<CinemaXNet.Domain.Entities.FoodBeverage>
 @{
     ViewData["Title"] = "Quản Lý Bắp Nước";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
-    var items = Model?.ToList() ?? new List<dynamic>();
+    var items = Model?.ToList() ?? new List<CinemaXNet.Domain.Entities.FoodBeverage>();
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
 }
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-light">
@@ -40,32 +42,32 @@
                     {
                         <tr>
                             <td>
-                                <img src="@(item.image_url ?? "https://placehold.co/100x100/111/fff?text=No+Image")"
+                                <img src="@(item.ImageUrl ?? "https://placehold.co/100x100/111/fff?text=No+Image")"
                                      alt="Image" class="img-thumbnail bg-light border-light rounded shadow-sm"
                                      style="width: 60px; height: 60px; object-fit: cover;">
                             </td>
-                            <td><strong class="text-dark">@item.name</strong></td>
-                            <td><small class="text-secondary">@item.description</small></td>
-                            <td class="text-success fw-bold">@string.Format("{0:N0}₫", item.price)</td>
+                            <td><strong class="text-dark">@item.Name</strong></td>
+                            <td><small class="text-secondary">@item.Description</small></td>
+                            <td class="text-success fw-bold">@string.Format("{0:N0}₫", item.Price)</td>
                             <td>
-                                @if (item.stock_quantity > 0) {
-                                    <span class="badge bg-info">@item.stock_quantity</span>
+                                @if (item.StockQuantity > 0) {
+                                    <span class="badge bg-info">@item.StockQuantity</span>
                                 } else {
                                     <span class="badge bg-danger">Hết hàng</span>
                                 }
                             </td>
                             <td class="text-end">
-                                <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#editFoodModal-@item.id">
+                                <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#editFoodModal-@item.Id">
                                     <i class="bi bi-pencil"></i>
                                 </button>
-                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteFoodModal-@item.id">
+                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteFoodModal-@item.Id">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </td>
                         </tr>
 
                         <!-- Edit Modal -->
-                        <div class="modal fade" id="editFoodModal-@item.id" tabindex="-1">
+                        <div class="modal fade" id="editFoodModal-@item.Id" tabindex="-1">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content bg-light text-dark border border-light shadow-lg">
                                     <div class="modal-header bg-white border-bottom border-light">
@@ -74,23 +76,23 @@
                                     </div>
                                     <form method="post" action="/admin/food-beverages/update" enctype="multipart/form-data">
                                         @Html.AntiForgeryToken()
-                                        <input type="hidden" name="id" value="@item.id" />
+                                        <input type="hidden" name="id" value="@item.Id" />
                                         <div class="modal-body p-4 text-start">
                                             <div class="mb-3">
                                                 <label class="form-label text-dark fw-bold">Tên Combo</label>
-                                                <input type="text" name="name" value="@item.name" class="form-control bg-white text-dark border-light" required>
+                                                <input type="text" name="name" value="@item.Name" class="form-control bg-white text-dark border-light" required>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label text-dark fw-bold">Giá bán</label>
-                                                <input type="number" name="price" value="@item.price" class="form-control bg-white text-dark border-light" required>
+                                                <input type="number" name="price" value="@item.Price" class="form-control bg-white text-dark border-light" required>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label text-dark fw-bold">Mô tả chi tiết</label>
-                                                <textarea name="description" rows="3" class="form-control bg-white text-dark border-light">@item.description</textarea>
+                                                <textarea name="description" rows="3" class="form-control bg-white text-dark border-light">@item.Description</textarea>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label text-dark fw-bold">Tồn kho</label>
-                                                <input type="number" name="stockQuantity" value="@item.stock_quantity" class="form-control bg-white text-dark border-light" required min="0">
+                                                <input type="number" name="stockQuantity" value="@item.StockQuantity" class="form-control bg-white text-dark border-light" required min="0">
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label text-dark fw-bold">Ảnh sản phẩm mới (để trống nếu giữ cũ)</label>
@@ -107,7 +109,7 @@
                         </div>
 
                         <!-- Delete Modal -->
-                        <div class="modal fade" id="deleteFoodModal-@item.id" tabindex="-1">
+                        <div class="modal fade" id="deleteFoodModal-@item.Id" tabindex="-1">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content bg-light text-dark border border-light shadow-lg">
                                     <div class="modal-header bg-white border-bottom border-light">
@@ -115,13 +117,13 @@
                                         <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
                                     </div>
                                     <div class="modal-body p-4 text-start">
-                                        Bạn có chắc chắn muốn xóa sản phẩm <strong>@item.name</strong>?
+                                        Bạn có chắc chắn muốn xóa sản phẩm <strong>@item.Name</strong>?
                                     </div>
                                     <div class="modal-footer bg-white border-top border-light">
                                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
                                         <form method="post" action="/admin/food-beverages/delete">
                                             @Html.AntiForgeryToken()
-                                            <input type="hidden" name="id" value="@item.id" />
+                                            <input type="hidden" name="id" value="@item.Id" />
                                             <button type="submit" class="btn btn-danger fw-bold">Xóa</button>
                                         </form>
                                     </div>
@@ -134,6 +136,26 @@
         </table>
     </div>
 </div>
+
+@if (totalPages > 1)
+{
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                <a class="page-link" href="?page=@(currentPage - 1)">Trước</a>
+            </li>
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <li class="page-item @(i == currentPage ? "active" : "")">
+                    <a class="page-link" href="?page=@i">@i</a>
+                </li>
+            }
+            <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                <a class="page-link" href="?page=@(currentPage + 1)">Sau</a>
+            </li>
+        </ul>
+    </nav>
+}
 
 <!-- Add Modal -->
 <div class="modal fade" id="addFoodModal" tabindex="-1">

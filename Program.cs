@@ -1,17 +1,25 @@
 using System.Data;
-using CinemaXNet.Data;
-using CinemaXNet.Models.Repository.Implementations;
-using CinemaXNet.Models.Repository.Interfaces;
-using CinemaXNet.Models.Services.Implementations;
-using CinemaXNet.Models.Services.Interfaces;
-using CinemaXNet.Services;
+using CinemaXNet.Infrastructure.Data;
+using CinemaXNet.Infrastructure.Repositories;
+using CinemaXNet.Application.Interfaces;
+using CinemaXNet.Application.Services;
+using CinemaXNet.Application.Interfaces;
+using CinemaXNet.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Data.Sqlite;
+using Serilog;
+using CinemaXNet.Infrastructure.Middleware;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// ── Serilog ────────────────────────────────────────────────────────────────
+builder.Host.UseSerilog((ctx, lc) => lc
+    .WriteTo.Console()
+    .ReadFrom.Configuration(ctx.Configuration));
 
 // ── MVC ────────────────────────────────────────────────────────────────────
 builder.Services.AddControllersWithViews();
@@ -56,7 +64,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             ValidateIssuerSigningKey = true,
             ValidIssuer = jwtSettings["Issuer"] ?? "CinemaX",
             ValidAudience = jwtSettings["Audience"] ?? "CinemaXUsers",
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+            ClockSkew = TimeSpan.Zero
         };
     });
 
@@ -82,17 +91,56 @@ Dapper.SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
 Dapper.SqlMapper.AddTypeHandler(new TimeOnlyTypeHandler());
 
 // ── Repositories ──────────────────────────────────────────────────────────
-builder.Services.AddScoped<IMovieRepository,    MovieRepository>();
-builder.Services.AddScoped<IUserRepository,     UserRepository>();
-builder.Services.AddScoped<IShowtimeRepository, ShowtimeRepository>();
-builder.Services.AddScoped<ITicketRepository,   TicketRepository>();
+builder.Services.AddScoped<ICinemaRepository, CinemaRepository>();
+builder.Services.AddScoped<IMovieRepository, MovieRepository>();
+builder.Services.AddScoped<ITicketRepository, TicketRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
-builder.Services.AddScoped<IAuditLogService, AuditLogService>();
-builder.Services.AddScoped<IDynamicPricingService, DynamicPricingService>();
-builder.Services.AddScoped<ICinemaRepository,   CinemaRepository>();
-builder.Services.AddScoped<IReviewRepository,   ReviewRepository>();
+builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
+builder.Services.AddScoped<IMembershipRepository, MembershipRepository>();
+builder.Services.AddScoped<ICampaignRepository, CampaignRepository>();
+builder.Services.AddScoped<IPricingRuleRepository, PricingRuleRepository>();
+builder.Services.AddScoped<IContactRepository, ContactRepository>();
+builder.Services.AddScoped<INewsRepository, NewsRepository>();
+builder.Services.AddScoped<ISettingRepository, SettingRepository>();
+builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+builder.Services.AddScoped<IRoomRepository, RoomRepository>();
+builder.Services.AddScoped<IShowtimeRepository, ShowtimeRepository>();
+builder.Services.AddScoped<IFoodBeverageRepository, FoodBeverageRepository>();
+builder.Services.AddScoped<IScannerRepository, ScannerRepository>();
+builder.Services.AddScoped<IRefundRepository, RefundRepository>();
+builder.Services.AddScoped<IReportRepository, ReportRepository>();
 
-// ── Services ───────────────────────────────────────────────────────────────
+// Đăng ký Services
+builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IMovieService, MovieService>();
+builder.Services.AddScoped<ITicketService, TicketService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<ICinemaService, CinemaService>();
+builder.Services.AddScoped<IDynamicPricingService, DynamicPricingService>();
+builder.Services.AddScoped<IPromotionService, PromotionService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IAuditLogService, AuditLogService>();
+builder.Services.AddScoped<IMembershipService, MembershipService>();
+builder.Services.AddScoped<ICampaignService, CampaignService>();
+builder.Services.AddScoped<IPricingRuleService, PricingRuleService>();
+builder.Services.AddScoped<IContactService, ContactService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<INewsService, NewsService>();
+builder.Services.AddScoped<ISettingService, SettingService>();
+builder.Services.AddScoped<IRoomService, RoomService>();
+builder.Services.AddScoped<IShowtimeService, ShowtimeService>();
+builder.Services.AddScoped<IFoodBeverageService, FoodBeverageService>();
+builder.Services.AddScoped<IScannerService, ScannerService>();
+builder.Services.AddScoped<IRefundService, RefundService>();
+builder.Services.AddScoped<IReportService, ReportService>();
+
+// ── AutoMapper & MediatR ──────────────────────────────────────────────────
+builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+
 builder.Services.AddScoped<IUserService,      UserService>();
 builder.Services.AddScoped<IMovieService,     MovieService>();
 builder.Services.AddScoped<ITicketService,    TicketService>();
@@ -100,6 +148,7 @@ builder.Services.AddScoped<IPaymentService,   PaymentService>();
 builder.Services.AddScoped<IPromotionService, PromotionService>();
 builder.Services.AddScoped<ICinemaService,    CinemaService>();
 builder.Services.AddScoped<IJwtService,       JwtService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 // ── Background Service (thay cron job PHP) ────────────────────────────────
 builder.Services.AddHostedService<HoldExpiryBackgroundService>();
@@ -111,9 +160,11 @@ builder.Services.AddHttpContextAccessor();
 var app = builder.Build();
 
 // ── Middleware Pipeline ────────────────────────────────────────────────────
+app.UseMiddleware<GlobalExceptionMiddleware>();
+
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/error/500");
+    // app.UseExceptionHandler("/error/500");
     app.UseHsts();
 }
 app.UseStatusCodePagesWithReExecute("/error/{0}");

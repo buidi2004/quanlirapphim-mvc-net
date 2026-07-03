@@ -129,3 +129,17 @@
         </table>
     </div>
 </div>
+
+@if (ViewBag.TotalPages > 1)
+{
+    <div class="d-flex justify-content-center mt-4">
+        <ul class="pagination pagination-sm">
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="/admin/contacts?page=@i">@i</a>
+                </li>
+            }
+        </ul>
+    </div>
+}

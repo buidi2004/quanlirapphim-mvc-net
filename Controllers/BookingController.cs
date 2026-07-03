@@ -1,5 +1,5 @@
-using CinemaXNet.Core.Exceptions;
-using CinemaXNet.Models.Services.Interfaces;
+using CinemaXNet.Domain.Exceptions;
+using CinemaXNet.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -13,7 +13,7 @@ public class BookingController(
     IMovieService movieService,
     IPromotionService promotionService,
     ICinemaService cinemaService,
-    CinemaXNet.Models.Repository.Interfaces.IShowtimeRepository showtimeRepo) : Controller
+    CinemaXNet.Application.Interfaces.IShowtimeRepository showtimeRepo) : Controller
 {
     // GET /booking/{showtimeId}
     [AllowAnonymous]

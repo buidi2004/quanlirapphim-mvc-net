@@ -1,9 +1,9 @@
-@model CinemaXNet.ViewModels.PaginatedList<CinemaXNet.Models.Domain.Movie>
+@model CinemaXNet.Application.ViewModels.PaginatedList<CinemaXNet.Domain.Entities.Movie>
 @{
     ViewData["Title"] = "Quản Lý Phim";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     var errors = ViewBag.Errors as Dictionary<string, string>;
-    var movies = Model?.Items ?? new List<CinemaXNet.Models.Domain.Movie>();
+    var movies = Model?.Items ?? new List<CinemaXNet.Domain.Entities.Movie>();
 }
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-light">

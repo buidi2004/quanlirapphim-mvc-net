@@ -1,9 +1,23 @@
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 
-// Sử dụng IP WSL trực tiếp để kết nối tới Backend Docker
-const API_BASE_URL = 'http://172.18.226.230:8080'; 
-export const IMAGE_BASE_URL = 'http://172.18.226.230:8080';
+import { Platform } from 'react-native';
+
+// Lấy URL cấu hình từ biến môi trường (EXPO_PUBLIC_API_URL)
+// Nếu không có, tự động chuyển đổi tùy theo nền tảng (Platform)
+const getBaseUrl = () => {
+  if (process.env.EXPO_PUBLIC_API_URL) {
+    return process.env.EXPO_PUBLIC_API_URL;
+  }
+  // Fallback mặc định khi không có .env
+  if (Platform.OS === 'android') {
+    return 'http://10.0.2.2:5062'; // Android Emulator
+  }
+  return 'http://localhost:5062'; // iOS Simulator & Web
+};
+
+const API_BASE_URL = getBaseUrl(); 
+export const IMAGE_BASE_URL = API_BASE_URL;
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -21,12 +35,12 @@ apiClient.interceptors.request.use(
     }
 
     try {
-      const token = await AsyncStorage.getItem('userToken');
+      const token = await SecureStore.getItemAsync('userToken');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
     } catch (e) {
-      console.error('Error fetching token from AsyncStorage', e);
+      console.error('Error fetching token from SecureStore', e);
     }
     return config;
   },

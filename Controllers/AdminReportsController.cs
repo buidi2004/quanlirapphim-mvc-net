@@ -1,47 +1,32 @@
-using System.Data;
-using Dapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using CinemaXNet.Application.Interfaces;
 
 namespace CinemaXNet.Controllers;
 
 [Authorize(Roles = "admin,cinema_manager")]
 [Route("admin/reports")]
-public class AdminReportsController(IDbConnection db) : Controller
+public class AdminReportsController(IReportService reportService) : Controller
 {
     [HttpGet]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int page = 1)
     {
-        var sql = """
-            SELECT m.title AS MovieTitle, COUNT(t.id) AS TotalTickets, SUM(t.total_price) AS TotalRevenue
-            FROM tickets t
-            JOIN showtimes s ON t.showtime_id = s.id
-            JOIN movies m ON s.movie_id = m.id
-            WHERE t.status = 'paid'
-            GROUP BY m.id, m.title
-            ORDER BY TotalRevenue DESC
-        """;
-        var reports = await db.QueryAsync<dynamic>(sql);
+        int pageSize = 10;
+        var (items, totalCount) = await reportService.GetMovieRevenueReportPagedAsync(page, pageSize);
         
-        var totalRevenue = reports.Sum(r => (decimal)r.TotalRevenue);
-        ViewBag.TotalRevenue = totalRevenue;
+        var totalRevenue = items.Sum(r => (decimal)r.TotalRevenue);
+        ViewBag.TotalRevenue = totalRevenue; // Note: This is just total of the current page now, but keeping for compatibility
+        
+        ViewBag.CurrentPage = page;
+        ViewBag.TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
 
-        return View("~/Views/Admin/Reports/Index.cshtml", reports);
+        return View("~/Views/Admin/Reports/Index.cshtml", items);
     }
 
     [HttpGet("export")]
     public async Task<IActionResult> ExportCsv()
     {
-        var sql = """
-            SELECT m.title AS MovieTitle, COUNT(t.id) AS TotalTickets, SUM(t.total_price) AS TotalRevenue
-            FROM tickets t
-            JOIN showtimes s ON t.showtime_id = s.id
-            JOIN movies m ON s.movie_id = m.id
-            WHERE t.status = 'paid'
-            GROUP BY m.id, m.title
-            ORDER BY TotalRevenue DESC
-        """;
-        var reports = await db.QueryAsync<dynamic>(sql);
+        var reports = await reportService.GetMovieRevenueReportAsync();
 
         var builder = new System.Text.StringBuilder();
         // UTF-8 BOM for Excel to read accents properly

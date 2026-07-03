@@ -1,6 +1,6 @@
 @{
     ViewData["Title"] = "Hệ thống rạp";
-    var cinemas          = ViewBag.Cinemas   as IEnumerable<CinemaXNet.Models.Domain.Cinema> ?? [];
+    var cinemas          = ViewBag.Cinemas   as IEnumerable<CinemaXNet.Domain.Entities.Cinema> ?? [];
     var provinces        = ViewBag.Provinces as IEnumerable<string> ?? [];
     var selectedProvince = ViewBag.SelectedProvince as string;
 }

@@ -1,10 +1,10 @@
 @{
     ViewData["Title"] = "Trang chủ";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    var nowShowing = ViewBag.NowShowing as IEnumerable<CinemaXNet.Models.Domain.Movie> ?? new List<CinemaXNet.Models.Domain.Movie>();
-    var comingSoon = ViewBag.ComingSoon as IEnumerable<CinemaXNet.Models.Domain.Movie> ?? new List<CinemaXNet.Models.Domain.Movie>();
-    var promotions = ViewBag.Promotions as List<CinemaXNet.ViewModels.PromotionItemViewModel> ?? new List<CinemaXNet.ViewModels.PromotionItemViewModel>();
-    var news       = ViewBag.News       as List<CinemaXNet.ViewModels.NewsItemViewModel>       ?? new List<CinemaXNet.ViewModels.NewsItemViewModel>();
+    var nowShowing = ViewBag.NowShowing as IEnumerable<CinemaXNet.Domain.Entities.Movie> ?? new List<CinemaXNet.Domain.Entities.Movie>();
+    var comingSoon = ViewBag.ComingSoon as IEnumerable<CinemaXNet.Domain.Entities.Movie> ?? new List<CinemaXNet.Domain.Entities.Movie>();
+    var promotions = ViewBag.Promotions as List<CinemaXNet.Application.ViewModels.PromotionItemViewModel> ?? new List<CinemaXNet.Application.ViewModels.PromotionItemViewModel>();
+    var news       = ViewBag.News       as List<CinemaXNet.Application.ViewModels.NewsItemViewModel>       ?? new List<CinemaXNet.Application.ViewModels.NewsItemViewModel>();
 }
 
 <!-- #1 Hero Carousel -->

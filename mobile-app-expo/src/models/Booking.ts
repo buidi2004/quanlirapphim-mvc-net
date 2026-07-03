@@ -4,6 +4,7 @@ export interface Seat {
   col: number;
   status: 'available' | 'holding' | 'paid' | 'maintenance';
   price: number;
+  type?: 'Normal' | 'VIP' | 'Sweetbox';
 }
 
 export interface SeatMapResponse {

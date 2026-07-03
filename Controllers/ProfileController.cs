@@ -1,6 +1,6 @@
-using CinemaXNet.Core.Exceptions;
-using CinemaXNet.Models.Services.Interfaces;
-using CinemaXNet.ViewModels;
+using CinemaXNet.Domain.Exceptions;
+using CinemaXNet.Application.Interfaces;
+using CinemaXNet.Application.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -11,7 +11,7 @@ namespace CinemaXNet.Controllers;
 
 [Authorize]
 [Route("profile")]
-public class ProfileController(IUserService userService, IDbConnection db) : Controller
+public class ProfileController(IUserService userService, ITicketService ticketService) : Controller
 {
     private int GetUserId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
@@ -23,25 +23,10 @@ public class ProfileController(IUserService userService, IDbConnection db) : Con
         var user   = await userService.GetByIdAsync(userId);
 
         // Stats
-        var stats = await db.QueryFirstOrDefaultAsync("""
-            SELECT COUNT(*) AS TotalTickets, COUNT(DISTINCT s.movie_id) AS TotalMovies
-            FROM tickets t
-            JOIN showtimes s ON s.id = t.showtime_id
-            WHERE t.user_id = @userId AND t.status = 'paid'
-        """, new { userId });
+        var stats = await ticketService.GetUserTicketStatsAsync(userId);
 
         // Recent tickets
-        var recentTickets = await db.QueryAsync("""
-            SELECT t.id, t.seat_code AS SeatCode, t.status, t.total_price AS TotalPrice,
-                   t.booked_at AS BookedAt, m.title AS MovieTitle, m.poster_url AS PosterUrl,
-                   s.show_date AS ShowDate, s.start_time AS StartTime, r.name AS RoomName
-            FROM tickets t
-            JOIN showtimes s ON s.id = t.showtime_id
-            JOIN movies m ON m.id = s.movie_id
-            JOIN rooms r ON r.id = s.room_id
-            WHERE t.user_id = @userId
-            ORDER BY t.booked_at DESC LIMIT 5
-        """, new { userId });
+        var recentTickets = (await ticketService.GetUserTransactionsAsync(userId, null)).Take(5);
 
         // Member level progress
         var levelThresholds = new Dictionary<string, decimal>
@@ -127,31 +112,7 @@ public class ProfileController(IUserService userService, IDbConnection db) : Con
     public async Task<IActionResult> Transactions(string? status)
     {
         var userId = GetUserId();
-        var sql    = """
-            SELECT t.id, t.seat_code AS SeatCode, t.status, t.total_price AS TotalPrice,
-                   t.booked_at AS BookedAt, t.promotion_code AS PromotionCode,
-                   m.title AS MovieTitle, s.show_date AS ShowDate,
-                   s.start_time AS StartTime, r.name AS RoomName
-            FROM tickets t
-            JOIN showtimes s ON s.id = t.showtime_id
-            JOIN movies m ON m.id = s.movie_id
-            JOIN rooms r ON r.id = s.room_id
-            WHERE t.user_id = @userId
-        """;
-
-        object param;
-        if (!string.IsNullOrEmpty(status))
-        {
-            sql += " AND t.status = @status";
-            param = new { userId, status };
-        }
-        else
-        {
-            param = new { userId };
-        }
-        sql += " ORDER BY t.booked_at DESC";
-
-        var transactions = (await db.QueryAsync(sql, param)).ToList();
+        var transactions = (await ticketService.GetUserTransactionsAsync(userId, status)).ToList();
         var totalSpent   = transactions
             .Where(t => t.status == "paid")
             .Sum(t => (decimal)t.TotalPrice);

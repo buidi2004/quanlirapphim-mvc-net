@@ -1,6 +1,6 @@
 using System.Security.Claims;
-using CinemaXNet.Models.Domain;
-using CinemaXNet.Models.Repository.Interfaces;
+using CinemaXNet.Domain.Entities;
+using CinemaXNet.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

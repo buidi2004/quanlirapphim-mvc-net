@@ -1,6 +1,6 @@
 @{
     ViewData["Title"] = "Hồ sơ";
-    var user          = ViewBag.User  as CinemaXNet.Models.Domain.User;
+    var user          = ViewBag.User  as CinemaXNet.Domain.Entities.User;
     var stats         = ViewBag.Stats;
     var recentTickets = ViewBag.RecentTickets as IEnumerable<dynamic> ?? [];
     var levelProgress = (double)(ViewBag.LevelProgress ?? 0);

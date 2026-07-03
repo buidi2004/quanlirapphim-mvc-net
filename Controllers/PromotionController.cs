@@ -1,4 +1,4 @@
-using CinemaXNet.ViewModels;
+using CinemaXNet.Application.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CinemaXNet.Controllers;

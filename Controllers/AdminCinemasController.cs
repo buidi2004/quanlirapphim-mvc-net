@@ -1,6 +1,6 @@
 using System.Data;
-using CinemaXNet.Models.Domain;
-using Dapper;
+using CinemaXNet.Domain.Entities;
+using CinemaXNet.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,12 +8,13 @@ namespace CinemaXNet.Controllers;
 
 [Authorize(Roles = "admin,cinema_manager")]
 [Route("admin/cinemas")]
-public class AdminCinemasController(IDbConnection db) : Controller
+public class AdminCinemasController(ICinemaService cinemaService) : Controller
 {
     [HttpGet]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int page = 1)
     {
-        var cinemas = await db.QueryAsync<Cinema>("SELECT * FROM cinemas ORDER BY id DESC");
+        var cinemas = await cinemaService.GetAllAsync();
+        // Todo: Add true pagination logic
         return View("~/Views/Admin/Cinemas/Index.cshtml", cinemas);
     }
 
@@ -23,13 +24,13 @@ public class AdminCinemasController(IDbConnection db) : Controller
     {
         try
         {
-            var sql = "INSERT INTO cinemas (name, address, province, phone) VALUES (@Name, @Address, @Province, @Phone)";
-            await db.ExecuteAsync(sql, new { Name = name, Address = address, Province = province, Phone = phone });
+            var cinema = new Cinema { Name = name, Address = address, Province = province, Phone = phone };
+            await cinemaService.CreateAsync(cinema);
             TempData["Success"] = "Thêm rạp thành công!";
         }
         catch (Exception ex)
         {
-            TempData["Error"] = "Lỗi: " + ex.Message;
+            TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
         return RedirectToAction(nameof(Index));
     }
@@ -40,13 +41,13 @@ public class AdminCinemasController(IDbConnection db) : Controller
     {
         try
         {
-            var sql = "UPDATE cinemas SET name = @Name, address = @Address, province = @Province, phone = @Phone WHERE id = @Id";
-            await db.ExecuteAsync(sql, new { Id = id, Name = name, Address = address, Province = province, Phone = phone });
+            var cinema = new Cinema { Name = name, Address = address, Province = province, Phone = phone };
+            await cinemaService.UpdateAsync(id, cinema);
             TempData["Success"] = "Cập nhật rạp thành công!";
         }
         catch (Exception ex)
         {
-            TempData["Error"] = "Lỗi: " + ex.Message;
+            TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
         return RedirectToAction(nameof(Index));
     }
@@ -57,12 +58,12 @@ public class AdminCinemasController(IDbConnection db) : Controller
     {
         try
         {
-            await db.ExecuteAsync("DELETE FROM cinemas WHERE id = @Id", new { Id = id });
+            await cinemaService.DeleteAsync(id);
             TempData["Success"] = "Xóa rạp thành công!";
         }
         catch (Exception ex)
         {
-            TempData["Error"] = "Lỗi: " + ex.Message;
+            TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
         return RedirectToAction(nameof(Index));
     }

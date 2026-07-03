@@ -1,0 +1,8 @@
+{
+    "dotnetAcquisitionExtension.existingDotnetPath": [
+        {
+            "extensionId": "ms-dotnettools.csharp",
+            "path": "/Users/admin/.dotnet/dotnet"
+        }
+    ]
+}

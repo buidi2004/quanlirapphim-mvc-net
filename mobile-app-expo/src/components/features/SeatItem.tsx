@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming, withSequence } from 'react-native-reanimated';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Seat } from '../../models/Booking';
 import { Theme } from '../../theme/tokens';
 
@@ -15,7 +16,6 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 export const SeatItem: React.FC<Props> = ({ seat, isSelected, onSelect }) => {
   const scale = useSharedValue(1);
 
-  // Hiệu ứng scale popup nhẹ khi chọn hoặc bỏ chọn ghế
   useEffect(() => {
     if (isSelected) {
       scale.value = withSequence(
@@ -32,27 +32,47 @@ export const SeatItem: React.FC<Props> = ({ seat, isSelected, onSelect }) => {
   }));
 
   const isUnavailable = seat.status === 'paid' || seat.status === 'holding' || seat.status === 'maintenance';
+  const isVip = seat.type === 'VIP';
+  const isSweetbox = seat.type === 'Sweetbox';
 
   const handlePress = () => {
     if (isUnavailable) return;
     onSelect(seat);
   };
 
+  const getContainerStyle = () => {
+    let baseStyles: any[] = [styles.seat];
+    if (isSweetbox) baseStyles.push(styles.seatSweetbox);
+    if (isVip) baseStyles.push(styles.seatVip);
+    if (isUnavailable) baseStyles.push(styles.seatUnavailable);
+    if (isSelected) baseStyles.push(styles.seatSelected);
+    return baseStyles;
+  };
+
+  const renderContent = () => {
+    if (isSweetbox && !isUnavailable && !isSelected) {
+      return (
+        <LinearGradient colors={['#ff4b2b', '#ff416c']} style={styles.sweetboxGradient}>
+          <Text style={[styles.seatText, { color: '#fff' }]}>{seat.code}</Text>
+        </LinearGradient>
+      );
+    }
+    return (
+      <Text style={[styles.seatText, isSelected && styles.seatTextSelected, isVip && !isSelected && !isUnavailable && { color: Theme.colors.gold }]}>
+        {seat.code}
+      </Text>
+    );
+  };
+
   return (
     <AnimatedPressable
-      style={[
-        styles.seat,
-        isUnavailable && styles.seatUnavailable,
-        isSelected && styles.seatSelected
-      ]}
+      style={[getContainerStyle(), animatedStyle]}
       onPress={handlePress}
       onPressIn={() => !isUnavailable && (scale.value = withTiming(0.9, { duration: 100 }))}
       onPressOut={() => !isUnavailable && (scale.value = withTiming(1, { duration: 100 }))}
       disabled={isUnavailable}
     >
-      <Text style={[styles.seatText, isSelected && styles.seatTextSelected]}>
-        {seat.code}
-      </Text>
+      {renderContent()}
     </AnimatedPressable>
   );
 };
@@ -68,6 +88,20 @@ const styles = StyleSheet.create({
     margin: 4,
     borderWidth: 1,
     borderColor: '#444',
+    overflow: 'hidden',
+  },
+  seatVip: {
+    borderColor: Theme.colors.gold,
+    borderWidth: 1.5,
+  },
+  seatSweetbox: {
+    width: 76, // 36*2 + 4 margin
+    borderColor: '#ff416c',
+  },
+  sweetboxGradient: {
+    ...StyleSheet.absoluteFill,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   seatUnavailable: {
     backgroundColor: '#6c757d',

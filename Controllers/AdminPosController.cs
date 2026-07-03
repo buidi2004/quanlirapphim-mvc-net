@@ -1,8 +1,8 @@
-using CinemaXNet.Models.Services.Interfaces;
+using CinemaXNet.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using CinemaXNet.Core.Exceptions;
+using CinemaXNet.Domain.Exceptions;
 
 namespace CinemaXNet.Controllers;
 

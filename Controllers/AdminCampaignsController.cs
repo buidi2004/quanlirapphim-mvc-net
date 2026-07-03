@@ -1,21 +1,21 @@
-using System.Data;
-using Dapper;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using CinemaXNet.Application.Interfaces;
 
 namespace CinemaXNet.Controllers;
 
 [Authorize(Roles = "admin,cinema_manager")]
 [Route("admin/campaigns")]
-public class AdminCampaignsController(IDbConnection db) : Controller
+public class AdminCampaignsController(ICampaignService campaignService) : Controller
 {
     [HttpGet]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int page = 1)
     {
         ViewBag.PageTitle = "Chiến dịch Marketing";
-        var sql = "SELECT * FROM marketing_campaigns ORDER BY id DESC";
-        var campaigns = await db.QueryAsync<dynamic>(sql);
-        return View("~/Views/Admin/Campaigns/Index.cshtml", campaigns);
+        int pageSize = 10;
+        var paginated = await campaignService.GetPaginatedAsync(page, pageSize);
+        return View("~/Views/Admin/Campaigns/Index.cshtml", paginated);
     }
 
     [HttpPost]
@@ -28,11 +28,7 @@ public class AdminCampaignsController(IDbConnection db) : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        var sql = @"
-            INSERT INTO marketing_campaigns (name, type, target_audience, content, status, scheduled_at)
-            VALUES (@Name, @Type, @TargetAudience, @Content, 'Scheduled', @ScheduledAt)";
-        
-        await db.ExecuteAsync(sql, new 
+        await campaignService.CreateAsync(new 
         { 
             Name = name, 
             Type = type, 

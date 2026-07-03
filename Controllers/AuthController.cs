@@ -1,6 +1,6 @@
-using CinemaXNet.Core.Exceptions;
-using CinemaXNet.Models.Services.Interfaces;
-using CinemaXNet.ViewModels;
+using CinemaXNet.Domain.Exceptions;
+using CinemaXNet.Application.Interfaces;
+using CinemaXNet.Application.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
@@ -177,7 +177,7 @@ public class AuthController(IUserService userService) : Controller
     }
 
     // ── Helpers ────────────────────────────────────────────────────────────
-    private async Task SignInUser(CinemaXNet.Models.Domain.User user)
+    private async Task SignInUser(CinemaXNet.Domain.Entities.User user)
     {
         var claims = new List<Claim>
         {

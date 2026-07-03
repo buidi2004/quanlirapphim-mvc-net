@@ -1,10 +1,10 @@
-@model IEnumerable<dynamic>
+@model IEnumerable<CinemaXNet.Domain.Entities.Showtime>
 @{
     ViewData["Title"] = "Quản Lý Suất Chiếu";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
-    var showtimes = Model?.ToList() ?? new List<dynamic>();
-    var movies = ViewBag.Movies as IEnumerable<CinemaXNet.Models.Domain.Movie> ?? new List<CinemaXNet.Models.Domain.Movie>();
-    var rooms = ViewBag.Rooms as IEnumerable<dynamic> ?? new List<dynamic>();
+    var showtimes = Model?.ToList() ?? new List<CinemaXNet.Domain.Entities.Showtime>();
+    var movies = ViewBag.Movies as IEnumerable<CinemaXNet.Domain.Entities.Movie> ?? new List<CinemaXNet.Domain.Entities.Movie>();
+    var rooms = ViewBag.Rooms as IEnumerable<CinemaXNet.Domain.Entities.Room> ?? new List<CinemaXNet.Domain.Entities.Room>();
 }
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-light">
@@ -42,24 +42,24 @@
                     @foreach (var s in showtimes)
                     {
                         <tr>
-                            <td>@s.id</td>
-                            <td><strong class="text-dark">@s.MovieTitle</strong></td>
-                            <td>@s.CinemaName - @s.RoomName</td>
-                            <td>@Convert.ToDateTime(s.show_date).ToString("dd/MM/yyyy")</td>
-                            <td><span class="badge bg-secondary">@s.start_time - @s.end_time</span></td>
-                            <td>@string.Format("{0:N0}₫", s.price)</td>
+                            <td>@s.Id</td>
+                            <td><strong class="text-dark">@s.Movie?.Title</strong></td>
+                            <td>@s.Room?.Cinema?.Name - @s.Room?.Name</td>
+                            <td>@s.ShowDate.ToString("dd/MM/yyyy")</td>
+                            <td><span class="badge bg-secondary">@s.StartTime.ToString("HH:mm") - @s.EndTime?.ToString("HH:mm")</span></td>
+                            <td>@string.Format("{0:N0}₫", s.Price)</td>
                             <td class="text-end">
-                                <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#editShowtimeModal-@s.id">
+                                <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#editShowtimeModal-@s.Id">
                                     <i class="bi bi-pencil"></i>
                                 </button>
-                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteShowtimeModal-@s.id">
+                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteShowtimeModal-@s.Id">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </td>
                         </tr>
 
                         <!-- Edit Modal -->
-                        <div class="modal fade" id="editShowtimeModal-@s.id" tabindex="-1">
+                        <div class="modal fade" id="editShowtimeModal-@s.Id" tabindex="-1">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content bg-light text-dark border border-light shadow-lg">
                                     <div class="modal-header bg-white border-bottom border-light">
@@ -68,13 +68,13 @@
                                     </div>
                                     <form method="post" action="/admin/showtimes/update">
                                         @Html.AntiForgeryToken()
-                                        <input type="hidden" name="id" value="@s.id" />
+                                        <input type="hidden" name="id" value="@s.Id" />
                                         <div class="modal-body p-4 text-start">
                                             <div class="mb-3">
                                                 <label class="form-label text-dark fw-bold">Phim</label>
                                                 <select name="movieId" class="form-select bg-white text-dark border-light" required>
                                                     @foreach(var m in movies) {
-                                                        <option value="@m.Id" selected="@(m.Id == (int)s.movie_id)">@m.Title</option>
+                                                        <option value="@m.Id" selected="@(m.Id == s.MovieId)">@m.Title</option>
                                                     }
                                                 </select>
                                             </div>
@@ -82,28 +82,28 @@
                                                 <label class="form-label text-dark fw-bold">Phòng chiếu</label>
                                                 <select name="roomId" class="form-select bg-white text-dark border-light" required>
                                                     @foreach(var r in rooms) {
-                                                        <option value="@r.id" selected="@(r.id == (int)s.room_id)">@r.CinemaName - @r.name</option>
+                                                        <option value="@r.Id" selected="@(r.Id == s.RoomId)">@r.Cinema?.Name - @r.Name</option>
                                                     }
                                                 </select>
                                             </div>
                                             <div class="row g-3 mb-3">
                                                 <div class="col-md-6">
                                                     <label class="form-label text-dark fw-bold">Ngày chiếu</label>
-                                                    <input type="date" name="showDate" value="@s.show_date" class="form-control bg-white text-dark border-light" required>
+                                                    <input type="date" name="showDate" value="@s.ShowDate.ToString("yyyy-MM-dd")" class="form-control bg-white text-dark border-light" required>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label class="form-label text-dark fw-bold">Giá vé</label>
-                                                    <input type="number" name="price" value="@s.price" class="form-control bg-white text-dark border-light" required>
+                                                    <input type="number" name="price" value="@s.Price" class="form-control bg-white text-dark border-light" required>
                                                 </div>
                                             </div>
                                             <div class="row g-3 mb-3">
                                                 <div class="col-md-6">
                                                     <label class="form-label text-dark fw-bold">Giờ bắt đầu</label>
-                                                    <input type="time" name="startTime" value="@s.start_time" class="form-control bg-white text-dark border-light" required>
+                                                    <input type="time" name="startTime" value="@s.StartTime.ToString("HH:mm")" class="form-control bg-white text-dark border-light" required>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label class="form-label text-dark fw-bold">Giờ kết thúc</label>
-                                                    <input type="time" name="endTime" value="@s.end_time" class="form-control bg-white text-dark border-light" required>
+                                                    <input type="time" name="endTime" value="@s.EndTime?.ToString("HH:mm")" class="form-control bg-white text-dark border-light" required>
                                                 </div>
                                             </div>
                                         </div>
@@ -117,7 +117,7 @@
                         </div>
 
                         <!-- Delete Modal -->
-                        <div class="modal fade" id="deleteShowtimeModal-@s.id" tabindex="-1">
+                        <div class="modal fade" id="deleteShowtimeModal-@s.Id" tabindex="-1">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content bg-light text-dark border border-light shadow-lg">
                                     <div class="modal-header bg-white border-bottom border-light">
@@ -131,7 +131,7 @@
                                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
                                         <form method="post" action="/admin/showtimes/delete">
                                             @Html.AntiForgeryToken()
-                                            <input type="hidden" name="id" value="@s.id" />
+                                            <input type="hidden" name="id" value="@s.Id" />
                                             <button type="submit" class="btn btn-danger fw-bold">Xóa</button>
                                         </form>
                                     </div>
@@ -143,6 +143,20 @@
             </tbody>
         </table>
     </div>
+    
+    @if (ViewBag.TotalPages > 1)
+    {
+        <div class="card-footer bg-white border-top border-light d-flex justify-content-center">
+            <ul class="pagination pagination-sm mb-0">
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                        <a class="page-link" href="/admin/showtimes?page=@i">@i</a>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
 </div>
 
 <!-- Add Modal -->
@@ -168,7 +182,7 @@
                         <label class="form-label text-dark fw-bold">Phòng chiếu</label>
                         <select name="roomId" class="form-select bg-white text-dark border-light" required>
                             @foreach(var r in rooms) {
-                                <option value="@r.id">@r.CinemaName - @r.name</option>
+                                <option value="@r.Id">@r.Cinema?.Name - @r.Name</option>
                             }
                         </select>
                     </div>

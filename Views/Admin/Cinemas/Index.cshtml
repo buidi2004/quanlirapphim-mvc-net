@@ -1,8 +1,8 @@
-@model IEnumerable<CinemaXNet.Models.Domain.Cinema>
+@model IEnumerable<CinemaXNet.Domain.Entities.Cinema>
 @{
     ViewData["Title"] = "Quản Lý Rạp Chiếu";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
-    var cinemas = Model?.ToList() ?? new List<CinemaXNet.Models.Domain.Cinema>();
+    var cinemas = Model?.ToList() ?? new List<CinemaXNet.Domain.Entities.Cinema>();
 }
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-light">

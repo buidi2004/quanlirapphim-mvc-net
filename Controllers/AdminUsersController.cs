@@ -1,25 +1,20 @@
-using System.Data;
-using Dapper;
+using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using CinemaXNet.Application.Interfaces;
 
 namespace CinemaXNet.Controllers;
 
 [Authorize(Roles = "admin")]
 [Route("admin/users")]
-public class AdminUsersController(IDbConnection db) : Controller
+public class AdminUsersController(IUserService userService) : Controller
 {
     [HttpGet]
     public async Task<IActionResult> Index(int page = 1)
     {
         int pageSize = 10;
-        int limit = pageSize;
-        int offset = (page - 1) * pageSize;
-        
-        var count = await db.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM users");
-        var users = await db.QueryAsync<dynamic>("SELECT id, full_name, email, phone, role, created_at FROM users ORDER BY id DESC LIMIT @limit OFFSET @offset", new { limit, offset });
-        
-        var paginated = new CinemaXNet.ViewModels.PaginatedList<dynamic>(users.ToList(), count, page, pageSize);
+        var paginated = await userService.GetPaginatedUsersAsync(page, pageSize);
         return View("~/Views/Admin/Users/Index.cshtml", paginated);
     }
 
@@ -29,12 +24,12 @@ public class AdminUsersController(IDbConnection db) : Controller
     {
         try
         {
-            await db.ExecuteAsync("UPDATE users SET role = @Role WHERE id = @Id", new { Role = role, Id = id });
+            await userService.UpdateRoleAsync(id, role);
             TempData["Success"] = "Cập nhật quyền thành công!";
         }
         catch (Exception ex)
         {
-            TempData["Error"] = "Lỗi: " + ex.Message;
+            TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
         return RedirectToAction(nameof(Index));
     }

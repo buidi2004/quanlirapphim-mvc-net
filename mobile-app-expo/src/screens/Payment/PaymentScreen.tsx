@@ -1,0 +1,389 @@
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, StatusBar, Alert, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { Theme } from '../../theme/tokens';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Seat } from '../../models/Booking';
+import { Image } from 'expo-image';
+
+const PAYMENT_METHODS = [
+  { id: 'momo', name: 'Ví MoMo', icon: 'https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png' },
+  { id: 'zalopay', name: 'ZaloPay', icon: 'https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-ZaloPay-Square.png' },
+  { id: 'vnpay', name: 'VNPay', icon: 'https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-VNPAY-QR-1.png' },
+  { id: 'card', name: 'Thẻ Visa/Mastercard', icon: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png' },
+];
+
+export const PaymentScreen = ({ route, navigation }: any) => {
+  const { selectedSeats, showtimeId, concessions, seatPrice, concessionPrice } = route.params || { 
+    selectedSeats: [], showtimeId: 0, concessions: {}, seatPrice: 0, concessionPrice: 0 
+  };
+  const insets = useSafeAreaInsets();
+  
+  const [timeLeft, setTimeLeft] = useState(12 * 60 + 34); // Mock 12:34
+  const [discountCode, setDiscountCode] = useState('');
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [selectedMethod, setSelectedMethod] = useState('momo');
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          Alert.alert('Hết thời gian', 'Phiên giữ ghế của bạn đã hết hạn.', [
+            { text: 'Quay lại', onPress: () => navigation.navigate('MainTabs') }
+          ]);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
+
+  const applyDiscount = () => {
+    if (discountCode.toUpperCase() === 'CINEMAX20') {
+      const discount = Math.round((seatPrice + concessionPrice) * 0.2);
+      setDiscountAmount(discount);
+      Alert.alert('Thành công', `Áp dụng mã giảm giá 20%: -${discount.toLocaleString('vi-VN')}₫`);
+    } else {
+      setDiscountAmount(0);
+      Alert.alert('Lỗi', 'Mã giảm giá không hợp lệ!');
+    }
+  };
+
+  const totalAmount = seatPrice + concessionPrice - discountAmount;
+
+  const handlePayment = () => {
+    // Navigate to Success screen
+    navigation.navigate('PaymentSuccess', { 
+      transactionId: `CXN-${Math.floor(Math.random() * 1000000)}`,
+      movieTitle: 'Avengers Endgame',
+      room: 'IMAX 3',
+      time: '10/07 - 15:30',
+      seats: (selectedSeats as Seat[]).map(s => s.code).join(', ')
+    });
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor={Theme.colors.background} />
+      
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+          <Ionicons name="chevron-back" size={24} color="#fff" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>XÁC NHẬN THANH TOÁN</Text>
+        <View style={{ width: 40 }} />
+      </View>
+
+      <KeyboardAvoidingView 
+        style={{ flex: 1 }} 
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+        {/* Timer Banner */}
+        <View style={styles.timerBanner}>
+          <Text style={styles.timerLabel}>Thời gian giữ ghế:</Text>
+          <Text style={styles.timerText}>{formatTime(timeLeft)}</Text>
+        </View>
+
+        {/* Order Details */}
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>Chi tiết đặt vé</Text>
+          <View style={styles.row}>
+            <Text style={styles.label}>Phim:</Text>
+            <Text style={styles.value}>Avengers Endgame</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Suất chiếu:</Text>
+            <Text style={styles.value}>10/07/2026 - 15:30</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Phòng chiếu:</Text>
+            <Text style={styles.value}>Phòng IMAX 3</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Số lượng:</Text>
+            <Text style={styles.value}>{selectedSeats.length} vé</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Ghế:</Text>
+            <Text style={styles.valueGold}>{(selectedSeats as Seat[]).map(s => s.code).join(', ')}</Text>
+          </View>
+          
+          {concessionPrice > 0 && (
+            <>
+              <View style={styles.divider} />
+              <Text style={styles.sectionTitle}>Bắp nước</Text>
+              {Object.keys(concessions).map(key => concessions[key] > 0 && (
+                <View key={key} style={styles.row}>
+                  <Text style={styles.label}>{concessions[key]}x Sản phẩm</Text>
+                </View>
+              ))}
+            </>
+          )}
+        </View>
+
+        {/* Discount Code */}
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>Mã giảm giá</Text>
+          <View style={styles.discountRow}>
+            <TextInput
+              style={styles.discountInput}
+              placeholder="Nhập mã... (thử CINEMAX20)"
+              placeholderTextColor="#666"
+              value={discountCode}
+              onChangeText={setDiscountCode}
+              autoCapitalize="characters"
+            />
+            <TouchableOpacity style={styles.applyBtn} onPress={applyDiscount}>
+              <Text style={styles.applyBtnText}>Áp dụng</Text>
+            </TouchableOpacity>
+          </View>
+          {discountAmount > 0 && (
+            <Text style={styles.discountSuccess}>✅ Giảm 20% (-{discountAmount.toLocaleString('vi-VN')}₫)</Text>
+          )}
+        </View>
+
+        {/* Payment Methods */}
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>Phương thức thanh toán</Text>
+          {PAYMENT_METHODS.map(method => (
+            <TouchableOpacity 
+              key={method.id} 
+              style={[styles.methodItem, selectedMethod === method.id && styles.methodItemActive]}
+              onPress={() => setSelectedMethod(method.id)}
+            >
+              <View style={styles.radio}>
+                {selectedMethod === method.id && <View style={styles.radioInner} />}
+              </View>
+              <Image source={{ uri: method.icon }} style={styles.methodIcon} contentFit="contain" />
+              <Text style={styles.methodName}>{method.name}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
+      </KeyboardAvoidingView>
+
+      {/* Sticky Bottom */}
+      <View style={[styles.stickyBottom, { paddingBottom: Math.max(insets.bottom, Theme.spacing.md) }]}>
+        <View style={styles.summaryTotal}>
+          <View>
+            <Text style={styles.summaryLabel}>TỔNG CỘNG:</Text>
+            <Text style={styles.totalPrice}>{totalAmount.toLocaleString('vi-VN')}₫</Text>
+          </View>
+          {discountAmount > 0 && (
+            <Text style={styles.originalPrice}>{(seatPrice + concessionPrice).toLocaleString('vi-VN')}₫</Text>
+          )}
+        </View>
+        <TouchableOpacity style={styles.payBtn} onPress={handlePayment}>
+          <Text style={styles.payBtnText}>XÁC NHẬN THANH TOÁN</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Theme.colors.background,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Theme.spacing.md,
+    paddingVertical: Theme.spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: '#222',
+  },
+  backBtn: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+  headerTitle: {
+    color: Theme.colors.textPrimary,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  scrollContent: {
+    padding: Theme.spacing.md,
+    paddingBottom: 40,
+  },
+  timerBanner: {
+    backgroundColor: 'rgba(255, 193, 7, 0.1)',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: Theme.spacing.md,
+    borderRadius: Theme.radius.md,
+    marginBottom: Theme.spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 193, 7, 0.3)',
+    gap: 8,
+  },
+  timerLabel: {
+    color: Theme.colors.textPrimary,
+    fontSize: 14,
+  },
+  timerText: {
+    color: Theme.colors.gold,
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  card: {
+    backgroundColor: '#222',
+    borderRadius: Theme.radius.lg,
+    padding: Theme.spacing.lg,
+    marginBottom: Theme.spacing.md,
+    borderWidth: 1,
+    borderColor: '#333',
+  },
+  sectionTitle: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: Theme.spacing.md,
+    textTransform: 'uppercase',
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  label: {
+    color: '#aaa',
+    fontSize: 14,
+  },
+  value: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  valueGold: {
+    color: Theme.colors.gold,
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#333',
+    marginVertical: Theme.spacing.md,
+  },
+  discountRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  discountInput: {
+    flex: 1,
+    backgroundColor: '#111',
+    borderWidth: 1,
+    borderColor: '#444',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    color: '#fff',
+  },
+  applyBtn: {
+    backgroundColor: Theme.colors.gold,
+    paddingHorizontal: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+  applyBtnText: {
+    color: '#000',
+    fontWeight: 'bold',
+  },
+  discountSuccess: {
+    color: '#4CAF50',
+    marginTop: 8,
+    fontSize: 14,
+  },
+  methodItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
+  },
+  methodItemActive: {
+    backgroundColor: 'rgba(255,255,255,0.05)',
+  },
+  radio: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: Theme.colors.gold,
+    marginRight: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  radioInner: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: Theme.colors.gold,
+  },
+  methodIcon: {
+    width: 30,
+    height: 30,
+    marginRight: 12,
+    backgroundColor: '#fff',
+    borderRadius: 4,
+  },
+  methodName: {
+    color: '#fff',
+    fontSize: 14,
+  },
+  stickyBottom: {
+    backgroundColor: Theme.colors.surface,
+    paddingHorizontal: Theme.spacing.lg,
+    paddingTop: Theme.spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: '#333',
+    elevation: 20,
+  },
+  summaryTotal: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    marginBottom: Theme.spacing.md,
+  },
+  summaryLabel: {
+    color: Theme.colors.textMuted,
+    fontSize: 12,
+    marginBottom: 4,
+  },
+  totalPrice: {
+    color: Theme.colors.gold,
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  originalPrice: {
+    color: '#666',
+    fontSize: 14,
+    textDecorationLine: 'line-through',
+  },
+  payBtn: {
+    backgroundColor: Theme.colors.accent,
+    paddingVertical: 14,
+    borderRadius: Theme.radius.btn,
+    alignItems: 'center',
+  },
+  payBtnText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    letterSpacing: 1,
+  }
+});
