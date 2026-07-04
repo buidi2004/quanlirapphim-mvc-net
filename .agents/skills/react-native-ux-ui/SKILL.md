@@ -2004,6 +2004,233 @@ await SecureStore.deleteItemAsync('auth_token');
 
 ---
 
+## Nguyên tắc thiết kế iOS-Native — Glassmorphism & Dock UI
+
+> Section này bổ sung quy chuẩn thiết kế kiểu iOS hiện đại cho toàn bộ app CinemaXNet Mobile.
+> Bao gồm: Floating Dock Tab Bar, hiệu ứng kính mờ (Glassmorphism), và bo cong chuẩn iOS.
+
+### 1. Floating Dock Tab Bar (macOS Dock style)
+
+Bottom Tab Bar của app PHẢI được thiết kế theo phong cách **macOS Dock** — nổi (floating), bo cong tròn, hiệu ứng kính mờ:
+
+**Đặc điểm:**
+- `position: 'absolute'` — nổi trên content, KHÔNG đẩy layout
+- `marginHorizontal: 16` — thu hẹp, KHÔNG full width
+- `borderRadius: 28` (`Theme.radius.dock`) — bo cong tròn giống dock
+- Nền kính mờ: `expo-glass-effect` `GlassView` trên iOS 26+, fallback `rgba(18,18,30,0.65)` trên Android
+- Viền mỏng: `borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.12)'`
+- Shadow nhẹ phía dưới tạo cảm giác floating
+- Nút "Đặt vé" giữa dock nổi lên (`marginTop: -18`) với background accent
+
+**Code pattern (Custom tabBar):**
+```tsx
+import { GlassView, isGlassEffectAPIAvailable } from 'expo-glass-effect';
+
+const FloatingDockTabBar = ({ state, descriptors, navigation }: BottomTabBarProps) => {
+  const insets = useSafeAreaInsets();
+  const glassAvailable = isGlassEffectAPIAvailable();
+
+  const dockContent = (
+    <View style={dockStyles.innerRow}>
+      {state.routes.map((route, index) => {
+        const isFocused = state.index === index;
+        // ... render tab items
+      })}
+    </View>
+  );
+
+  const dockOuterStyle = { bottom: Math.max(insets.bottom, 8) + 4 };
+
+  if (glassAvailable) {
+    return (
+      <View style={[dockStyles.dockOuter, dockOuterStyle]}>
+        <GlassView
+          glassEffectStyle="regular"
+          colorScheme="dark"
+          tintColor={Theme.colors.glass.tint}
+          style={dockStyles.dockContainer}
+        >
+          {dockContent}
+        </GlassView>
+      </View>
+    );
+  }
+
+  // Fallback: semi-transparent
+  return (
+    <View style={[dockStyles.dockOuter, dockOuterStyle]}>
+      <View style={[dockStyles.dockContainer, { backgroundColor: Theme.colors.glass.background }]}>
+        {dockContent}
+      </View>
+    </View>
+  );
+};
+
+// Dùng trong Tab.Navigator:
+<Tab.Navigator tabBar={(props) => <FloatingDockTabBar {...props} />} />
+```
+
+**Lưu ý:** Vì dock nổi bằng `position: absolute`, các ScrollView/FlatList trong Tab screens cần `contentContainerStyle={{ paddingBottom: 100 }}` để content không bị dock che.
+
+---
+
+### 2. Glassmorphism Standards (Kính mờ)
+
+Hiệu ứng kính mờ (glass/blur) được áp dụng cho các surface sau:
+
+| Surface | Glass Style | Khi nào dùng |
+|---------|-------------|-------------|
+| **Bottom Tab Bar (Dock)** | `GlassView regular` | Luôn luôn |
+| **Screen Header** | `GlassView regular` | Khi cần header trong suốt (scroll-through) |
+| **Sticky Bottom Bar** | `GlassView regular` | SeatSelection, Concession, Payment |
+| **Cards quan trọng** | `GlassCard` component | Payment cards, order summary |
+| **Modals / BottomSheet** | `GlassView regular` | Popup, BottomSheet nền |
+
+**Thư viện:** `expo-glass-effect` (đã có trong dependencies)
+- `GlassView`: iOS 26+ native liquid glass, fallback `View` trên Android
+- `GlassContainer`: Grouping nhiều GlassView gần nhau (merge hiệu ứng)
+- `isGlassEffectAPIAvailable()`: Check runtime support
+
+**Glass Color Tokens (`Theme.colors.glass`):**
+```typescript
+glass: {
+  background: 'rgba(18, 18, 30, 0.65)',       // Nền fallback chính
+  backgroundLight: 'rgba(26, 26, 46, 0.55)',   // Nền nhạt hơn
+  border: 'rgba(255, 255, 255, 0.12)',          // Viền glass chính
+  borderLight: 'rgba(255, 255, 255, 0.08)',     // Viền nhẹ
+  tint: 'rgba(13, 13, 13, 0.4)',               // Tint color cho GlassView
+}
+```
+
+**Reusable Components:**
+
+#### GlassCard (`src/components/ui/GlassCard.tsx`)
+```tsx
+import { GlassView, isGlassEffectAPIAvailable } from 'expo-glass-effect';
+
+<GlassCard intensity="regular" borderRadius={Theme.radius.card} bordered>
+  {/* Card content */}
+</GlassCard>
+```
+Props: `intensity` ('light' | 'regular'), `bordered` (boolean), `borderRadius` (number).
+iOS 26+: native GlassView. Fallback: semi-transparent View.
+
+#### GlassHeader (`src/components/ui/GlassHeader.tsx`)
+```tsx
+<GlassHeader
+  title="XÁC NHẬN THANH TOÁN"
+  onBack={() => navigation.goBack()}
+  rightAction={<SearchButton />}
+/>
+```
+Header iOS-style blur. Auto SafeArea padding top.
+
+**Quy tắc Glass:**
+- ❌ KHÔNG dùng glass cho tất cả mọi thứ — chỉ dùng cho surface "nổi" hoặc "floating"
+- ❌ KHÔNG lồng GlassView bên trong GlassView (dùng GlassContainer nếu cần group)
+- ✅ Luôn có fallback semi-transparent cho Android/iOS cũ
+- ✅ Viền glass luôn mỏng: `borderWidth: 0.5` (KHÔNG dùng 1 hoặc 2)
+
+---
+
+### 3. Bo cong (Rounded Corners) — Tiêu chuẩn iOS
+
+Tất cả component UI PHẢI sử dụng bo cong theo bảng sau:
+
+| Component | Radius Token | Giá trị | Ví dụ |
+|-----------|-------------|---------|-------|
+| Badge nhỏ, ghế (seat) | `Theme.radius.xs` | `6` | Age badge, seat button |
+| Chip, small badge | `Theme.radius.sm` | `8` | Filter chips, status tags |
+| Input fields | `Theme.radius.md` | `12` | TextInput, search bar |
+| Buttons (CTA) | `Theme.radius.btn` | `14` | "Đặt Vé", "Thanh Toán" |
+| Cards nhỏ, items | `Theme.radius.lg` | `16` | Promo chip, list item |
+| Cards lớn | `Theme.radius.card` | `20` | Movie card, payment card |
+| Sections, modals | `Theme.radius.xl` | `24` | Bottom sheet, section wrapper |
+| Floating Dock | `Theme.radius.dock` | `28` | Tab Bar dock |
+| Pill shape | `Theme.radius.pill` | `999` | Tag labels only |
+
+**Quy tắc bo cong:**
+- ❌ KHÔNG dùng `borderRadius: 8` cho cards — tối thiểu `20` (giống iOS App Store cards)
+- ❌ KHÔNG dùng góc vuông (radius 0) cho bất kỳ element tương tác nào
+- ✅ Icon containers dùng `borderRadius: 16` (kiểu iOS app icon, KHÔNG tròn hoàn toàn)
+- ✅ Buttons CTA luôn dùng `borderRadius: 14` (lớn hơn web nhưng không pill)
+- ✅ Sticky bottom bars dùng `borderTopLeftRadius: 24, borderTopRightRadius: 24`
+
+**Ví dụ so sánh trước/sau:**
+```diff
+// Cards
+- borderRadius: 12
++ borderRadius: Theme.radius.card  // 20
+
+// Buttons
+- borderRadius: 8
++ borderRadius: Theme.radius.btn   // 14
+
+// Inputs
+- borderRadius: 8
++ borderRadius: Theme.radius.md    // 12
+
+// Quick link icons (iOS app icon style, không tròn hoàn toàn)
+- borderRadius: 22  (circle)
++ borderRadius: Theme.radius.lg  // 16 (squircle)
+
+// Border width (glass-style mỏng hơn)
+- borderWidth: 1
++ borderWidth: 0.5
+```
+
+---
+
+### 4. Updated Design Tokens — `src/theme/tokens.ts`
+
+```typescript
+// iOS-Native Rounded Corners
+export const Radius = {
+  xs: 6,      // Badge nhỏ, seat ghế
+  sm: 8,      // Badge, small chips
+  md: 12,     // Input fields, small buttons
+  btn: 14,    // Buttons chính (CTA)
+  lg: 16,     // Cards nhỏ, section items
+  card: 20,   // Cards lớn (movie card, payment card, promo card)
+  xl: 24,     // Sections, modals, bottom sheets
+  dock: 28,   // Floating Dock Tab Bar
+  pill: 999,  // Rounded pill (tags, status chips)
+};
+
+// Shadows — Dock shadow mới
+export const Shadows = {
+  // ... existing card, strong ...
+  dock: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 20,
+    elevation: 15,
+  },
+  glass: {
+    shadowColor: 'rgba(0,0,0,0.5)',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+};
+```
+
+---
+
+### 5. Shared UI Components bổ sung
+
+Ngoài danh sách components đã có ở trên, thêm:
+
+| Component | Mô tả | Dùng ở |
+|-----------|--------|--------|
+| `GlassCard` | Card kính mờ iOS (GlassView + fallback) | B5, B4, B3, Cards quan trọng |
+| `GlassHeader` | Header blur iOS-style | Tất cả stack screens |
+| `FloatingDockTabBar` | Custom tab bar kiểu macOS Dock | AppNavigator (Tab.Navigator) |
+
+---
+
 ## Checklist trước khi merge (Cho Mobile)
 
 ### Layout & SafeArea

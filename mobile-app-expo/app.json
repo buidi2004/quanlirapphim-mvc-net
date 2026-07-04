@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "mobile-app-expo",
+    "backgroundColor": "#0d0d0d",
     "slug": "mobile-app-expo",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -8,9 +9,11 @@
     "scheme": "mobileappexpo",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "backgroundColor": "#0d0d0d"
     },
     "android": {
+      "backgroundColor": "#0d0d0d",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

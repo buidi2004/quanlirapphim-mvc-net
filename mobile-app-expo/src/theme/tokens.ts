@@ -1,5 +1,6 @@
 // CinemaXNet Design Tokens — Mobile
 // Kế thừa CSS Variables từ Web CinemaXNet
+// Updated: iOS-Native Glassmorphism & Dock UI Standards
 
 export const Colors = {
   // Brand
@@ -37,6 +38,15 @@ export const Colors = {
   seatSelected: '#e50914',
   seatBooked: '#6c757d',
   seatVipBorder: '#FFD700',
+
+  // Glass / Blur effect colors
+  glass: {
+    background: 'rgba(18, 18, 30, 0.65)',
+    backgroundLight: 'rgba(26, 26, 46, 0.55)',
+    border: 'rgba(255, 255, 255, 0.12)',
+    borderLight: 'rgba(255, 255, 255, 0.08)',
+    tint: 'rgba(13, 13, 13, 0.4)',
+  },
 };
 
 export const Spacing = {
@@ -48,14 +58,17 @@ export const Spacing = {
   xxl: 48,
 };
 
+// iOS-Native Rounded Corners — Chuẩn bo cong kiểu iOS
 export const Radius = {
-  sm: 6,
-  md: 8,
-  btn: 8,
-  lg: 12,
-  card: 12,
-  xl: 16,
-  pill: 999,
+  xs: 6,      // Badge nhỏ, seat ghế
+  sm: 8,      // Badge, small chips
+  md: 12,     // Input fields, small buttons
+  btn: 14,    // Buttons chính (CTA)
+  lg: 16,     // Cards nhỏ, section items
+  card: 20,   // Cards lớn (movie card, payment card, promo card)
+  xl: 24,     // Sections, modals, bottom sheets
+  dock: 28,   // Floating Dock Tab Bar
+  pill: 999,  // Rounded pill (tags, status chips)
 };
 
 export const Shadows = {
@@ -72,6 +85,20 @@ export const Shadows = {
     shadowOpacity: 0.4,
     shadowRadius: 24,
     elevation: 12,
+  },
+  dock: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 20,
+    elevation: 15,
+  },
+  glass: {
+    shadowColor: 'rgba(0,0,0,0.5)',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
 };
 

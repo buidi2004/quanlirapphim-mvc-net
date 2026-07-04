@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, StatusBar, Alert, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { GlassView, isGlassEffectAPIAvailable } from 'expo-glass-effect';
 import { Theme } from '../../theme/tokens';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Seat } from '../../models/Booking';
 import { Image } from 'expo-image';
+import { GlassHeader } from '../../components/ui/GlassHeader';
 
 const PAYMENT_METHODS = [
   { id: 'momo', name: 'Ví MoMo', icon: 'https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png' },
@@ -74,13 +76,10 @@ export const PaymentScreen = ({ route, navigation }: any) => {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={Theme.colors.background} />
       
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <Ionicons name="chevron-back" size={24} color="#fff" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>XÁC NHẬN THANH TOÁN</Text>
-        <View style={{ width: 40 }} />
-      </View>
+      <GlassHeader
+        title="XÁC NHẬN THANH TOÁN"
+        onBack={() => navigation.goBack()}
+      />
 
       <KeyboardAvoidingView 
         style={{ flex: 1 }} 
@@ -171,21 +170,43 @@ export const PaymentScreen = ({ route, navigation }: any) => {
       </ScrollView>
       </KeyboardAvoidingView>
 
-      {/* Sticky Bottom */}
-      <View style={[styles.stickyBottom, { paddingBottom: Math.max(insets.bottom, Theme.spacing.md) }]}>
-        <View style={styles.summaryTotal}>
-          <View>
-            <Text style={styles.summaryLabel}>TỔNG CỘNG:</Text>
-            <Text style={styles.totalPrice}>{totalAmount.toLocaleString('vi-VN')}₫</Text>
+      {/* Sticky Bottom — Glass effect */}
+      {isGlassEffectAPIAvailable() ? (
+        <GlassView
+          glassEffectStyle="regular"
+          colorScheme="dark"
+          tintColor={Theme.colors.glass.tint}
+          style={[styles.stickyBottom, { paddingBottom: Math.max(insets.bottom, Theme.spacing.md) }]}
+        >
+          <View style={styles.summaryTotal}>
+            <View>
+              <Text style={styles.summaryLabel}>TỔNG CỘNG:</Text>
+              <Text style={styles.totalPrice}>{totalAmount.toLocaleString('vi-VN')}₫</Text>
+            </View>
+            {discountAmount > 0 && (
+              <Text style={styles.originalPrice}>{(seatPrice + concessionPrice).toLocaleString('vi-VN')}₫</Text>
+            )}
           </View>
-          {discountAmount > 0 && (
-            <Text style={styles.originalPrice}>{(seatPrice + concessionPrice).toLocaleString('vi-VN')}₫</Text>
-          )}
+          <TouchableOpacity style={styles.payBtn} onPress={handlePayment} activeOpacity={0.85}>
+            <Text style={styles.payBtnText}>XÁC NHẬN THANH TOÁN</Text>
+          </TouchableOpacity>
+        </GlassView>
+      ) : (
+        <View style={[styles.stickyBottom, styles.stickyBottomFallback, { paddingBottom: Math.max(insets.bottom, Theme.spacing.md) }]}>
+          <View style={styles.summaryTotal}>
+            <View>
+              <Text style={styles.summaryLabel}>TỔNG CỘNG:</Text>
+              <Text style={styles.totalPrice}>{totalAmount.toLocaleString('vi-VN')}₫</Text>
+            </View>
+            {discountAmount > 0 && (
+              <Text style={styles.originalPrice}>{(seatPrice + concessionPrice).toLocaleString('vi-VN')}₫</Text>
+            )}
+          </View>
+          <TouchableOpacity style={styles.payBtn} onPress={handlePayment} activeOpacity={0.85}>
+            <Text style={styles.payBtnText}>XÁC NHẬN THANH TOÁN</Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.payBtn} onPress={handlePayment}>
-          <Text style={styles.payBtnText}>XÁC NHẬN THANH TOÁN</Text>
-        </TouchableOpacity>
-      </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -194,26 +215,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Theme.colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: Theme.spacing.md,
-    paddingVertical: Theme.spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: '#222',
-  },
-  backBtn: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-  },
-  headerTitle: {
-    color: Theme.colors.textPrimary,
-    fontSize: 16,
-    fontWeight: 'bold',
   },
   scrollContent: {
     padding: Theme.spacing.md,
@@ -225,7 +226,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: Theme.spacing.md,
-    borderRadius: Theme.radius.md,
+    borderRadius: Theme.radius.lg,
     marginBottom: Theme.spacing.md,
     borderWidth: 1,
     borderColor: 'rgba(255, 193, 7, 0.3)',
@@ -241,12 +242,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   card: {
-    backgroundColor: '#222',
-    borderRadius: Theme.radius.lg,
+    backgroundColor: Theme.colors.glass.background,
+    borderRadius: Theme.radius.card,
     padding: Theme.spacing.lg,
     marginBottom: Theme.spacing.md,
-    borderWidth: 1,
-    borderColor: '#333',
+    borderWidth: 0.5,
+    borderColor: Theme.colors.glass.border,
   },
   sectionTitle: {
     color: '#fff',
@@ -276,7 +277,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: '#333',
+    backgroundColor: 'rgba(255,255,255,0.08)',
     marginVertical: Theme.spacing.md,
   },
   discountRow: {
@@ -285,19 +286,21 @@ const styles = StyleSheet.create({
   },
   discountInput: {
     flex: 1,
-    backgroundColor: '#111',
-    borderWidth: 1,
-    borderColor: '#444',
-    borderRadius: 8,
-    paddingHorizontal: 12,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    borderWidth: 0.5,
+    borderColor: Theme.colors.glass.border,
+    borderRadius: Theme.radius.btn,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
     color: '#fff',
+    fontSize: 14,
   },
   applyBtn: {
     backgroundColor: Theme.colors.gold,
     paddingHorizontal: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 8,
+    borderRadius: Theme.radius.btn,
   },
   applyBtnText: {
     color: '#000',
@@ -346,12 +349,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   stickyBottom: {
-    backgroundColor: Theme.colors.surface,
     paddingHorizontal: Theme.spacing.lg,
     paddingTop: Theme.spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: '#333',
-    elevation: 20,
+    borderTopWidth: 0.5,
+    borderTopColor: Theme.colors.glass.border,
+    borderTopLeftRadius: Theme.radius.xl,
+    borderTopRightRadius: Theme.radius.xl,
+  },
+  stickyBottomFallback: {
+    backgroundColor: Theme.colors.glass.background,
   },
   summaryTotal: {
     flexDirection: 'row',
@@ -376,7 +382,7 @@ const styles = StyleSheet.create({
   },
   payBtn: {
     backgroundColor: Theme.colors.accent,
-    paddingVertical: 14,
+    paddingVertical: 16,
     borderRadius: Theme.radius.btn,
     alignItems: 'center',
   },

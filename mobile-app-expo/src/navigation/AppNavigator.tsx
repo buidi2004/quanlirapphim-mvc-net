@@ -1,9 +1,11 @@
 import React from 'react';
 import { NavigationContainer, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createBottomTabNavigator, BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import { View, Text, Platform } from 'react-native';
+import { View, Text, Platform, TouchableOpacity, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { GlassView, isGlassEffectAPIAvailable } from 'expo-glass-effect';
 import { RootStackParamList, MainTabParamList } from './types';
 import { Theme } from '../theme/tokens';
 
@@ -64,86 +66,221 @@ import { StaticPageScreen } from '../screens/Page/StaticPageScreen';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
-const TAB_BAR_STYLE = {
-  backgroundColor: '#12121e',
-  borderTopColor: '#1a1a2e',
-  borderTopWidth: 1,
-  paddingBottom: Platform.OS === 'ios' ? 20 : 8,
-  paddingTop: 8,
-  height: Platform.OS === 'ios' ? 82 : 60,
+// ── Tab Icon Map ──
+const TAB_ICONS: Record<string, { focused: keyof typeof Ionicons.glyphMap; unfocused: keyof typeof Ionicons.glyphMap }> = {
+  HomeTab: { focused: 'home', unfocused: 'home-outline' },
+  MovieTab: { focused: 'film', unfocused: 'film-outline' },
+  BookingTab: { focused: 'ticket', unfocused: 'ticket-outline' },
+  CinemaTab: { focused: 'business', unfocused: 'business-outline' },
+  ProfileTab: { focused: 'person', unfocused: 'person-outline' },
 };
 
+const TAB_LABELS: Record<string, string> = {
+  HomeTab: 'Trang chủ',
+  MovieTab: 'Phim',
+  BookingTab: 'Đặt vé',
+  CinemaTab: 'Rạp',
+  ProfileTab: 'Tài khoản',
+};
+
+// ── Floating Dock Tab Bar (macOS Dock style) ──
+const FloatingDockTabBar = ({ state, descriptors, navigation }: BottomTabBarProps) => {
+  const insets = useSafeAreaInsets();
+  const glassAvailable = isGlassEffectAPIAvailable();
+
+  const dockContent = (
+    <View style={dockStyles.innerRow}>
+      {state.routes.map((route, index) => {
+        const isFocused = state.index === index;
+        const isBooking = route.name === 'BookingTab';
+        const iconSet = TAB_ICONS[route.name] || TAB_ICONS.HomeTab;
+        const iconName = isFocused ? iconSet.focused : iconSet.unfocused;
+        const label = TAB_LABELS[route.name] || route.name;
+
+        const onPress = () => {
+          const event = navigation.emit({
+            type: 'tabPress',
+            target: route.key,
+            canPreventDefault: true,
+          });
+          if (!isFocused && !event.defaultPrevented) {
+            navigation.navigate(route.name);
+          }
+        };
+
+        const onLongPress = () => {
+          navigation.emit({
+            type: 'tabLongPress',
+            target: route.key,
+          });
+        };
+
+        // Nút Đặt vé nổi bật giữa dock
+        if (isBooking) {
+          return (
+            <TouchableOpacity
+              key={route.key}
+              accessibilityRole="button"
+              accessibilityState={isFocused ? { selected: true } : {}}
+              accessibilityLabel={label}
+              onPress={onPress}
+              onLongPress={onLongPress}
+              activeOpacity={0.8}
+              style={dockStyles.bookingBtnWrapper}
+            >
+              <View style={dockStyles.bookingBtn}>
+                <Ionicons name={iconName} size={20} color="#fff" />
+              </View>
+              <Text style={[dockStyles.label, isFocused && dockStyles.labelActive]}>
+                {label}
+              </Text>
+            </TouchableOpacity>
+          );
+        }
+
+        return (
+          <TouchableOpacity
+            key={route.key}
+            accessibilityRole="button"
+            accessibilityState={isFocused ? { selected: true } : {}}
+            accessibilityLabel={label}
+            onPress={onPress}
+            onLongPress={onLongPress}
+            activeOpacity={0.7}
+            style={dockStyles.tabItem}
+          >
+            <View style={[dockStyles.iconWrapper, isFocused && dockStyles.iconWrapperActive]}>
+              <Ionicons
+                name={iconName}
+                size={21}
+                color={isFocused ? Theme.colors.warning : '#666'}
+              />
+            </View>
+            <Text style={[dockStyles.label, isFocused && dockStyles.labelActive]}>
+              {label}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
+
+  const dockOuterStyle = {
+    bottom: Math.max(insets.bottom, 8) + 4,
+  };
+
+  if (glassAvailable) {
+    return (
+      <View style={[dockStyles.dockOuter, dockOuterStyle]}>
+        <GlassView
+          glassEffectStyle="regular"
+          colorScheme="dark"
+          tintColor={Theme.colors.glass.tint}
+          style={dockStyles.dockContainer}
+        >
+          {dockContent}
+        </GlassView>
+      </View>
+    );
+  }
+
+  // Fallback: semi-transparent dark background
+  return (
+    <View style={[dockStyles.dockOuter, dockOuterStyle]}>
+      <View style={[dockStyles.dockContainer, dockStyles.dockFallback]}>
+        {dockContent}
+      </View>
+    </View>
+  );
+};
+
+const dockStyles = StyleSheet.create({
+  dockOuter: {
+    position: 'absolute',
+    left: 16,
+    right: 16,
+    zIndex: 100,
+  },
+  dockContainer: {
+    borderRadius: Theme.radius.dock,
+    borderWidth: 0.5,
+    borderColor: Theme.colors.glass.border,
+    paddingVertical: 6,
+    paddingHorizontal: 4,
+    ...Theme.shadows.dock,
+  },
+  dockFallback: {
+    backgroundColor: Theme.colors.glass.background,
+  },
+  innerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+  },
+  tabItem: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 4,
+    gap: 2,
+  },
+  iconWrapper: {
+    width: 36,
+    height: 36,
+    borderRadius: Theme.radius.md,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  iconWrapperActive: {
+    backgroundColor: 'rgba(255, 193, 7, 0.12)',
+  },
+  bookingBtnWrapper: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: -18,
+    gap: 2,
+  },
+  bookingBtn: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: Theme.colors.accent,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: Theme.colors.accent,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.45,
+    shadowRadius: 10,
+    elevation: 8,
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.15)',
+  },
+  label: {
+    fontSize: 9,
+    fontWeight: '600',
+    color: '#555',
+    marginTop: 1,
+  },
+  labelActive: {
+    color: Theme.colors.warning,
+  },
+});
+
+// ── Tab Navigator ──
 const TabNavigator = () => {
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
+      tabBar={(props) => <FloatingDockTabBar {...props} />}
+      screenOptions={{
         headerShown: false,
-        tabBarStyle: TAB_BAR_STYLE,
-        tabBarActiveTintColor: Theme.colors.warning,
-        tabBarInactiveTintColor: '#555',
-        tabBarLabelStyle: { fontSize: 10, fontWeight: '600' },
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName: keyof typeof Ionicons.glyphMap = 'home';
-          const s = size - 2;
-
-          if (route.name === 'HomeTab') {
-            iconName = focused ? 'home' : 'home-outline';
-          } else if (route.name === 'MovieTab') {
-            iconName = focused ? 'film' : 'film-outline';
-          } else if (route.name === 'BookingTab') {
-            iconName = focused ? 'ticket' : 'ticket-outline';
-          } else if (route.name === 'CinemaTab') {
-            iconName = focused ? 'business' : 'business-outline';
-          } else if (route.name === 'ProfileTab') {
-            iconName = focused ? 'person' : 'person-outline';
-          }
-
-          return <Ionicons name={iconName} size={s} color={color} />;
-        },
-      })}
+        sceneStyle: { backgroundColor: Theme.colors.background },
+      }}
     >
-      <Tab.Screen
-        name="HomeTab"
-        component={HomeScreen}
-        options={{ tabBarLabel: 'Trang chủ' }}
-      />
-      <Tab.Screen
-        name="MovieTab"
-        component={MovieListScreen}
-        options={{ tabBarLabel: 'Phim' }}
-      />
-      <Tab.Screen
-        name="BookingTab"
-        component={QuickBookScreen}
-        options={{
-          tabBarLabel: 'Đặt vé',
-          tabBarIcon: ({ focused }) => (
-            <View style={{
-              width: 50, height: 50, borderRadius: 25,
-              backgroundColor: Theme.colors.accent,
-              justifyContent: 'center', alignItems: 'center',
-              marginBottom: Platform.OS === 'ios' ? 20 : 8,
-              shadowColor: Theme.colors.accent,
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.5,
-              shadowRadius: 8,
-              elevation: 8,
-            }}>
-              <Ionicons name={focused ? 'ticket' : 'ticket-outline'} size={22} color="#fff" />
-            </View>
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="CinemaTab"
-        component={CinemaListScreen}
-        options={{ tabBarLabel: 'Rạp' }}
-      />
-      <Tab.Screen
-        name="ProfileTab"
-        component={ProfileScreen}
-        options={{ tabBarLabel: 'Tài khoản' }}
-      />
+      <Tab.Screen name="HomeTab" component={HomeScreen} />
+      <Tab.Screen name="MovieTab" component={MovieListScreen} />
+      <Tab.Screen name="BookingTab" component={QuickBookScreen} />
+      <Tab.Screen name="CinemaTab" component={CinemaListScreen} />
+      <Tab.Screen name="ProfileTab" component={ProfileScreen} />
     </Tab.Navigator>
   );
 };
