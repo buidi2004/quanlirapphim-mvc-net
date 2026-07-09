@@ -56,6 +56,8 @@ public static class DatabaseInitializer
                 duration_minutes INTEGER NOT NULL CHECK (duration_minutes > 0),
                 description      TEXT,
                 age_rating       TEXT,
+                director         TEXT,
+                cast             TEXT,
                 created_at       TEXT    NOT NULL DEFAULT (datetime('now'))
             );
         """);
@@ -158,6 +160,8 @@ public static class DatabaseInitializer
         try { db.Execute("ALTER TABLE contacts ADD COLUMN replied_at TEXT;"); } catch {}
         try { db.Execute("ALTER TABLE users ADD COLUMN refresh_token TEXT;"); } catch {}
         try { db.Execute("ALTER TABLE users ADD COLUMN refresh_token_expiry TEXT;"); } catch {}
+        try { db.Execute("ALTER TABLE movies ADD COLUMN director TEXT;"); } catch {}
+        try { db.Execute("ALTER TABLE movies ADD COLUMN cast TEXT;"); } catch {}
 
         db.Execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_seat ON tickets (showtime_id, seat_code) WHERE status IN ('holding', 'paid');");
 

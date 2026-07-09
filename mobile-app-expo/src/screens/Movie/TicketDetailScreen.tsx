@@ -1,7 +1,7 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, SafeAreaView,
-  StatusBar, ScrollView,
+  View, Text, StyleSheet, TouchableOpacity, StatusBar, ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, {
@@ -9,31 +9,39 @@ import Animated, {
 } from 'react-native-reanimated';
 import QRCode from 'react-native-qrcode-svg';
 import { Theme } from '../../theme/tokens';
-
-const MOCK_TICKET = {
-  id: 'CXN-A1B2C3D4',
-  movieTitle: 'Avengers: Endgame',
-  movieRating: 'C13',
-  movieDuration: 181,
-  cinemaName: 'CinemaX Landmark 81',
-  roomName: 'Phòng IMAX 3',
-  showDate: '10/07/2026',
-  showTime: '15:30',
-  seats: ['C3', 'C4'],
-  seatType: 'VIP',
-  totalAmount: 180000,
-  purchaseDate: '09/07/2026 10:30',
-  status: 'paid',
-  concessions: [
-    { name: 'Combo Couple', quantity: 1, price: 109000 },
-  ],
-};
+import { TicketService } from '../../services/TicketService';
+import { TicketDetail } from '../../models/Ticket';
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
 export const TicketDetailScreen = ({ navigation, route }: any) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const rotateY = useSharedValue(0);
+  const [ticket, setTicket] = useState<TicketDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  React.useEffect(() => {
+    fetchTicket();
+  }, [route.params?.ticketId]);
+
+  const fetchTicket = async () => {
+    const ticketId = route.params?.ticketId;
+    if (!ticketId) {
+      setLoading(false);
+      return;
+    }
+    try {
+      setLoading(true);
+      const res = await TicketService.getTicketDetail(ticketId);
+      if (res.success) {
+        setTicket(res.data);
+      }
+    } catch (error: any) {
+      console.log('Error fetching ticket detail:', error?.message || error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const flipCard = () => {
     const nextFlipped = !isFlipped;
@@ -61,7 +69,21 @@ export const TicketDetailScreen = ({ navigation, route }: any) => {
     top: 0, left: 0, right: 0,
   }));
 
-  const ticket = MOCK_TICKET;
+  if (loading || !ticket) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="light-content" backgroundColor={Theme.colors.background} />
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+            <Ionicons name="chevron-back" size={24} color={Theme.colors.textPrimary} />
+          </TouchableOpacity>
+        </View>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+           <Text style={{color: Theme.colors.textPrimary}}>{loading ? 'Đang tải...' : 'Không tìm thấy vé'}</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -70,7 +92,7 @@ export const TicketDetailScreen = ({ navigation, route }: any) => {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <Ionicons name="chevron-back" size={24} color="#fff" />
+          <Ionicons name="chevron-back" size={24} color={Theme.colors.textPrimary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>CHI TIẾT VÉ</Text>
         <View style={{ width: 40 }} />
@@ -86,7 +108,7 @@ export const TicketDetailScreen = ({ navigation, route }: any) => {
                 {/* Card Header */}
                 <View style={styles.ticketHeader}>
                   <View>
-                    <Text style={styles.ticketBrand}>🎬 CinemaX</Text>
+                    <Text style={styles.ticketBrand}>CinemaX</Text>
                     <Text style={styles.ticketSubBrand}>Electronic Ticket</Text>
                   </View>
                   <View style={styles.paidBadge}>
@@ -107,9 +129,9 @@ export const TicketDetailScreen = ({ navigation, route }: any) => {
                   <Text style={styles.movieTitleTicket}>{ticket.movieTitle}</Text>
                   <View style={styles.movieBadgesRow}>
                     <View style={styles.ratingBadge}>
-                      <Text style={styles.ratingText}>{ticket.movieRating}</Text>
+                      <Text style={styles.ratingText}>{ticket.ageRating}</Text>
                     </View>
-                    <Text style={styles.durationText}>{ticket.movieDuration} phút</Text>
+                    <Text style={styles.durationText}>{ticket.durationMinutes} phút</Text>
                   </View>
                 </View>
 
@@ -123,7 +145,7 @@ export const TicketDetailScreen = ({ navigation, route }: any) => {
                   <View style={styles.detailItem}>
                     <Ionicons name="time-outline" size={14} color="#888" />
                     <Text style={styles.detailLabel}>Giờ</Text>
-                    <Text style={styles.detailValue}>{ticket.showTime}</Text>
+                    <Text style={styles.detailValue}>{ticket.startTime}</Text>
                   </View>
                   <View style={styles.detailItem}>
                     <Ionicons name="location-outline" size={14} color="#888" />
@@ -138,13 +160,13 @@ export const TicketDetailScreen = ({ navigation, route }: any) => {
                   <View style={styles.detailItem}>
                     <Ionicons name="grid-outline" size={14} color="#888" />
                     <Text style={styles.detailLabel}>Ghế</Text>
-                    <Text style={[styles.detailValue, { color: Theme.colors.gold }]}>{ticket.seats.join(', ')}</Text>
+                    <Text style={[styles.detailValue, { color: Theme.colors.gold }]}>{ticket.seatCode}</Text>
                   </View>
                   <View style={styles.detailItem}>
                     <Ionicons name="cash-outline" size={14} color="#888" />
                     <Text style={styles.detailLabel}>Giá</Text>
                     <Text style={[styles.detailValue, { color: Theme.colors.warning }]}>
-                      {ticket.totalAmount.toLocaleString('vi-VN')}₫
+                      {ticket.totalPrice.toLocaleString('vi-VN')}₫
                     </Text>
                   </View>
                 </View>
@@ -158,12 +180,12 @@ export const TicketDetailScreen = ({ navigation, route }: any) => {
 
               {/* BACK - QR Side */}
               <Animated.View style={[styles.ticketCard, styles.ticketCardBack, backStyle]}>
-                <Text style={styles.qrTitle}>📱 MÃ VÉ ĐIỆN TỬ</Text>
+                <Text style={styles.qrTitle}>MÃ VÉ ĐIỆN TỬ</Text>
                 <Text style={styles.qrSubtitle}>Đưa mã này cho nhân viên kiểm soát</Text>
 
                 <View style={styles.qrBox}>
                   <QRCode
-                    value={JSON.stringify({ code: ticket.id, ts: Date.now(), v: '1' })}
+                    value={JSON.stringify({ code: ticket.ticketCode || ticket.id, ts: Date.now(), v: '1' })}
                     size={180}
                     color="#000000"
                     backgroundColor="#ffffff"
@@ -171,7 +193,7 @@ export const TicketDetailScreen = ({ navigation, route }: any) => {
                 </View>
 
                 <View style={styles.ticketCodeRow}>
-                  <Text style={styles.ticketCode}>{ticket.id}</Text>
+                  <Text style={styles.ticketCode}>#CX{ticket.id.toString().padStart(6, '0')}</Text>
                 </View>
 
                 <TouchableOpacity style={styles.flipHint} onPress={flipCard}>
@@ -183,30 +205,18 @@ export const TicketDetailScreen = ({ navigation, route }: any) => {
           </TouchableOpacity>
         </View>
 
-        {/* Concessions */}
-        {ticket.concessions.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Bắp nước đã chọn</Text>
-            {ticket.concessions.map((c, i) => (
-              <View key={i} style={styles.concessionRow}>
-                <Ionicons name="fast-food-outline" size={16} color="#888" />
-                <Text style={styles.concessionName}>{c.quantity}x {c.name}</Text>
-                <Text style={styles.concessionPrice}>{c.price.toLocaleString('vi-VN')}₫</Text>
-              </View>
-            ))}
-          </View>
-        )}
+
 
         {/* Purchase Info */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Thông tin giao dịch</Text>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Mã giao dịch</Text>
-            <Text style={styles.infoValue}>{ticket.id}</Text>
+            <Text style={styles.infoValue}>#CX{ticket.id.toString().padStart(6, '0')}</Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Ngày mua</Text>
-            <Text style={styles.infoValue}>{ticket.purchaseDate}</Text>
+            <Text style={styles.infoValue}>{ticket.bookedAt}</Text>
           </View>
         </View>
 
@@ -231,19 +241,19 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: Theme.spacing.md, paddingVertical: Theme.spacing.md,
-    borderBottomWidth: 1, borderBottomColor: '#1a1a2e',
+    borderBottomWidth: 1, borderBottomColor: Theme.colors.cardBorder,
   },
   backBtn: { width: 40, height: 40, justifyContent: 'center' },
-  headerTitle: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+  headerTitle: { color: Theme.colors.textPrimary, fontSize: 16, fontWeight: 'bold' },
 
   cardContainer: { paddingHorizontal: Theme.spacing.md, paddingTop: Theme.spacing.xl },
   cardWrapper: { height: 430, position: 'relative' },
 
   ticketCard: {
-    backgroundColor: '#12121e',
+    backgroundColor: Theme.colors.surface,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#2d2d44',
+    borderColor: Theme.colors.cardBorder,
     padding: 20,
     height: 430,
     ...Theme.shadows.strong,
@@ -254,8 +264,8 @@ const styles = StyleSheet.create({
   },
 
   ticketHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 },
-  ticketBrand: { color: '#fff', fontSize: 18, fontWeight: '800' },
-  ticketSubBrand: { color: '#666', fontSize: 11 },
+  ticketBrand: { color: Theme.colors.textPrimary, fontSize: 18, fontWeight: '800' },
+  ticketSubBrand: { color: Theme.colors.textMuted, fontSize: 11 },
   paidBadge: {
     flexDirection: 'row', alignItems: 'center', gap: 4,
     backgroundColor: Theme.colors.successLight, paddingHorizontal: 8, paddingVertical: 4,
@@ -270,7 +280,7 @@ const styles = StyleSheet.create({
   },
   tearDash: {
     flex: 1, height: 1,
-    borderStyle: 'dashed', borderWidth: 1, borderColor: '#2d2d44',
+    borderStyle: 'dashed', borderWidth: 1, borderColor: Theme.colors.cardBorder,
     marginHorizontal: 8,
   },
   tearCircleRight: {
@@ -279,16 +289,16 @@ const styles = StyleSheet.create({
   },
 
   movieSection: { marginBottom: 16 },
-  movieTitleTicket: { color: '#fff', fontSize: 20, fontWeight: '800', marginBottom: 8 },
+  movieTitleTicket: { color: Theme.colors.textPrimary, fontSize: 20, fontWeight: '800', marginBottom: 8 },
   movieBadgesRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   ratingBadge: { backgroundColor: Theme.colors.badgeC13, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
-  ratingText: { color: '#fff', fontSize: 10, fontWeight: 'bold' },
-  durationText: { color: '#888', fontSize: 12 },
+  ratingText: { color: Theme.colors.textPrimary, fontSize: 10, fontWeight: 'bold' },
+  durationText: { color: Theme.colors.textSecondary, fontSize: 12 },
 
   detailsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 16 },
   detailItem: { width: '30%', gap: 3 },
-  detailLabel: { color: '#666', fontSize: 10 },
-  detailValue: { color: '#fff', fontSize: 13, fontWeight: '600' },
+  detailLabel: { color: Theme.colors.textMuted, fontSize: 10 },
+  detailValue: { color: Theme.colors.textPrimary, fontSize: 13, fontWeight: '600' },
 
   flipHint: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
@@ -297,8 +307,8 @@ const styles = StyleSheet.create({
   flipHintText: { color: Theme.colors.warning, fontSize: 12 },
 
   // QR Back
-  qrTitle: { color: '#fff', fontSize: 18, fontWeight: '800', marginBottom: 4 },
-  qrSubtitle: { color: '#888', fontSize: 12, marginBottom: 24, textAlign: 'center' },
+  qrTitle: { color: Theme.colors.textPrimary, fontSize: 18, fontWeight: '800', marginBottom: 4 },
+  qrSubtitle: { color: Theme.colors.textSecondary, fontSize: 12, marginBottom: 24, textAlign: 'center' },
   qrBox: {
     backgroundColor: '#fff', padding: 16, borderRadius: 12,
     marginBottom: 20,
@@ -321,8 +331,8 @@ const styles = StyleSheet.create({
   concessionPrice: { color: Theme.colors.warning, fontSize: 14, fontWeight: 'bold' },
 
   infoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  infoLabel: { color: '#888', fontSize: 13 },
-  infoValue: { color: '#fff', fontSize: 13, fontWeight: '600' },
+  infoLabel: { color: Theme.colors.textSecondary, fontSize: 13 },
+  infoValue: { color: Theme.colors.textPrimary, fontSize: 13, fontWeight: '600' },
 
   actions: { paddingHorizontal: Theme.spacing.md, marginTop: Theme.spacing.xl, gap: 12 },
   primaryBtn: {

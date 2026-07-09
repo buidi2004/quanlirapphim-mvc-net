@@ -1,15 +1,16 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View, Text, StyleSheet, Animated, Dimensions, StatusBar,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
 
 const { width, height } = Dimensions.get('window');
 
 export const SplashScreen = ({ onFinish }: { onFinish?: () => void }) => {
-  const logoScale = useRef(new Animated.Value(0.6)).current;
-  const logoOpacity = useRef(new Animated.Value(0)).current;
-  const barWidth = useRef(new Animated.Value(0)).current;
+  const [logoScale] = useState(() => new Animated.Value(0.6));
+  const [logoOpacity] = useState(() => new Animated.Value(0));
+  const [barWidth] = useState(() => new Animated.Value(0));
 
   useEffect(() => {
     Animated.sequence([
@@ -23,6 +24,7 @@ export const SplashScreen = ({ onFinish }: { onFinish?: () => void }) => {
     ]).start(() => {
       setTimeout(() => onFinish?.(), 300);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -33,7 +35,7 @@ export const SplashScreen = ({ onFinish }: { onFinish?: () => void }) => {
       <View style={styles.glow} />
 
       <Animated.View style={[styles.logoWrap, { opacity: logoOpacity, transform: [{ scale: logoScale }] }]}>
-        <Text style={styles.logoIcon}>🎬</Text>
+        <Ionicons name="videocam-outline" size={60} color="#fff" />
         <Text style={styles.logoText}>CinemaX</Text>
         <Text style={styles.logoTagline}>Trải nghiệm điện ảnh đỉnh cao</Text>
       </Animated.View>
@@ -60,18 +62,18 @@ const styles = StyleSheet.create({
   logoWrap: { alignItems: 'center', gap: 8 },
   logoIcon: { fontSize: 64, marginBottom: 8 },
   logoText: {
-    color: '#fff', fontSize: 42, fontWeight: '900',
+    color: Theme.colors.textPrimary, fontSize: 42, fontWeight: '900',
     letterSpacing: -1,
     textShadowColor: 'rgba(229,9,20,0.4)',
     textShadowOffset: { width: 0, height: 4 },
     textShadowRadius: 16,
   },
-  logoTagline: { color: '#888', fontSize: 13, letterSpacing: 2, textTransform: 'uppercase' },
+  logoTagline: { color: Theme.colors.textSecondary, fontSize: 13, letterSpacing: 2, textTransform: 'uppercase' },
 
   barContainer: {
     position: 'absolute', bottom: 80,
     width: width * 0.6, height: 3,
-    backgroundColor: '#222', borderRadius: 2, overflow: 'hidden',
+    backgroundColor: Theme.colors.surface, borderRadius: 2, overflow: 'hidden',
   },
   barFill: {
     height: '100%',

@@ -1,23 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import {
   View, Text, FlatList, ActivityIndicator,
-  StatusBar, TouchableOpacity, ScrollView,
+  StatusBar, TouchableOpacity, Pressable, ScrollView, Modal, TouchableWithoutFeedback, Dimensions, Animated, StyleSheet
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { MovieService } from '../../services/MovieService';
 import { Movie } from '../../models/Movie';
 import { MovieCard, MOVIE_CARD_WIDTH } from '../../components/features/MovieCard';
-import { HeroBanner } from '../../components/features/HeroBanner';
-import { QuickBookingBar } from '../../components/features/QuickBookingBar';
-import { TrendingList } from '../../components/features/TrendingList';
+import { TopAdsBanner } from '../../components/features/TopAdsBanner';
+import { GlassSurface } from '../../components/ui/GlassSurface';
+import { MoviePosterCarousel } from '../../components/features/MoviePosterCarousel';
+import { FloatingMascotFAB } from '../../components/features/FloatingMascotFAB';
+import { PromoModal } from '../../components/features/PromoModal';
+import { SupportBottomBar } from '../../components/features/SupportBottomBar';
+import { VideoSplashScreen } from '../Splash/VideoSplashScreen';
+import { SkeletonLoader } from '../../components/ui/SkeletonLoader';
 import { Theme } from '../../theme/tokens';
 import { styles } from './styles';
 
 const PROMOTION_BANNERS = [
-  { id: '1', icon: '🎁', text: 'Mua 2 vé tặng 1 combo bắp nước', bg: 'rgba(255,193,7,0.12)', border: '#ffc107' },
-  { id: '2', icon: '👥', text: 'Thứ 3 Vui Vẻ — Giảm 30% tất cả vé', bg: 'rgba(229,9,20,0.1)', border: '#e50914' },
+  { id: '1', iconName: 'gift-outline' as const, text: 'Mua 2 vé tặng 1 combo bắp nước', bg: 'rgba(255,193,7,0.12)', border: '#ffc107' },
+  { id: '2', iconName: 'people-outline' as const, text: 'Thứ 3 Vui Vẻ — Giảm 30% tất cả vé', bg: 'rgba(229,9,20,0.1)', border: '#e50914' },
 ];
+
 
 export const HomeScreen = ({ navigation }: any) => {
   const insets = useSafeAreaInsets();
@@ -25,8 +33,17 @@ export const HomeScreen = ({ navigation }: any) => {
   const [comingSoon, setComingSoon] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showPromoModal, setShowPromoModal] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => { fetchMovies(); }, []);
+
+  useEffect(() => {
+    // Hide the tab bar while the video splash screen is showing
+    navigation.setOptions({
+      tabBarStyle: { display: showSplash ? 'none' : 'flex' }
+    });
+  }, [navigation, showSplash]);
 
   const fetchMovies = async () => {
     try {
@@ -45,9 +62,16 @@ export const HomeScreen = ({ navigation }: any) => {
     }
   };
 
-  const handleMoviePress = (id: number) => {
+  const handleMoviePress = useCallback((id: number) => {
     navigation.navigate('MovieDetail', { movieId: id });
-  };
+  }, [navigation]);
+
+  const handleSplashFinish = useCallback(() => {
+    setShowSplash(false);
+    setShowPromoModal(true);
+  }, []);
+
+  const topAdsMovies = useMemo(() => nowShowing.slice(0, 5), [nowShowing]);
 
   const renderSection = (title: string, data: Movie[], navigateTo?: string) => (
     <View style={styles.sectionContainer}>
@@ -75,8 +99,16 @@ export const HomeScreen = ({ navigation }: any) => {
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
 
       {/* Floating Header */}
-      <View style={[styles.floatingHeader, { paddingTop: insets.top }]}>
-        <Text style={styles.logo}>🎬 CinemaX</Text>
+      <LinearGradient 
+        colors={['rgba(0,0,0,0.8)', 'rgba(0,0,0,0.4)', 'transparent']}
+        style={[styles.floatingHeader, { paddingTop: Math.max(insets.top, 40) }]}
+      >
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          <TouchableOpacity onPress={() => navigation.openDrawer()} style={{ padding: 4 }}>
+            <Ionicons name="menu" size={28} color="#fff" />
+          </TouchableOpacity>
+          <Text style={styles.logo}>CinemaX</Text>
+        </View>
         <View style={styles.headerActions}>
           <TouchableOpacity
             style={styles.iconButton}
@@ -99,11 +131,13 @@ export const HomeScreen = ({ navigation }: any) => {
             <Ionicons name="person-circle" size={32} color="#fff" />
           </TouchableOpacity>
         </View>
-      </View>
+      </LinearGradient>
 
       <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
-        <HeroBanner />
-        <QuickBookingBar />
+        {/* Spacer for Floating Header */}
+        <View style={{ height: Math.max(insets.top, 40) + 60 }} />
+        
+        <TopAdsBanner movies={topAdsMovies} onPress={handleMoviePress} />
 
         {/* Promotion Strip */}
         <ScrollView
@@ -112,82 +146,114 @@ export const HomeScreen = ({ navigation }: any) => {
           contentContainerStyle={styles.promoStrip}
         >
           {PROMOTION_BANNERS.map(p => (
-            <TouchableOpacity
+            <Pressable
               key={p.id}
-              style={[styles.promoChip, { backgroundColor: p.bg, borderColor: p.border }]}
               onPress={() => navigation.navigate('PromotionsList')}
+              style={({ pressed }) => [pressed && { transform: [{ scale: 0.96 }] }]}
             >
-              <Text style={styles.promoIcon}>{p.icon}</Text>
-              <Text style={styles.promoText}>{p.text}</Text>
-            </TouchableOpacity>
+              <GlassSurface variant="card" style={[styles.promoChip, { borderColor: p.border, backgroundColor: p.bg }]} borderRadius={12}>
+                <Ionicons name={p.iconName} size={18} color={p.border} style={{ marginRight: 6 }} />
+                <Text style={styles.promoText}>{p.text}</Text>
+              </GlassSurface>
+            </Pressable>
           ))}
         </ScrollView>
 
         {/* Content */}
         {loading ? (
-          <View style={[styles.centerContainer, { height: 300 }]}>
-            <ActivityIndicator size="large" color={Theme.colors.accent} />
-            <Text style={styles.loadingText}>Đang tải phim...</Text>
+          <View style={{ paddingTop: 20 }}>
+            <SkeletonLoader type="list" />
+            <SkeletonLoader type="list" />
           </View>
         ) : error ? (
           <View style={[styles.centerContainer, { height: 300 }]}>
             <Ionicons name="wifi-outline" size={48} color="#444" />
             <Text style={styles.errorText}>{error}</Text>
             <TouchableOpacity style={styles.retryBtn} onPress={fetchMovies}>
-              <Ionicons name="refresh-outline" size={16} color="#000" />
+              <Ionicons name="refresh-outline" size={16} color={Theme.colors.textPrimary} />
               <Text style={styles.retryButton}>Thử lại ngay</Text>
             </TouchableOpacity>
           </View>
         ) : (
           <View style={styles.contentPadding}>
             {nowShowing.length > 0 && (
-              <TrendingList movies={nowShowing} onPress={handleMoviePress} />
+              <View style={styles.sectionContainer}>
+                <View style={styles.sectionHeader}>
+                  <Text style={styles.sectionTitle}>Phim Đang Chiếu</Text>
+                  <TouchableOpacity onPress={() => navigation.navigate('MovieTab')}>
+                    <Text style={styles.seeAllText}>Xem tất cả →</Text>
+                  </TouchableOpacity>
+                </View>
+                <MoviePosterCarousel movies={nowShowing} onMoviePress={handleMoviePress} />
+              </View>
             )}
-            {nowShowing.length > 0 && renderSection('🎬 Phim Đang Chiếu', nowShowing, 'MovieTab')}
-            {comingSoon.length > 0 && renderSection('📅 Phim Sắp Chiếu', comingSoon, 'MovieTab')}
+            {comingSoon.length > 0 && renderSection('Phim Sắp Chiếu', comingSoon, 'MovieTab')}
 
             {/* Quick Links */}
             <View style={styles.quickLinks}>
-              <TouchableOpacity
-                style={styles.quickLink}
+              <Pressable
                 onPress={() => navigation.navigate('GlobalShowtimes')}
+                style={({ pressed }) => [{ flex: 1 }, pressed && { transform: [{ scale: 0.96 }] }]}
               >
-                <View style={styles.quickLinkIcon}>
-                  <Ionicons name="calendar-outline" size={22} color={Theme.colors.warning} />
-                </View>
-                <Text style={styles.quickLinkText}>Lịch chiếu</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.quickLink}
+                <GlassSurface variant="card" style={styles.quickLink} borderRadius={16}>
+                  <View style={styles.quickLinkIcon}>
+                    <Ionicons name="calendar-outline" size={22} color={Theme.colors.warning} />
+                  </View>
+                  <Text style={styles.quickLinkText}>Lịch chiếu</Text>
+                </GlassSurface>
+              </Pressable>
+              <Pressable
                 onPress={() => navigation.navigate('CinemaTab')}
+                style={({ pressed }) => [{ flex: 1 }, pressed && { transform: [{ scale: 0.96 }] }]}
               >
-                <View style={styles.quickLinkIcon}>
-                  <Ionicons name="business-outline" size={22} color={Theme.colors.warning} />
-                </View>
-                <Text style={styles.quickLinkText}>Hệ thống rạp</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.quickLink}
+                <GlassSurface variant="card" style={styles.quickLink} borderRadius={16}>
+                  <View style={styles.quickLinkIcon}>
+                    <Ionicons name="business-outline" size={22} color={Theme.colors.warning} />
+                  </View>
+                  <Text style={styles.quickLinkText}>Hệ thống rạp</Text>
+                </GlassSurface>
+              </Pressable>
+              <Pressable
                 onPress={() => navigation.navigate('PromotionsList')}
+                style={({ pressed }) => [{ flex: 1 }, pressed && { transform: [{ scale: 0.96 }] }]}
               >
-                <View style={styles.quickLinkIcon}>
-                  <Ionicons name="pricetag-outline" size={22} color={Theme.colors.warning} />
-                </View>
-                <Text style={styles.quickLinkText}>Khuyến mãi</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.quickLink}
+                <GlassSurface variant="card" style={styles.quickLink} borderRadius={16}>
+                  <View style={styles.quickLinkIcon}>
+                    <Ionicons name="pricetag-outline" size={22} color={Theme.colors.warning} />
+                  </View>
+                  <Text style={styles.quickLinkText}>Khuyến mãi</Text>
+                </GlassSurface>
+              </Pressable>
+              <Pressable
                 onPress={() => navigation.navigate('NewsList')}
+                style={({ pressed }) => [{ flex: 1 }, pressed && { transform: [{ scale: 0.96 }] }]}
               >
-                <View style={styles.quickLinkIcon}>
-                  <Ionicons name="newspaper-outline" size={22} color={Theme.colors.warning} />
-                </View>
-                <Text style={styles.quickLinkText}>Tin tức</Text>
-              </TouchableOpacity>
+                <GlassSurface variant="card" style={styles.quickLink} borderRadius={16}>
+                  <View style={styles.quickLinkIcon}>
+                    <Ionicons name="newspaper-outline" size={22} color={Theme.colors.warning} />
+                  </View>
+                  <Text style={styles.quickLinkText}>Tin tức</Text>
+                </GlassSurface>
+              </Pressable>
             </View>
           </View>
         )}
       </ScrollView>
+
+      {/* Promotion Modal */}
+      <PromoModal 
+        visible={showPromoModal} 
+        onClose={() => setShowPromoModal(false)} 
+      />
+
+      {/* FIXED: Prevent infinite re-render loop by using memoized callback */}
+      {showSplash && <VideoSplashScreen onFinish={handleSplashFinish} />}
+
+      {/* Support Bottom Bar */}
+      <SupportBottomBar onPress={() => navigation.navigate('Contact')} />
+
+      {/* Mascot FAB */}
+      <FloatingMascotFAB onPress={() => navigation.navigate('MovieTab')} />
     </View>
   );
 };

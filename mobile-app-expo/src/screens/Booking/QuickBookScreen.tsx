@@ -1,8 +1,10 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View, Text, StyleSheet, FlatList, TouchableOpacity,
-  SafeAreaView, StatusBar, ActivityIndicator, Animated, Dimensions,
+  StatusBar, ActivityIndicator, Dimensions,
 } from 'react-native';
+import Reanimated, { SlideInRight, SlideOutLeft, SlideInLeft, SlideOutRight } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { Theme } from '../../theme/tokens';
@@ -19,11 +21,11 @@ const STEPS = [
 
 // Mock data
 const MOCK_MOVIES = [
-  { id: 1, title: 'Avengers: Endgame', posterUrl: 'https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg', genre: 'Hành động', duration: 181, ageRating: 'C13' },
-  { id: 2, title: 'Dune: Part Two', posterUrl: 'https://image.tmdb.org/t/p/w500/czembW0Rk1Ke7lCJGahbOhdCuhV.jpg', genre: 'Khoa học', duration: 166, ageRating: 'C13' },
-  { id: 3, title: 'Deadpool & Wolverine', posterUrl: 'https://image.tmdb.org/t/p/w500/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg', genre: 'Hành động', duration: 127, ageRating: 'C18' },
-  { id: 4, title: 'Inside Out 2', posterUrl: 'https://image.tmdb.org/t/p/w500/vpnVM9B6NMmQpWeZvzLvDESb2QY.jpg', genre: 'Hoạt hình', duration: 100, ageRating: 'P' },
-  { id: 5, title: 'Oppenheimer', posterUrl: 'https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg', genre: 'Tiểu sử', duration: 180, ageRating: 'C18' },
+  { id: 1, title: 'Avengers: Endgame', posterUrl: 'https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg', genre: 'Hành động', durationMinutes: 181, ageRating: 'C13' },
+  { id: 2, title: 'Dune: Part Two', posterUrl: 'https://image.tmdb.org/t/p/w500/czembW0Rk1Ke7lCJGahbOhdCuhV.jpg', genre: 'Khoa học', durationMinutes: 166, ageRating: 'C13' },
+  { id: 3, title: 'Deadpool & Wolverine', posterUrl: 'https://image.tmdb.org/t/p/w500/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg', genre: 'Hành động', durationMinutes: 127, ageRating: 'C18' },
+  { id: 4, title: 'Inside Out 2', posterUrl: 'https://image.tmdb.org/t/p/w500/vpnVM9B6NMmQpWeZvzLvDESb2QY.jpg', genre: 'Hoạt hình', durationMinutes: 100, ageRating: 'P' },
+  { id: 5, title: 'Oppenheimer', posterUrl: 'https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg', genre: 'Tiểu sử', durationMinutes: 180, ageRating: 'C18' },
 ];
 
 const MOCK_CINEMAS = [
@@ -59,11 +61,11 @@ const MOCK_SHOWTIMES = [
 
 export const QuickBookScreen = ({ navigation }: any) => {
   const [step, setStep] = useState(1);
+  const [direction, setDirection] = useState<'forward' | 'backward'>('forward');
   const [selectedMovie, setSelectedMovie] = useState<any>(null);
   const [selectedCinema, setSelectedCinema] = useState<any>(null);
   const [selectedDate, setSelectedDate] = useState(getNext7Days()[0].dateString);
   const [loadingCinemas, setLoadingCinemas] = useState(false);
-  const slideAnim = useRef(new Animated.Value(0)).current;
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -76,10 +78,7 @@ export const QuickBookScreen = ({ navigation }: any) => {
   const days = getNext7Days();
 
   const goToStep = (nextStep: number) => {
-    Animated.sequence([
-      Animated.timing(slideAnim, { toValue: -20, duration: 150, useNativeDriver: true }),
-      Animated.timing(slideAnim, { toValue: 0, duration: 200, useNativeDriver: true }),
-    ]).start();
+    setDirection(nextStep > step ? 'forward' : 'backward');
     setStep(nextStep);
   };
 
@@ -125,7 +124,7 @@ export const QuickBookScreen = ({ navigation }: any) => {
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
           <Ionicons name="chevron-back" size={24} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>⚡ ĐẶT VÉ NHANH</Text>
+        <Text style={styles.headerTitle}>ĐẶT VÉ NHANH</Text>
         <View style={{ width: 40 }} />
       </View>
 
@@ -170,7 +169,12 @@ export const QuickBookScreen = ({ navigation }: any) => {
       )}
 
       {/* Step Content */}
-      <Animated.View style={[styles.content, { transform: [{ translateY: slideAnim }] }]}>
+      <Reanimated.View 
+        key={step} 
+        style={styles.content} 
+        entering={direction === 'forward' ? SlideInRight : SlideInLeft} 
+        exiting={direction === 'forward' ? SlideOutLeft : SlideOutRight}
+      >
 
         {/* STEP 1: CHỌN PHIM */}
         {step === 1 && (
@@ -193,7 +197,7 @@ export const QuickBookScreen = ({ navigation }: any) => {
                   />
                   <View style={styles.movieInfo}>
                     <Text style={styles.movieTitle} numberOfLines={2}>{item.title}</Text>
-                    <Text style={styles.movieMeta}>{item.genre} · {item.duration} phút</Text>
+                    <Text style={styles.movieMeta}>{item.genre} · {item.durationMinutes} phút</Text>
                     <View style={[styles.ageBadge, { backgroundColor: getAgeBadgeColor(item.ageRating) }]}>
                       <Text style={styles.ageBadgeText}>{item.ageRating}</Text>
                     </View>
@@ -297,7 +301,7 @@ export const QuickBookScreen = ({ navigation }: any) => {
             />
           </>
         )}
-      </Animated.View>
+      </Reanimated.View>
     </SafeAreaView>
   );
 };
@@ -311,7 +315,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Theme.spacing.md,
     paddingVertical: Theme.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#1a1a2e',
+    borderBottomColor: Theme.colors.cardBorder,
   },
   backBtn: { width: 40, height: 40, justifyContent: 'center' },
   headerTitle: { color: Theme.colors.warning, fontSize: 16, fontWeight: 'bold' },
@@ -323,59 +327,59 @@ const styles = StyleSheet.create({
     paddingVertical: Theme.spacing.md,
     backgroundColor: Theme.colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#1a1a2e',
+    borderBottomColor: Theme.colors.cardBorder,
   },
   stepItem: { alignItems: 'center' },
   stepCircle: {
     width: 28, height: 28, borderRadius: 14,
-    backgroundColor: '#222', borderWidth: 2, borderColor: '#444',
+    backgroundColor: Theme.colors.surface, borderWidth: 2, borderColor: Theme.colors.cardBorder,
     justifyContent: 'center', alignItems: 'center',
   },
   stepCircleActive: { borderColor: Theme.colors.warning, backgroundColor: 'rgba(255,193,7,0.1)' },
   stepCircleDone: { backgroundColor: Theme.colors.warning, borderColor: Theme.colors.warning },
-  stepNum: { color: '#666', fontSize: 13, fontWeight: 'bold' },
+  stepNum: { color: Theme.colors.textMuted, fontSize: 13, fontWeight: 'bold' },
   stepNumActive: { color: Theme.colors.warning },
-  stepLabel: { color: '#555', fontSize: 10, marginTop: 4 },
+  stepLabel: { color: Theme.colors.textMuted, fontSize: 10, marginTop: 4 },
   stepLabelActive: { color: Theme.colors.warning, fontWeight: 'bold' },
-  stepLine: { flex: 1, height: 2, backgroundColor: '#333', marginBottom: 16 },
+  stepLine: { flex: 1, height: 2, backgroundColor: Theme.colors.cardBorder, marginBottom: 16 },
   stepLineDone: { backgroundColor: Theme.colors.warning },
 
   summaryBar: {
     flexDirection: 'row', flexWrap: 'wrap', gap: 8,
     paddingHorizontal: Theme.spacing.md, paddingVertical: 10,
-    backgroundColor: '#111', borderBottomWidth: 1, borderBottomColor: '#1a1a2e',
+    backgroundColor: Theme.colors.surface, borderBottomWidth: 1, borderBottomColor: Theme.colors.cardBorder,
   },
   summaryChip: {
     flexDirection: 'row', alignItems: 'center', gap: 4,
-    backgroundColor: '#1a1a2e', paddingHorizontal: 10, paddingVertical: 5,
-    borderRadius: Theme.radius.pill, borderWidth: 1, borderColor: '#2d2d44',
+    backgroundColor: Theme.colors.surface, paddingHorizontal: 10, paddingVertical: 5,
+    borderRadius: Theme.radius.pill, borderWidth: 1, borderColor: Theme.colors.cardBorder,
     maxWidth: SCREEN_WIDTH * 0.45,
   },
   summaryText: { color: Theme.colors.warning, fontSize: 11, flex: 1 },
 
   content: { flex: 1, paddingHorizontal: Theme.spacing.md, paddingTop: Theme.spacing.md },
-  stepTitle: { color: '#fff', fontSize: 17, fontWeight: 'bold', marginBottom: 4 },
-  stepSubtitle: { color: '#888', fontSize: 13, marginBottom: Theme.spacing.md },
+  stepTitle: { color: Theme.colors.textPrimary, fontSize: 17, fontWeight: 'bold', marginBottom: 4 },
+  stepSubtitle: { color: Theme.colors.textSecondary, fontSize: 13, marginBottom: Theme.spacing.md },
 
   // Movie row
   movieRow: {
     flexDirection: 'row', alignItems: 'center',
     backgroundColor: Theme.colors.surface, borderRadius: Theme.radius.lg,
-    padding: 12, marginBottom: 10, borderWidth: 1, borderColor: '#2d2d44',
+    padding: 12, marginBottom: 10, borderWidth: 1, borderColor: Theme.colors.cardBorder,
   },
   movieRowSelected: { borderColor: Theme.colors.warning, backgroundColor: 'rgba(255,193,7,0.06)' },
-  movieThumb: { width: 56, height: 80, borderRadius: Theme.radius.sm, backgroundColor: '#333' },
+  movieThumb: { width: 56, height: 80, borderRadius: Theme.radius.sm, backgroundColor: Theme.colors.cardBorder },
   movieInfo: { flex: 1, paddingHorizontal: 12 },
-  movieTitle: { color: '#fff', fontSize: 15, fontWeight: 'bold', marginBottom: 4 },
-  movieMeta: { color: '#888', fontSize: 12, marginBottom: 6 },
+  movieTitle: { color: Theme.colors.textPrimary, fontSize: 15, fontWeight: 'bold', marginBottom: 4 },
+  movieMeta: { color: Theme.colors.textSecondary, fontSize: 12, marginBottom: 6 },
   ageBadge: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, alignSelf: 'flex-start' },
-  ageBadgeText: { color: '#fff', fontSize: 10, fontWeight: 'bold' },
+  ageBadgeText: { color: Theme.colors.textPrimary, fontSize: 10, fontWeight: 'bold' },
 
   // Cinema row
   cinemaRow: {
     flexDirection: 'row', alignItems: 'center',
     backgroundColor: Theme.colors.surface, borderRadius: Theme.radius.lg,
-    padding: 14, marginBottom: 10, borderWidth: 1, borderColor: '#2d2d44',
+    padding: 14, marginBottom: 10, borderWidth: 1, borderColor: Theme.colors.cardBorder,
   },
   cinemaIconBox: {
     width: 44, height: 44, borderRadius: 22,
@@ -383,38 +387,38 @@ const styles = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center', marginRight: 12,
   },
   cinemaInfo: { flex: 1 },
-  cinemaName: { color: '#fff', fontSize: 15, fontWeight: 'bold', marginBottom: 4 },
-  cinemaAddr: { color: '#888', fontSize: 12 },
+  cinemaName: { color: Theme.colors.textPrimary, fontSize: 15, fontWeight: 'bold', marginBottom: 4 },
+  cinemaAddr: { color: Theme.colors.textSecondary, fontSize: 12 },
 
   // Day row
   dayRow: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     backgroundColor: Theme.colors.surface, borderRadius: Theme.radius.lg,
-    padding: 16, marginBottom: 10, borderWidth: 1, borderColor: '#2d2d44',
+    padding: 16, marginBottom: 10, borderWidth: 1, borderColor: Theme.colors.cardBorder,
   },
   dayRowActive: { borderColor: Theme.colors.warning, backgroundColor: 'rgba(255,193,7,0.06)' },
   dayLeft: { gap: 2 },
-  dayName: { color: '#888', fontSize: 12 },
+  dayName: { color: Theme.colors.textSecondary, fontSize: 12 },
   dayNameActive: { color: Theme.colors.warning },
-  dayNumber: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
+  dayNumber: { color: Theme.colors.textPrimary, fontSize: 18, fontWeight: 'bold' },
   dayNumberActive: { color: Theme.colors.warning },
 
   // Showtime
   showtimeCard: {
     flex: 1, backgroundColor: Theme.colors.surface, borderRadius: Theme.radius.lg,
-    padding: 14, borderWidth: 1, borderColor: '#2d2d44', alignItems: 'center', gap: 6,
+    padding: 14, borderWidth: 1, borderColor: Theme.colors.cardBorder, alignItems: 'center', gap: 6,
   },
   showtimeCardLow: { borderColor: Theme.colors.badgeC18, backgroundColor: 'rgba(220,53,69,0.05)' },
-  showtimeTime: { color: '#fff', fontSize: 22, fontWeight: 'bold' },
-  showtimeRoom: { color: '#888', fontSize: 11, textAlign: 'center' },
+  showtimeTime: { color: Theme.colors.textPrimary, fontSize: 22, fontWeight: 'bold' },
+  showtimeRoom: { color: Theme.colors.textSecondary, fontSize: 11, textAlign: 'center' },
   showtimeFormatBadge: {
     backgroundColor: 'rgba(255,193,7,0.15)', paddingHorizontal: 8,
     paddingVertical: 2, borderRadius: Theme.radius.pill,
   },
   showtimeFormat: { color: Theme.colors.warning, fontSize: 10, fontWeight: 'bold' },
-  showtimeSeats: { color: '#666', fontSize: 11 },
+  showtimeSeats: { color: Theme.colors.textMuted, fontSize: 11 },
   showtimeSeatsLow: { color: Theme.colors.danger },
 
   loadingBox: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 16 },
-  loadingText: { color: '#888', fontSize: 14 },
+  loadingText: { color: Theme.colors.textSecondary, fontSize: 14 },
 });

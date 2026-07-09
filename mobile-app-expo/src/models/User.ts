@@ -16,15 +16,20 @@ export interface User {
 
 export interface AuthResponse {
   success: boolean;
-  token?: string;
-  refreshToken?: string;
-  user?: User;
+  message?: string;
   error?: string;
+  data?: {
+    token: string;
+    refreshToken: string;
+    user: User;
+  };
 }
 
 export interface ProfileResponse {
   success: boolean;
-  user: User;
   message?: string;
   error?: string;
+  data?: {
+    user: User;
+  };
 }

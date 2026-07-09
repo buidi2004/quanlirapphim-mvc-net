@@ -12,7 +12,7 @@ const { width } = Dimensions.get('window');
 const SLIDES = [
   {
     id: '1',
-    icon: '🎬',
+    iconName: "videocam-outline" as const,
     title: 'Khám phá phim hot nhất',
     subtitle: 'Cập nhật liên tục các phim bom tấn mới ra mắt, trailer độc quyền và review chuyên sâu.',
     color: '#e50914',
@@ -20,7 +20,7 @@ const SLIDES = [
   },
   {
     id: '2',
-    icon: '💺',
+    iconName: "ticket-outline" as const,
     title: 'Đặt vé siêu nhanh',
     subtitle: 'Chọn ghế yêu thích, đặt bắp nước và thanh toán chỉ trong 60 giây. Không cần xếp hàng!',
     color: '#ffc107',
@@ -28,7 +28,7 @@ const SLIDES = [
   },
   {
     id: '3',
-    icon: '🎁',
+    iconName: "gift-outline" as const,
     title: 'Tích điểm, đổi quà',
     subtitle: 'Mỗi vé là một điểm thưởng. Tích đủ điểm để lên hạng Gold, Platinum và nhận vé miễn phí.',
     color: '#FFD700',
@@ -87,7 +87,7 @@ export const OnboardingScreen = ({ navigation }: any) => {
         renderItem={({ item }) => (
           <View style={[styles.slide, { width }]}>
             <View style={[styles.iconCircle, { backgroundColor: item.bg, borderColor: item.color + '40' }]}>
-              <Text style={styles.slideIcon}>{item.icon}</Text>
+              <Ionicons name={item.iconName} size={72} color={item.color} />
               {/* Glow ring */}
               <View style={[styles.glowRing, { borderColor: item.color + '30' }]} />
             </View>
@@ -120,7 +120,7 @@ export const OnboardingScreen = ({ navigation }: any) => {
           onPress={goToNext}
         >
           <Text style={styles.ctaBtnText}>
-            {isLast ? '🚀 BẮT ĐẦU NGAY' : 'Tiếp theo'}
+            {isLast ? 'BẮT ĐẦU NGAY' : 'Tiếp theo'}
           </Text>
           {!isLast && <Ionicons name="arrow-forward" size={18} color="#000" />}
         </TouchableOpacity>
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     borderRadius: Theme.radius.pill,
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)',
   },
-  skipText: { color: '#aaa', fontSize: 13 },
+  skipText: { color: Theme.colors.textSecondary, fontSize: 13 },
 
   slide: {
     alignItems: 'center', justifyContent: 'center',
@@ -156,11 +156,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   slideTitle: {
-    color: '#fff', fontSize: 26, fontWeight: '800',
+    color: Theme.colors.textPrimary, fontSize: 26, fontWeight: '800',
     textAlign: 'center', marginBottom: 16, lineHeight: 32,
   },
   slideSubtitle: {
-    color: '#888', fontSize: 15, textAlign: 'center',
+    color: Theme.colors.textSecondary, fontSize: 15, textAlign: 'center',
     lineHeight: 24, maxWidth: 300,
   },
 

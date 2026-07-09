@@ -19,6 +19,7 @@ import Animated, {
 
 const { width, height } = Dimensions.get('window');
 const HEADER_HEIGHT = height * 0.55;
+const AnimatedImage = Animated.createAnimatedComponent(Image);
 
 // Generate real dates from today
 const getNext7Days = () => {
@@ -50,7 +51,7 @@ export const MovieDetailScreen = ({ route, navigation }: any) => {
   const { movieId } = route.params || {};
   const insets = useSafeAreaInsets();
 
-  const [data, setData] = useState<MovieDetailResponse | null>(null);
+  const [data, setData] = useState<MovieDetailResponse['data'] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState(getNext7Days()[0].dateString);
@@ -73,7 +74,11 @@ export const MovieDetailScreen = ({ route, navigation }: any) => {
   }));
 
   const toolbarOpacity = useAnimatedStyle(() => ({
-    opacity: interpolate(scrollY.value, [HEADER_HEIGHT * 0.5, HEADER_HEIGHT], [0, 1], Extrapolation.CLAMP),
+    opacity: interpolate(scrollY.value, [HEADER_HEIGHT * 0.75, HEADER_HEIGHT], [0, 1], Extrapolation.CLAMP),
+  }));
+
+  const floatingHeaderOpacity = useAnimatedStyle(() => ({
+    opacity: interpolate(scrollY.value, [HEADER_HEIGHT * 0.5, HEADER_HEIGHT * 0.75], [1, 0], Extrapolation.CLAMP),
   }));
 
   useEffect(() => { fetchDetail(); }, [movieId]);
@@ -82,7 +87,7 @@ export const MovieDetailScreen = ({ route, navigation }: any) => {
     try {
       setLoading(true);
       const res = await MovieService.getMovieDetail(movieId);
-      if (res.success) { setData(res); }
+      if (res.success && res.data) { setData(res.data); }
       else { setError(res.error || 'Lỗi lấy thông tin phim'); }
     } catch { setError('Mất kết nối Internet.'); }
     finally { setLoading(false); }
@@ -140,12 +145,12 @@ export const MovieDetailScreen = ({ route, navigation }: any) => {
         paddingTop: insets.top, paddingBottom: 10,
         paddingHorizontal: Theme.spacing.md,
         flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-        borderBottomWidth: 1, borderBottomColor: '#1a1a2e',
+        borderBottomWidth: 1, borderBottomColor: Theme.colors.cardBorder,
       }, toolbarOpacity]}>
         <TouchableOpacity style={styles.iconBtn} onPress={() => navigation.goBack()}>
           <Ionicons name="chevron-back" size={24} color="#fff" />
         </TouchableOpacity>
-        <Text style={{ color: '#fff', fontSize: 15, fontWeight: 'bold', flex: 1, textAlign: 'center' }} numberOfLines={1}>
+        <Text style={{ color: Theme.colors.textPrimary, fontSize: 15, fontWeight: 'bold', flex: 1, textAlign: 'center' }} numberOfLines={1}>
           {movie.title}
         </Text>
         <TouchableOpacity style={styles.iconBtn} onPress={handleShare}>
@@ -154,7 +159,7 @@ export const MovieDetailScreen = ({ route, navigation }: any) => {
       </Animated.View>
 
       {/* Floating Back Button (visible when near top) */}
-      <View style={[styles.headerActions, { top: insets.top + 10 }]}>
+      <Animated.View style={[styles.headerActions, { top: insets.top + 10 }, floatingHeaderOpacity]}>
         <TouchableOpacity style={styles.iconBtn} onPress={() => navigation.goBack()}>
           <Ionicons name="chevron-back" size={28} color="#fff" />
         </TouchableOpacity>
@@ -173,7 +178,7 @@ export const MovieDetailScreen = ({ route, navigation }: any) => {
             <Ionicons name="share-outline" size={22} color="#fff" />
           </TouchableOpacity>
         </View>
-      </View>
+      </Animated.View>
 
       <Animated.ScrollView
         onScroll={scrollHandler}
@@ -184,7 +189,13 @@ export const MovieDetailScreen = ({ route, navigation }: any) => {
         {/* Hero Poster */}
         <View style={{ height: HEADER_HEIGHT }}>
           <Animated.View style={[styles.posterHeader, headerAnimatedStyle]}>
-            <Image source={{ uri: posterUrl }} style={styles.posterImage} contentFit="cover" />
+            <AnimatedImage 
+              source={{ uri: posterUrl }} 
+              // @ts-ignore: sharedTransitionTag is injected by Reanimated
+              sharedTransitionTag={`poster-${movieId}`}
+              style={styles.posterImage} 
+              contentFit="cover" 
+            />
             <LinearGradient
               colors={['rgba(0,0,0,0.05)', 'rgba(0,0,0,0.7)', '#0d0d0d']}
               locations={[0, 0.55, 1]}
@@ -212,7 +223,7 @@ export const MovieDetailScreen = ({ route, navigation }: any) => {
                 <Ionicons name="star" size={14} color={Theme.colors.gold} />
                 <Text style={styles.ratingText}>4.8/5 (328 lượt)</Text>
               </View>
-              <Text style={styles.metaText}>{movie.duration} phút</Text>
+              <Text style={styles.metaText}>{movie.durationMinutes} phút</Text>
               <View style={styles.statusChip}>
                 <Text style={styles.statusText}>Đang chiếu</Text>
               </View>
@@ -246,21 +257,19 @@ export const MovieDetailScreen = ({ route, navigation }: any) => {
           </TouchableOpacity>
 
           {/* Cast */}
-          <Text style={styles.sectionTitle}>DIỄN VIÊN</Text>
-          <FlatList
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={MOCK_CAST}
-            keyExtractor={item => item.name}
-            contentContainerStyle={{ gap: 12, marginBottom: 20 }}
-            renderItem={({ item }) => (
-              <View style={castCardStyle}>
-                <Image source={{ uri: item.avatar }} style={castAvatarStyle} contentFit="cover" />
-                <Text style={castNameStyle} numberOfLines={2}>{item.name}</Text>
-                <Text style={castRoleStyle} numberOfLines={1}>{item.role}</Text>
-              </View>
-            )}
-          />
+          {movie.cast && (
+            <>
+              <Text style={styles.sectionTitle}>DIỄN VIÊN</Text>
+              <FlatList
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                data={movie.cast.split(',').map(s => s.trim()).filter(s => s)}
+                keyExtractor={item => item}
+                contentContainerStyle={{ gap: 12, marginBottom: 20 }}
+                renderItem={({ item }) => <ActorCard name={item} />}
+              />
+            </>
+          )}
 
           {/* Showtimes */}
           <Text style={styles.sectionTitle}>LỊCH CHIẾU & SUẤT CHIẾU</Text>
@@ -311,7 +320,7 @@ export const MovieDetailScreen = ({ route, navigation }: any) => {
                     <Text style={[styles.timeText, selectedShowtime?.id === item.id && styles.timeTextActive]}>
                       {item.startTime}
                     </Text>
-                    <Text style={{ color: '#888', fontSize: 10, marginTop: 2 }}>2D</Text>
+                    <Text style={{ color: Theme.colors.textSecondary, fontSize: 10, marginTop: 2 }}>2D</Text>
                   </TouchableOpacity>
                 ))}
               </View>
@@ -319,7 +328,7 @@ export const MovieDetailScreen = ({ route, navigation }: any) => {
           ) : (
             <View style={{ alignItems: 'center', paddingVertical: 30, gap: 10 }}>
               <Ionicons name="calendar-outline" size={40} color="#333" />
-              <Text style={{ color: '#666', fontSize: 14 }}>Chưa có suất chiếu trong ngày này.</Text>
+              <Text style={{ color: Theme.colors.textMuted, fontSize: 14 }}>Chưa có suất chiếu trong ngày này.</Text>
             </View>
           )}
         </View>
@@ -353,20 +362,96 @@ const genreChipStyle = {
   paddingHorizontal: 8, paddingVertical: 3,
   borderRadius: 4, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)',
 };
-const genreChipTextStyle = { color: '#ccc', fontSize: 11 };
+const genreChipTextStyle = { color: Theme.colors.textSecondary, fontSize: 11 };
 
 const castCardStyle = {
-  width: 80, alignItems: 'center' as const, gap: 6,
+  width: 90, alignItems: 'center' as const, gap: 6,
 };
 const castAvatarStyle = {
   width: 60, height: 60, borderRadius: 30,
   borderWidth: 2, borderColor: Theme.colors.cardBorder,
-  backgroundColor: '#222',
+  backgroundColor: Theme.colors.surface,
+  justifyContent: 'center' as const, alignItems: 'center' as const,
 };
 const castNameStyle = {
   color: '#ddd', fontSize: 10, fontWeight: '600' as const,
   textAlign: 'center' as const, lineHeight: 13,
 };
 const castRoleStyle = {
-  color: '#888', fontSize: 9, textAlign: 'center' as const,
+  color: Theme.colors.textSecondary, fontSize: 9, textAlign: 'center' as const,
 };
+
+// Global cache to prevent infinite fetching loops across renders and components
+const globalActorImageCache: Record<string, string> = {};
+
+// --- Custom Actor Card Component to fetch Real Images ---
+const ActorCard = React.memo(({ name }: { name: string }) => {
+  const [imageUrl, setImageUrl] = useState<string | null>(globalActorImageCache[name] || null);
+
+  useEffect(() => {
+    // Nếu ảnh đã có trong cache thì không gọi API nữa, tránh lỗi vòng lặp gọi API (DDoS ẩn)
+    if (globalActorImageCache[name]) {
+      if (imageUrl !== globalActorImageCache[name]) {
+        setImageUrl(globalActorImageCache[name]);
+      }
+      return;
+    }
+
+    let isMounted = true;
+    const fetchWikiImage = async () => {
+      try {
+        // Try Vietnamese Wiki first
+        let res = await fetch(`https://vi.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(name)}&gsrlimit=1&prop=pageimages&pithumbsize=200&format=json`);
+        let json = await res.json();
+        let pages = json.query?.pages;
+        
+        let img: string | undefined;
+        if (pages) {
+          const pageId = Object.keys(pages)[0];
+          img = pages[pageId]?.thumbnail?.source;
+        }
+
+        // Fallback to English Wiki
+        if (!img) {
+          res = await fetch(`https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(name)}&gsrlimit=1&prop=pageimages&pithumbsize=200&format=json`);
+          json = await res.json();
+          pages = json.query?.pages;
+          if (pages) {
+            const pageId = Object.keys(pages)[0];
+            img = pages[pageId]?.thumbnail?.source;
+          }
+        }
+
+        if (img) {
+          globalActorImageCache[name] = img; // Lưu vào cache toàn cục
+          if (isMounted) setImageUrl(img);
+        }
+      } catch (e) {
+        // Silent fail to fallback
+      }
+    };
+    
+    // Đảm bảo không gọi song song quá nhiều request bằng cách setTimeout nhỏ hoặc chỉ gọi khi đang render
+    fetchWikiImage();
+    
+    return () => { isMounted = false; };
+  }, [name]);
+
+  return (
+    <View style={castCardStyle}>
+      {imageUrl ? (
+        <Image 
+          source={{ uri: imageUrl }} 
+          style={castAvatarStyle}
+          contentFit="cover" 
+        />
+      ) : (
+        <View style={[castAvatarStyle, { backgroundColor: '#333', borderColor: '#444' }]}>
+          <Ionicons name="person" size={32} color="#666" />
+        </View>
+      )}
+      <Text style={castNameStyle} numberOfLines={2}>{name}</Text>
+      <Text style={castRoleStyle} numberOfLines={1}>Diễn viên</Text>
+    </View>
+  );
+});

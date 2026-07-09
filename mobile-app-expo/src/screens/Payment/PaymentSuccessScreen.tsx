@@ -1,5 +1,6 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, SafeAreaView, StatusBar, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, StatusBar, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
 import QRCode from 'react-native-qrcode-svg';
@@ -179,13 +180,13 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   successTitle: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 8,
   },
   successSubtitle: {
-    color: '#aaa',
+    color: Theme.colors.textSecondary,
     fontSize: 14,
   },
   cardWrapper: {
@@ -204,9 +205,9 @@ const styles = StyleSheet.create({
     backfaceVisibility: 'hidden',
   },
   cardFront: {
-    backgroundColor: '#222',
+    backgroundColor: Theme.colors.surface,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: Theme.colors.cardBorder,
   },
   cardBack: {
     backgroundColor: '#fff',
@@ -230,7 +231,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   movieTitle: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 24,
@@ -244,13 +245,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   infoLabel: {
-    color: '#888',
+    color: Theme.colors.textSecondary,
     fontSize: 12,
     marginBottom: 4,
     textTransform: 'uppercase',
   },
   infoValue: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -268,7 +269,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   tapText: {
-    color: '#666',
+    color: Theme.colors.textMuted,
     fontSize: 12,
   },
   qrContainer: {
@@ -304,7 +305,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   primaryBtnText: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 16,
     fontWeight: 'bold',
     letterSpacing: 1,
@@ -314,10 +315,10 @@ const styles = StyleSheet.create({
     borderRadius: Theme.radius.btn,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#444',
+    borderColor: Theme.colors.cardBorder,
   },
   secondaryBtnText: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 16,
     fontWeight: 'bold',
   }

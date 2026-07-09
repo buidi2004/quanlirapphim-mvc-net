@@ -13,6 +13,7 @@ using Microsoft.Data.Sqlite;
 using Serilog;
 using CinemaXNet.Infrastructure.Middleware;
 using System.Reflection;
+using ModelContextProtocol.Server;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -157,6 +158,14 @@ builder.Services.AddHostedService<MarketingBackgroundService>();
 // ── IHttpContextAccessor ──────────────────────────────────────────────────
 builder.Services.AddHttpContextAccessor();
 
+// ── MCP Server ────────────────────────────────────────────────────────────
+builder.Services.AddMcpServer(options => 
+{
+    options.ServerInfo = new() { Name = "CinemaX-MCP", Version = "1.0.0" };
+})
+.WithHttpTransport(options => options.Stateless = true)
+.WithToolsFromAssembly(typeof(Program).Assembly);
+
 var app = builder.Build();
 
 // ── Middleware Pipeline ────────────────────────────────────────────────────
@@ -167,7 +176,22 @@ if (!app.Environment.IsDevelopment())
     // app.UseExceptionHandler("/error/500");
     app.UseHsts();
 }
-app.UseStatusCodePagesWithReExecute("/error/{0}");
+app.UseWhen(context => !context.Request.Path.StartsWithSegments("/api"), appBuilder =>
+{
+    appBuilder.UseStatusCodePagesWithReExecute("/error/{0}");
+});
+
+app.UseWhen(context => context.Request.Path.StartsWithSegments("/api"), appBuilder =>
+{
+    appBuilder.UseStatusCodePages(async context =>
+    {
+        context.HttpContext.Response.ContentType = "application/json";
+        await context.HttpContext.Response.WriteAsJsonAsync(new { 
+            success = false, 
+            error = "Truy cập bị từ chối hoặc không tìm thấy tài nguyên (Lỗi " + context.HttpContext.Response.StatusCode + ")" 
+        });
+    });
+});
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
@@ -197,5 +221,8 @@ app.MapControllerRoute("news",           "news",           new { controller = "N
 app.MapControllerRoute("promotions",     "promotions",     new { controller = "Promotion", action = "Index" });
 app.MapControllerRoute("cinemas",        "cinemas",        new { controller = "Cinema",    action = "Index" });
 app.MapControllerRoute("profile",        "profile",        new { controller = "Profile",   action = "Index" });
+
+// ── MCP Endpoint ───────────────────────────────────────────────────────────
+app.MapMcp("/api/mcp");
 
 app.Run();

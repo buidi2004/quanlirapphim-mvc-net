@@ -1,5 +1,6 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, StatusBar, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, StatusBar, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
 import { Concession, ConcessionItem } from '../../components/features/ConcessionItem';
@@ -35,7 +36,9 @@ const MOCK_CONCESSIONS: Concession[] = [
 ];
 
 export const ConcessionScreen = ({ route, navigation }: any) => {
-  const { selectedSeats, showtimeId } = route.params || { selectedSeats: [], showtimeId: 0 };
+  const showtimeId = route.params?.showtimeId || 0;
+  const selectedSeats = route.params?.selectedSeats || [];
+  const ticketIds = route.params?.ticketIds || [];
   const insets = useSafeAreaInsets();
   
   const [quantities, setQuantities] = useState<{[key: string]: number}>({});
@@ -75,6 +78,7 @@ export const ConcessionScreen = ({ route, navigation }: any) => {
     navigation.navigate('Payment', { 
       selectedSeats, 
       showtimeId, 
+      ticketIds,
       concessions: quantities,
       seatPrice,
       concessionPrice: totalConcessionPrice
@@ -156,7 +160,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Theme.spacing.md,
     paddingVertical: Theme.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#222',
+    borderBottomColor: Theme.colors.cardBorder,
   },
   backBtn: {
     width: 40,
@@ -195,7 +199,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Theme.spacing.lg,
     paddingTop: Theme.spacing.md,
     borderTopWidth: 1,
-    borderTopColor: '#333',
+    borderTopColor: Theme.colors.cardBorder,
     elevation: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -5 },
@@ -229,7 +233,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   skipBtnText: {
-    color: '#aaa',
+    color: Theme.colors.textSecondary,
     fontWeight: 'bold',
     fontSize: 14,
   },
@@ -242,7 +246,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   nextBtnText: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 16,
     fontWeight: 'bold',
     letterSpacing: 1,

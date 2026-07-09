@@ -24,7 +24,7 @@ public class AdminController(IMovieService movieService, IAuditLogService auditL
     {
         int pageSize = 10;
         var movies = await movieService.GetAllPaginatedAsync(page, pageSize);
-        return View(movies);
+        return View("Movies/Index", movies);
     }
 
     // POST /admin/movies
@@ -59,7 +59,7 @@ public class AdminController(IMovieService movieService, IAuditLogService auditL
         {
             ViewBag.Errors = errors;
             var movies = await movieService.GetAllPaginatedAsync(1, 10);
-            return View("Movies", movies);
+            return View("Movies/Index", movies);
         }
 
         try
@@ -89,7 +89,7 @@ public class AdminController(IMovieService movieService, IAuditLogService auditL
         {
             ViewBag.Errors = new Dictionary<string, string> { ["general"] = "Lỗi hệ thống: " + ex.Message };
             var movies = await movieService.GetAllPaginatedAsync(1, 10);
-            return View("Movies", movies);
+            return View("Movies/Index", movies);
         }
     }
 

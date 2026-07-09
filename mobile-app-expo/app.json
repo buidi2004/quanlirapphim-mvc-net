@@ -10,7 +10,8 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon",
-      "backgroundColor": "#0d0d0d"
+      "backgroundColor": "#0d0d0d",
+      "bundleIdentifier": "com.buidi2004.cinemaxnet"
     },
     "android": {
       "backgroundColor": "#0d0d0d",
@@ -21,7 +22,7 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.mobileappexpo"
+      "package": "com.buidi2004.cinemaxnet"
     },
     "web": {
       "output": "single",
@@ -37,7 +38,8 @@
             "imageWidth": 76
           }
         }
-      ]
+      ],
+      "expo-video"
     ],
     "experiments": {
       "reactCompiler": true

@@ -85,10 +85,40 @@ Thư mục phục vụ các file tĩnh cho trình duyệt tải về:
 
 ---
 
+## 3. Mobile App (FE - React Native / Expo) - Cấu trúc thư mục & Chức năng
+
+Dự án có thêm phần Mobile App được xây dựng bằng **React Native / Expo** nằm trong thư mục `/mobile-app-expo`. 
+
+### 3.1. Phân chia cấu trúc thư mục (`/mobile-app-expo/src`)
+- **`/api`**: Quản lý API client và cấu hình kết nối tới Backend.
+- **`/components`**: Chứa các UI components dùng chung, được chia nhỏ thành `common`, `features` (như `MovieCard`, `SeatItem`, `ConcessionItem`), và `ui` (như `GlassCard`, `SkeletonLoader`).
+- **`/hooks`**: Các Custom Hooks (ví dụ: `useTheme.ts`).
+- **`/models`**: Khai báo TypeScript interfaces/types (`Movie.ts`, `Ticket.ts`, `User.ts`,...).
+- **`/navigation`**: Cấu hình điều hướng React Navigation (bao gồm `AppNavigator`, Bottom Tabs, Drawer).
+- **`/screens`**: Chứa toàn bộ các màn hình hiển thị, chia theo nhóm chức năng:
+  - **Auth**: `LoginScreen`, `RegisterScreen`, `ForgotPasswordScreen`,...
+  - **Home & Movie**: `HomeScreen`, `MovieListScreen`, `MovieDetailScreen`, `MyTicketsScreen`,...
+  - **Booking**: `QuickBookScreen`, `SeatSelectionScreen`, `ConcessionScreen`,...
+  - **Cinema**: `CinemaListScreen`, `CinemaDetailScreen`, `GlobalShowtimesScreen`.
+  - **Payment**: `PaymentScreen`, `PaymentSuccessScreen`.
+  - **Profile**: `ProfileScreen`, `EditProfileScreen`, `TransactionHistoryScreen`, `ChangePasswordScreen`.
+  - **Khác**: `News`, `Promotion`, `Search`, `Settings`, `Splash`, `Error`, `Page` (Các trang tĩnh).
+- **`/services`**: Quản lý logic gọi API (ví dụ: `AuthService`, `BookingService`, `MovieService`).
+- **`/theme`**: Quản lý design tokens, màu sắc, font chữ (`tokens.ts`, `global.css`).
+
+### 3.2. Bản đồ màn hình (Navigation Structure)
+Theo tài liệu (wiki) thiết kế UX/UI trên Mobile App:
+*   **Tab chính (Bottom Tab Navigator):** Trang chủ (Home), Phim (Movie), Đặt vé nhanh (QuickBook), Rạp (Cinema), Tài khoản (Profile).
+*   **Stack Screens (Push từ Tab):** Chi tiết phim, Mua vé (Chọn ghế, Bắp nước, Thanh toán), Chi tiết rạp, Lịch chiếu, Tin tức, Khuyến mãi, Tìm kiếm, v.v.
+*   **Auth Stack:** Các luồng xác thực người dùng (Đăng nhập, Đăng ký, Đổi mật khẩu).
+*   **Mobile-only Screens:** Màn hình Splash khi mở app, Onboarding, Cài đặt ứng dụng (Settings), và Quản lý thông báo (Notification).
+
+---
+
 ## Tóm tắt luồng hoạt động (Workflow)
 
-1. **Người dùng (FE)** gửi HTTP Request thông qua giao diện Razor (Views).
-2. **Controller (BE)** tiếp nhận Request, thực hiện validate ban đầu qua `ViewModels`.
+1. **Người dùng (FE / Mobile App)** gửi HTTP Request thông qua giao diện Razor (Views) hoặc các màn hình React Native.
+2. **Controller (BE)** tiếp nhận Request, thực hiện validate ban đầu qua `ViewModels` (hoặc xử lý API endpoints cho Mobile).
 3. Controller gọi xuống **Service (BLL)** để thực hiện các quy tắc và nghiệp vụ logic.
 4. Service gọi xuống **Repository (DAL)** để lấy/cập nhật dữ liệu vào **Database (SQLite)**.
-5. Service trả kết quả lại cho Controller, Controller binding dữ liệu vào `ViewModels` và trả về `Views` cho người dùng.
+5. Service trả kết quả lại cho Controller, Controller binding dữ liệu vào `ViewModels` và trả về `Views` cho nền tảng Web, hoặc trả JSON cho Mobile App.

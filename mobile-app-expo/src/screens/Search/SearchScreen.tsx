@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, SafeAreaView, StatusBar, TextInput } from 'react-native';
+import { SafeAreaView } from "react-native-safe-area-context";
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, StatusBar, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { Theme } from '../../theme/tokens';
@@ -45,7 +46,7 @@ export const SearchScreen = ({ navigation }: any) => {
     return () => clearTimeout(timeout);
   }, [searchQuery, activeGenre]);
 
-  const renderMovieCard = ({ item }: { item: Movie }) => (
+  const renderMovieCard = useCallback(({ item }: { item: Movie }) => (
     <TouchableOpacity 
       style={styles.card}
       onPress={() => navigation.navigate('MovieDetail', { movieId: item.id })}
@@ -63,7 +64,7 @@ export const SearchScreen = ({ navigation }: any) => {
         <Text style={styles.genre} numberOfLines={1}>{item.genre}</Text>
       </View>
     </TouchableOpacity>
-  );
+  ), [navigation]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -150,20 +151,20 @@ const styles = StyleSheet.create({
   searchHeader: {
     padding: Theme.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#222',
+    borderBottomColor: Theme.colors.cardBorder,
   },
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#222',
+    backgroundColor: Theme.colors.surface,
     borderRadius: Theme.radius.md,
     paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: Theme.colors.cardBorder,
   },
   searchInput: {
     flex: 1,
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     paddingVertical: 12,
     paddingHorizontal: 8,
     fontSize: 16,
@@ -171,7 +172,7 @@ const styles = StyleSheet.create({
   genreWrapper: {
     paddingVertical: Theme.spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: '#222',
+    borderBottomColor: Theme.colors.cardBorder,
   },
   genreList: {
     paddingHorizontal: Theme.spacing.md,
@@ -181,16 +182,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 20,
-    backgroundColor: '#222',
+    backgroundColor: Theme.colors.surface,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: Theme.colors.cardBorder,
   },
   genreChipActive: {
     backgroundColor: 'rgba(255, 193, 7, 0.1)',
     borderColor: Theme.colors.gold,
   },
   genreChipText: {
-    color: '#aaa',
+    color: Theme.colors.textSecondary,
     fontSize: 12,
   },
   genreChipTextActive: {
@@ -204,7 +205,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   emptyText: {
-    color: '#aaa',
+    color: Theme.colors.textSecondary,
     marginTop: 16,
     marginBottom: 20,
     fontSize: 16,
@@ -230,13 +231,13 @@ const styles = StyleSheet.create({
     marginBottom: Theme.spacing.md,
   },
   resultCount: {
-    color: '#aaa',
+    color: Theme.colors.textSecondary,
     marginBottom: Theme.spacing.md,
     fontSize: 14,
   },
   card: {
     width: '48%',
-    backgroundColor: '#111',
+    backgroundColor: Theme.colors.surface,
     borderRadius: Theme.radius.card,
     overflow: 'hidden',
     position: 'relative',
@@ -255,7 +256,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   badgeAgeText: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 10,
     fontWeight: 'bold',
   },
@@ -263,13 +264,13 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   title: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 14,
     fontWeight: 'bold',
     marginBottom: 4,
   },
   genre: {
-    color: '#aaa',
+    color: Theme.colors.textSecondary,
     fontSize: 12,
   },
 });

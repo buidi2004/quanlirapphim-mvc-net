@@ -13,11 +13,15 @@ export const MOVIE_CARD_WIDTH = width * 0.4;
 interface Props {
   movie: Movie;
   onPress: (id: number) => void;
+  style?: any;
+  hideText?: boolean;
 }
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-export const MovieCard: React.FC<Props> = ({ movie, onPress }) => {
+const AnimatedImage = Animated.createAnimatedComponent(Image);
+
+export const MovieCard: React.FC<Props> = ({ movie, onPress, style, hideText }) => {
   const scale = useSharedValue(1);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -26,15 +30,17 @@ export const MovieCard: React.FC<Props> = ({ movie, onPress }) => {
 
   return (
     <AnimatedPressable 
-      style={[styles.container, animatedStyle]}
+      style={[styles.container, style, animatedStyle]}
       onPress={() => onPress(movie.id)}
       onPressIn={() => scale.value = withTiming(0.96, { duration: 150 })}
       onPressOut={() => scale.value = withTiming(1, { duration: 150 })}
     >
       <View style={styles.imageContainer}>
         {/* Ảnh Poster dùng expo-image siêu mượt, tự handle cache & lỗi */}
-        <Image 
-          source={{ uri: movie.posterUrl?.startsWith('http') ? movie.posterUrl : `${IMAGE_BASE_URL}${movie.posterUrl}` }} 
+        <AnimatedImage 
+          source={{ uri: movie?.posterUrl?.startsWith('http') ? movie.posterUrl : `${IMAGE_BASE_URL}${movie?.posterUrl}` }} 
+          // @ts-ignore: sharedTransitionTag is injected by Reanimated
+          sharedTransitionTag={`poster-${movie.id}`}
           style={styles.poster}
           contentFit="cover"
           transition={200}
@@ -47,8 +53,12 @@ export const MovieCard: React.FC<Props> = ({ movie, onPress }) => {
         </View>
       </View>
       {/* Tiêu đề in đậm, tối đa 2 dòng */}
-      <Text style={styles.title} numberOfLines={2}>{movie.title}</Text>
-      <Text style={styles.genre} numberOfLines={1}>{movie.genre}</Text>
+      {!hideText && (
+        <>
+          <Text style={styles.title} numberOfLines={2}>{movie.title}</Text>
+          <Text style={styles.genre} numberOfLines={1}>{movie.genre}</Text>
+        </>
+      )}
     </AnimatedPressable>
   );
 };
@@ -67,7 +77,7 @@ const styles = StyleSheet.create({
   },
   poster: {
     width: '100%',
-    aspectRatio: 2/3,
+    aspectRatio: 3/4, // Exactly as requested
   },
   badge: {
     position: 'absolute',

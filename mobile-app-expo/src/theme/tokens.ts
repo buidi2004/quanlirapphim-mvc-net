@@ -2,7 +2,9 @@
 // Kế thừa CSS Variables từ Web CinemaXNet
 // Updated: iOS-Native Glassmorphism & Dock UI Standards
 
-export const Colors = {
+import { Appearance } from 'react-native';
+
+export const DarkColors = {
   // Brand
   accent: '#e50914',
   accentLight: 'rgba(229,9,20,0.15)',
@@ -46,8 +48,31 @@ export const Colors = {
     border: 'rgba(255, 255, 255, 0.12)',
     borderLight: 'rgba(255, 255, 255, 0.08)',
     tint: 'rgba(13, 13, 13, 0.4)',
+    topHighlight: 'rgba(255, 255, 255, 0.35)',
   },
 };
+
+export const LightColors = {
+  ...DarkColors,
+  background: '#f8f9fa',
+  surface: '#ffffff',
+  card: '#ffffff',
+  cardBorder: '#e0e0e0',
+  textPrimary: '#212529',
+  textSecondary: '#495057',
+  textMuted: '#adb5bd',
+  seatAvailable: '#e9ecef',
+  glass: {
+    background: 'rgba(255, 255, 255, 0.65)',
+    backgroundLight: 'rgba(255, 255, 255, 0.85)',
+    border: 'rgba(0, 0, 0, 0.12)',
+    borderLight: 'rgba(0, 0, 0, 0.05)',
+    tint: 'rgba(255, 255, 255, 0.4)',
+    topHighlight: 'rgba(255, 255, 255, 0.65)',
+  },
+};
+
+export const Colors = Appearance.getColorScheme() === 'light' ? LightColors : DarkColors;
 
 export const Spacing = {
   xs: 4,

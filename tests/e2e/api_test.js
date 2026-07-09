@@ -3,7 +3,7 @@ const cheerio = require('cheerio');
 const qs = require('querystring');
 
 const instance = axios.create({
-    baseURL: 'http://localhost:8080',
+    baseURL: 'http://localhost:5062',
     maxRedirects: 0,
     validateStatus: function (status) { return status >= 200 && status < 400; }
 });
@@ -30,7 +30,7 @@ async function runTests() {
     console.log('1. Đang đăng nhập (API)...');
     let res = await instance.post('/login', qs.stringify({
         Email: 'admin@cinemax.com',
-        Password: 'admin',
+        Password: 'Password123!',
         __RequestVerificationToken: token
     }), {
         headers: { 
@@ -94,4 +94,7 @@ async function runTests() {
 
 runTests().catch(e => {
     console.error('❌ Lỗi:', e.message);
+    if(e.response) {
+        console.error('Response body:', e.response.data);
+    }
 });

@@ -10,31 +10,43 @@ async function runDeepFlowTest() {
     // 1. Login
     console.log('\n1. Login as test@example.com...');
     let res = await axios.post(`${API_URL}/auth/login`, { email: 'test@example.com', password: 'Password123' });
+    let responseData = res.data.data || res.data;
     if (!res.data.success) {
       // If test@example.com doesn't work, register it
       console.log('Login failed, attempting to register test user...');
       res = await axios.post(`${API_URL}/auth/register`, { username: 'testbooker', email: 'test@example.com', password: 'Password123' });
+      responseData = res.data.data || res.data;
       if (!res.data.success) throw new Error("Could not login or register");
     }
-    token = res.data.token;
+    token = responseData.token;
     console.log(`✅ Logged in successfully. Token length: ${token.length}`);
     const headers = { Authorization: `Bearer ${token}` };
 
-    // 2. Get Movies
-    console.log('\n2. Fetching Now Showing Movies...');
+    // 2. & 3. Get Movies and find one with showtimes
+    console.log('\n2. Fetching Now Showing Movies and Showtimes...');
     res = await axios.get(`${API_URL}/movies?status=now_showing`);
     const movies = res.data.data;
     if (!movies || movies.length === 0) throw new Error("No movies found");
-    const movie = movies[0];
-    console.log(`✅ Selected Movie: ${movie.title} (ID: ${movie.id})`);
+    
+    let movie = null;
+    let showtime = null;
 
-    // 3. Get Showtimes
-    console.log(`\n3. Fetching Showtimes for Movie ${movie.id}...`);
-    res = await axios.get(`${API_URL}/movies/${movie.id}/showtimes`);
-    const showtimeGroups = res.data.showtimes;
-    if (!showtimeGroups || showtimeGroups.length === 0) throw new Error("No showtimes found");
-    // get first showtime
-    const showtime = showtimeGroups[0];
+    for (const m of movies) {
+        let stRes = await axios.get(`${API_URL}/movies/${m.id}/showtimes`);
+        let responseData = stRes.data.data || stRes.data;
+        const showtimeGroups = responseData.showtimes;
+        if (showtimeGroups && showtimeGroups.length > 0) {
+            movie = m;
+            showtime = showtimeGroups[0];
+            break;
+        }
+    }
+
+    if (!movie || !showtime) {
+        throw new Error("No showtimes found for ANY movie today!");
+    }
+
+    console.log(`✅ Selected Movie: ${movie.title} (ID: ${movie.id})`);
     console.log(`✅ Selected Showtime: ID ${showtime.id}, Room: ${showtime.roomName}, Time: ${showtime.startTime}`);
 
     // 4. Get Seat Map
@@ -57,7 +69,8 @@ async function runDeepFlowTest() {
     }, { headers });
     
     if (!res.data.success) throw new Error(`Hold failed: ${res.data.message}`);
-    const holdResult = res.data.holdResult;
+    const holdData = res.data.data || res.data;
+    const holdResult = holdData.holdResult;
     const ticketIds = holdResult.ticketIds;
     console.log(`✅ Seats held successfully! Ticket IDs: ${ticketIds.join(', ')}. Expires in ${holdResult.remainingSeconds}s`);
 
@@ -65,7 +78,7 @@ async function runDeepFlowTest() {
     console.log(`\n6. Confirming Payment...`);
     res = await axios.post(`${API_URL}/booking/confirm`, {
       ticketIds: ticketIds,
-      paymentMethod: 'credit_card',
+      paymentMethod: 'vnpay',
       promoCode: ''
     }, { headers });
 
@@ -75,7 +88,8 @@ async function runDeepFlowTest() {
     // 7. Check My Tickets
     console.log(`\n7. Fetching My Tickets History...`);
     res = await axios.get(`${API_URL}/tickets/my-tickets`, { headers });
-    const myTickets = res.data.data;
+    const ticketsData = res.data.data || res.data;
+    const myTickets = ticketsData; // Assuming data is the array or object with data
     const recentTickets = myTickets.filter(t => selectedSeats.includes(t.seat_code) && t.showtime_id === showtime.id);
     if (recentTickets.length === 2) {
       console.log(`✅ Success: Found the 2 newly booked tickets in history!`);

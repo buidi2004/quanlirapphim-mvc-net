@@ -1,7 +1,7 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, SafeAreaView,
-  StatusBar, TextInput, KeyboardAvoidingView, Platform, ScrollView,
+  View, Text, StyleSheet, TouchableOpacity, StatusBar, TextInput, KeyboardAvoidingView, Platform, ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
@@ -181,10 +181,10 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: Theme.spacing.md, paddingVertical: Theme.spacing.md,
-    borderBottomWidth: 1, borderBottomColor: '#1a1a2e',
+    borderBottomWidth: 1, borderBottomColor: Theme.colors.cardBorder,
   },
   backBtn: { width: 40, height: 40, justifyContent: 'center' },
-  headerTitle: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+  headerTitle: { color: Theme.colors.textPrimary, fontSize: 16, fontWeight: 'bold' },
 
   content: { padding: Theme.spacing.md },
 
@@ -194,8 +194,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,193,7,0.1)', justifyContent: 'center', alignItems: 'center',
     borderWidth: 2, borderColor: 'rgba(255,193,7,0.3)',
   },
-  iconTitle: { color: '#fff', fontSize: 20, fontWeight: 'bold' },
-  iconSubtitle: { color: '#888', fontSize: 13, textAlign: 'center' },
+  iconTitle: { color: Theme.colors.textPrimary, fontSize: 20, fontWeight: 'bold' },
+  iconSubtitle: { color: Theme.colors.textSecondary, fontSize: 13, textAlign: 'center' },
 
   form: {
     backgroundColor: Theme.colors.surface, borderRadius: Theme.radius.xl,
@@ -203,26 +203,26 @@ const styles = StyleSheet.create({
     marginBottom: Theme.spacing.xl,
   },
   inputGroup: { marginBottom: 20 },
-  label: { color: '#aaa', fontSize: 13, marginBottom: 8, fontWeight: '500' },
+  label: { color: Theme.colors.textSecondary, fontSize: 13, marginBottom: 8, fontWeight: '500' },
   inputWrapper: {
     flexDirection: 'row', alignItems: 'center',
-    backgroundColor: '#111', borderRadius: Theme.radius.md,
-    borderWidth: 1, borderColor: '#333',
+    backgroundColor: Theme.colors.surface, borderRadius: Theme.radius.md,
+    borderWidth: 1, borderColor: Theme.colors.cardBorder,
   },
   inputError: { borderColor: Theme.colors.danger },
   inputIcon: { paddingLeft: 14 },
-  input: { flex: 1, color: '#fff', paddingHorizontal: 12, paddingVertical: 14, fontSize: 15 },
+  input: { flex: 1, color: Theme.colors.textPrimary, paddingHorizontal: 12, paddingVertical: 14, fontSize: 15 },
   eyeBtn: { paddingHorizontal: 14, paddingVertical: 14 },
 
   errorRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 },
   errorText: { color: Theme.colors.danger, fontSize: 12 },
 
-  divider: { height: 1, backgroundColor: '#222', marginVertical: 4 },
+  divider: { height: 1, backgroundColor: Theme.colors.surface, marginVertical: 4 },
 
   strengthRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 16, marginTop: -12 },
-  strengthBar: { flex: 1, height: 4, borderRadius: 2, backgroundColor: '#333' },
+  strengthBar: { flex: 1, height: 4, borderRadius: 2, backgroundColor: Theme.colors.cardBorder },
   strengthBarActive: { backgroundColor: Theme.colors.warning },
-  strengthText: { color: '#888', fontSize: 11, minWidth: 60 },
+  strengthText: { color: Theme.colors.textSecondary, fontSize: 11, minWidth: 60 },
 
   matchRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 4, marginTop: -12 },
   matchText: { color: Theme.colors.success, fontSize: 12 },
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
   submitBtnText: { color: '#000', fontWeight: 'bold', fontSize: 16 },
   cancelBtn: {
     alignItems: 'center', paddingVertical: 14,
-    borderRadius: Theme.radius.lg, borderWidth: 1, borderColor: '#333',
+    borderRadius: Theme.radius.lg, borderWidth: 1, borderColor: Theme.colors.cardBorder,
   },
-  cancelBtnText: { color: '#888', fontSize: 15 },
+  cancelBtnText: { color: Theme.colors.textSecondary, fontSize: 15 },
 });

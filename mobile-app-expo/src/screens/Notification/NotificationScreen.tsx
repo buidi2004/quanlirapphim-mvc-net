@@ -1,5 +1,6 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, SafeAreaView, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
 
@@ -37,7 +38,7 @@ export const NotificationScreen = ({ navigation }: any) => {
       case 'reminder': return { name: 'ticket', color: '#ff9800', bg: 'rgba(255, 152, 0, 0.1)' };
       case 'reward': return { name: 'star', color: '#2196f3', bg: 'rgba(33, 150, 243, 0.1)' };
       case 'promo': return { name: 'pricetag', color: '#e91e63', bg: 'rgba(233, 30, 99, 0.1)' };
-      default: return { name: 'notifications', color: '#fff', bg: '#333' };
+      default: return { name: 'notifications', color: Theme.colors.textPrimary, bg: '#333' };
     }
   };
 
@@ -103,7 +104,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Theme.spacing.md,
     paddingVertical: Theme.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#222',
+    borderBottomColor: Theme.colors.cardBorder,
   },
   backBtn: {
     width: 40,
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   headerTitle: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -151,13 +152,13 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   title: {
-    color: '#ccc',
+    color: Theme.colors.textSecondary,
     fontSize: 15,
     fontWeight: '600',
     flex: 1,
   },
   unreadTitle: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontWeight: 'bold',
   },
   unreadDot: {
@@ -168,13 +169,13 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   message: {
-    color: '#888',
+    color: Theme.colors.textSecondary,
     fontSize: 13,
     lineHeight: 20,
     marginBottom: 8,
   },
   time: {
-    color: '#555',
+    color: Theme.colors.textMuted,
     fontSize: 11,
   },
   emptyContainer: {
@@ -182,7 +183,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    color: '#666',
+    color: Theme.colors.textMuted,
     marginTop: 16,
     fontSize: 15,
   }

@@ -2,12 +2,14 @@ export interface Movie {
   id: number;
   title: string;
   description: string;
-  duration: number;
-  releaseDate: string;
+  durationMinutes: number;
+  releaseDate?: string;
+  createdAt: string;
   genre: string;
-  director: string;
-  cast: string;
-  rating: number;
+  director?: string;
+  cast?: string;
+  rating?: number;
+  ageRating?: string;
   posterUrl: string;
   trailerUrl?: string;
   status: string;
@@ -35,10 +37,12 @@ export interface ShowtimeSummary {
 
 export interface MovieDetailResponse {
   success: boolean;
-  movie: Movie;
-  selectedDate: string;
-  showtimes: ShowtimeSummary[];
-  reviews: Review[];
+  data: {
+    movie: Movie;
+    selectedDate: string;
+    showtimes: ShowtimeSummary[];
+    reviews: Review[];
+  };
   error?: string;
 }
 

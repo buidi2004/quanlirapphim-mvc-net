@@ -7,7 +7,12 @@ export interface Cinema {
   imageUrl?: string;
   lat?: number;
   lng?: number;
-  distance?: number; // Only populated when fetching nearest cinemas
+  distance?: number;
+  phone?: string;
+  email?: string;
+  openingHours?: string;
+  description?: string;
+  facilities?: string;
 }
 
 export interface CinemasResponse {
@@ -26,7 +31,7 @@ export interface CinemaShowtimeGroup {
   movie: {
     id: number;
     title: string;
-    duration: number;
+    durationMinutes: number;
     genre: string;
     posterUrl: string;
   };

@@ -53,7 +53,7 @@ const TrendingCard = ({ movie, rank, onPress }: { movie: Movie, rank: number, on
       onPressOut={() => scale.value = withTiming(1, { duration: 150 })}
     >
       <Image 
-        source={{ uri: movie.posterUrl?.startsWith('http') ? movie.posterUrl : `${IMAGE_BASE_URL}${movie.posterUrl}` }} 
+        source={{ uri: movie?.posterUrl?.startsWith('http') ? movie.posterUrl : `${IMAGE_BASE_URL}${movie?.posterUrl}` }} 
         style={styles.poster} 
         contentFit="cover" 
       />

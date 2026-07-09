@@ -5,8 +5,12 @@ namespace CinemaXNet.Application.ViewModels;
 public class ShowtimeSummary
 {
     public int Id { get; set; }
+    public int CinemaId { get; set; }
+    public string CinemaName { get; set; } = "";
     public DateOnly ShowDate { get; set; }
     public TimeOnly StartTime { get; set; }
+    public TimeOnly? EndTime { get; set; }
+    public decimal Price { get; set; }
     public string FormattedPrice { get; set; } = "";
     public string RoomName { get; set; } = "";
     public int AvailableSeats { get; set; }

@@ -17,7 +17,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: Theme.spacing.md,
     paddingVertical: Theme.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#222',
+    borderBottomColor: Theme.colors.cardBorder,
   },
   backBtn: {
     width: 40,
@@ -41,7 +41,7 @@ export const styles = StyleSheet.create({
   },
   mapContainer: {
     flex: 1,
-    backgroundColor: '#111',
+    backgroundColor: Theme.colors.surface,
     overflow: 'hidden',
   },
   zoomContent: {
@@ -68,7 +68,7 @@ export const styles = StyleSheet.create({
     elevation: 5,
   },
   screenText: {
-    color: '#666',
+    color: Theme.colors.textMuted,
     fontSize: 10,
     letterSpacing: 4,
     marginTop: 10,
@@ -82,7 +82,7 @@ export const styles = StyleSheet.create({
     marginBottom: 8,
   },
   rowLabel: {
-    color: '#888',
+    color: Theme.colors.textSecondary,
     width: 24,
     textAlign: 'center',
     fontSize: 12,
@@ -95,7 +95,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderTopWidth: 1,
-    borderTopColor: '#222',
+    borderTopColor: Theme.colors.cardBorder,
     gap: 16,
   },
   legendItem: {
@@ -109,7 +109,7 @@ export const styles = StyleSheet.create({
     borderRadius: 2,
   },
   legendText: {
-    color: '#aaa',
+    color: Theme.colors.textSecondary,
     fontSize: 10,
   },
   stickyBottom: {
@@ -117,7 +117,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: Theme.spacing.lg,
     paddingTop: Theme.spacing.md,
     borderTopWidth: 1,
-    borderTopColor: '#333',
+    borderTopColor: Theme.colors.cardBorder,
     elevation: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -5 },
@@ -151,7 +151,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   bookButtonText: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 16,
     fontWeight: 'bold',
     letterSpacing: 1,

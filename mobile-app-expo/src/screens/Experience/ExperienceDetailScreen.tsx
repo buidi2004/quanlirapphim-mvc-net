@@ -1,7 +1,8 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import React from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  SafeAreaView, StatusBar,
+  StatusBar,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -169,13 +170,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12, paddingVertical: 4, borderRadius: Theme.radius.pill,
     borderWidth: 1, marginBottom: 12,
   },
-  badgeText: { color: '#fff', fontSize: 11, fontWeight: 'bold' },
+  badgeText: { color: Theme.colors.textPrimary, fontSize: 11, fontWeight: 'bold' },
   heroIcon: { fontSize: 48, marginBottom: 8 },
   heroName: { fontSize: 36, fontWeight: '900', marginBottom: 6 },
-  heroSlogan: { color: '#ccc', fontSize: 15, fontStyle: 'italic' },
+  heroSlogan: { color: Theme.colors.textSecondary, fontSize: 15, fontStyle: 'italic' },
 
   body: { padding: Theme.spacing.lg },
-  description: { color: '#aaa', fontSize: 15, lineHeight: 24, marginBottom: Theme.spacing.xl },
+  description: { color: Theme.colors.textSecondary, fontSize: 15, lineHeight: 24, marginBottom: Theme.spacing.xl },
 
   sectionTitle: { color: Theme.colors.warning, fontSize: 16, fontWeight: 'bold', marginBottom: 14 },
 
@@ -188,8 +189,8 @@ const styles = StyleSheet.create({
     width: 48, height: 48, borderRadius: 24,
     justifyContent: 'center', alignItems: 'center',
   },
-  highlightTitle: { color: '#fff', fontSize: 12, fontWeight: 'bold', textAlign: 'center' },
-  highlightDesc: { color: '#666', fontSize: 10, textAlign: 'center' },
+  highlightTitle: { color: Theme.colors.textPrimary, fontSize: 12, fontWeight: 'bold', textAlign: 'center' },
+  highlightDesc: { color: Theme.colors.textMuted, fontSize: 10, textAlign: 'center' },
 
   noteBox: {
     flexDirection: 'row', gap: 10, alignItems: 'flex-start',
@@ -197,13 +198,13 @@ const styles = StyleSheet.create({
     padding: 14, marginBottom: Theme.spacing.xl,
     borderWidth: 1, borderColor: Theme.colors.cardBorder,
   },
-  noteText: { color: '#aaa', fontSize: 13, lineHeight: 20, flex: 1 },
+  noteText: { color: Theme.colors.textSecondary, fontSize: 13, lineHeight: 20, flex: 1 },
 
   bookBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
     borderRadius: Theme.radius.lg, paddingVertical: 16, marginBottom: Theme.spacing.xl,
   },
-  bookBtnText: { color: '#fff', fontWeight: '800', fontSize: 16 },
+  bookBtnText: { color: Theme.colors.textPrimary, fontWeight: '800', fontSize: 16 },
 
   otherCard: {
     flexDirection: 'row', alignItems: 'center', gap: 12,
@@ -211,6 +212,6 @@ const styles = StyleSheet.create({
     padding: 16, marginBottom: 12, borderWidth: 1, borderColor: Theme.colors.cardBorder,
   },
   otherIcon: { fontSize: 28 },
-  otherName: { color: '#fff', fontSize: 15, fontWeight: 'bold', marginBottom: 2 },
-  otherSlogan: { color: '#888', fontSize: 12 },
+  otherName: { color: Theme.colors.textPrimary, fontSize: 15, fontWeight: 'bold', marginBottom: 2 },
+  otherSlogan: { color: Theme.colors.textSecondary, fontSize: 12 },
 });

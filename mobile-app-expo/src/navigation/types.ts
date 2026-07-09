@@ -1,5 +1,6 @@
 export type RootStackParamList = {
-  // ── Tabs ──
+  // ── Drawer & Tabs ──
+  MainDrawer: undefined;
   MainTabs: undefined;
 
   // ── Auth Flow ──

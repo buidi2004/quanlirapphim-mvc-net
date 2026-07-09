@@ -6,7 +6,7 @@ const { width, height } = Dimensions.get('window');
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#111',
+    backgroundColor: Theme.colors.surface,
   },
   centerContainer: {
     justifyContent: 'center',
@@ -53,7 +53,7 @@ export const styles = StyleSheet.create({
     padding: Theme.spacing.lg,
   },
   title: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 32,
     fontWeight: '900',
     marginBottom: Theme.spacing.sm,
@@ -74,12 +74,12 @@ export const styles = StyleSheet.create({
     borderRadius: 4,
   },
   badgeAgeText: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 12,
     fontWeight: 'bold',
   },
   metaText: {
-    color: '#ccc',
+    color: Theme.colors.textSecondary,
     fontSize: 14,
   },
   ratingChip: {
@@ -92,7 +92,7 @@ export const styles = StyleSheet.create({
     gap: 4,
   },
   ratingText: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 12,
     fontWeight: 'bold',
   },
@@ -123,16 +123,16 @@ export const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.4)',
   },
   trailerBtnText: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 14,
     fontWeight: 'bold',
   },
   infoContainer: {
     padding: Theme.spacing.lg,
-    backgroundColor: '#111',
+    backgroundColor: Theme.colors.surface,
   },
   sectionTitle: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 16,
     fontWeight: 'bold',
     marginTop: Theme.spacing.md,
@@ -141,7 +141,7 @@ export const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   description: {
-    color: '#ccc',
+    color: Theme.colors.textSecondary,
     fontSize: 15,
     lineHeight: 24,
     marginBottom: Theme.spacing.lg,
@@ -151,49 +151,49 @@ export const styles = StyleSheet.create({
     gap: 12,
   },
   dateChip: {
-    backgroundColor: '#222',
+    backgroundColor: Theme.colors.surface,
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 12,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: Theme.colors.cardBorder,
   },
   dateChipActive: {
     backgroundColor: Theme.colors.gold,
     borderColor: Theme.colors.gold,
   },
   dayName: {
-    color: '#888',
+    color: Theme.colors.textSecondary,
     fontSize: 12,
   },
   dayNumber: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 20,
     fontWeight: 'bold',
     marginVertical: 2,
   },
   monthLabel: {
-    color: '#888',
+    color: Theme.colors.textSecondary,
     fontSize: 10,
   },
   dateTextActive: {
     color: '#000',
   },
   cinemaGroup: {
-    backgroundColor: '#222',
+    backgroundColor: Theme.colors.surface,
     padding: Theme.spacing.md,
     borderRadius: Theme.radius.lg,
     marginBottom: Theme.spacing.md,
   },
   cinemaName: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 4,
   },
   cinemaLocation: {
-    color: '#888',
+    color: Theme.colors.textSecondary,
     fontSize: 12,
     marginBottom: 12,
   },
@@ -203,19 +203,19 @@ export const styles = StyleSheet.create({
     gap: 10,
   },
   showtimeCard: {
-    backgroundColor: '#333',
+    backgroundColor: Theme.colors.cardBorder,
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#444',
+    borderColor: Theme.colors.cardBorder,
   },
   showtimeCardActive: {
     backgroundColor: 'rgba(255, 193, 7, 0.1)',
     borderColor: Theme.colors.gold,
   },
   timeText: {
-    color: '#ccc',
+    color: Theme.colors.textSecondary,
     fontSize: 14,
     fontWeight: 'bold',
   },
@@ -231,7 +231,7 @@ export const styles = StyleSheet.create({
     paddingTop: Theme.spacing.md,
     paddingHorizontal: Theme.spacing.lg,
     borderTopWidth: 1,
-    borderTopColor: '#333',
+    borderTopColor: Theme.colors.cardBorder,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -242,7 +242,7 @@ export const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   cinemaText: {
-    color: '#888',
+    color: Theme.colors.textSecondary,
     fontSize: 12,
   },
   bookButton: {

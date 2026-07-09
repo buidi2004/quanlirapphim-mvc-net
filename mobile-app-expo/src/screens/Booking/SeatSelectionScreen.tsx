@@ -1,5 +1,6 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, SafeAreaView, Dimensions, StatusBar } from 'react-native';
+import { View, Text, TouchableOpacity, Dimensions, StatusBar, Alert } from 'react-native';
 import { BookingService } from '../../services/BookingService';
 import { SeatMapResponse, Seat } from '../../models/Booking';
 import { SeatItem } from '../../components/features/SeatItem';
@@ -53,9 +54,41 @@ export const SeatSelectionScreen = ({ route, navigation }: any) => {
     });
   };
 
-  const handleNext = () => {
+  const [holding, setHolding] = useState(false);
+
+  const handleNext = async () => {
     if (selectedSeats.length === 0) return;
-    navigation.navigate('Concession', { selectedSeats, showtimeId });
+    
+    setHolding(true);
+    try {
+      const res: any = await BookingService.holdSeats({
+        showtimeId: parseInt(showtimeId),
+        seatCodes: selectedSeats.map(s => s.code)
+      });
+      
+      const holdResult = res.data?.holdResult;
+      if (res.success && holdResult && holdResult.ticketIds) {
+        navigation.navigate('Concession', { 
+          selectedSeats, 
+          showtimeId, 
+          ticketIds: holdResult.ticketIds 
+        });
+      } else {
+        Alert.alert('Lỗi', res.message || 'Không thể giữ ghế, vui lòng thử lại.');
+      }
+    } catch (e: any) {
+      console.log('Error holding seats:', e?.message || e);
+      if (e.error && e.error.includes('401')) {
+        Alert.alert('Yêu cầu đăng nhập', 'Bạn cần đăng nhập tài khoản để có thể giữ ghế và đặt vé.', [
+          { text: 'Để sau', style: 'cancel' },
+          { text: 'Đăng nhập ngay', onPress: () => navigation.navigate('Login') }
+        ]);
+      } else {
+        Alert.alert('Lỗi', e.error || 'Ghế bạn chọn có thể đã được người khác đặt hoặc đã xảy ra lỗi.');
+      }
+    } finally {
+      setHolding(false);
+    }
   };
 
   if (loading) return (
@@ -71,7 +104,7 @@ export const SeatSelectionScreen = ({ route, navigation }: any) => {
   );
 
   const rows: { [key: string]: Seat[] } = {};
-  data.seats.forEach(seat => {
+  (data.seats || []).forEach(seat => {
     if (!rows[seat.row]) rows[seat.row] = [];
     rows[seat.row].push(seat);
   });
@@ -155,11 +188,15 @@ export const SeatSelectionScreen = ({ route, navigation }: any) => {
         </View>
         
         <TouchableOpacity 
-          style={[styles.bookButton, selectedSeats.length === 0 && { opacity: 0.5 }]}
-          disabled={selectedSeats.length === 0}
+          style={[styles.bookButton, (selectedSeats.length === 0 || holding) && { opacity: 0.5 }]}
+          disabled={selectedSeats.length === 0 || holding}
           onPress={handleNext}
         >
-          <Text style={styles.bookButtonText}>GIỮ GHẾ (15 PHÚT)</Text>
+          {holding ? (
+            <ActivityIndicator size="small" color="#000" />
+          ) : (
+            <Text style={styles.bookButtonText}>GIỮ GHẾ (15 PHÚT)</Text>
+          )}
         </TouchableOpacity>
       </View>
     </SafeAreaView>

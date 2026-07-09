@@ -16,9 +16,10 @@ async function runTests() {
   try {
     console.log('Testing Login...');
     const res = await axios.post(`${API_URL}/auth/login`, { email: 'test@example.com', password: 'Password123' });
-    if (res.data.success && res.data.token) {
-      token = res.data.token;
-      console.log(`✅ Success: Logged in as ${res.data.user.email}`);
+    const responseData = res.data.data || res.data;
+    if (res.data.success && responseData.token) {
+      token = responseData.token;
+      console.log(`✅ Success: Logged in as ${responseData.user.email}`);
     } else {
       console.log('❌ Failed: Invalid login response', res.data);
     }

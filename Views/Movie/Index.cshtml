@@ -73,7 +73,7 @@ else
                         <img src="@(movie.PosterUrl ?? "https://placehold.co/400x600/111/fff?text=No+Poster")"
                              class="card-img-top img-fluid rounded-top"
                              alt="@movie.Title"
-                             style="height: 300px; object-fit: cover;">
+                             style="height: 300px; object-fit: cover;" loading="lazy" decoding="async">
                         @if (movie.AgeRating != null)
                         {
                             <span class="badge position-absolute top-0 end-0 m-2 badge-@movie.AgeRating.ToLower()">

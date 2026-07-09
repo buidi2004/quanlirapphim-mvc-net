@@ -1,15 +1,26 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar, TextInput, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, StatusBar, TextInput, ScrollView, KeyboardAvoidingView, Platform, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { Theme } from '../../theme/tokens';
 import * as ImagePicker from 'expo-image-picker';
+import { AuthService } from '../../services/AuthService';
+import { IMAGE_BASE_URL } from '../../api/apiClient';
 
-export const EditProfileScreen = ({ navigation }: any) => {
-  const [avatarUri, setAvatarUri] = useState('https://ui-avatars.com/api/?name=Nguyen+Van+A&background=0D8ABC&color=fff');
-  const [name, setName] = useState('Nguyễn Văn A');
-  const [phone, setPhone] = useState('0901234567');
-  const [gender, setGender] = useState('Nam');
+export const EditProfileScreen = ({ route, navigation }: any) => {
+  const user = route.params?.user || {};
+  
+  const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName || user.username || 'User')}&background=0D8ABC&color=fff`;
+  const initialAvatar = user.avatarUrl 
+    ? (user.avatarUrl.startsWith('http') ? user.avatarUrl : `${IMAGE_BASE_URL}${user.avatarUrl}`)
+    : defaultAvatar;
+
+  const [avatarUri, setAvatarUri] = useState(initialAvatar);
+  const [name, setName] = useState(user.fullName || '');
+  const [phone, setPhone] = useState(user.phone || '');
+  const [gender, setGender] = useState(user.gender || 'Nam');
+  const [saving, setSaving] = useState(false);
 
   const pickAvatar = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -23,6 +34,32 @@ export const EditProfileScreen = ({ navigation }: any) => {
     }
   };
 
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      // If the user picked a new local image, you would normally upload it to an S3 or your backend first.
+      // For this demo, we'll just send the text fields.
+      const res = await AuthService.updateProfile({
+        fullName: name,
+        phone: phone,
+        gender: gender,
+        city: user.city || '',
+        dateOfBirth: user.dateOfBirth || ''
+      });
+      if (res.success) {
+        Alert.alert('Thành công', 'Đã cập nhật hồ sơ.', [
+          { text: 'OK', onPress: () => navigation.goBack() }
+        ]);
+      } else {
+        Alert.alert('Lỗi', res.error || 'Cập nhật thất bại.');
+      }
+    } catch (e: any) {
+      Alert.alert('Lỗi', e.message || 'Lỗi kết nối.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={Theme.colors.background} />
@@ -32,8 +69,8 @@ export const EditProfileScreen = ({ navigation }: any) => {
           <Ionicons name="chevron-back" size={24} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>CHỈNH SỬA HỒ SƠ</Text>
-        <TouchableOpacity style={styles.saveBtn} onPress={() => navigation.goBack()}>
-          <Text style={styles.saveBtnText}>Lưu</Text>
+        <TouchableOpacity style={styles.saveBtn} onPress={handleSave} disabled={saving}>
+          {saving ? <ActivityIndicator color={Theme.colors.gold} /> : <Text style={styles.saveBtnText}>Lưu</Text>}
         </TouchableOpacity>
       </View>
 
@@ -47,7 +84,7 @@ export const EditProfileScreen = ({ navigation }: any) => {
                 <Ionicons name="camera" size={16} color="#000" />
               </TouchableOpacity>
             </View>
-            <Text style={styles.emailText}>user@example.com</Text>
+            <Text style={styles.emailText}>{user.email || 'user@example.com'}</Text>
           </View>
 
           <View style={styles.formSection}>
@@ -106,7 +143,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Theme.spacing.md,
     paddingVertical: Theme.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#222',
+    borderBottomColor: Theme.colors.cardBorder,
   },
   backBtn: {
     width: 40,
@@ -115,7 +152,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   headerTitle: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -148,7 +185,7 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 50,
     borderWidth: 2,
-    borderColor: '#333',
+    borderColor: Theme.colors.cardBorder,
   },
   editAvatarBtn: {
     position: 'absolute',
@@ -164,30 +201,30 @@ const styles = StyleSheet.create({
     borderColor: Theme.colors.background,
   },
   emailText: {
-    color: '#888',
+    color: Theme.colors.textSecondary,
     fontSize: 14,
   },
   formSection: {
-    backgroundColor: '#111',
+    backgroundColor: Theme.colors.surface,
     padding: 20,
     borderRadius: Theme.radius.lg,
     borderWidth: 1,
-    borderColor: '#222',
+    borderColor: Theme.colors.cardBorder,
   },
   inputGroup: {
     marginBottom: 20,
   },
   label: {
-    color: '#888',
+    color: Theme.colors.textSecondary,
     fontSize: 13,
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#222',
+    backgroundColor: Theme.colors.surface,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: Theme.colors.cardBorder,
     borderRadius: Theme.radius.md,
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 16,
@@ -200,9 +237,9 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     alignItems: 'center',
-    backgroundColor: '#222',
+    backgroundColor: Theme.colors.surface,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: Theme.colors.cardBorder,
     borderRadius: Theme.radius.md,
   },
   genderChipActive: {
@@ -210,7 +247,7 @@ const styles = StyleSheet.create({
     borderColor: Theme.colors.gold,
   },
   genderText: {
-    color: '#888',
+    color: Theme.colors.textSecondary,
     fontSize: 15,
   },
   genderTextActive: {

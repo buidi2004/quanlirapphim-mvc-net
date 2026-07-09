@@ -1,5 +1,6 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, SafeAreaView, StatusBar, ToastAndroid, Platform } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, StatusBar, ToastAndroid, Platform } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
@@ -118,7 +119,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Theme.spacing.md,
     paddingVertical: Theme.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#222',
+    borderBottomColor: Theme.colors.cardBorder,
   },
   backBtn: {
     width: 40,
@@ -127,7 +128,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   headerTitle: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -135,7 +136,7 @@ const styles = StyleSheet.create({
     padding: Theme.spacing.md,
     backgroundColor: 'rgba(255, 193, 7, 0.05)',
     borderBottomWidth: 1,
-    borderBottomColor: '#333',
+    borderBottomColor: Theme.colors.cardBorder,
   },
   subHeaderText: {
     color: Theme.colors.gold,
@@ -146,12 +147,12 @@ const styles = StyleSheet.create({
     padding: Theme.spacing.md,
   },
   card: {
-    backgroundColor: '#222',
+    backgroundColor: Theme.colors.surface,
     borderRadius: Theme.radius.lg,
     overflow: 'hidden',
     marginBottom: Theme.spacing.lg,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: Theme.colors.cardBorder,
   },
   imageWrapper: {
     position: 'relative',
@@ -171,7 +172,7 @@ const styles = StyleSheet.create({
     transform: [{ rotate: '45deg' }],
   },
   ribbonText: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontWeight: '900',
     fontSize: 12,
   },
@@ -179,7 +180,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   title: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 12,
@@ -189,11 +190,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 12,
-    backgroundColor: '#111',
+    backgroundColor: Theme.colors.surface,
     borderRadius: 8,
     padding: 8,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: Theme.colors.cardBorder,
     borderStyle: 'dashed',
   },
   codeBox: {
@@ -208,14 +209,14 @@ const styles = StyleSheet.create({
   copyBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#333',
+    backgroundColor: Theme.colors.cardBorder,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 4,
     gap: 4,
   },
   copyText: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 12,
     fontWeight: '600',
   },
@@ -229,7 +230,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   metaText: {
-    color: '#888',
+    color: Theme.colors.textSecondary,
     fontSize: 12,
   }
 });

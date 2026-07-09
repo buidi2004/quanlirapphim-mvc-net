@@ -1,69 +1,70 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, SafeAreaView, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const MOCK_TICKETS = [
-  {
-    id: '#CX000123',
-    movieTitle: 'Avengers Endgame',
-    date: '10/07',
-    time: '15:30',
-    seat: 'C3',
-    price: 90000,
-    status: 'paid',
-    purchaseTime: '09/07 10:30',
-  },
-  {
-    id: '#CX000124',
-    movieTitle: 'Dune: Part Two',
-    date: '12/07',
-    time: '19:30',
-    seat: 'E1, E2',
-    price: 180000,
-    status: 'paid',
-    purchaseTime: '10/07 08:15',
-  }
-];
+import { TicketService } from '../../services/TicketService';
+import { TicketHistoryItem } from '../../models/Ticket';
 
 export const MyTicketsScreen = ({ navigation }: any) => {
   const insets = useSafeAreaInsets();
+  const [tickets, setTickets] = React.useState<TicketHistoryItem[]>([]);
+  const [loading, setLoading] = React.useState(true);
 
-  const renderTicket = ({ item }: { item: typeof MOCK_TICKETS[0] }) => (
-    <View style={styles.ticketCard}>
+  React.useEffect(() => {
+    fetchTickets();
+  }, []);
+
+  const fetchTickets = async () => {
+    try {
+      setLoading(true);
+      const res = await TicketService.getMyTickets();
+      if (res.success) {
+        setTickets(res.data);
+      }
+    } catch (error: any) {
+      console.log('Error fetching tickets:', error?.message || error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const renderTicket = ({ item }: { item: TicketHistoryItem }) => (
+    <TouchableOpacity style={styles.ticketCard} onPress={() => navigation.navigate('TicketDetail', { ticketId: item.id })}>
       <View style={styles.cardHeader}>
         <View style={styles.brandRow}>
           <Ionicons name="ticket" size={16} color={Theme.colors.gold} />
           <Text style={styles.brandText}>CinemaX Ticket</Text>
         </View>
         <View style={styles.statusBadge}>
-          <Text style={styles.statusText}>✅ Đã TT</Text>
+          <Text style={styles.statusText}>{item.status === 'paid' ? '✅ Đã TT' : '⏳ Chờ TT'}</Text>
         </View>
       </View>
 
       <View style={styles.cardBody}>
-        <Text style={styles.movieTitle}>{item.movieTitle}</Text>
+        <Text style={styles.movieTitle}>{item.movie_title}</Text>
         
         <View style={styles.infoGrid}>
           <View style={styles.infoCol}>
             <Text style={styles.infoLabel}>Ngày chiếu</Text>
-            <Text style={styles.infoValue}>📅 {item.date}</Text>
+            <Text style={styles.infoValue}>📅 {item.show_date}</Text>
           </View>
           <View style={styles.infoCol}>
             <Text style={styles.infoLabel}>Giờ chiếu</Text>
-            <Text style={styles.infoValue}>⏰ {item.time}</Text>
+            <Text style={styles.infoValue}>⏰ {item.start_time}</Text>
           </View>
         </View>
 
         <View style={styles.infoGrid}>
           <View style={styles.infoCol}>
             <Text style={styles.infoLabel}>Ghế</Text>
-            <Text style={styles.infoValueGold}>💺 {item.seat}</Text>
+            <Text style={styles.infoValueGold}>💺 {item.seat_code}</Text>
           </View>
           <View style={styles.infoCol}>
             <Text style={styles.infoLabel}>Giá vé</Text>
-            <Text style={styles.infoValue}>💰 {item.price.toLocaleString('vi-VN')}₫</Text>
+            <Text style={styles.infoValue}>💰 {item.total_price.toLocaleString('vi-VN')}₫</Text>
           </View>
         </View>
       </View>
@@ -77,11 +78,11 @@ export const MyTicketsScreen = ({ navigation }: any) => {
       <View style={styles.cardFooter}>
         <View>
           <Text style={styles.footerLabel}>Mã Giao Dịch:</Text>
-          <Text style={styles.footerValue}>{item.id}</Text>
+          <Text style={styles.footerValue}>#CX{item.id.toString().padStart(6, '0')}</Text>
         </View>
         <View style={{ alignItems: 'flex-end' }}>
           <Text style={styles.footerLabel}>Mua lúc:</Text>
-          <Text style={styles.footerValue}>{item.purchaseTime}</Text>
+          <Text style={styles.footerValue}>{item.booked_at}</Text>
         </View>
       </View>
       
@@ -92,7 +93,7 @@ export const MyTicketsScreen = ({ navigation }: any) => {
         <Ionicons name="document-text-outline" size={16} color={Theme.colors.textPrimary} />
         <Text style={styles.invoiceText}>Yêu cầu Hóa đơn</Text>
       </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -107,7 +108,11 @@ export const MyTicketsScreen = ({ navigation }: any) => {
         <View style={{ width: 40 }} />
       </View>
 
-      {MOCK_TICKETS.length === 0 ? (
+      {loading ? (
+        <View style={styles.emptyContainer}>
+           <Text style={{color: '#fff'}}>Đang tải...</Text>
+        </View>
+      ) : tickets.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Ionicons name="ticket-outline" size={80} color="#444" />
           <Text style={styles.emptyText}>Bạn chưa mua vé nào</Text>
@@ -117,8 +122,8 @@ export const MyTicketsScreen = ({ navigation }: any) => {
         </View>
       ) : (
         <FlatList
-          data={MOCK_TICKETS}
-          keyExtractor={item => item.id}
+          data={tickets}
+          keyExtractor={item => item.id.toString()}
           contentContainerStyle={[styles.listContent, { paddingBottom: Math.max(insets.bottom, 20) }]}
           showsVerticalScrollIndicator={false}
           renderItem={renderTicket}
@@ -140,7 +145,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Theme.spacing.md,
     paddingVertical: Theme.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#222',
+    borderBottomColor: Theme.colors.cardBorder,
   },
   backBtn: {
     width: 40,
@@ -149,7 +154,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   headerTitle: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -160,7 +165,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   emptyText: {
-    color: '#aaa',
+    color: Theme.colors.textSecondary,
     fontSize: 16,
     marginTop: 16,
     marginBottom: 24,
@@ -190,7 +195,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: '#222',
+    backgroundColor: Theme.colors.surface,
   },
   brandRow: {
     flexDirection: 'row',
@@ -232,7 +237,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   infoLabel: {
-    color: '#666',
+    color: Theme.colors.textMuted,
     fontSize: 12,
     marginBottom: 4,
   },
@@ -286,7 +291,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
   },
   footerLabel: {
-    color: '#888',
+    color: Theme.colors.textSecondary,
     fontSize: 10,
     marginBottom: 2,
   },

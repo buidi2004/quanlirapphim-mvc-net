@@ -1,7 +1,8 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  SafeAreaView, StatusBar, Animated,
+  StatusBar, Animated,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
@@ -76,7 +77,7 @@ const PAGE_CONTENT: Record<string, { title: string; icon: string; sections: { he
   },
   app_download: {
     title: 'Tải Ứng Dụng',
-    icon: '📱',
+    icon: "phone-portrait-outline",
     sections: [
       { heading: 'CinemaX trên di động', content: 'Ứng dụng CinemaX có mặt trên cả iOS và Android, được thiết kế để mang đến trải nghiệm đặt vé nhanh nhất và tiện lợi nhất.' },
       { heading: 'Tính năng nổi bật', content: '• Đặt vé nhanh trong 60 giây\n• Lịch chiếu cập nhật theo thời gian thực\n• Vé điện tử với mã QR\n• Tích điểm thưởng tự động\n• Thông báo phim mới và ưu đãi\n• Tìm rạp gần nhất bằng GPS' },
@@ -208,16 +209,16 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: Theme.spacing.md, paddingVertical: Theme.spacing.md,
-    borderBottomWidth: 1, borderBottomColor: '#1a1a2e',
+    borderBottomWidth: 1, borderBottomColor: Theme.colors.cardBorder,
   },
   backBtn: { width: 40, height: 40, justifyContent: 'center' },
-  headerTitle: { color: '#fff', fontSize: 13, fontWeight: 'bold', flex: 1, textAlign: 'center' },
+  headerTitle: { color: Theme.colors.textPrimary, fontSize: 13, fontWeight: 'bold', flex: 1, textAlign: 'center' },
 
   content: { padding: Theme.spacing.lg, paddingBottom: 40 },
 
   pageHeader: { alignItems: 'center', paddingVertical: 24, gap: 12, marginBottom: 8 },
   pageIcon: { fontSize: 48 },
-  pageTitle: { color: '#fff', fontSize: 22, fontWeight: '800', textAlign: 'center' },
+  pageTitle: { color: Theme.colors.textPrimary, fontSize: 22, fontWeight: '800', textAlign: 'center' },
 
   section: {
     backgroundColor: Theme.colors.surface, borderRadius: Theme.radius.lg,
@@ -226,7 +227,7 @@ const styles = StyleSheet.create({
   sectionHeading: {
     color: Theme.colors.warning, fontSize: 14, fontWeight: 'bold', marginBottom: 10,
   },
-  sectionContent: { color: '#aaa', fontSize: 14, lineHeight: 22 },
+  sectionContent: { color: Theme.colors.textSecondary, fontSize: 14, lineHeight: 22 },
 
   // FAQ
   faqList: { gap: 8 },
@@ -235,11 +236,11 @@ const styles = StyleSheet.create({
     padding: 16, borderWidth: 1, borderColor: Theme.colors.cardBorder,
   },
   faqHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12 },
-  faqQuestion: { color: '#fff', fontSize: 14, fontWeight: '600', flex: 1, lineHeight: 20 },
-  faqAnswer: { color: '#aaa', fontSize: 13, lineHeight: 21, marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#222' },
+  faqQuestion: { color: Theme.colors.textPrimary, fontSize: 14, fontWeight: '600', flex: 1, lineHeight: 20 },
+  faqAnswer: { color: Theme.colors.textSecondary, fontSize: 13, lineHeight: 21, marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: Theme.colors.cardBorder },
 
   ctaSection: { marginTop: 24, alignItems: 'center', gap: 12 },
-  ctaText: { color: '#888', fontSize: 14 },
+  ctaText: { color: Theme.colors.textSecondary, fontSize: 14 },
   ctaBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
     backgroundColor: Theme.colors.warning, paddingHorizontal: 24, paddingVertical: 12,

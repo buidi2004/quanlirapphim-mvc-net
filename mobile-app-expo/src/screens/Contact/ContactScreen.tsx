@@ -1,5 +1,6 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar, TextInput, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, StatusBar, TextInput, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
 
@@ -159,7 +160,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Theme.spacing.md,
     paddingVertical: Theme.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#222',
+    borderBottomColor: Theme.colors.cardBorder,
   },
   backBtn: {
     width: 40,
@@ -168,7 +169,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   headerTitle: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -179,7 +180,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   sectionTitle: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 16,
@@ -189,16 +190,16 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   label: {
-    color: '#aaa',
+    color: Theme.colors.textSecondary,
     fontSize: 13,
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#111',
+    backgroundColor: Theme.colors.surface,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: Theme.colors.cardBorder,
     borderRadius: Theme.radius.md,
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 15,
@@ -210,15 +211,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#111',
+    backgroundColor: Theme.colors.surface,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: Theme.colors.cardBorder,
     borderRadius: Theme.radius.md,
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
   dropdownText: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 15,
   },
   submitBtn: {
@@ -235,7 +236,7 @@ const styles = StyleSheet.create({
   },
   infoCard: {
     flexDirection: 'row',
-    backgroundColor: '#1a1a1a',
+    backgroundColor: Theme.colors.surface,
     borderRadius: Theme.radius.md,
     padding: 16,
     marginBottom: 12,
@@ -247,18 +248,18 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   infoTitle: {
-    color: '#aaa',
+    color: Theme.colors.textSecondary,
     fontSize: 13,
     marginBottom: 4,
   },
   infoValue: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 2,
   },
   infoDesc: {
-    color: '#666',
+    color: Theme.colors.textMuted,
     fontSize: 12,
   }
 });

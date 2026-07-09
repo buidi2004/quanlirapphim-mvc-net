@@ -24,6 +24,12 @@ public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExcep
 
     private static Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
+        if (!context.Request.Path.StartsWithSegments("/api"))
+        {
+            // Rethrow to let the default ASP.NET Core exception handler or Developer Exception Page handle it for web views
+            throw exception;
+        }
+
         context.Response.ContentType = "application/json";
 
         var statusCode = exception switch

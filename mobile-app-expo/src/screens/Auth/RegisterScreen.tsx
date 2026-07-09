@@ -1,5 +1,6 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, SafeAreaView, ActivityIndicator, StatusBar } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator, StatusBar } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthService } from '../../services/AuthService';
@@ -27,15 +28,15 @@ export const RegisterScreen = ({ navigation }: any) => {
     try {
       setLoading(true);
       setError(null);
-      const res = await AuthService.register(name, email, password);
+      const res = await AuthService.register(name, email, password, name, phone);
       if (res.success) {
         // Tự động chuyển về login hoặc đăng nhập luôn
         navigation.navigate('Login');
       } else {
-        setError(res.error || 'Đăng ký thất bại');
+        setError(res.message || 'Đăng ký thất bại');
       }
     } catch (e: any) {
-      setError('Lỗi kết nối. Vui lòng thử lại sau.');
+      setError(e.message || 'Lỗi kết nối. Vui lòng thử lại sau.');
     } finally {
       setLoading(false);
     }
@@ -70,7 +71,7 @@ export const RegisterScreen = ({ navigation }: any) => {
               <TextInput 
                 style={styles.input}
                 placeholder="Họ và tên..."
-                placeholderTextColor="#666"
+                placeholderTextColor="#aaa"
                 value={name}
                 onChangeText={setName}
               />
@@ -81,7 +82,7 @@ export const RegisterScreen = ({ navigation }: any) => {
               <TextInput 
                 style={styles.input}
                 placeholder="Email của bạn..."
-                placeholderTextColor="#666"
+                placeholderTextColor="#aaa"
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
@@ -94,7 +95,7 @@ export const RegisterScreen = ({ navigation }: any) => {
               <TextInput 
                 style={styles.input}
                 placeholder="Số điện thoại..."
-                placeholderTextColor="#666"
+                placeholderTextColor="#aaa"
                 value={phone}
                 onChangeText={setPhone}
                 keyboardType="phone-pad"
@@ -106,7 +107,7 @@ export const RegisterScreen = ({ navigation }: any) => {
               <TextInput 
                 style={styles.input}
                 placeholder="Mật khẩu..."
-                placeholderTextColor="#666"
+                placeholderTextColor="#aaa"
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
@@ -118,7 +119,7 @@ export const RegisterScreen = ({ navigation }: any) => {
               <TextInput 
                 style={styles.input}
                 placeholder="Xác nhận mật khẩu..."
-                placeholderTextColor="#666"
+                placeholderTextColor="#aaa"
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
                 secureTextEntry

@@ -15,7 +15,7 @@ public class UserService(IUserRepository userRepo) : IUserService
         return user;
     }
 
-    public async Task<User> RegisterAsync(string username, string email, string password)
+    public async Task<User> RegisterAsync(string username, string email, string password, string fullName = "", string phone = "")
     {
         var existing = await userRepo.FindByEmailAsync(email);
         if (existing != null)
@@ -26,7 +26,9 @@ public class UserService(IUserRepository userRepo) : IUserService
             Username     = username,
             Email        = email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
-            Role         = "user"
+            Role         = "user",
+            FullName     = fullName,
+            Phone        = phone
         };
 
         var id = await userRepo.CreateAsync(user);

@@ -1,7 +1,7 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, SafeAreaView,
-  StatusBar, ScrollView,
+  View, Text, StyleSheet, TouchableOpacity, StatusBar, ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
@@ -151,26 +151,26 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: Theme.spacing.md, paddingVertical: Theme.spacing.md,
-    borderBottomWidth: 1, borderBottomColor: '#1a1a2e',
+    borderBottomWidth: 1, borderBottomColor: Theme.colors.cardBorder,
   },
   backBtn: { width: 40, height: 40, justifyContent: 'center' },
-  headerTitle: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+  headerTitle: { color: Theme.colors.textPrimary, fontSize: 16, fontWeight: 'bold' },
 
   content: { padding: Theme.spacing.md, gap: Theme.spacing.md },
 
   statusCard: {
-    backgroundColor: '#12121e', borderRadius: Theme.radius.xl,
-    padding: 20, borderWidth: 1, borderColor: '#2d2d44',
+    backgroundColor: Theme.colors.surface, borderRadius: Theme.radius.xl,
+    padding: 20, borderWidth: 1, borderColor: Theme.colors.cardBorder,
   },
   statusHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 },
-  statusCodeLabel: { color: '#666', fontSize: 10, letterSpacing: 1, marginBottom: 4 },
+  statusCodeLabel: { color: Theme.colors.textMuted, fontSize: 10, letterSpacing: 1, marginBottom: 4 },
   statusCode: { color: Theme.colors.warning, fontSize: 22, fontWeight: '800' },
   statusBadge: {
     flexDirection: 'row', alignItems: 'center', gap: 4,
     paddingHorizontal: 10, paddingVertical: 6, borderRadius: Theme.radius.pill, borderWidth: 1,
   },
   statusLabel: { fontSize: 11, fontWeight: 'bold' },
-  statusDate: { color: '#666', fontSize: 12 },
+  statusDate: { color: Theme.colors.textMuted, fontSize: 12 },
 
   section: {
     backgroundColor: Theme.colors.surface, borderRadius: Theme.radius.lg,
@@ -179,14 +179,14 @@ const styles = StyleSheet.create({
   sectionTitle: { color: Theme.colors.warning, fontSize: 14, fontWeight: 'bold', marginBottom: 14 },
 
   infoRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
-  infoLabel: { color: '#888', fontSize: 13, minWidth: 55 },
+  infoLabel: { color: Theme.colors.textSecondary, fontSize: 13, minWidth: 55 },
   infoValue: { color: '#ddd', fontSize: 13, flex: 1 },
 
   messageBox: {
     borderLeftWidth: 3, borderLeftColor: Theme.colors.warning,
     backgroundColor: 'rgba(255,193,7,0.05)', padding: 14, borderRadius: Theme.radius.md,
   },
-  messageText: { color: '#ccc', fontSize: 14, lineHeight: 22 },
+  messageText: { color: Theme.colors.textSecondary, fontSize: 14, lineHeight: 22 },
 
   replyBox: {
     backgroundColor: 'rgba(25,135,84,0.05)', borderRadius: Theme.radius.lg,
@@ -197,17 +197,17 @@ const styles = StyleSheet.create({
     width: 36, height: 36, borderRadius: 18,
     backgroundColor: 'rgba(255,193,7,0.1)', justifyContent: 'center', alignItems: 'center',
   },
-  replyAgentName: { color: '#fff', fontSize: 14, fontWeight: 'bold' },
-  replyTime: { color: '#888', fontSize: 11, marginTop: 2 },
-  replyContent: { color: '#ccc', fontSize: 14, lineHeight: 22 },
+  replyAgentName: { color: Theme.colors.textPrimary, fontSize: 14, fontWeight: 'bold' },
+  replyTime: { color: Theme.colors.textSecondary, fontSize: 11, marginTop: 2 },
+  replyContent: { color: Theme.colors.textSecondary, fontSize: 14, lineHeight: 22 },
 
   pendingBox: {
     flexDirection: 'row', alignItems: 'flex-start', gap: 12,
     backgroundColor: 'rgba(13,202,240,0.05)', padding: 14,
     borderRadius: Theme.radius.lg, borderWidth: 1, borderColor: 'rgba(13,202,240,0.2)',
   },
-  pendingTitle: { color: '#fff', fontSize: 14, fontWeight: 'bold', marginBottom: 4 },
-  pendingSubtitle: { color: '#888', fontSize: 12 },
+  pendingTitle: { color: Theme.colors.textPrimary, fontSize: 14, fontWeight: 'bold', marginBottom: 4 },
+  pendingSubtitle: { color: Theme.colors.textSecondary, fontSize: 12 },
 
   actions: { gap: 12, paddingBottom: 20 },
   newRequestBtn: {
@@ -217,8 +217,8 @@ const styles = StyleSheet.create({
   newRequestText: { color: Theme.colors.warning, fontWeight: 'bold', fontSize: 15 },
   homeBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
-    backgroundColor: '#222', borderRadius: Theme.radius.lg, paddingVertical: 14,
-    borderWidth: 1, borderColor: '#333',
+    backgroundColor: Theme.colors.surface, borderRadius: Theme.radius.lg, paddingVertical: 14,
+    borderWidth: 1, borderColor: Theme.colors.cardBorder,
   },
-  homeBtnText: { color: '#fff', fontWeight: 'bold', fontSize: 15 },
+  homeBtnText: { color: Theme.colors.textPrimary, fontWeight: 'bold', fontSize: 15 },
 });

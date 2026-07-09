@@ -12,17 +12,24 @@ public class ShowtimeRepository(IDbConnection db) : IShowtimeRepository
         const string sql = @"
             SELECT s.id, s.movie_id AS MovieId, s.room_id AS RoomId,
                    s.show_date AS ShowDate, s.start_time AS StartTime, s.price, s.created_at AS CreatedAt,
-                   r.id, r.name, r.total_rows AS TotalRows, r.seats_per_row AS SeatsPerRow
+                   r.id, r.cinema_id AS CinemaId, r.name, r.total_rows AS TotalRows, r.seats_per_row AS SeatsPerRow,
+                   c.id, c.name, c.province, c.district, c.address, c.slug
             FROM showtimes s
             JOIN rooms r ON r.id = s.room_id
+            JOIN cinemas c ON c.id = r.cinema_id
             WHERE s.movie_id = @movieId AND s.show_date = @date
             ORDER BY s.start_time";
 
-        var showtimes = await db.QueryAsync<Showtime, Room, Showtime>(
+        var showtimes = await db.QueryAsync<Showtime, Room, Cinema, Showtime>(
             sql,
-            (showtime, room) => { showtime.Room = room; return showtime; },
+            (showtime, room, cinema) => 
+            { 
+                room.Cinema = cinema; 
+                showtime.Room = room; 
+                return showtime; 
+            },
             new { movieId, date = date.ToString("yyyy-MM-dd") },
-            splitOn: "id"
+            splitOn: "id,id"
         );
         return showtimes;
     }
@@ -110,7 +117,7 @@ public class ShowtimeRepository(IDbConnection db) : IShowtimeRepository
         var totalCount = await db.ExecuteScalarAsync<int>(countSql);
 
         var sql = @"
-            SELECT s.id, s.movie_id AS MovieId, s.room_id AS RoomId, s.show_date AS ShowDate, s.start_time AS StartTime, s.end_time AS EndTime, s.price,
+            SELECT s.id, s.movie_id AS MovieId, s.room_id AS RoomId, s.show_date AS ShowDate, s.start_time AS StartTime, s.price,
                    m.id, m.title,
                    r.id, r.name,
                    c.id, c.name

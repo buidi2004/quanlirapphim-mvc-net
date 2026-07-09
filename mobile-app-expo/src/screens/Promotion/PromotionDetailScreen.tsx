@@ -1,5 +1,6 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar, ScrollView, Platform, ToastAndroid } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, StatusBar, ScrollView, Platform, ToastAndroid } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
@@ -151,7 +152,7 @@ const styles = StyleSheet.create({
     transform: [{ rotate: '-5deg' }],
   },
   promoBadgeText: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 24,
     fontWeight: '900',
   },
@@ -160,7 +161,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   title: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 24,
@@ -168,12 +169,12 @@ const styles = StyleSheet.create({
   },
   statsRow: {
     flexDirection: 'row',
-    backgroundColor: '#222',
+    backgroundColor: Theme.colors.surface,
     borderRadius: Theme.radius.lg,
     padding: Theme.spacing.md,
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: Theme.colors.cardBorder,
   },
   statBox: {
     flex: 1,
@@ -181,17 +182,17 @@ const styles = StyleSheet.create({
   },
   statDivider: {
     width: 1,
-    backgroundColor: '#333',
+    backgroundColor: Theme.colors.cardBorder,
     marginHorizontal: 16,
   },
   statLabel: {
-    color: '#888',
+    color: Theme.colors.textSecondary,
     fontSize: 12,
     marginTop: 8,
     marginBottom: 4,
   },
   statValue: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 14,
     fontWeight: 'bold',
   },
@@ -211,7 +212,7 @@ const styles = StyleSheet.create({
     borderColor: '#4CAF50',
   },
   copyLabel: {
-    color: '#aaa',
+    color: Theme.colors.textSecondary,
     fontSize: 12,
     marginBottom: 4,
   },
@@ -233,7 +234,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   sectionTitle: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 12,
@@ -252,7 +253,7 @@ const styles = StyleSheet.create({
     backgroundColor: Theme.colors.surface,
     padding: Theme.spacing.lg,
     borderTopWidth: 1,
-    borderTopColor: '#333',
+    borderTopColor: Theme.colors.cardBorder,
   },
   bookBtn: {
     flexDirection: 'row',

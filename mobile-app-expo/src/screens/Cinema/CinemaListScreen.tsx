@@ -1,34 +1,63 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, SafeAreaView, StatusBar, Linking } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, StatusBar, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
 import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withTiming, withSequence } from 'react-native-reanimated';
 
-const CITIES = ['Hồ Chí Minh', 'Hà Nội', 'Đà Nẵng', 'Hải Phòng', 'Cần Thơ'];
-
-const MOCK_CINEMAS = [
-  { id: '1', name: 'CinemaX Nguyễn Du', address: '116 Nguyễn Du, Q.1, TP.HCM', distance: 1.2, hasIMAX: true },
-  { id: '2', name: 'CinemaX Landmark', address: 'Vincom Landmark 81, Q.Bình Thạnh, TP.HCM', distance: 3.5, hasIMAX: false },
-  { id: '3', name: 'CinemaX Sư Vạn Hạnh', address: 'Tầng 6 Vạn Hạnh Mall, Q.10, TP.HCM', distance: 5.1, hasIMAX: true },
-];
+import { CinemaService } from '../../services/CinemaService';
+import { Cinema } from '../../models/Cinema';
 
 export const CinemaListScreen = ({ navigation }: any) => {
-  const [activeCity, setActiveCity] = useState('Hồ Chí Minh');
+  const [activeCity, setActiveCity] = useState<string>('Hồ Chí Minh');
+  const [cities, setCities] = useState<string[]>([]);
+  const [cinemas, setCinemas] = useState<Cinema[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedCinema, setSelectedCinema] = useState<string | null>(null);
 
   // Animation cho icon định vị
   const bounceValue = useSharedValue(0);
 
   useEffect(() => {
-    bounceValue.value = withRepeat(
-      withSequence(
-        withTiming(-5, { duration: 500 }),
-        withTiming(0, { duration: 500 })
-      ),
-      -1,
-      true
-    );
+    fetchProvinces();
   }, []);
+
+  useEffect(() => {
+    if (activeCity) {
+      fetchCinemas(activeCity);
+    }
+  }, [activeCity]);
+
+  const fetchProvinces = async () => {
+    try {
+      const res = await CinemaService.getProvinces();
+      if (res.success && res.data.length > 0) {
+        setCities(res.data);
+        if (!res.data.includes(activeCity)) {
+           setActiveCity(res.data[0]);
+        }
+      } else {
+        // Fallback
+        setCities(['Hồ Chí Minh', 'Hà Nội', 'Đà Nẵng']);
+      }
+    } catch (e) {
+      setCities(['Hồ Chí Minh', 'Hà Nội', 'Đà Nẵng']);
+    }
+  };
+
+  const fetchCinemas = async (province: string) => {
+    setLoading(true);
+    try {
+      const res = await CinemaService.getCinemas(province);
+      if (res.success) {
+        setCinemas(res.data);
+      }
+    } catch (e: any) {
+      console.log('Error fetching cinemas:', e?.message || e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const animatedIconStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: bounceValue.value }]
@@ -39,34 +68,23 @@ export const CinemaListScreen = ({ navigation }: any) => {
     Linking.openURL(url);
   };
 
-  const renderCinema = ({ item }: { item: any }) => {
-    const isSelected = selectedCinema === item.id;
+  const renderCinema = ({ item }: { item: Cinema }) => {
+    const isSelected = selectedCinema === item.id.toString();
     return (
       <TouchableOpacity 
         style={[styles.cinemaCard, isSelected && styles.cinemaCardSelected]}
-        onPress={() => setSelectedCinema(item.id)}
+        onPress={() => navigation.navigate('CinemaDetail', { cinema: item })}
       >
         <View style={styles.cardHeader}>
           <Text style={[styles.cinemaName, isSelected && { color: Theme.colors.gold }]}>{item.name}</Text>
-          {item.hasIMAX && (
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>IMAX</Text>
-            </View>
-          )}
         </View>
         <Text style={styles.address}>{item.address}</Text>
         
         <View style={styles.cardFooter}>
           <View style={styles.distanceRow}>
-            {isSelected ? (
-              <Animated.View style={animatedIconStyle}>
-                <Ionicons name="location" size={16} color={Theme.colors.accent} />
-              </Animated.View>
-            ) : (
-              <Ionicons name="location-outline" size={16} color="#888" />
-            )}
+            <Ionicons name="location-outline" size={16} color="#888" />
             <Text style={[styles.distance, isSelected && { color: Theme.colors.accent }]}>
-              Cách bạn {item.distance} km
+              {item.distance ? `Cách bạn ${item.distance} km` : item.province}
             </Text>
           </View>
           
@@ -91,7 +109,7 @@ export const CinemaListScreen = ({ navigation }: any) => {
         <FlatList
           horizontal
           showsHorizontalScrollIndicator={false}
-          data={CITIES}
+          data={cities}
           keyExtractor={item => item}
           contentContainerStyle={styles.cityList}
           renderItem={({ item }) => (
@@ -106,11 +124,14 @@ export const CinemaListScreen = ({ navigation }: any) => {
       </View>
 
       <FlatList
-        data={MOCK_CINEMAS}
-        keyExtractor={item => item.id}
+        data={cinemas}
+        keyExtractor={item => item.id.toString()}
         contentContainerStyle={styles.listContent}
         renderItem={renderCinema}
         showsVerticalScrollIndicator={false}
+        ListEmptyComponent={
+           loading ? <Text style={{textAlign: 'center', marginTop: 20, color: Theme.colors.textSecondary}}>Đang tải rạp...</Text> : <Text style={{textAlign: 'center', marginTop: 20, color: Theme.colors.textSecondary}}>Không có rạp nào ở khu vực này</Text>
+        }
       />
     </SafeAreaView>
   );
@@ -124,17 +145,17 @@ const styles = StyleSheet.create({
   header: {
     padding: Theme.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#222',
+    borderBottomColor: Theme.colors.cardBorder,
     alignItems: 'center',
   },
   headerTitle: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 16,
     fontWeight: 'bold',
   },
   citySelector: {
     borderBottomWidth: 1,
-    borderBottomColor: '#222',
+    borderBottomColor: Theme.colors.cardBorder,
     paddingVertical: Theme.spacing.sm,
   },
   cityList: {
@@ -145,16 +166,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#222',
+    backgroundColor: Theme.colors.surface,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: Theme.colors.cardBorder,
   },
   cityChipActive: {
     backgroundColor: 'rgba(255, 193, 7, 0.1)',
     borderColor: Theme.colors.gold,
   },
   cityChipText: {
-    color: '#aaa',
+    color: Theme.colors.textSecondary,
     fontSize: 13,
   },
   cityChipTextActive: {
@@ -165,12 +186,12 @@ const styles = StyleSheet.create({
     padding: Theme.spacing.md,
   },
   cinemaCard: {
-    backgroundColor: '#222',
+    backgroundColor: Theme.colors.surface,
     borderRadius: Theme.radius.lg,
     padding: Theme.spacing.md,
     marginBottom: Theme.spacing.md,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: Theme.colors.cardBorder,
   },
   cinemaCardSelected: {
     borderColor: Theme.colors.gold,
@@ -183,7 +204,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   cinemaName: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -201,7 +222,7 @@ const styles = StyleSheet.create({
     fontWeight: '900',
   },
   address: {
-    color: '#aaa',
+    color: Theme.colors.textSecondary,
     fontSize: 13,
     marginBottom: 16,
     lineHeight: 18,
@@ -211,7 +232,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: '#333',
+    borderTopColor: Theme.colors.cardBorder,
     paddingTop: 12,
   },
   distanceRow: {
@@ -220,7 +241,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   distance: {
-    color: '#888',
+    color: Theme.colors.textSecondary,
     fontSize: 12,
   },
   mapBtn: {

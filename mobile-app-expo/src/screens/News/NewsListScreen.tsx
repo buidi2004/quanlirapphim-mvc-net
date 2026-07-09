@@ -1,5 +1,6 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, SafeAreaView, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, StatusBar } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
@@ -114,7 +115,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Theme.spacing.md,
     paddingVertical: Theme.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#222',
+    borderBottomColor: Theme.colors.cardBorder,
   },
   backBtn: {
     width: 40,
@@ -123,7 +124,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   headerTitle: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -157,31 +158,31 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   categoryText: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 10,
     fontWeight: '900',
     textTransform: 'uppercase',
   },
   featuredTitle: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 8,
     lineHeight: 30,
   },
   featuredSummary: {
-    color: '#ccc',
+    color: Theme.colors.textSecondary,
     fontSize: 14,
     lineHeight: 20,
   },
   newsCard: {
     flexDirection: 'row',
-    backgroundColor: '#111',
+    backgroundColor: Theme.colors.surface,
     borderRadius: Theme.radius.md,
     overflow: 'hidden',
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#222',
+    borderColor: Theme.colors.cardBorder,
   },
   newsImage: {
     width: 120,
@@ -204,18 +205,18 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   newsDate: {
-    color: '#666',
+    color: Theme.colors.textMuted,
     fontSize: 10,
   },
   newsTitle: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 14,
     fontWeight: 'bold',
     marginBottom: 6,
     lineHeight: 20,
   },
   newsSummary: {
-    color: '#888',
+    color: Theme.colors.textSecondary,
     fontSize: 12,
     lineHeight: 18,
     marginBottom: 8,

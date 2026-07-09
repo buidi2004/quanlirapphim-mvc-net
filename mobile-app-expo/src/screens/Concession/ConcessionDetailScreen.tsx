@@ -1,7 +1,8 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  SafeAreaView, StatusBar, Dimensions,
+  StatusBar, Dimensions,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -274,7 +275,7 @@ const styles = StyleSheet.create({
     borderRadius: 8, transform: [{ rotate: '-5deg' }],
     borderWidth: 2, borderColor: '#fff',
   },
-  discountText: { color: '#fff', fontWeight: '900', fontSize: 20 },
+  discountText: { color: Theme.colors.textPrimary, fontWeight: '900', fontSize: 20 },
   heroContent: { padding: Theme.spacing.lg, paddingBottom: Theme.spacing.xl },
   limitedBadge: {
     flexDirection: 'row', alignItems: 'center',
@@ -284,12 +285,12 @@ const styles = StyleSheet.create({
   },
   limitedText: { color: '#000', fontSize: 10, fontWeight: '900' },
   heroTitle: {
-    color: '#fff', fontSize: 28, fontWeight: '900', marginBottom: 8,
+    color: Theme.colors.textPrimary, fontSize: 28, fontWeight: '900', marginBottom: 8,
     textShadowColor: 'rgba(0,0,0,0.8)',
     textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 6,
   },
   priceRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  originalPrice: { color: '#999', fontSize: 16, textDecorationLine: 'line-through' },
+  originalPrice: { color: Theme.colors.textSecondary, fontSize: 16, textDecorationLine: 'line-through' },
   currentPrice: { color: Theme.colors.gold, fontSize: 26, fontWeight: '900' },
 
   body: { padding: Theme.spacing.lg },
@@ -306,7 +307,7 @@ const styles = StyleSheet.create({
   qtyBtn: {
     width: 36, height: 36, borderRadius: 18,
     backgroundColor: Theme.colors.surface,
-    borderWidth: 1, borderColor: '#444',
+    borderWidth: 1, borderColor: Theme.colors.cardBorder,
     justifyContent: 'center', alignItems: 'center',
   },
   qtyBtnDisabled: { borderColor: '#2a2a2a' },
@@ -315,14 +316,14 @@ const styles = StyleSheet.create({
     backgroundColor: Theme.colors.accent,
     justifyContent: 'center', alignItems: 'center',
   },
-  qtyNumber: { color: '#fff', fontSize: 20, fontWeight: 'bold', minWidth: 28, textAlign: 'center' },
+  qtyNumber: { color: Theme.colors.textPrimary, fontSize: 20, fontWeight: 'bold', minWidth: 28, textAlign: 'center' },
 
   section: { marginBottom: Theme.spacing.xl },
   sectionTitle: {
     color: Theme.colors.warning, fontSize: 15, fontWeight: 'bold',
     marginBottom: 12, textTransform: 'uppercase', letterSpacing: 0.5,
   },
-  descText: { color: '#ccc', fontSize: 15, lineHeight: 24 },
+  descText: { color: Theme.colors.textSecondary, fontSize: 15, lineHeight: 24 },
   containRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 },
   containDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: Theme.colors.gold },
   containText: { color: '#ddd', fontSize: 14 },
@@ -333,8 +334,8 @@ const styles = StyleSheet.create({
     borderRadius: Theme.radius.md, padding: 12, alignItems: 'center',
     borderWidth: 1, borderColor: Theme.colors.cardBorder,
   },
-  nutritionValue: { color: '#fff', fontSize: 14, fontWeight: 'bold', marginBottom: 4 },
-  nutritionLabel: { color: '#888', fontSize: 10 },
+  nutritionValue: { color: Theme.colors.textPrimary, fontSize: 14, fontWeight: 'bold', marginBottom: 4 },
+  nutritionLabel: { color: Theme.colors.textSecondary, fontSize: 10 },
 
   noteBox: {
     flexDirection: 'row', alignItems: 'flex-start', gap: 8,
@@ -342,7 +343,7 @@ const styles = StyleSheet.create({
     padding: 12, marginBottom: Theme.spacing.xl,
     borderWidth: 1, borderColor: 'rgba(255,193,7,0.2)',
   },
-  noteText: { color: '#aaa', fontSize: 13, lineHeight: 20, flex: 1 },
+  noteText: { color: Theme.colors.textSecondary, fontSize: 13, lineHeight: 20, flex: 1 },
 
   relatedCard: {
     width: 130, backgroundColor: Theme.colors.surface,
@@ -350,14 +351,14 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: Theme.colors.cardBorder,
   },
   relatedImage: { width: 130, height: 100 },
-  relatedName: { color: '#fff', fontSize: 12, fontWeight: 'bold', padding: 8, paddingBottom: 4 },
+  relatedName: { color: Theme.colors.textPrimary, fontSize: 12, fontWeight: 'bold', padding: 8, paddingBottom: 4 },
   relatedPrice: { color: Theme.colors.gold, fontSize: 12, fontWeight: 'bold', paddingHorizontal: 8, paddingBottom: 8 },
 
   stickyBottom: {
     position: 'absolute', bottom: 0, left: 0, right: 0,
     backgroundColor: Theme.colors.surface,
     paddingHorizontal: Theme.spacing.lg, paddingTop: Theme.spacing.md,
-    borderTopWidth: 1, borderTopColor: '#333',
+    borderTopWidth: 1, borderTopColor: Theme.colors.cardBorder,
     elevation: 20, shadowColor: '#000',
     shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.4, shadowRadius: 12,
   },
@@ -368,6 +369,6 @@ const styles = StyleSheet.create({
   ctaBtnOutline: {
     backgroundColor: 'transparent', borderWidth: 2, borderColor: Theme.colors.gold,
   },
-  ctaBtnText: { color: '#fff', fontWeight: 'bold', fontSize: 14, letterSpacing: 0.5 },
+  ctaBtnText: { color: Theme.colors.textPrimary, fontWeight: 'bold', fontSize: 14, letterSpacing: 0.5 },
   ctaBtnTextOutline: { color: Theme.colors.gold },
 });

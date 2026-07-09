@@ -28,7 +28,7 @@ public class AuthApiController(IUserService userService, IJwtService jwtService)
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest req)
     {
-        var user = await userService.RegisterAsync(req.Username, req.Email, req.Password);
+        var user = await userService.RegisterAsync(req.Username, req.Email, req.Password, req.FullName, req.Phone);
         var token = jwtService.GenerateToken(user);
         var refreshToken = jwtService.GenerateRefreshToken();
         var expiry = DateTime.UtcNow.AddDays(30).ToString("yyyy-MM-dd HH:mm:ss");
@@ -90,7 +90,7 @@ public class AuthApiController(IUserService userService, IJwtService jwtService)
 }
 
 public class LoginRequest { public string Email { get; set; } = string.Empty; public string Password { get; set; } = string.Empty; }
-public class RegisterRequest { public string Username { get; set; } = string.Empty; public string Email { get; set; } = string.Empty; public string Password { get; set; } = string.Empty; }
+public class RegisterRequest { public string Username { get; set; } = string.Empty; public string Email { get; set; } = string.Empty; public string Password { get; set; } = string.Empty; public string FullName { get; set; } = string.Empty; public string Phone { get; set; } = string.Empty; }
 public class UpdateProfileRequest { public string FullName { get; set; } = string.Empty; public string Phone { get; set; } = string.Empty; public string DateOfBirth { get; set; } = string.Empty; public string Gender { get; set; } = string.Empty; public string City { get; set; } = string.Empty; public string AvatarUrl { get; set; } = string.Empty; }
 public class ChangePasswordRequest { public string CurrentPassword { get; set; } = string.Empty; public string NewPassword { get; set; } = string.Empty; }
 public class RefreshTokenRequest { public string RefreshToken { get; set; } = string.Empty; }

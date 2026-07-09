@@ -1,5 +1,6 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, SafeAreaView, StatusBar, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, StatusBar, ActivityIndicator, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { Theme } from '../../theme/tokens';
@@ -67,7 +68,7 @@ export const MovieListScreen = ({ navigation }: any) => {
       <View style={styles.info}>
         <Text style={styles.title} numberOfLines={2}>{item.title}</Text>
         <Text style={styles.genre} numberOfLines={1}>{item.genre}</Text>
-        <Text style={styles.duration}>{item.duration} phút</Text>
+        <Text style={styles.duration}>{item.durationMinutes} phút</Text>
       </View>
     </TouchableOpacity>
   );
@@ -161,17 +162,17 @@ const styles = StyleSheet.create({
   header: {
     padding: Theme.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#222',
+    borderBottomColor: Theme.colors.cardBorder,
     alignItems: 'center',
   },
   headerTitle: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 16,
     fontWeight: 'bold',
   },
   filterContainer: {
     borderBottomWidth: 1,
-    borderBottomColor: '#222',
+    borderBottomColor: Theme.colors.cardBorder,
   },
   statusTabs: {
     flexDirection: 'row',
@@ -183,16 +184,16 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     alignItems: 'center',
     borderRadius: 8,
-    backgroundColor: '#222',
+    backgroundColor: Theme.colors.surface,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: Theme.colors.cardBorder,
   },
   statusTabActive: {
     backgroundColor: 'rgba(255, 193, 7, 0.1)',
     borderColor: Theme.colors.gold,
   },
   statusTabText: {
-    color: '#aaa',
+    color: Theme.colors.textSecondary,
     fontSize: 13,
     fontWeight: 'bold',
   },
@@ -210,16 +211,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 20,
-    backgroundColor: '#222',
+    backgroundColor: Theme.colors.surface,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: Theme.colors.cardBorder,
   },
   genreChipActive: {
     backgroundColor: '#fff',
     borderColor: '#fff',
   },
   genreChipText: {
-    color: '#aaa',
+    color: Theme.colors.textSecondary,
     fontSize: 12,
   },
   genreChipTextActive: {
@@ -235,7 +236,7 @@ const styles = StyleSheet.create({
   },
   card: {
     width: '48%',
-    backgroundColor: '#111',
+    backgroundColor: Theme.colors.surface,
     borderRadius: Theme.radius.card,
     overflow: 'hidden',
   },
@@ -257,7 +258,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   badgeAgeText: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 10,
     fontWeight: 'bold',
   },
@@ -265,18 +266,18 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   title: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 14,
     fontWeight: 'bold',
     marginBottom: 4,
   },
   genre: {
-    color: '#aaa',
+    color: Theme.colors.textSecondary,
     fontSize: 12,
     marginBottom: 2,
   },
   duration: {
-    color: '#666',
+    color: Theme.colors.textMuted,
     fontSize: 12,
   },
   centerContainer: {
@@ -286,7 +287,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   emptyText: {
-    color: '#aaa',
+    color: Theme.colors.textSecondary,
     textAlign: 'center',
     marginTop: 16,
     marginBottom: 20,

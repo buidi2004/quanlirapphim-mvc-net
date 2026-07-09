@@ -18,7 +18,7 @@
         <!-- Slide 1 -->
         <div class="carousel-item active">
             <div class="position-relative hero-slide">
-                <img src="https://images.unsplash.com/photo-1534809027769-b00d750a6bac?q=80&w=1200&auto=format&fit=crop" class="w-100 h-100" style="object-fit: cover; filter: brightness(0.6);" alt="Slide 1">
+                <img src="/images/movies/lat-mat-7.jpg" class="w-100 h-100" style="object-fit: cover; filter: brightness(0.6);" alt="Slide 1">
                 <div class="carousel-caption text-start bottom-0 pb-4 pb-md-5 ps-3 ps-md-4 w-100" style="background: linear-gradient(transparent, rgba(0,0,0,0.95)); left: 0; right: 0;">
                     <span class="badge bg-danger mb-2 px-2 px-md-3 py-1 py-md-2 fs-7 fs-md-6" data-aos="fade-up" data-aos-delay="200">ĐANG CHIẾU</span>
                     <h1 class="display-6 display-md-4 fw-bold text-warning text-shadow mb-1" data-aos="fade-up" data-aos-delay="400">AVENGERS: ENDGAME</h1>
@@ -33,7 +33,7 @@
         <!-- Slide 2 -->
         <div class="carousel-item">
             <div class="position-relative hero-slide">
-                <img src="https://images.unsplash.com/photo-1473580044384-7ba9967e16a0?q=80&w=1200&auto=format&fit=crop" class="w-100 h-100" style="object-fit: cover; filter: brightness(0.6);" alt="Slide 2">
+                <img src="/images/movies/dao-pho-piano.jpg" class="w-100 h-100" style="object-fit: cover; filter: brightness(0.6);" alt="Slide 2">
                 <div class="carousel-caption text-start bottom-0 pb-4 pb-md-5 ps-3 ps-md-4 w-100" style="background: linear-gradient(transparent, rgba(0,0,0,0.95)); left: 0; right: 0;">
                     <span class="badge bg-info mb-2 px-2 px-md-3 py-1 py-md-2 fs-7 fs-md-6 text-dark">SẮP CHIẾU</span>
                     <h1 class="display-6 display-md-4 fw-bold text-dark text-shadow mb-1">DUNE: PART TWO</h1>
@@ -47,7 +47,7 @@
         <!-- Slide 3 -->
         <div class="carousel-item">
             <div class="position-relative hero-slide">
-                <img src="https://images.unsplash.com/photo-1605806616949-1e87b487cb2a?q=80&w=1200&auto=format&fit=crop" class="w-100 h-100" style="object-fit: cover; filter: brightness(0.6);" alt="Slide 3">
+                <img src="/images/movies/mai.jpg" class="w-100 h-100" style="object-fit: cover; filter: brightness(0.6);" alt="Slide 3">
                 <div class="carousel-caption text-start bottom-0 pb-4 pb-md-5 ps-3 ps-md-4 w-100" style="background: linear-gradient(transparent, rgba(0,0,0,0.95)); left: 0; right: 0;">
                     <span class="badge bg-danger mb-2 px-2 px-md-3 py-1 py-md-2 fs-7 fs-md-6">ĐANG CHIẾU</span>
                     <h1 class="display-6 display-md-4 fw-bold text-warning text-shadow mb-1">SPIDER-MAN: NO WAY HOME</h1>
@@ -84,8 +84,8 @@
         <div class="flex-shrink-0" style="width: 350px; scroll-snap-align: start;" data-aos="fade-left" data-aos-delay="@(trendingCount * 100)">
             <div class="movie-card-3d h-100">
                 <div class="card bg-white border-0 shadow-lg movie-card rounded-4 overflow-hidden position-relative" onclick="location.href='/movies/@movie.Id'">
-                    <img src="@(movie.PosterUrl ?? "https://placehold.co/400x600/111/fff")" 
-                         class="w-100" style="height: 500px; object-fit: cover;" alt="@movie.Title">
+                    <img src="@(movie.PosterUrl ?? "/images/movies/lat-mat-7.jpg")" 
+                         class="w-100" style="height: 500px; object-fit: cover;" alt="@movie.Title" loading="lazy" decoding="async">
                     <div class="position-absolute bottom-0 w-100 p-4" style="background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);">
                         <h4 class="text-dark fw-bold mb-1 text-truncate">@movie.Title</h4>
                         <div class="d-flex align-items-center mb-2">
@@ -124,10 +124,10 @@
                         <div class="card bg-white border border-light h-100 shadow movie-card"
                              onclick="location.href='/movies/@movie.Id'">
                             <div class="position-relative">
-                                <img src="@(movie.PosterUrl ?? "https://placehold.co/400x600/111/fff?text=No+Poster")"
+                                <img src="@(movie.PosterUrl ?? "/images/movies/lat-mat-7.jpg")"
                                      class="card-img-top img-fluid rounded-top"
                                      alt="@movie.Title"
-                                     style="height: 300px; object-fit: cover;">
+                                     style="height: 300px; object-fit: cover;" loading="lazy" decoding="async">
                                 @if (!string.IsNullOrEmpty(movie.AgeRating)) {
                                     <span class="badge position-absolute top-0 end-0 m-2 badge-@movie.AgeRating?.ToLower()">
                                         @movie.AgeRating
@@ -174,10 +174,10 @@
                         <div class="card bg-white border border-light h-100 shadow movie-card"
                              onclick="location.href='/movies/@movie.Id'">
                             <div class="position-relative">
-                                <img src="@(movie.PosterUrl ?? "https://placehold.co/400x600/111/fff?text=No+Poster")"
+                                <img src="@(movie.PosterUrl ?? "/images/movies/lat-mat-7.jpg")"
                                      class="card-img-top img-fluid rounded-top"
                                      alt="@movie.Title"
-                                     style="height: 300px; object-fit: cover;">
+                                     style="height: 300px; object-fit: cover;" loading="lazy" decoding="async">
                                 @if (!string.IsNullOrEmpty(movie.AgeRating)) {
                                     <span class="badge position-absolute top-0 end-0 m-2 badge-@movie.AgeRating?.ToLower()">
                                         @movie.AgeRating
@@ -214,7 +214,7 @@
     <div class="row g-4">
         <div class="col-md-6" data-aos="fade-right">
             <div class="card bg-white border-0 overflow-hidden rounded-4 h-100 shadow-lg position-relative group-hover">
-                <img src="https://placehold.co/800x400/2a1a1a/e5a720?text=Combo+Avatar" class="w-100 h-100 transition-all" style="object-fit: cover;" alt="Combo Avatar">
+                <img src="/images/movies/lat-mat-7.jpg" class="w-100 h-100 transition-all" style="object-fit: cover;" alt="Combo Avatar">
                 <div class="position-absolute bottom-0 start-0 w-100 p-4" style="background: linear-gradient(transparent, rgba(255,255,255,0.95));">
                     <h4 class="text-warning fw-bold mb-1">Avatar: The Way of Water Combo</h4>
                     <p class="text-dark mb-2">1 Ly nước tạo hình + 1 Bắp khổng lồ + Tặng kèm Postcard</p>
@@ -226,7 +226,7 @@
             <div class="row g-4 h-100">
                 <div class="col-12 h-50" data-aos="fade-down">
                     <div class="card bg-white border-0 overflow-hidden rounded-4 h-100 shadow position-relative group-hover">
-                        <img src="https://placehold.co/800x200/1f1f1f/fff?text=Combo+Couple" class="w-100 h-100 transition-all" style="object-fit: cover;" alt="Combo Couple">
+                        <img src="/images/movies/dao-pho-piano.jpg" class="w-100 h-100 transition-all" style="object-fit: cover;" alt="Combo Couple">
                         <div class="position-absolute bottom-0 start-0 w-100 p-3" style="background: linear-gradient(transparent, rgba(255,255,255,0.9));">
                             <h5 class="text-dark fw-bold mb-0">Combo Couple (2 Nước + 1 Bắp)</h5>
                             <strong class="text-warning">109.000₫</strong>
@@ -235,7 +235,7 @@
                 </div>
                 <div class="col-12 h-50" data-aos="fade-up">
                     <div class="card bg-white border-0 overflow-hidden rounded-4 h-100 shadow position-relative group-hover">
-                        <img src="https://placehold.co/800x200/111/fff?text=Dune+Merchandise" class="w-100 h-100 transition-all" style="object-fit: cover;" alt="Dune Merch">
+                        <img src="/images/movies/mai.jpg" class="w-100 h-100 transition-all" style="object-fit: cover;" alt="Dune Merch">
                         <div class="position-absolute bottom-0 start-0 w-100 p-3" style="background: linear-gradient(transparent, rgba(255,255,255,0.9));">
                             <h5 class="text-dark fw-bold mb-0">Exclusive Dune Sandworm Bucket</h5>
                             <strong class="text-warning">399.000₫</strong>
@@ -318,8 +318,7 @@
             </div>
         </div>
         <div class="col-md-6 text-center" data-aos="fade-left" data-aos-delay="300">
-            <!-- Mockup Smartphone Image Placeholder -->
-            <img src="https://placehold.co/300x500/000/fff?text=CinemaX+App+UI" class="img-fluid rounded-4 shadow-lg border border-light" style="transform: rotate(-10deg); max-height: 400px;" alt="App Mockup">
+            <img src="/images/movies/lat-mat-7.jpg" class="img-fluid rounded-4 shadow-lg border border-light" style="transform: rotate(-10deg); max-height: 400px;" alt="App Mockup">
         </div>
     </div>
     <!-- Background Decor -->
@@ -341,7 +340,7 @@
             var index = indexN++;
             <div class="col-md-4" data-aos="fade-up" data-aos-delay="@(index * 150)">
                 <div class="card bg-white shadow-sm border border-light h-100 news-card overflow-hidden" onclick="location.href='/news/@n.Slug'">
-                    <img src="@(n.ImageUrl ?? "https://placehold.co/600x300/1a1a3e/fff?text=News")" class="card-img-top transition-all" style="height: 200px; object-fit: cover;" alt="@n.Title">
+                    <img src="@(n.ImageUrl ?? "/images/movies/mai.jpg")" class="card-img-top transition-all" style="height: 200px; object-fit: cover;" alt="@n.Title" loading="lazy" decoding="async">
                     <div class="card-body">
                         <span class="badge bg-secondary rounded-pill mb-2">@n.Category</span>
                         <h6 class="text-dark fw-bold mb-2">@n.Title</h6>
@@ -400,7 +399,7 @@
     <div class="row g-4">
         <div class="col-md-4" data-aos="zoom-in" data-aos-delay="100">
             <div class="card bg-white border-0 rounded-4 overflow-hidden h-100 shadow-lg group-hover position-relative cursor-pointer" style="min-height: 250px;" onclick="location.href='/experiences/imax'">
-                <img src="https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=800&auto=format&fit=crop" class="w-100 h-100 transition-all position-absolute" style="object-fit: cover;" alt="IMAX">
+                <img src="/images/movies/lat-mat-7.jpg" class="w-100 h-100 transition-all position-absolute" style="object-fit: cover;" alt="IMAX">
                 <div class="position-absolute w-100 h-100 top-0 start-0" style="background: linear-gradient(to top, rgba(255,255,255,0.95) 10%, transparent);"></div>
                 <div class="position-absolute bottom-0 p-4">
                     <h3 class="fw-bold text-info" style="letter-spacing: 2px;">IMAX</h3>
@@ -410,7 +409,7 @@
         </div>
         <div class="col-md-4" data-aos="zoom-in" data-aos-delay="200">
             <div class="card bg-white border-0 rounded-4 overflow-hidden h-100 shadow-lg group-hover position-relative cursor-pointer" style="min-height: 250px;" onclick="location.href='/experiences/dolby-atmos'">
-                <img src="https://images.unsplash.com/photo-1606335543042-57c525922933?q=80&w=800&auto=format&fit=crop" class="w-100 h-100 transition-all position-absolute" style="object-fit: cover;" alt="4DX">
+                <img src="/images/movies/dao-pho-piano.jpg" class="w-100 h-100 transition-all position-absolute" style="object-fit: cover;" alt="4DX">
                 <div class="position-absolute w-100 h-100 top-0 start-0" style="background: linear-gradient(to top, rgba(255,255,255,0.95) 10%, transparent);"></div>
                 <div class="position-absolute bottom-0 p-4">
                     <h3 class="fw-bold text-danger" style="letter-spacing: 2px;">ATMOS</h3>
@@ -420,7 +419,7 @@
         </div>
         <div class="col-md-4" data-aos="zoom-in" data-aos-delay="300">
             <div class="card bg-white border-0 rounded-4 overflow-hidden h-100 shadow-lg group-hover position-relative cursor-pointer" style="min-height: 250px;" onclick="location.href='/experiences/sweetbox'">
-                <img src="https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?q=80&w=800&auto=format&fit=crop" class="w-100 h-100 transition-all position-absolute" style="object-fit: cover;" alt="SWEETBOX">
+                <img src="/images/movies/mai.jpg" class="w-100 h-100 transition-all position-absolute" style="object-fit: cover;" alt="SWEETBOX">
                 <div class="position-absolute w-100 h-100 top-0 start-0" style="background: linear-gradient(to top, rgba(255,255,255,0.95) 10%, transparent);"></div>
                 <div class="position-absolute bottom-0 p-4">
                     <h3 class="fw-bold text-warning" style="letter-spacing: 2px;">SWEETBOX</h3>

@@ -1,5 +1,6 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar, TextInput, KeyboardAvoidingView, Platform, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, StatusBar, TextInput, KeyboardAvoidingView, Platform, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -109,7 +110,7 @@ export const ResetPasswordScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: Theme.colors.background,
   },
   scrollContent: {
     flexGrow: 1,
@@ -124,13 +125,13 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   title: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 12,
   },
   subtitle: {
-    color: '#aaa',
+    color: Theme.colors.textSecondary,
     fontSize: 15,
     textAlign: 'center',
     lineHeight: 22,
@@ -154,7 +155,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     paddingVertical: 16,
     fontSize: 16,
   },

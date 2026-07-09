@@ -1,8 +1,11 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar, FlatList, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, StatusBar, FlatList, ScrollView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { TicketService } from '../../services/TicketService';
+import { TicketHistoryItem } from '../../models/Ticket';
 
 const TABS = [
   { id: 'all', label: 'Tất cả' },
@@ -11,47 +14,31 @@ const TABS = [
   { id: 'cancelled', label: 'Đã hủy' },
 ];
 
-const MOCK_TX = [
-  {
-    id: '#CX000123',
-    title: 'Avengers Endgame',
-    date: '10/07',
-    time: '15:30',
-    room: 'Phòng 3',
-    seat: 'C3',
-    price: 90000,
-    status: 'paid',
-    createdAt: '05/07 10:30',
-  },
-  {
-    id: '#CX000124',
-    title: 'Dune: Part Two',
-    date: '12/07',
-    time: '19:30',
-    room: 'Phòng IMAX 1',
-    seat: 'E1, E2',
-    price: 180000,
-    status: 'holding',
-    createdAt: '10/07 08:15',
-  },
-  {
-    id: '#CX000120',
-    title: 'Kung Fu Panda 4',
-    date: '01/07',
-    time: '10:00',
-    room: 'Phòng 5',
-    seat: 'A1, A2, A3',
-    price: 250000,
-    status: 'cancelled',
-    createdAt: '28/06 14:20',
-  }
-];
-
 export const TransactionHistoryScreen = ({ navigation }: any) => {
-  const [activeTab, setActiveTab] = useState('all');
   const insets = useSafeAreaInsets();
+  const [activeTab, setActiveTab] = useState('all');
+  const [transactions, setTransactions] = useState<TicketHistoryItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredTx = MOCK_TX.filter(tx => activeTab === 'all' || tx.status === activeTab);
+  React.useEffect(() => {
+    fetchTransactions();
+  }, []);
+
+  const fetchTransactions = async () => {
+    try {
+      setLoading(true);
+      const res = await TicketService.getMyTickets();
+      if (res.success) {
+        setTransactions(res.data);
+      }
+    } catch (error: any) {
+      console.log('Error fetching transactions:', error?.message || error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredTx = transactions.filter(tx => activeTab === 'all' || tx.status === activeTab);
 
   const renderStatusBadge = (status: string) => {
     switch (status) {
@@ -66,28 +53,26 @@ export const TransactionHistoryScreen = ({ navigation }: any) => {
     }
   };
 
-  const renderTxItem = ({ item }: { item: typeof MOCK_TX[0] }) => (
+  const renderTxItem = ({ item }: { item: TicketHistoryItem }) => (
     <View style={styles.txCard}>
       <View style={styles.txHeader}>
-        <View>
-          <Text style={styles.txTitle}>{item.title}</Text>
-          <Text style={styles.txSub}>📅 {item.date} ⏰ {item.time}</Text>
-          <Text style={styles.txSub}>🚪 {item.room} · Ghế {item.seat}</Text>
+        <View style={{ flex: 1, paddingRight: 10 }}>
+          <Text style={styles.txTitle} numberOfLines={1}>{item.movie_title}</Text>
+          <Text style={styles.txSub}>📅 {item.show_date} ⏰ {item.start_time}</Text>
+          <Text style={styles.txSub}>Ghế: {item.seat_code}</Text>
         </View>
         <View style={{ alignItems: 'flex-end' }}>
           {renderStatusBadge(item.status)}
-          <Text style={styles.txPrice}>{item.price.toLocaleString('vi-VN')}₫</Text>
-          <Text style={styles.txDate}>{item.createdAt}</Text>
+          <Text style={styles.txPrice}>{item.total_price.toLocaleString('vi-VN')}₫</Text>
+          <Text style={styles.txDate}>{item.booked_at}</Text>
         </View>
       </View>
       <View style={styles.txFooter}>
-        <Text style={styles.txId}>Mã GD: {item.id}</Text>
-        {item.status === 'paid' && (
-          <TouchableOpacity style={styles.detailBtn}>
-            <Text style={styles.detailBtnText}>Xem vé</Text>
-            <Ionicons name="chevron-forward" size={14} color={Theme.colors.gold} />
-          </TouchableOpacity>
-        )}
+        <Text style={styles.txId}>Mã GD: #CX{item.id.toString().padStart(6, '0')}</Text>
+        <TouchableOpacity style={styles.detailBtn} onPress={() => navigation.navigate('TicketDetail', { ticketId: item.id })}>
+          <Text style={styles.detailBtnText}>Chi tiết</Text>
+          <Ionicons name="chevron-forward" size={14} color={Theme.colors.gold} />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -126,15 +111,19 @@ export const TransactionHistoryScreen = ({ navigation }: any) => {
         </View>
       </View>
 
-      {filteredTx.length === 0 ? (
+      {loading ? (
+        <View style={styles.emptyContainer}>
+          <ActivityIndicator color={Theme.colors.gold} />
+        </View>
+      ) : filteredTx.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Ionicons name="receipt-outline" size={60} color="#333" />
-          <Text style={styles.emptyText}>Chưa có giao dịch nào</Text>
+          <Text style={styles.emptyText}>Không có giao dịch nào</Text>
         </View>
       ) : (
         <FlatList
           data={filteredTx}
-          keyExtractor={item => item.id}
+          keyExtractor={item => item.id.toString()}
           contentContainerStyle={[styles.listContent, { paddingBottom: Math.max(insets.bottom, 20) }]}
           showsVerticalScrollIndicator={false}
           renderItem={renderTxItem}
@@ -156,7 +145,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Theme.spacing.md,
     paddingVertical: Theme.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#222',
+    borderBottomColor: Theme.colors.cardBorder,
   },
   backBtn: {
     width: 40,
@@ -165,13 +154,13 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   headerTitle: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 16,
     fontWeight: 'bold',
   },
   tabsWrapper: {
     borderBottomWidth: 1,
-    borderBottomColor: '#222',
+    borderBottomColor: Theme.colors.cardBorder,
   },
   tabsContent: {
     paddingHorizontal: Theme.spacing.md,
@@ -182,16 +171,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#111',
+    backgroundColor: Theme.colors.surface,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: Theme.colors.cardBorder,
   },
   tabActive: {
     backgroundColor: 'rgba(255, 193, 7, 0.1)',
     borderColor: Theme.colors.gold,
   },
   tabText: {
-    color: '#aaa',
+    color: Theme.colors.textSecondary,
     fontSize: 13,
   },
   tabTextActive: {
@@ -209,7 +198,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 193, 7, 0.2)',
   },
   summaryLabel: {
-    color: '#888',
+    color: Theme.colors.textSecondary,
     fontSize: 12,
     marginBottom: 4,
   },
@@ -224,7 +213,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    color: '#666',
+    color: Theme.colors.textMuted,
     marginTop: 16,
     fontSize: 15,
   },
@@ -232,27 +221,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: Theme.spacing.md,
   },
   txCard: {
-    backgroundColor: '#111',
+    backgroundColor: Theme.colors.surface,
     borderRadius: Theme.radius.lg,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#222',
+    borderColor: Theme.colors.cardBorder,
   },
   txHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#222',
+    borderBottomColor: Theme.colors.cardBorder,
   },
   txTitle: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 6,
   },
   txSub: {
-    color: '#aaa',
+    color: Theme.colors.textSecondary,
     fontSize: 13,
     marginBottom: 4,
   },
@@ -267,13 +256,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   txPrice: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 4,
   },
   txDate: {
-    color: '#666',
+    color: Theme.colors.textMuted,
     fontSize: 12,
   },
   txFooter: {
@@ -282,12 +271,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#0a0a0a',
+    backgroundColor: Theme.colors.surface,
     borderBottomLeftRadius: Theme.radius.lg,
     borderBottomRightRadius: Theme.radius.lg,
   },
   txId: {
-    color: '#666',
+    color: Theme.colors.textMuted,
     fontSize: 12,
   },
   detailBtn: {

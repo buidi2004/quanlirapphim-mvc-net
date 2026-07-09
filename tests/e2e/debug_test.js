@@ -2,22 +2,22 @@ const puppeteer = require('puppeteer');
 (async () => {
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
-    await page.goto('http://localhost:8080/login');
+    await page.goto('http://localhost:5062/login');
     await page.type('input[name="Email"]', 'admin@cinemax.com');
-    await page.type('input[name="Password"]', 'admin');
+    await page.type('input[name="Password"]', 'Password123!');
     await Promise.all([ 
         page.waitForNavigation(), 
-        page.$eval('button[type="submit"]', btn => btn.click()) 
+        page.$eval('.card form button[type="submit"]', btn => btn.click()) 
     ]);
     
-    const url = page.url();
-    console.log('URL after login:', url);
-    if(url.includes('login')) {
-        const error = await page.evaluate(() => {
-            const el = document.querySelector('.alert-danger');
-            return el ? el.innerText : 'No alert-danger found. Body: ' + document.body.innerText.substring(0, 200);
-        });
-        console.log('Login Error Message:', error);
+    await page.goto('http://localhost:5062/admin/news');
+    console.log('URL is:', page.url());
+    const html = await page.content();
+    console.log(html.substring(0, 1000));
+    if (html.includes('addNewsModal')) {
+        console.log('FOUND addNewsModal');
+    } else {
+        console.log('NOT FOUND addNewsModal');
     }
     await browser.close();
 })();

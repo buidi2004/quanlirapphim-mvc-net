@@ -1,5 +1,6 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, StatusBar, ScrollView } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
@@ -151,7 +152,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   title: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 26,
     fontWeight: 'bold',
     marginBottom: 16,
@@ -163,7 +164,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   metaText: {
-    color: '#888',
+    color: Theme.colors.textSecondary,
     fontSize: 13,
     marginLeft: 6,
     marginRight: 16,
@@ -172,19 +173,19 @@ const styles = StyleSheet.create({
     width: 4,
     height: 4,
     borderRadius: 2,
-    backgroundColor: '#555',
+    backgroundColor: Theme.colors.cardBorder,
     marginRight: 16,
   },
   divider: {
     height: 1,
-    backgroundColor: '#222',
+    backgroundColor: Theme.colors.surface,
     marginBottom: 24,
   },
   htmlContent: {
     marginBottom: 30,
   },
   summary: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 16,
     fontWeight: '600',
     lineHeight: 24,
@@ -192,7 +193,7 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   paragraph: {
-    color: '#ccc',
+    color: Theme.colors.textSecondary,
     fontSize: 15,
     lineHeight: 26,
     marginBottom: 20,
@@ -204,7 +205,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   imageCaption: {
-    color: '#888',
+    color: Theme.colors.textSecondary,
     fontSize: 12,
     textAlign: 'center',
     fontStyle: 'italic',
@@ -213,10 +214,10 @@ const styles = StyleSheet.create({
   relatedSection: {
     padding: Theme.spacing.lg,
     paddingBottom: 100,
-    backgroundColor: '#111',
+    backgroundColor: Theme.colors.surface,
   },
   sectionTitle: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 16,
@@ -234,7 +235,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   relatedTitle: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 13,
     fontWeight: 'bold',
     lineHeight: 18,
@@ -247,7 +248,7 @@ const styles = StyleSheet.create({
     backgroundColor: Theme.colors.surface,
     padding: Theme.spacing.lg,
     borderTopWidth: 1,
-    borderTopColor: '#333',
+    borderTopColor: Theme.colors.cardBorder,
   },
   bookBtn: {
     flexDirection: 'row',

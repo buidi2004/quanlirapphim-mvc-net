@@ -1,5 +1,6 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, StatusBar, Alert, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, StatusBar, Alert, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { GlassView, isGlassEffectAPIAvailable } from 'expo-glass-effect';
 import { Theme } from '../../theme/tokens';
@@ -7,6 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Seat } from '../../models/Booking';
 import { Image } from 'expo-image';
 import { GlassHeader } from '../../components/ui/GlassHeader';
+import { BookingService } from '../../services/BookingService';
 
 const PAYMENT_METHODS = [
   { id: 'momo', name: 'Ví MoMo', icon: 'https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png' },
@@ -16,15 +18,20 @@ const PAYMENT_METHODS = [
 ];
 
 export const PaymentScreen = ({ route, navigation }: any) => {
-  const { selectedSeats, showtimeId, concessions, seatPrice, concessionPrice } = route.params || { 
-    selectedSeats: [], showtimeId: 0, concessions: {}, seatPrice: 0, concessionPrice: 0 
-  };
+  const selectedSeats = route.params?.selectedSeats || [];
+  const showtimeId = route.params?.showtimeId || 0;
+  const ticketIds = route.params?.ticketIds || [];
+  const concessions = route.params?.concessions || {};
+  const seatPrice = route.params?.seatPrice || 0;
+  const concessionPrice = route.params?.concessionPrice || 0;
   const insets = useSafeAreaInsets();
   
   const [timeLeft, setTimeLeft] = useState(12 * 60 + 34); // Mock 12:34
   const [discountCode, setDiscountCode] = useState('');
   const [discountAmount, setDiscountAmount] = useState(0);
   const [selectedMethod, setSelectedMethod] = useState('momo');
+  const [loading, setLoading] = useState(false);
+  const [promoLoading, setPromoLoading] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -48,28 +55,64 @@ export const PaymentScreen = ({ route, navigation }: any) => {
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
-  const applyDiscount = () => {
-    if (discountCode.toUpperCase() === 'CINEMAX20') {
-      const discount = Math.round((seatPrice + concessionPrice) * 0.2);
-      setDiscountAmount(discount);
-      Alert.alert('Thành công', `Áp dụng mã giảm giá 20%: -${discount.toLocaleString('vi-VN')}₫`);
-    } else {
+  const applyDiscount = async () => {
+    if (!discountCode.trim()) return;
+    
+    setPromoLoading(true);
+    try {
+      const res: any = await BookingService.applyPromo({
+        code: discountCode,
+        subtotal: seatPrice + concessionPrice
+      });
+      if (res.success && res.data) {
+        setDiscountAmount(res.data.discount || 0);
+        Alert.alert('Thành công', `Đã áp dụng mã giảm giá: -${(res.data.discount || 0).toLocaleString('vi-VN')}₫`);
+      } else {
+        setDiscountAmount(0);
+        Alert.alert('Lỗi', res.message || 'Mã giảm giá không hợp lệ!');
+      }
+    } catch (e: any) {
       setDiscountAmount(0);
-      Alert.alert('Lỗi', 'Mã giảm giá không hợp lệ!');
+      Alert.alert('Lỗi', e.message || 'Mã giảm giá không hợp lệ hoặc đã hết hạn!');
+    } finally {
+      setPromoLoading(false);
     }
   };
 
   const totalAmount = seatPrice + concessionPrice - discountAmount;
 
-  const handlePayment = () => {
-    // Navigate to Success screen
-    navigation.navigate('PaymentSuccess', { 
-      transactionId: `CXN-${Math.floor(Math.random() * 1000000)}`,
-      movieTitle: 'Avengers Endgame',
-      room: 'IMAX 3',
-      time: '10/07 - 15:30',
-      seats: (selectedSeats as Seat[]).map(s => s.code).join(', ')
-    });
+  const handlePayment = async () => {
+    if (ticketIds.length === 0) {
+      Alert.alert('Lỗi', 'Không tìm thấy vé. Vui lòng quay lại chọn ghế.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res: any = await BookingService.confirmBooking({
+        ticketIds: ticketIds,
+        paymentMethod: selectedMethod,
+        totalPrice: totalAmount,
+        promotionCode: discountCode || undefined
+      });
+
+      if (res.success) {
+        navigation.navigate('PaymentSuccess', { 
+          transactionId: res.data?.transactionId || `CXN-${Math.floor(Math.random() * 1000000)}`,
+          movieTitle: 'Avengers Endgame', // Should ideally pass these from previous screens
+          room: 'IMAX 3',
+          time: '10/07 - 15:30',
+          seats: (selectedSeats as Seat[]).map(s => s.code).join(', ')
+        });
+      } else {
+        Alert.alert('Thanh toán thất bại', res.message || 'Có lỗi xảy ra khi thanh toán.');
+      }
+    } catch (e: any) {
+      console.log('Payment error:', e?.message || e);
+      Alert.alert('Thanh toán thất bại', e.message || 'Có lỗi xảy ra khi kết nối cổng thanh toán.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -141,8 +184,12 @@ export const PaymentScreen = ({ route, navigation }: any) => {
               onChangeText={setDiscountCode}
               autoCapitalize="characters"
             />
-            <TouchableOpacity style={styles.applyBtn} onPress={applyDiscount}>
-              <Text style={styles.applyBtnText}>Áp dụng</Text>
+            <TouchableOpacity style={styles.applyBtn} onPress={applyDiscount} disabled={promoLoading}>
+              {promoLoading ? (
+                <ActivityIndicator size="small" color="#000" />
+              ) : (
+                <Text style={styles.applyBtnText}>Áp dụng</Text>
+              )}
             </TouchableOpacity>
           </View>
           {discountAmount > 0 && (
@@ -187,8 +234,12 @@ export const PaymentScreen = ({ route, navigation }: any) => {
               <Text style={styles.originalPrice}>{(seatPrice + concessionPrice).toLocaleString('vi-VN')}₫</Text>
             )}
           </View>
-          <TouchableOpacity style={styles.payBtn} onPress={handlePayment} activeOpacity={0.85}>
-            <Text style={styles.payBtnText}>XÁC NHẬN THANH TOÁN</Text>
+          <TouchableOpacity style={[styles.payBtn, loading && { opacity: 0.7 }]} onPress={handlePayment} activeOpacity={0.85} disabled={loading}>
+            {loading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={styles.payBtnText}>XÁC NHẬN THANH TOÁN</Text>
+            )}
           </TouchableOpacity>
         </GlassView>
       ) : (
@@ -202,8 +253,12 @@ export const PaymentScreen = ({ route, navigation }: any) => {
               <Text style={styles.originalPrice}>{(seatPrice + concessionPrice).toLocaleString('vi-VN')}₫</Text>
             )}
           </View>
-          <TouchableOpacity style={styles.payBtn} onPress={handlePayment} activeOpacity={0.85}>
-            <Text style={styles.payBtnText}>XÁC NHẬN THANH TOÁN</Text>
+          <TouchableOpacity style={[styles.payBtn, loading && { opacity: 0.7 }]} onPress={handlePayment} activeOpacity={0.85} disabled={loading}>
+            {loading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={styles.payBtnText}>XÁC NHẬN THANH TOÁN</Text>
+            )}
           </TouchableOpacity>
         </View>
       )}
@@ -250,7 +305,7 @@ const styles = StyleSheet.create({
     borderColor: Theme.colors.glass.border,
   },
   sectionTitle: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: Theme.spacing.md,
@@ -262,11 +317,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   label: {
-    color: '#aaa',
+    color: Theme.colors.textSecondary,
     fontSize: 14,
   },
   value: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 14,
     fontWeight: '600',
   },
@@ -292,7 +347,7 @@ const styles = StyleSheet.create({
     borderRadius: Theme.radius.btn,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 14,
   },
   applyBtn: {
@@ -316,7 +371,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#333',
+    borderBottomColor: Theme.colors.cardBorder,
   },
   methodItemActive: {
     backgroundColor: 'rgba(255,255,255,0.05)',
@@ -345,7 +400,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   methodName: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 14,
   },
   stickyBottom: {
@@ -376,7 +431,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   originalPrice: {
-    color: '#666',
+    color: Theme.colors.textMuted,
     fontSize: 14,
     textDecorationLine: 'line-through',
   },
@@ -387,7 +442,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   payBtnText: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 16,
     fontWeight: 'bold',
     letterSpacing: 1,

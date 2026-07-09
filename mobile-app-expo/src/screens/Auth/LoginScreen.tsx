@@ -1,5 +1,6 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, SafeAreaView, ActivityIndicator, StatusBar } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator, StatusBar } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
@@ -22,17 +23,22 @@ export const LoginScreen = ({ navigation }: any) => {
       setLoading(true);
       setError(null);
       const res = await AuthService.login(email, password);
-      if (res.success && res.token) {
-        await SecureStore.setItemAsync('userToken', res.token);
-        if (res.refreshToken) {
-          await SecureStore.setItemAsync('refreshToken', res.refreshToken);
+      if (res.success && res.data?.token) {
+        if (Platform.OS === 'web') {
+          localStorage.setItem('userToken', res.data.token);
+          if (res.data.refreshToken) localStorage.setItem('refreshToken', res.data.refreshToken);
+        } else {
+          await SecureStore.setItemAsync('userToken', res.data.token);
+          if (res.data.refreshToken) {
+            await SecureStore.setItemAsync('refreshToken', res.data.refreshToken);
+          }
         }
         navigation.replace('MainTabs');
       } else {
-        setError(res.error || 'Đăng nhập thất bại');
+        setError(res.message || 'Đăng nhập thất bại');
       }
     } catch (e: any) {
-      setError('Lỗi kết nối. Vui lòng thử lại sau.');
+      setError(e.message || 'Lỗi kết nối. Vui lòng thử lại sau.');
     } finally {
       setLoading(false);
     }
@@ -67,7 +73,7 @@ export const LoginScreen = ({ navigation }: any) => {
               <TextInput 
                 style={styles.input}
                 placeholder="Email của bạn..."
-                placeholderTextColor="#666"
+                placeholderTextColor="#aaa"
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
@@ -80,7 +86,7 @@ export const LoginScreen = ({ navigation }: any) => {
               <TextInput 
                 style={styles.input}
                 placeholder="Mật khẩu..."
-                placeholderTextColor="#666"
+                placeholderTextColor="#aaa"
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry

@@ -1,18 +1,28 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Pressable, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
 import { useNavigation } from '@react-navigation/native';
+import { GlassSurface } from '../ui/GlassSurface';
+
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export const QuickBookingBar = () => {
   const navigation = useNavigation<any>();
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }]
+  }));
 
   return (
     <View style={styles.container}>
-      <View style={styles.card}>
+      <GlassSurface variant="card" style={styles.card} borderRadius={Theme.radius.lg}>
         <View style={styles.content}>
           <View style={styles.iconContainer}>
-            <Ionicons name="flash" size={24} color={Theme.colors.gold} />
+            <Ionicons name="flash-outline" size={24} color={Theme.colors.gold} />
           </View>
           <View style={styles.textContainer}>
             <Text style={styles.title}>Đặt Vé Nhanh</Text>
@@ -20,14 +30,16 @@ export const QuickBookingBar = () => {
           </View>
         </View>
         
-        <TouchableOpacity 
-          style={styles.button}
+        <AnimatedPressable 
+          style={[styles.button, animatedStyle]}
           onPress={() => navigation.navigate('QuickBook')}
+          onPressIn={() => scale.value = withTiming(0.96, { duration: 150 })}
+          onPressOut={() => scale.value = withTiming(1, { duration: 150 })}
         >
           <Text style={styles.buttonText}>Bắt đầu</Text>
           <Ionicons name="arrow-forward" size={16} color="#000" />
-        </TouchableOpacity>
-      </View>
+        </AnimatedPressable>
+      </GlassSurface>
     </View>
   );
 };
@@ -35,13 +47,11 @@ export const QuickBookingBar = () => {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: Theme.spacing.md,
-    marginTop: -30, // Chồng lên HeroBanner một chút
+    marginTop: Theme.spacing.md,
     marginBottom: Theme.spacing.xl,
     zIndex: 10,
   },
   card: {
-    backgroundColor: Theme.colors.surface,
-    borderRadius: Theme.radius.lg,
     padding: Theme.spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
@@ -82,10 +92,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Theme.colors.gold,
-    paddingVertical: 8,
+    paddingVertical: Platform.select({ ios: 12, android: 10 }),
     paddingHorizontal: 16,
-    borderRadius: 20,
-    gap: 4,
+    borderRadius: Theme.radius.btn || 14,
+    gap: 6,
   },
   buttonText: {
     color: '#000',

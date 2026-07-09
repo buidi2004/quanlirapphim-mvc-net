@@ -10,6 +10,8 @@ public class Movie
     public int DurationMinutes { get; set; }
     public string? Description { get; set; }
     public string? AgeRating { get; set; } // 'P' | 'C13' | 'C16' | 'C18'
+    public string? Director { get; set; }
+    public string? Cast { get; set; }
     public DateTime CreatedAt { get; set; }
     
     public double AverageRating { get; set; } = 0.0;

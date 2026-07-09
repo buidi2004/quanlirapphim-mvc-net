@@ -1,5 +1,6 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar, ScrollView, Switch, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, StatusBar, ScrollView, Switch, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
 
@@ -187,7 +188,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Theme.spacing.md,
     paddingVertical: Theme.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#222',
+    borderBottomColor: Theme.colors.cardBorder,
   },
   backBtn: {
     width: 40,
@@ -196,7 +197,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   headerTitle: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -208,7 +209,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionTitle: {
-    color: '#888',
+    color: Theme.colors.textSecondary,
     fontSize: 12,
     fontWeight: 'bold',
     marginBottom: 8,
@@ -216,10 +217,10 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   card: {
-    backgroundColor: '#111',
+    backgroundColor: Theme.colors.surface,
     borderRadius: Theme.radius.lg,
     borderWidth: 1,
-    borderColor: '#222',
+    borderColor: Theme.colors.cardBorder,
     overflow: 'hidden',
   },
   row: {
@@ -242,16 +243,16 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   rowText: {
-    color: '#fff',
+    color: Theme.colors.textPrimary,
     fontSize: 15,
   },
   divider: {
     height: 1,
-    backgroundColor: '#222',
+    backgroundColor: Theme.colors.surface,
     marginLeft: 48,
   },
   versionText: {
-    color: '#888',
+    color: Theme.colors.textSecondary,
     fontSize: 14,
   },
   deleteBtn: {

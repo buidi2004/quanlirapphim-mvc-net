@@ -84,16 +84,7 @@ Tài liệu này là **nguồn sự thật duy nhất** cho mọi quyết địn
 
 | # | Web View | Mobile Screen | File path |
 |---|----------|---------------|-----------|
-| E1 | `Page/membership.cshtml` | `MembershipScreen` | `src/screens/Page/MembershipScreen.tsx` |
-| E2 | `Page/faq.cshtml` | `FAQScreen` | `src/screens/Page/FAQScreen.tsx` |
-| E3 | `Page/terms.cshtml` | `TermsScreen` | `src/screens/Page/TermsScreen.tsx` |
-| E4 | `Page/privacy_policy.cshtml` | `PrivacyPolicyScreen` | `src/screens/Page/PrivacyPolicyScreen.tsx` |
-| E5 | `Page/payment_policy.cshtml` | `PaymentPolicyScreen` | `src/screens/Page/PaymentPolicyScreen.tsx` |
-| E6 | `Page/cinema_rules.cshtml` | `CinemaRulesScreen` | `src/screens/Page/CinemaRulesScreen.tsx` |
-| E7 | `Page/terms_transaction.cshtml` | `TransactionTermsScreen` | `src/screens/Page/TransactionTermsScreen.tsx` |
-| E8 | `Page/app.cshtml` | `AppDownloadScreen` | `src/screens/Page/AppDownloadScreen.tsx` |
-| E9 | `Page/careers.cshtml` | `CareersScreen` | `src/screens/Page/CareersScreen.tsx` |
-| E10 | `Page/partners.cshtml` | `PartnersScreen` | `src/screens/Page/PartnersScreen.tsx` |
+| E1 | `Page/*.cshtml` (Tất cả: membership, faq, terms, privacy, cinema_rules...) | `StaticPageScreen` | `src/screens/Page/StaticPageScreen.tsx` |
 
 ### Nhóm G: Mobile-only screens (Không có trên Web)
 
@@ -101,16 +92,15 @@ Tài liệu này là **nguồn sự thật duy nhất** cho mọi quyết địn
 |---|---------------|-----------|--------|
 | G1 | `NotificationScreen` | `src/screens/Notification/NotificationScreen.tsx` | Danh sách thông báo (kế thừa Navbar bell dropdown) |
 | G2 | `SettingsScreen` | `src/screens/Settings/SettingsScreen.tsx` | Cài đặt app: theme, ngôn ngữ, push notification |
-| G3 | `SplashScreen` | `src/screens/Splash/SplashScreen.tsx` | Splash logo khi mở app |
-| G4 | `OnboardingScreen` | `src/screens/Onboarding/OnboardingScreen.tsx` | Giới thiệu app lần đầu (3 slides) |
+| G3 | `SplashScreen` | `src/screens/Splash/SplashScreen.tsx` | Splash logo tĩnh khi mở app |
+| G4 | `VideoSplashScreen` | `src/screens/Splash/VideoSplashScreen.tsx` | Splash logo dạng video/animation khi mở app |
+| G5 | `OnboardingScreen` | `src/screens/Onboarding/OnboardingScreen.tsx` | Giới thiệu app lần đầu (3 slides) |
 
 ### Nhóm F: Error screens
 
 | # | Web View | Mobile Screen | File path |
 |---|----------|---------------|-----------|
-| F1 | `Home/Error404.cshtml` | `NotFoundScreen` | `src/screens/Error/NotFoundScreen.tsx` |
-| F2 | `Home/Error500.cshtml` | `ServerErrorScreen` | `src/screens/Error/ServerErrorScreen.tsx` |
-| F3 | (Mất mạng — mobile only) | `NoConnectionScreen` | `src/screens/Error/NoConnectionScreen.tsx` |
+| F1 | `Home/Error404.cshtml`, `Home/Error500.cshtml`, Network Error | `ErrorScreens` | `src/screens/Error/ErrorScreens.tsx` |
 
 ---
 

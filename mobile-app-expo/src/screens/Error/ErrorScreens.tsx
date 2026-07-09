@@ -1,6 +1,7 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import React from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar,
+  View, Text, StyleSheet, TouchableOpacity, StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
@@ -35,7 +36,7 @@ export const ServerErrorScreen = ({ navigation }: any) => (
       <View style={styles.iconWrap}>
         <Ionicons name="film" size={64} color="#333" />
         <View style={[styles.xBadge, { backgroundColor: Theme.colors.danger }]}>
-          <Text style={{ color: '#fff', fontSize: 12, fontWeight: 'bold' }}>!</Text>
+          <Text style={{ color: Theme.colors.textPrimary, fontSize: 12, fontWeight: 'bold' }}>!</Text>
         </View>
       </View>
       <Text style={styles.code}>500</Text>
@@ -79,8 +80,8 @@ const styles = StyleSheet.create({
   iconWrap: {
     position: 'relative', marginBottom: 24,
     width: 100, height: 100, justifyContent: 'center', alignItems: 'center',
-    backgroundColor: '#111', borderRadius: 50,
-    borderWidth: 1, borderColor: '#222',
+    backgroundColor: Theme.colors.surface, borderRadius: 50,
+    borderWidth: 1, borderColor: Theme.colors.cardBorder,
   },
   xBadge: {
     position: 'absolute', top: 0, right: 0,
@@ -94,11 +95,11 @@ const styles = StyleSheet.create({
     marginBottom: 8, letterSpacing: -4,
   },
   title: {
-    color: '#fff', fontSize: 20, fontWeight: 'bold',
+    color: Theme.colors.textPrimary, fontSize: 20, fontWeight: 'bold',
     textAlign: 'center', marginBottom: 12,
   },
   subtitle: {
-    color: '#888', fontSize: 14, lineHeight: 22,
+    color: Theme.colors.textSecondary, fontSize: 14, lineHeight: 22,
     textAlign: 'center', marginBottom: 32,
   },
   btn: {
@@ -109,10 +110,10 @@ const styles = StyleSheet.create({
   },
   btnText: { color: '#000', fontWeight: 'bold', fontSize: 15 },
   outlineBtn: {
-    borderWidth: 1, borderColor: '#444',
+    borderWidth: 1, borderColor: Theme.colors.cardBorder,
     paddingHorizontal: 28, paddingVertical: 12, borderRadius: Theme.radius.pill,
   },
-  outlineBtnText: { color: '#aaa', fontSize: 14 },
+  outlineBtnText: { color: Theme.colors.textSecondary, fontSize: 14 },
 
   // Overlay (NoConnection)
   overlayContainer: {
@@ -121,13 +122,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center', zIndex: 999,
   },
   overlayCard: {
-    backgroundColor: '#12121e', borderRadius: 20,
+    backgroundColor: Theme.colors.surface, borderRadius: 20,
     padding: 32, alignItems: 'center', gap: 12,
-    borderWidth: 1, borderColor: '#2d2d44',
+    borderWidth: 1, borderColor: Theme.colors.cardBorder,
     marginHorizontal: 24,
   },
-  overlayTitle: { color: '#fff', fontSize: 18, fontWeight: 'bold', textAlign: 'center' },
-  overlaySubtitle: { color: '#888', fontSize: 13, textAlign: 'center', lineHeight: 20 },
+  overlayTitle: { color: Theme.colors.textPrimary, fontSize: 18, fontWeight: 'bold', textAlign: 'center' },
+  overlaySubtitle: { color: Theme.colors.textSecondary, fontSize: 13, textAlign: 'center', lineHeight: 20 },
   retryBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
     backgroundColor: Theme.colors.warning,

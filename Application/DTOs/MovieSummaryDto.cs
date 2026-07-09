@@ -9,4 +9,6 @@ public class MovieSummaryDto
     public string Status { get; set; } = string.Empty;
     public int DurationMinutes { get; set; }
     public string AgeRating { get; set; } = string.Empty;
+    public string? Director { get; set; }
+    public string? Cast { get; set; }
 }

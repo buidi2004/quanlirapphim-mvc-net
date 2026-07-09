@@ -1,7 +1,8 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, SectionList, TouchableOpacity,
-  SafeAreaView, StatusBar, ScrollView,
+  StatusBar, ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
@@ -28,8 +29,8 @@ const SECTIONS_DATA = [
         name: 'CinemaX Landmark 81',
         address: 'Tầng 10, Landmark 81, Bình Thạnh',
         movies: [
-          { id: 1, title: 'Avengers: Endgame', rating: 'C13', duration: 181, times: ['10:30', '13:15', '16:00', '19:30', '21:45'] },
-          { id: 2, title: 'Dune: Part Two', rating: 'C13', duration: 166, times: ['14:00', '19:30'] },
+          { id: 1, title: 'Avengers: Endgame', rating: 'C13', durationMinutes: 181, times: ['10:30', '13:15', '16:00', '19:30', '21:45'] },
+          { id: 2, title: 'Dune: Part Two', rating: 'C13', durationMinutes: 166, times: ['14:00', '19:30'] },
         ],
       },
       {
@@ -37,8 +38,8 @@ const SECTIONS_DATA = [
         name: 'CinemaX Vincom Đồng Khởi',
         address: 'Tầng 8, Vincom Center, Q.1',
         movies: [
-          { id: 3, title: 'Deadpool & Wolverine', rating: 'C18', duration: 127, times: ['11:00', '14:00', '17:00', '20:00'] },
-          { id: 4, title: 'Inside Out 2', rating: 'P', duration: 100, times: ['09:00', '11:30', '14:00'] },
+          { id: 3, title: 'Deadpool & Wolverine', rating: 'C18', durationMinutes: 127, times: ['11:00', '14:00', '17:00', '20:00'] },
+          { id: 4, title: 'Inside Out 2', rating: 'P', durationMinutes: 100, times: ['09:00', '11:30', '14:00'] },
         ],
       },
     ],
@@ -51,8 +52,8 @@ const SECTIONS_DATA = [
         name: 'CinemaX Vincom Bà Triệu',
         address: 'Tầng 5, Vincom, Hai Bà Trưng',
         movies: [
-          { id: 5, title: 'Oppenheimer', rating: 'C18', duration: 180, times: ['10:00', '14:00', '18:00'] },
-          { id: 2, title: 'Dune: Part Two', rating: 'C13', duration: 166, times: ['12:00', '16:00', '20:00'] },
+          { id: 5, title: 'Oppenheimer', rating: 'C18', durationMinutes: 180, times: ['10:00', '14:00', '18:00'] },
+          { id: 2, title: 'Dune: Part Two', rating: 'C13', durationMinutes: 166, times: ['12:00', '16:00', '20:00'] },
         ],
       },
     ],
@@ -65,7 +66,7 @@ const SECTIONS_DATA = [
         name: 'CinemaX Vincom Đà Nẵng',
         address: 'Tầng 6, Vincom, Sơn Trà',
         movies: [
-          { id: 1, title: 'Avengers: Endgame', rating: 'C13', duration: 181, times: ['11:00', '14:30', '18:00'] },
+          { id: 1, title: 'Avengers: Endgame', rating: 'C13', durationMinutes: 181, times: ['11:00', '14:30', '18:00'] },
         ],
       },
     ],
@@ -165,7 +166,7 @@ export const GlobalShowtimesScreen = ({ navigation }: any) => {
                   <View style={[styles.ratingBadge, { backgroundColor: getRatingColor(movie.rating) }]}>
                     <Text style={styles.ratingText}>{movie.rating}</Text>
                   </View>
-                  <Text style={styles.duration}>{movie.duration}ph</Text>
+                  <Text style={styles.duration}>{movie.durationMinutes}ph</Text>
                 </View>
                 <View style={styles.timesRow}>
                   {movie.times.map(t => (
@@ -200,22 +201,22 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: Theme.spacing.md, paddingVertical: Theme.spacing.md,
-    borderBottomWidth: 1, borderBottomColor: '#1a1a2e',
+    borderBottomWidth: 1, borderBottomColor: Theme.colors.cardBorder,
   },
   backBtn: { width: 40, height: 40, justifyContent: 'center' },
   headerTitle: { color: Theme.colors.warning, fontSize: 14, fontWeight: 'bold' },
 
-  dateWrapper: { backgroundColor: Theme.colors.surface, borderBottomWidth: 1, borderBottomColor: '#1a1a2e' },
+  dateWrapper: { backgroundColor: Theme.colors.surface, borderBottomWidth: 1, borderBottomColor: Theme.colors.cardBorder },
   dateScroll: { gap: 8, paddingHorizontal: 16, paddingVertical: 12 },
   dateChip: {
     paddingHorizontal: 14, paddingVertical: 8, borderRadius: Theme.radius.pill,
-    backgroundColor: '#222', borderWidth: 1, borderColor: '#333',
+    backgroundColor: Theme.colors.surface, borderWidth: 1, borderColor: Theme.colors.cardBorder,
   },
   dateChipActive: { backgroundColor: Theme.colors.warningLight, borderColor: Theme.colors.warning },
-  dateLabel: { color: '#aaa', fontSize: 12, fontWeight: '600' },
+  dateLabel: { color: Theme.colors.textSecondary, fontSize: 12, fontWeight: '600' },
   dateLabelActive: { color: Theme.colors.warning },
 
-  provinceBar: { paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#1a1a2e' },
+  provinceBar: { paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: Theme.colors.cardBorder },
   provinceChip: {
     paddingHorizontal: 14, paddingVertical: 6, borderRadius: Theme.radius.pill,
     backgroundColor: Theme.colors.accentLight, borderWidth: 1, borderColor: Theme.colors.accent,
@@ -224,10 +225,10 @@ const styles = StyleSheet.create({
 
   sectionHeader: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
-    backgroundColor: '#111', paddingHorizontal: Theme.spacing.md, paddingVertical: 12,
-    borderBottomWidth: 1, borderBottomColor: '#1a1a2e',
+    backgroundColor: Theme.colors.surface, paddingHorizontal: Theme.spacing.md, paddingVertical: 12,
+    borderBottomWidth: 1, borderBottomColor: Theme.colors.cardBorder,
   },
-  sectionTitle: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+  sectionTitle: { color: Theme.colors.textPrimary, fontSize: 16, fontWeight: 'bold' },
 
   cinemaBlock: {
     marginHorizontal: Theme.spacing.md, marginTop: 12,
@@ -242,15 +243,15 @@ const styles = StyleSheet.create({
     width: 36, height: 36, borderRadius: 18,
     backgroundColor: 'rgba(255,193,7,0.1)', justifyContent: 'center', alignItems: 'center',
   },
-  cinemaName: { color: '#fff', fontSize: 14, fontWeight: 'bold', marginBottom: 2 },
-  cinemaAddr: { color: '#888', fontSize: 11 },
+  cinemaName: { color: Theme.colors.textPrimary, fontSize: 14, fontWeight: 'bold', marginBottom: 2 },
+  cinemaAddr: { color: Theme.colors.textSecondary, fontSize: 11 },
 
-  movieBlock: { padding: 14, borderBottomWidth: 1, borderBottomColor: '#1a1a2e' },
+  movieBlock: { padding: 14, borderBottomWidth: 1, borderBottomColor: Theme.colors.cardBorder },
   movieInfoRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
-  movieTitle: { color: '#fff', fontSize: 14, fontWeight: '600', flex: 1 },
+  movieTitle: { color: Theme.colors.textPrimary, fontSize: 14, fontWeight: '600', flex: 1 },
   ratingBadge: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
-  ratingText: { color: '#fff', fontSize: 9, fontWeight: 'bold' },
-  duration: { color: '#888', fontSize: 11 },
+  ratingText: { color: Theme.colors.textPrimary, fontSize: 9, fontWeight: 'bold' },
+  duration: { color: Theme.colors.textSecondary, fontSize: 11 },
   timesRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   timeChip: {
     paddingHorizontal: 12, paddingVertical: 7, borderRadius: Theme.radius.md,
@@ -259,5 +260,5 @@ const styles = StyleSheet.create({
   timeText: { color: Theme.colors.warning, fontSize: 13, fontWeight: 'bold' },
 
   emptyContainer: { paddingTop: 80, alignItems: 'center', gap: 16 },
-  emptyText: { color: '#666', fontSize: 15 },
+  emptyText: { color: Theme.colors.textMuted, fontSize: 15 },
 });

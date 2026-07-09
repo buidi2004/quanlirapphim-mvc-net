@@ -64,8 +64,12 @@ public class MovieService(
             summaries.Add(new ShowtimeSummary
             {
                 Id             = showtime.Id,
+                CinemaId       = showtime.Room?.CinemaId ?? 0,
+                CinemaName     = showtime.Room?.Cinema?.Name ?? "",
                 ShowDate       = showtime.ShowDate,
                 StartTime      = showtime.StartTime,
+                EndTime        = showtime.EndTime,
+                Price          = dynamicPrice,
                 FormattedPrice = showtime.GetFormattedPrice(),
                 RoomName       = showtime.Room.Name,
                 AvailableSeats = Math.Max(0, totalSeats - activeCount)

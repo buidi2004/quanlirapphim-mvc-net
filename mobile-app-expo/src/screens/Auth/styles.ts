@@ -37,7 +37,7 @@ export const styles = StyleSheet.create({
     textShadowRadius: 10,
   },
   subtitle: {
-    color: '#aaa',
+    color: '#e0e0e0', // forced light color against dark overlay
     textAlign: 'center',
     fontSize: 14,
     marginBottom: Theme.spacing.lg * 2,
@@ -65,7 +65,7 @@ export const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    color: '#fff',
+    color: '#ffffff', // forced white
     paddingVertical: 14,
     fontSize: 16,
   },
@@ -88,7 +88,7 @@ export const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   linkText: {
-    color: '#aaa',
+    color: '#e0e0e0',
     textAlign: 'center',
     marginTop: Theme.spacing.lg,
     fontSize: 14,
@@ -98,7 +98,7 @@ export const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   forgotText: {
-    color: Theme.colors.textPrimary,
+    color: '#ffffff',
     textAlign: 'right',
     fontSize: 12,
     marginTop: -4,
