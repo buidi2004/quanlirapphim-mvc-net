@@ -10,6 +10,10 @@ namespace CinemaXNet.Controllers;
 [Route("admin")]
 public class AdminController(IMovieService movieService, IAuditLogService auditLogService, IDashboardService dashboardService) : Controller
 {
+    // GET /admin
+    [HttpGet("")]
+    public IActionResult Index() => RedirectToAction(nameof(Dashboard));
+
     // GET /admin/dashboard
     [HttpGet("dashboard")]
     public async Task<IActionResult> Dashboard()

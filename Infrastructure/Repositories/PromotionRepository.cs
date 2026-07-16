@@ -28,13 +28,13 @@ public class PromotionRepository(IDbConnection db) : IPromotionRepository
 
     public Task CreateAsync(dynamic promo)
     {
-        var sql = "INSERT INTO promotions (code, title, description, discount_percent, valid_from, valid_to, is_active) VALUES (@Code, @Title, @Description, @DiscountPercent, @ValidFrom, @ValidTo, @IsActive)";
+        var sql = "INSERT INTO promotions (code, discount_type, discount_value, max_uses, expires_at, is_active) VALUES (@Code, @DiscountType, @DiscountValue, @MaxUses, @ExpiresAt, @IsActive)";
         return db.ExecuteAsync(sql, (object)promo);
     }
 
     public Task UpdateAsync(dynamic promo)
     {
-        var sql = "UPDATE promotions SET code = @Code, title = @Title, description = @Description, discount_percent = @DiscountPercent, valid_from = @ValidFrom, valid_to = @ValidTo, is_active = @IsActive WHERE id = @Id";
+        var sql = "UPDATE promotions SET code = @Code, discount_type = @DiscountType, discount_value = @DiscountValue, max_uses = @MaxUses, expires_at = @ExpiresAt, is_active = @IsActive WHERE id = @Id";
         return db.ExecuteAsync(sql, (object)promo);
     }
 

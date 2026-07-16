@@ -2,7 +2,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  StatusBar, Linking, Platform,
+  StatusBar, Linking, Platform, ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
@@ -12,49 +12,31 @@ import { CinemaService } from '../../services/CinemaService';
 import { Cinema, CinemaShowtimeGroup } from '../../models/Cinema';
 import { IMAGE_BASE_URL } from '../../api/apiClient';
 
-const MOCK_CINEMA = {
+const MOCK_CINEMA: Cinema = {
   id: 1,
   name: 'CinemaX Landmark 81',
-  city: 'TP.HCM',
+  slug: 'cinemax-landmark-81',
+  province: 'TP.Hồ Chí Minh',
   address: 'Tầng 10, Landmark 81, 720A Điện Biên Phủ, P.22, Bình Thạnh, TP.HCM',
   phone: '028-1234-5678',
   email: 'landmark81@cinemax.vn',
-  hours: '08:00 - 24:00',
+  openingHours: '08:00 - 24:00',
   imageUrl: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800',
   lat: 10.7941,
   lng: 106.7218,
-  facilities: ['IMAX', 'Dolby Atmos', '4DX', 'Sweetbox', 'Parking', 'F&B', 'WiFi'],
-  experiences: [
-    { name: 'IMAX', icon: 'expand-outline', description: 'Màn hình khổng lồ & âm thanh đỉnh cao' },
-    { name: 'Dolby Atmos', icon: 'volume-high-outline', description: 'Âm thanh vòm 360° hoàn hảo' },
-    { name: 'Sweetbox', icon: 'heart-outline', description: 'Ghế đôi lãng mạn dành cho cặp đôi' },
-  ],
-  description: 'CinemaX Landmark 81 là rạp chiếu phim hiện đại nhất TP.HCM, tọa lạc tại tòa nhà cao nhất Việt Nam. Với 8 phòng chiếu bao gồm IMAX, Dolby Atmos và Sweetbox, chúng tôi mang đến trải nghiệm điện ảnh đỉnh cao.',
+  facilities: 'IMAX, Dolby Atmos, 4DX, Sweetbox, Parking, F&B, WiFi',
+  description: 'CinemaX Landmark 81 là rạp chiếu phim hiện đại nhất TP.HCM, tọa lạc tại tòa nhà cao nhất Việt Nam.',
 };
 
-const MOCK_SHOWTIMES_TODAY = [
-  {
-    id: 1,
-    title: 'Avengers: Endgame',
-    rating: 'C13',
-    durationMinutes: 181,
-    times: ['10:30', '13:15', '16:00', '19:30', '21:45'],
-  },
-  {
-    id: 2,
-    title: 'Dune: Part Two',
-    rating: 'C13',
-    durationMinutes: 166,
-    times: ['11:00', '14:00', '19:00'],
-  },
-  {
-    id: 3,
-    title: 'Inside Out 2',
-    rating: 'P',
-    durationMinutes: 100,
-    times: ['09:00', '11:30', '14:00', '16:30'],
-  },
+const MOCK_EXPERIENCES = [
+  { name: 'IMAX', icon: 'expand-outline', description: 'Màn hình khổng lồ & âm thanh đỉnh cao' },
+  { name: 'Dolby Atmos', icon: 'volume-high-outline', description: 'Âm thanh vòm 360° hoàn hảo' },
+  { name: 'Sweetbox', icon: 'heart-outline', description: 'Ghế đôi lãng mạn dành cho cặp đôi' },
 ];
+
+
+
+
 
 const getNext7Days = () => {
   const dayNames = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
@@ -74,28 +56,62 @@ export const CinemaDetailScreen = ({ navigation, route }: any) => {
   const [selectedDate, setSelectedDate] = useState(getNext7Days()[0].dateString);
   const [showtimes, setShowtimes] = useState<CinemaShowtimeGroup[]>([]);
   const [loadingShowtimes, setLoadingShowtimes] = useState(false);
+  const [cinemaData, setCinemaData] = useState<Cinema | null>(route.params?.cinema || null);
+  const [loadingCinema, setLoadingCinema] = useState(!route.params?.cinema);
   const days = getNext7Days();
-  
-  const cinema: Cinema = route.params?.cinema || MOCK_CINEMA;
+
+  // Bug #3 fix: nếu chỉ nhận cinemaId (từ GlobalShowtimesScreen), fetch cinema đầy đủ từ API
+  useEffect(() => {
+    if (!route.params?.cinema && route.params?.cinemaId) {
+      fetchCinema(route.params.cinemaId);
+    }
+  }, []);
+
+  const fetchCinema = async (id: number) => {
+    try {
+      setLoadingCinema(true);
+      const res = await CinemaService.getCinemas();
+      if (res.success) {
+        const found = res.data.find((c: Cinema) => c.id === id);
+        setCinemaData(found || MOCK_CINEMA);
+      } else {
+        setCinemaData(MOCK_CINEMA);
+      }
+    } catch {
+      setCinemaData(MOCK_CINEMA);
+    } finally {
+      setLoadingCinema(false);
+    }
+  };
+
+  const cinema: Cinema = cinemaData || MOCK_CINEMA;
 
   useEffect(() => {
-    fetchShowtimes();
-  }, [selectedDate, cinema.id]);
+    if (!loadingCinema) fetchShowtimes();
+  }, [selectedDate, cinema.id, loadingCinema]);
 
   const fetchShowtimes = async () => {
     setLoadingShowtimes(true);
     try {
       const res = await CinemaService.getCinemaShowtimes(cinema.id, selectedDate);
       if (res.success) {
-        setShowtimes(res.data || []);
+        setShowtimes(res.data?.items || []);
       }
     } catch (error: any) {
       console.log('Error fetching showtimes:', error?.message || error);
-      setShowtimes([]); // Fallback to empty array
+      setShowtimes([]);
     } finally {
       setLoadingShowtimes(false);
     }
   };
+
+  if (loadingCinema) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#0a0a0a', justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#f5c518" />
+      </SafeAreaView>
+    );
+  }
 
   const openMap = () => {
     const url = Platform.select({
@@ -189,7 +205,7 @@ export const CinemaDetailScreen = ({ navigation, route }: any) => {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Trải nghiệm tại rạp</Text>
             <View style={styles.expRow}>
-              {MOCK_CINEMA.experiences.map(exp => (
+              {MOCK_EXPERIENCES.map((exp: { name: string; icon: string; description: string }) => (
                 <View key={exp.name} style={styles.expCard}>
                   <Ionicons name={exp.icon as any} size={24} color={Theme.colors.warning} />
                   <Text style={styles.expName}>{exp.name}</Text>
@@ -249,6 +265,7 @@ export const CinemaDetailScreen = ({ navigation, route }: any) => {
                         })}
                       >
                         <Text style={styles.timeText}>{t.startTime}</Text>
+                        <Text style={{color: Theme.colors.textMuted, fontSize: 10, marginTop: 2, textAlign: 'center'}}>{t.format || '2D'}</Text>
                       </TouchableOpacity>
                     ))}
                   </View>

@@ -1,7 +1,6 @@
 export type RootStackParamList = {
   // ── Drawer & Tabs ──
-  MainDrawer: undefined;
-  MainTabs: undefined;
+  MainDrawer: { screen?: string; params?: object } | undefined;
 
   // ── Auth Flow ──
   Login: undefined;
@@ -16,16 +15,15 @@ export type RootStackParamList = {
   TicketDetail: { ticketId?: string };
 
   // ── Booking Flow ──
-  QuickBook: undefined;
   SeatSelection: { showtimeId?: number; movieTitle?: string; cinemaName?: string; showDate?: string; showTime?: string; roomName?: string };
-  Concession: { showtimeId?: number; movieTitle?: string };
+  Concession: { showtimeId?: number; selectedSeats?: any[]; ticketIds?: any[]; remainingSeconds?: number; movieTitle?: string; roomName?: string; startTime?: string; cinemaName?: string };
   ConcessionDetail: { item?: any };
-  Payment: { showtimeId?: number };
+  Payment: { showtimeId?: number; selectedSeats?: any[]; ticketIds?: any[]; concessions?: object; concessionNames?: { [key: string]: string }; seatPrice?: number; concessionPrice?: number; remainingSeconds?: number; movieTitle?: string; roomName?: string; startTime?: string; cinemaName?: string };
   PaymentSuccess: { transactionId?: string };
 
   // ── Cinema Flow ──
   CinemaList: undefined;
-  CinemaDetail: { cinemaId?: number };
+  CinemaDetail: { cinema?: any; cinemaId?: number };
   GlobalShowtimes: undefined;
 
   // ── Search ──

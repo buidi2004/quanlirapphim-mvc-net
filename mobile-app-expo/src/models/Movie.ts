@@ -31,6 +31,7 @@ export interface ShowtimeSummary {
   roomName: string;
   startTime: string;
   endTime: string;
+  format: string;
   price: number;
   availableSeats: number;
 }

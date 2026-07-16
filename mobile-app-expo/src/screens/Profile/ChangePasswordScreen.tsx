@@ -1,11 +1,11 @@
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, StatusBar, TextInput, KeyboardAvoidingView, Platform, ScrollView,
+  View, Text, StyleSheet, TouchableOpacity, StatusBar, TextInput, KeyboardAvoidingView, Platform, ScrollView, Alert
 } from 'react-native';
+import { AuthService } from '../../services/AuthService';
 import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
-
 export const ChangePasswordScreen = ({ navigation }: any) => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -28,10 +28,20 @@ export const ChangePasswordScreen = ({ navigation }: any) => {
   const handleSubmit = async () => {
     if (!validate()) return;
     setLoading(true);
-    // Simulate API
-    await new Promise(r => setTimeout(r, 1200));
-    setLoading(false);
-    navigation.goBack();
+    try {
+      const res: any = await AuthService.changePassword(currentPassword, newPassword);
+      if (res.success) {
+        Alert.alert('Thành công', 'Đã đổi mật khẩu.', [
+          { text: 'OK', onPress: () => navigation.goBack() }
+        ]);
+      } else {
+        Alert.alert('Lỗi', res.error || res.message || 'Đổi mật khẩu thất bại.');
+      }
+    } catch (e: any) {
+      Alert.alert('Lỗi', e.error || e.message || 'Mất kết nối.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const PasswordField = ({

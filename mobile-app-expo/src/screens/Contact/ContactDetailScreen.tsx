@@ -134,7 +134,7 @@ export const ContactDetailScreen = ({ navigation, route }: any) => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.homeBtn}
-            onPress={() => navigation.navigate('MainTabs')}
+            onPress={() => navigation.navigate('MainDrawer')}
           >
             <Ionicons name="home-outline" size={18} color="#fff" />
             <Text style={styles.homeBtnText}>Quay lại Trang chủ</Text>

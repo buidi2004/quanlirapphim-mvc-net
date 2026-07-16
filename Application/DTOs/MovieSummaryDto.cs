@@ -11,4 +11,8 @@ public class MovieSummaryDto
     public string AgeRating { get; set; } = string.Empty;
     public string? Director { get; set; }
     public string? Cast { get; set; }
+    public string? Description { get; set; }
+    public DateTime? ReleaseDate { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public string? TrailerUrl { get; set; }
 }

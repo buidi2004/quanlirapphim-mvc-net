@@ -9,58 +9,59 @@
         <div class="card bg-white border border-light p-4 rounded shadow-lg">
             <h2 class="text-center text-warning fw-medium mb-4">ĐĂNG KÝ</h2>
 
-            @if (!string.IsNullOrEmpty(Model.GeneralError))
-            {
-                <div class="alert alert-danger border-0 p-2 text-center mb-3" style="background-color: #3b171c; color: #f8d7da;">
-                    <small>@Model.GeneralError</small>
-                </div>
-            }
+                @if (!string.IsNullOrEmpty(Model.GeneralError))
+                {
+                    <div class="alert alert-danger border-0 p-2 text-center mb-3" style="background-color: rgba(111, 66, 193, 0.2); color: #6f42c1;">
+                        <small>@Model.GeneralError</small>
+                    </div>
+                }
 
-            <form method="post" action="/register">
-                @Html.AntiForgeryToken()
+                <form method="post" action="/register">
+                    @Html.AntiForgeryToken()
 
-                <div class="mb-3">
-                    <label class="form-label text-dark">Tên người dùng</label>
-                    <input type="text" name="Username"
-                           class="form-control bg-light text-dark border-light @(ViewData.ModelState["Username"]?.Errors.Count > 0 ? "is-invalid" : "")"
-                           placeholder="Nhập tên người dùng..."
-                           value="@Model.Username" required>
-                    <span asp-validation-for="Username" class="invalid-feedback"></span>
-                </div>
+                    <div class="mb-3">
+                        <label class="form-label text-dark">Tên người dùng</label>
+                        <input type="text" name="Username"
+                               class="form-control bg-white bg-opacity-50 text-dark border-light @(ViewData.ModelState["Username"]?.Errors.Count > 0 ? "is-invalid" : "")"
+                               placeholder="Nhập tên người dùng..."
+                               value="@Model.Username" required>
+                        <span asp-validation-for="Username" class="invalid-feedback text-purple"></span>
+                    </div>
 
-                <div class="mb-3">
-                    <label class="form-label text-dark">Email</label>
-                    <input type="email" name="Email"
-                           class="form-control bg-light text-dark border-light @(ViewData.ModelState["Email"]?.Errors.Count > 0 ? "is-invalid" : "")"
-                           placeholder="name@example.com"
-                           value="@Model.Email" required>
-                    <span asp-validation-for="Email" class="invalid-feedback"></span>
-                </div>
+                    <div class="mb-3">
+                        <label class="form-label text-dark">Email</label>
+                        <input type="email" name="Email"
+                               class="form-control bg-white bg-opacity-50 text-dark border-light @(ViewData.ModelState["Email"]?.Errors.Count > 0 ? "is-invalid" : "")"
+                               placeholder="name@example.com"
+                               value="@Model.Email" required>
+                        <span asp-validation-for="Email" class="invalid-feedback text-purple"></span>
+                    </div>
 
-                <div class="mb-3">
-                    <label class="form-label text-dark">Mật khẩu</label>
-                    <input type="password" name="Password"
-                           class="form-control bg-light text-dark border-light @(ViewData.ModelState["Password"]?.Errors.Count > 0 ? "is-invalid" : "")"
-                           placeholder="Tối thiểu 6 ký tự" required>
-                    <span asp-validation-for="Password" class="invalid-feedback"></span>
-                </div>
+                    <div class="mb-3">
+                        <label class="form-label text-dark">Mật khẩu</label>
+                        <input type="password" name="Password"
+                               class="form-control bg-white bg-opacity-50 text-dark border-light @(ViewData.ModelState["Password"]?.Errors.Count > 0 ? "is-invalid" : "")"
+                               placeholder="Tối thiểu 6 ký tự" required>
+                        <span asp-validation-for="Password" class="invalid-feedback text-purple"></span>
+                    </div>
 
-                <div class="mb-4">
-                    <label class="form-label text-dark">Xác nhận mật khẩu</label>
-                    <input type="password" name="ConfirmPassword"
-                           class="form-control bg-light text-dark border-light @(ViewData.ModelState["ConfirmPassword"]?.Errors.Count > 0 ? "is-invalid" : "")"
-                           placeholder="Xác nhận mật khẩu" required>
-                    <span asp-validation-for="ConfirmPassword" class="invalid-feedback"></span>
-                </div>
+                    <div class="mb-4">
+                        <label class="form-label text-dark">Xác nhận mật khẩu</label>
+                        <input type="password" name="ConfirmPassword"
+                               class="form-control bg-white bg-opacity-50 text-dark border-light @(ViewData.ModelState["ConfirmPassword"]?.Errors.Count > 0 ? "is-invalid" : "")"
+                               placeholder="Xác nhận mật khẩu" required>
+                        <span asp-validation-for="ConfirmPassword" class="invalid-feedback text-purple"></span>
+                    </div>
 
                 <button type="submit" class="btn btn-warning w-100 fw-medium py-2 shadow mb-3">
                     ĐĂNG KÝ
                 </button>
 
-                <p class="text-center text-secondary small mb-0">
-                    Đã có tài khoản? <a href="/login" class="text-warning text-decoration-none fw-semibold">Đăng nhập ngay</a>
-                </p>
-            </form>
+                    <p class="text-center text-dark small mb-0 opacity-75">
+                        Đã có tài khoản? <a href="/login" class="text-purple text-decoration-none fw-bold">Đăng nhập ngay</a>
+                    </p>
+                </form>
+            </div>
         </div>
     </div>
 </div>

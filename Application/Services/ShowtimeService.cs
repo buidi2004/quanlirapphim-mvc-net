@@ -3,7 +3,7 @@ using CinemaXNet.Application.Interfaces;
 
 namespace CinemaXNet.Application.Services;
 
-public class ShowtimeService(IShowtimeRepository repository) : IShowtimeService
+public class ShowtimeService(IShowtimeRepository repository, ITicketRepository ticketRepository) : IShowtimeService
 {
     public Task<Showtime?> FindByIdAsync(int id) => repository.FindByIdAsync(id);
     public Task<IEnumerable<Showtime>> GetByMovieAndDateAsync(int movieId, DateOnly date) => repository.GetByMovieAndDateAsync(movieId, date);
@@ -14,7 +14,15 @@ public class ShowtimeService(IShowtimeRepository repository) : IShowtimeService
     public Task<IEnumerable<Movie>> GetAllMoviesAsync() => repository.GetAllMoviesAsync();
     public Task<IEnumerable<Room>> GetAllRoomsWithCinemaAsync() => repository.GetAllRoomsWithCinemaAsync();
     
-    public Task AddAsync(int movieId, int roomId, string showDate, string startTime, string endTime, decimal price) => repository.AddAsync(movieId, roomId, showDate, startTime, endTime, price);
-    public Task UpdateAsync(int id, int movieId, int roomId, string showDate, string startTime, string endTime, decimal price) => repository.UpdateAsync(id, movieId, roomId, showDate, startTime, endTime, price);
-    public Task DeleteAsync(int id) => repository.DeleteAsync(id);
+    public async Task AddAsync(int movieId, int roomId, string showDate, string startTime, string format, decimal price) => 
+        await repository.AddAsync(movieId, roomId, showDate, startTime, format, price);
+        
+    public async Task UpdateAsync(int id, int movieId, int roomId, string showDate, string startTime, string format, decimal price) => 
+        await repository.UpdateAsync(id, movieId, roomId, showDate, startTime, format, price);
+    public async Task DeleteAsync(int id)
+    {
+        if (await ticketRepository.HasActiveTicketsForShowtimeAsync(id))
+            throw new CinemaXNet.Domain.Exceptions.BusinessException("Không thể xóa suất chiếu này vì đã có vé được thanh toán.");
+        await repository.DeleteAsync(id);
+    }
 }

@@ -17,7 +17,7 @@
             <div class="list-group list-group-flush custom-scroll" style="height: 500px; overflow-y: auto;">
                 @foreach (var m in movies)
                 {
-                    <button class="list-group-item list-group-item-action bg-dark text-light border-0 py-3 movie-item" data-id="@m.Id">
+                    <button class="list-group-item list-group-item-action bg-white text-dark border-0 py-3 movie-item" data-id="@m.Id">
                         <div class="d-flex align-items-center">
                             <img src="@m.PosterUrl" class="rounded me-3" style="width: 40px; height: 60px; object-fit: cover;">
                             <div>
@@ -79,7 +79,7 @@
     .list-group-item.active { background-color: #333 !important; border-left: 4px solid #6f42c1 !important; color: #fff !important; }
     .list-group-item:hover:not(.active) { background-color: rgba(255,193,7,0.1) !important; cursor: pointer; }
     .time-btn { transition: all 0.2s; }
-    .time-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(255,193,7,0.2); }
+    .time-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(124, 58, 237, 0.2); }
 </style>
 
 @section Scripts {
@@ -111,7 +111,7 @@
 
         async function loadCinemas(movieId) {
             const list = document.getElementById('cinema-list');
-            list.innerHTML = '<div class="text-center p-4 text-warning"><div class="spinner-border spinner-border-sm"></div> Đang tải...</div>';
+            list.innerHTML = '<div class="text-center p-4 text-purple"><div class="spinner-border spinner-border-sm"></div> Đang tải...</div>';
             
             try {
                 const res = await fetch(`/api/quickbooking/cinemas?movieId=${movieId}`);
@@ -125,8 +125,8 @@
                 list.innerHTML = '';
                 data.forEach(c => {
                     const btn = document.createElement('button');
-                    btn.className = 'list-group-item list-group-item-action bg-dark text-light border-0 py-3 cinema-item';
-                    btn.innerHTML = `<i class="bi bi-building me-2 text-warning"></i>${c.name}`;
+                    btn.className = 'list-group-item list-group-item-action bg-white text-dark border-0 py-3 cinema-item';
+                    btn.innerHTML = `<i class="bi bi-building me-2 text-purple"></i>${c.name}`;
                     btn.onclick = () => {
                         document.querySelectorAll('.cinema-item').forEach(i => i.classList.remove('active'));
                         btn.classList.add('active');
@@ -144,7 +144,7 @@
 
         async function loadDates(movieId, cinemaId) {
             const list = document.getElementById('date-list');
-            list.innerHTML = '<div class="text-center p-4 text-warning"><div class="spinner-border spinner-border-sm"></div> Đang tải...</div>';
+            list.innerHTML = '<div class="text-center p-4 text-purple"><div class="spinner-border spinner-border-sm"></div> Đang tải...</div>';
             
             try {
                 const res = await fetch(`/api/quickbooking/dates?movieId=${movieId}&cinemaId=${cinemaId}`);
@@ -170,7 +170,7 @@
 
         async function loadShowtimes(movieId, cinemaId, date) {
             const list = document.getElementById('time-list');
-            list.innerHTML = '<div class="text-center p-4 text-warning"><div class="spinner-border spinner-border-sm"></div> Đang tải...</div>';
+            list.innerHTML = '<div class="text-center p-4 text-purple"><div class="spinner-border spinner-border-sm"></div> Đang tải...</div>';
             
             try {
                 const res = await fetch(`/api/quickbooking/showtimes?movieId=${movieId}&cinemaId=${cinemaId}&date=${date}`);

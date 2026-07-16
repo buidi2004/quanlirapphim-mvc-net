@@ -11,7 +11,7 @@ public class ShowtimeRepository(IDbConnection db) : IShowtimeRepository
     {
         const string sql = @"
             SELECT s.id, s.movie_id AS MovieId, s.room_id AS RoomId,
-                   s.show_date AS ShowDate, s.start_time AS StartTime, s.price, s.created_at AS CreatedAt,
+                   s.show_date AS ShowDate, s.start_time AS StartTime, s.format AS Format, s.price, s.created_at AS CreatedAt,
                    r.id, r.cinema_id AS CinemaId, r.name, r.total_rows AS TotalRows, r.seats_per_row AS SeatsPerRow,
                    c.id, c.name, c.province, c.district, c.address, c.slug
             FROM showtimes s
@@ -38,7 +38,7 @@ public class ShowtimeRepository(IDbConnection db) : IShowtimeRepository
     {
         const string sql = @"
             SELECT s.id, s.movie_id AS MovieId, s.room_id AS RoomId,
-                   s.show_date AS ShowDate, s.start_time AS StartTime, s.price, s.created_at AS CreatedAt,
+                   s.show_date AS ShowDate, s.start_time AS StartTime, s.format AS Format, s.price, s.created_at AS CreatedAt,
                    r.id, r.name, r.total_rows AS TotalRows, r.seats_per_row AS SeatsPerRow,
                    m.id, m.title, m.poster_url AS PosterUrl, m.genre,
                    m.status, m.duration_minutes AS DurationMinutes, m.description, m.age_rating AS AgeRating, m.created_at AS CreatedAt
@@ -60,7 +60,7 @@ public class ShowtimeRepository(IDbConnection db) : IShowtimeRepository
     {
         const string sql = @"
             SELECT s.id, s.movie_id AS MovieId, s.room_id AS RoomId,
-                   s.show_date AS ShowDate, s.start_time AS StartTime, s.price, s.created_at AS CreatedAt,
+                   s.show_date AS ShowDate, s.start_time AS StartTime, s.format AS Format, s.price, s.created_at AS CreatedAt,
                    r.id, r.cinema_id AS CinemaId, r.name, r.total_rows AS TotalRows, r.seats_per_row AS SeatsPerRow,
                    m.id, m.title, m.poster_url AS PosterUrl, m.genre,
                    m.status, m.duration_minutes AS DurationMinutes, m.description, m.age_rating AS AgeRating, m.created_at AS CreatedAt
@@ -83,7 +83,7 @@ public class ShowtimeRepository(IDbConnection db) : IShowtimeRepository
     {
         const string sql = @"
             SELECT s.id, s.movie_id AS MovieId, s.room_id AS RoomId,
-                   s.show_date AS ShowDate, s.start_time AS StartTime, s.price, s.created_at AS CreatedAt,
+                   s.show_date AS ShowDate, s.start_time AS StartTime, s.format AS Format, s.price, s.created_at AS CreatedAt,
                    r.id, r.cinema_id AS CinemaId, r.name, r.total_rows AS TotalRows, r.seats_per_row AS SeatsPerRow,
                    c.id, c.name, c.province, c.district, c.address, c.slug,
                    m.id, m.title, m.poster_url AS PosterUrl, m.genre,
@@ -117,7 +117,7 @@ public class ShowtimeRepository(IDbConnection db) : IShowtimeRepository
         var totalCount = await db.ExecuteScalarAsync<int>(countSql);
 
         var sql = @"
-            SELECT s.id, s.movie_id AS MovieId, s.room_id AS RoomId, s.show_date AS ShowDate, s.start_time AS StartTime, s.price,
+            SELECT s.id, s.movie_id AS MovieId, s.room_id AS RoomId, s.show_date AS ShowDate, s.start_time AS StartTime, s.format AS Format, s.price,
                    m.id, m.title,
                    r.id, r.name,
                    c.id, c.name
@@ -168,16 +168,16 @@ public class ShowtimeRepository(IDbConnection db) : IShowtimeRepository
         );
     }
 
-    public async Task AddAsync(int movieId, int roomId, string showDate, string startTime, string endTime, decimal price)
+    public async Task AddAsync(int movieId, int roomId, string showDate, string startTime, string format, decimal price)
     {
-        var sql = "INSERT INTO showtimes (movie_id, room_id, show_date, start_time, end_time, price) VALUES (@MovieId, @RoomId, @ShowDate, @StartTime, @EndTime, @Price)";
-        await db.ExecuteAsync(sql, new { MovieId = movieId, RoomId = roomId, ShowDate = showDate, StartTime = startTime, EndTime = endTime, Price = price });
+        var sql = "INSERT INTO showtimes (movie_id, room_id, show_date, start_time, format, price) VALUES (@MovieId, @RoomId, @ShowDate, @StartTime, @Format, @Price)";
+        await db.ExecuteAsync(sql, new { MovieId = movieId, RoomId = roomId, ShowDate = showDate, StartTime = startTime, Format = format, Price = price });
     }
 
-    public async Task UpdateAsync(int id, int movieId, int roomId, string showDate, string startTime, string endTime, decimal price)
+    public async Task UpdateAsync(int id, int movieId, int roomId, string showDate, string startTime, string format, decimal price)
     {
-        var sql = "UPDATE showtimes SET movie_id = @MovieId, room_id = @RoomId, show_date = @ShowDate, start_time = @StartTime, end_time = @EndTime, price = @Price WHERE id = @Id";
-        await db.ExecuteAsync(sql, new { Id = id, MovieId = movieId, RoomId = roomId, ShowDate = showDate, StartTime = startTime, EndTime = endTime, Price = price });
+        var sql = "UPDATE showtimes SET movie_id = @MovieId, room_id = @RoomId, show_date = @ShowDate, start_time = @StartTime, format = @Format, price = @Price WHERE id = @Id";
+        await db.ExecuteAsync(sql, new { Id = id, MovieId = movieId, RoomId = roomId, ShowDate = showDate, StartTime = startTime, Format = format, Price = price });
     }
 
     public async Task DeleteAsync(int id)

@@ -81,7 +81,7 @@ export const ConcessionDetailScreen = ({ route, navigation }: any) => {
       handleQtyChange(1);
       return;
     }
-    navigation.navigate('MainTabs');
+    navigation.navigate('MainDrawer');
   };
 
   const discount = item.originalPrice > item.price

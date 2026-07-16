@@ -60,14 +60,14 @@
         <div class="text-center py-5 text-secondary">
             <i class="bi bi-emoji-frown" style="font-size:3rem;"></i>
             <p class="mt-3">Không tìm thấy phim nào với từ khóa "<strong class="text-dark">@Model.Query</strong>"</p>
-            <a href="/movies" class="btn btn-outline-warning mt-2">Xem tất cả phim</a>
+            <a href="/movies" class="btn btn-outline-purple mt-2">Xem tất cả phim</a>
         </div>
     }
     else
     {
         <p class="text-secondary small mb-3">
             Tìm thấy <strong class="text-dark">@Model.Results.Count()</strong> kết quả
-            cho "<span class="text-warning">@Model.Query</span>"
+            cho "<span class="text-purple">@Model.Query</span>"
         </p>
         <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-4">
             @foreach (var movie in Model.Results)

@@ -13,7 +13,7 @@ public interface IShowtimeRepository
     Task<IEnumerable<Movie>> GetAllMoviesAsync();
     Task<IEnumerable<Room>> GetAllRoomsWithCinemaAsync();
     
-    Task AddAsync(int movieId, int roomId, string showDate, string startTime, string endTime, decimal price);
-    Task UpdateAsync(int id, int movieId, int roomId, string showDate, string startTime, string endTime, decimal price);
+    Task AddAsync(int movieId, int roomId, string showDate, string startTime, string format, decimal price);
+    Task UpdateAsync(int id, int movieId, int roomId, string showDate, string startTime, string format, decimal price);
     Task DeleteAsync(int id);
 }

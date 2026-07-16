@@ -1,7 +1,7 @@
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, StatusBar, ScrollView,
+  View, Text, StyleSheet, TouchableOpacity, StatusBar, ScrollView, Modal, TextInput, Alert, ActivityIndicator
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, {
@@ -11,6 +11,10 @@ import QRCode from 'react-native-qrcode-svg';
 import { Theme } from '../../theme/tokens';
 import { TicketService } from '../../services/TicketService';
 import { TicketDetail } from '../../models/Ticket';
+import ViewShot from 'react-native-view-shot';
+import * as Sharing from 'expo-sharing';
+import { useRef } from 'react';
+import { apiClient } from '../../api/apiClient';
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -19,6 +23,14 @@ export const TicketDetailScreen = ({ navigation, route }: any) => {
   const rotateY = useSharedValue(0);
   const [ticket, setTicket] = useState<TicketDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isSharing, setIsSharing] = useState(false);
+  const [qrType, setQrType] = useState<'ticket' | 'concession'>('ticket');
+  const viewShotRef = useRef<any>(null);
+
+  const [reviewModalVisible, setReviewModalVisible] = useState(false);
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState('');
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   React.useEffect(() => {
     fetchTicket();
@@ -43,10 +55,52 @@ export const TicketDetailScreen = ({ navigation, route }: any) => {
     }
   };
 
-  const flipCard = () => {
+  const flipCard = (type?: 'ticket' | 'concession') => {
+    if (type) setQrType(type);
     const nextFlipped = !isFlipped;
     rotateY.value = withTiming(nextFlipped ? 180 : 0, { duration: 600 });
     setIsFlipped(nextFlipped);
+  };
+
+  const shareTicket = async () => {
+    try {
+      setIsSharing(true);
+      // Wait for React to hide the buttons
+      setTimeout(async () => {
+        if (viewShotRef.current) {
+          const uri = await viewShotRef.current.capture();
+          await Sharing.shareAsync(uri, {
+            mimeType: 'image/png',
+            dialogTitle: 'Chia sẻ vé xem phim',
+            UTI: 'public.png'
+          });
+        }
+        setIsSharing(false);
+      }, 100);
+    } catch (e) {
+      console.log('Share error', e);
+      setIsSharing(false);
+    }
+  };
+
+  const submitReview = async () => {
+    if (!comment.trim()) {
+      Alert.alert('Lỗi', 'Vui lòng nhập nội dung đánh giá');
+      return;
+    }
+    try {
+      setSubmittingReview(true);
+      const res = await apiClient.post(`/movies/${ticket?.movieId}/reviews`, { rating, comment });
+      if (res.data?.success) {
+        Alert.alert('Thành công', 'Cảm ơn bạn đã đánh giá phim!');
+        setReviewModalVisible(false);
+      }
+    } catch (e) {
+      console.log('Error submitting review', e);
+      Alert.alert('Lỗi', 'Không thể gửi đánh giá lúc này.');
+    } finally {
+      setSubmittingReview(false);
+    }
   };
 
   const frontStyle = useAnimatedStyle(() => ({
@@ -101,8 +155,8 @@ export const TicketDetailScreen = ({ navigation, route }: any) => {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
         {/* 3D Flip Card */}
         <View style={styles.cardContainer}>
-          <TouchableOpacity onPress={flipCard} activeOpacity={0.9}>
-            <View style={styles.cardWrapper}>
+          <TouchableOpacity onPress={() => flipCard('ticket')} activeOpacity={0.9}>
+            <ViewShot ref={viewShotRef} style={styles.cardWrapper} options={{ format: 'png', quality: 1 }}>
               {/* FRONT */}
               <Animated.View style={[styles.ticketCard, frontStyle]}>
                 {/* Card Header */}
@@ -172,20 +226,34 @@ export const TicketDetailScreen = ({ navigation, route }: any) => {
                 </View>
 
                 {/* Flip Hint */}
-                <TouchableOpacity style={styles.flipHint} onPress={flipCard}>
-                  <Ionicons name="qr-code-outline" size={16} color={Theme.colors.warning} />
-                  <Text style={styles.flipHintText}>🔄 Chạm để xem mã QR</Text>
-                </TouchableOpacity>
+                {!isSharing && (
+                  <View style={styles.flipHint}>
+                    <TouchableOpacity style={styles.flipBtn} onPress={() => flipCard('ticket')}>
+                      <Ionicons name="qr-code-outline" size={16} color={Theme.colors.warning} />
+                      <Text style={styles.flipHintText}>Mã Vé Cửa</Text>
+                    </TouchableOpacity>
+                    <View style={styles.flipDivider} />
+                    <TouchableOpacity style={styles.flipBtn} onPress={() => flipCard('concession')}>
+                      <Ionicons name="fast-food-outline" size={16} color={Theme.colors.warning} />
+                      <Text style={styles.flipHintText}>Mã Bắp Nước</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
               </Animated.View>
 
               {/* BACK - QR Side */}
               <Animated.View style={[styles.ticketCard, styles.ticketCardBack, backStyle]}>
-                <Text style={styles.qrTitle}>MÃ VÉ ĐIỆN TỬ</Text>
+                <Text style={styles.qrTitle}>{qrType === 'concession' ? 'MÃ BẮP NƯỚC' : 'MÃ VÉ ĐIỆN TỬ'}</Text>
                 <Text style={styles.qrSubtitle}>Đưa mã này cho nhân viên kiểm soát</Text>
 
                 <View style={styles.qrBox}>
                   <QRCode
-                    value={JSON.stringify({ code: ticket.ticketCode || ticket.id, ts: Date.now(), v: '1' })}
+                    value={JSON.stringify({ 
+                      type: qrType,
+                      code: ticket.ticketCode || ticket.id, 
+                      ts: Date.now(), 
+                      v: '1' 
+                    })}
                     size={180}
                     color="#000000"
                     backgroundColor="#ffffff"
@@ -196,12 +264,14 @@ export const TicketDetailScreen = ({ navigation, route }: any) => {
                   <Text style={styles.ticketCode}>#CX{ticket.id.toString().padStart(6, '0')}</Text>
                 </View>
 
-                <TouchableOpacity style={styles.flipHint} onPress={flipCard}>
-                  <Ionicons name="card-outline" size={16} color={Theme.colors.warning} />
-                  <Text style={styles.flipHintText}>🔄 Chạm để lật lại</Text>
-                </TouchableOpacity>
+                {!isSharing && (
+                  <TouchableOpacity style={[styles.flipHint, { borderTopWidth: 0 }]} onPress={() => flipCard()}>
+                    <Ionicons name="card-outline" size={16} color={Theme.colors.warning} />
+                    <Text style={styles.flipHintText}>🔄 Chạm để lật lại</Text>
+                  </TouchableOpacity>
+                )}
               </Animated.View>
-            </View>
+            </ViewShot>
           </TouchableOpacity>
         </View>
 
@@ -222,16 +292,65 @@ export const TicketDetailScreen = ({ navigation, route }: any) => {
 
         {/* Action Buttons */}
         <View style={styles.actions}>
+          {ticket.status === 'used' && (
+            <TouchableOpacity style={[styles.primaryBtn, { backgroundColor: Theme.colors.badgeC13, marginBottom: 12 }]} onPress={() => setReviewModalVisible(true)}>
+              <Ionicons name="star" size={18} color="#fff" />
+              <Text style={[styles.primaryBtnText, { color: '#fff' }]}>Đánh giá phim</Text>
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity style={styles.primaryBtn} onPress={shareTicket}>
+            <Ionicons name="share-social-outline" size={18} color="#000" />
+            <Text style={styles.primaryBtnText}>Chia sẻ vé (Lưu ảnh)</Text>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.secondaryBtn} onPress={() => navigation.navigate('MyTickets')}>
             <Ionicons name="ticket-outline" size={18} color={Theme.colors.warning} />
             <Text style={styles.secondaryBtnText}>Về danh sách vé</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.primaryBtn}>
-            <Ionicons name="document-text-outline" size={18} color="#000" />
-            <Text style={styles.primaryBtnText}>Yêu cầu Hóa đơn VAT</Text>
-          </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* Review Modal */}
+      <Modal
+        visible={reviewModalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setReviewModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Đánh giá phim</Text>
+            <Text style={styles.modalSubtitle}>{ticket.movieTitle}</Text>
+            
+            <View style={styles.starsContainer}>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <TouchableOpacity key={star} onPress={() => setRating(star)}>
+                  <Ionicons name={star <= rating ? "star" : "star-outline"} size={32} color={Theme.colors.warning} style={{ marginHorizontal: 4 }} />
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <TextInput
+              style={styles.reviewInput}
+              placeholder="Chia sẻ cảm nhận của bạn về bộ phim..."
+              placeholderTextColor="#888"
+              multiline
+              numberOfLines={4}
+              value={comment}
+              onChangeText={setComment}
+            />
+
+            <View style={styles.modalActions}>
+              <TouchableOpacity style={[styles.modalBtn, styles.modalCancelBtn]} onPress={() => setReviewModalVisible(false)}>
+                <Text style={styles.modalCancelText}>Hủy</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.modalBtn, styles.modalSubmitBtn]} onPress={submitReview} disabled={submittingReview}>
+                {submittingReview ? <ActivityIndicator color="#000" /> : <Text style={styles.modalSubmitText}>Gửi Đánh Giá</Text>}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
     </SafeAreaView>
   );
 };
@@ -301,8 +420,14 @@ const styles = StyleSheet.create({
   detailValue: { color: Theme.colors.textPrimary, fontSize: 13, fontWeight: '600' },
 
   flipHint: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     borderTopWidth: 1, borderTopColor: '#2d2d44', paddingTop: 12,
+  },
+  flipBtn: {
+    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
+  },
+  flipDivider: {
+    width: 1, height: 20, backgroundColor: '#2d2d44',
   },
   flipHintText: { color: Theme.colors.warning, fontSize: 12 },
 
@@ -345,4 +470,21 @@ const styles = StyleSheet.create({
     borderWidth: 2, borderColor: Theme.colors.warning, borderRadius: Theme.radius.lg, paddingVertical: 14,
   },
   secondaryBtnText: { color: Theme.colors.warning, fontWeight: 'bold', fontSize: 15 },
+
+  // Modal
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: 20 },
+  modalContent: { backgroundColor: Theme.colors.surface, width: '100%', borderRadius: 16, padding: 20, borderWidth: 1, borderColor: Theme.colors.cardBorder },
+  modalTitle: { color: Theme.colors.textPrimary, fontSize: 18, fontWeight: 'bold', textAlign: 'center' },
+  modalSubtitle: { color: Theme.colors.warning, fontSize: 14, textAlign: 'center', marginBottom: 20 },
+  starsContainer: { flexDirection: 'row', justifyContent: 'center', marginBottom: 20 },
+  reviewInput: {
+    backgroundColor: '#111', color: '#fff', borderRadius: 12, padding: 16,
+    height: 100, textAlignVertical: 'top', borderWidth: 1, borderColor: '#333', marginBottom: 20
+  },
+  modalActions: { flexDirection: 'row', gap: 12 },
+  modalBtn: { flex: 1, paddingVertical: 14, borderRadius: 12, alignItems: 'center' },
+  modalCancelBtn: { backgroundColor: '#333' },
+  modalCancelText: { color: '#fff', fontWeight: 'bold' },
+  modalSubmitBtn: { backgroundColor: Theme.colors.warning },
+  modalSubmitText: { color: '#000', fontWeight: 'bold' },
 });

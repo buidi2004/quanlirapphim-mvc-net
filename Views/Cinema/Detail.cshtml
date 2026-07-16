@@ -25,14 +25,14 @@
                 <ul class="list-unstyled text-secondary small">
                     @if (Model.Phone != null)
                     {
-                        <li class="mb-2"><i class="bi bi-telephone me-2 text-warning"></i>@Model.Phone</li>
+                        <li class="mb-2"><i class="bi bi-telephone me-2 text-purple"></i>@Model.Phone</li>
                     }
                     @if (Model.Email != null)
                     {
-                        <li class="mb-2"><i class="bi bi-envelope me-2 text-warning"></i>@Model.Email</li>
+                        <li class="mb-2"><i class="bi bi-envelope me-2 text-purple"></i>@Model.Email</li>
                     }
-                    <li class="mb-2"><i class="bi bi-clock me-2 text-warning"></i>@Model.OpeningHours</li>
-                    <li class="mb-2"><i class="bi bi-geo-alt me-2 text-warning"></i>@Model.GetFullAddress()</li>
+                    <li class="mb-2"><i class="bi bi-clock me-2 text-purple"></i>@Model.OpeningHours</li>
+                    <li class="mb-2"><i class="bi bi-geo-alt me-2 text-purple"></i>@Model.GetFullAddress()</li>
                 </ul>
             </div>
         </div>
@@ -42,7 +42,7 @@
         {
             <div class="card bg-white border-light mb-3">
                 <div class="card-body">
-                    <h5 class="text-warning mb-3"><i class="bi bi-stars me-2"></i>Tiện ích</h5>
+                    <h5 class="text-purple mb-3"><i class="bi bi-stars me-2"></i>Tiện ích</h5>
                     <div class="d-flex flex-wrap gap-2">
                         @foreach (var f in Model.GetFacilityList())
                         {
@@ -60,7 +60,7 @@
                 <div class="card-body p-0 rounded">
                     <a href="https://maps.google.com/?q=@Model.Latitude,@Model.Longitude"
                        target="_blank" class="d-block text-center py-4 text-decoration-none">
-                        <i class="bi bi-map text-warning" style="font-size:2rem;"></i>
+                        <i class="bi bi-map text-purple" style="font-size:2rem;"></i>
                         <p class="text-secondary small mt-2 mb-0">Mở Google Maps</p>
                     </a>
                 </div>
@@ -74,7 +74,7 @@
         {
             <div class="card bg-white border-light mb-4">
                 <div class="card-body">
-                    <h5 class="text-warning mb-3"><i class="bi bi-building me-2"></i>Giới thiệu</h5>
+                    <h5 class="text-purple mb-3"><i class="bi bi-building me-2"></i>Giới thiệu</h5>
                     <p class="text-secondary">@Model.Description</p>
                 </div>
             </div>
@@ -83,7 +83,7 @@
         <!-- Experiences at this cinema -->
         <div class="card bg-white border-light mb-4">
             <div class="card-body">
-                <h5 class="text-warning mb-3"><i class="bi bi-collection-play me-2"></i>Trải nghiệm tại rạp</h5>
+                <h5 class="text-purple mb-3"><i class="bi bi-collection-play me-2"></i>Trải nghiệm tại rạp</h5>
                 <div class="row g-3">
                     @foreach (var exp in new[] {
                         ("dolby-atmos", "Dolby Atmos", "bi-speaker", "bg-success"),
@@ -96,7 +96,7 @@
                                 <div class="card bg-light border-light text-center p-3 h-100"
                                      style="transition:.2s;" onmouseover="this.style.borderColor='#6f42c1'"
                                      onmouseout="this.style.borderColor='#6c757d'">
-                                    <i class="bi @exp.Item3 text-warning mb-2" style="font-size:1.5rem;"></i>
+                                    <i class="bi @exp.Item3 text-purple mb-2" style="font-size:1.5rem;"></i>
                                     <small class="text-dark">@exp.Item2</small>
                                 </div>
                             </a>
@@ -107,9 +107,9 @@
         </div>
 
         <!-- Showtimes -->
-        <div class="text-center p-4 rounded-3 border border-warning border-opacity-25"
-             style="background:rgba(255,193,7,.05);">
-            <h5 class="text-white mb-2">Lịch chiếu tại @Model.Name</h5>
+        <div class="text-center p-4 rounded-3 border border-purple border-opacity-25"
+             style="background:rgba(124,58,237,.05);">
+            <h5 class="text-purple fw-bold mb-2">Lịch chiếu tại @Model.Name</h5>
             
             <div class="d-flex justify-content-center flex-wrap gap-2 mb-4 mt-3">
                 @for (int i = 0; i < 7; i++)

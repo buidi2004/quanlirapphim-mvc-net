@@ -13,18 +13,18 @@
     <div class="col-md-4">
         <!-- Virtual Loyalty Card -->
         <div class="card border-0 text-white mb-4 shadow-lg loyalty-card" style="background: linear-gradient(135deg, #1a1a2e, #000000); border-radius: 15px; overflow: hidden; position: relative;">
-            <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(255,193,7,0.1); border-radius: 50%;"></div>
+            <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(124,58,237,0.1); border-radius: 50%;"></div>
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-start mb-4">
                     <div>
                         <h6 class="text-warning fw-medium mb-0" style="letter-spacing: 2px;">CINEMAX REWARDS</h6>
                         <span class="small text-light">Thành viên @user?.GetMemberLevelLabel()</span>
                     </div>
-                    <i class="bi bi-award-fill text-warning fs-2 shadow-sm"></i>
+                    <i class="bi bi-award-fill text-purple fs-2 shadow-sm"></i>
                 </div>
                 
                 <div class="d-flex align-items-center mb-4">
-                    <img src="@user?.GetAvatarUrl()" class="rounded-circle me-3 border border-2 border-warning" style="width:60px; height:60px; object-fit:cover;" alt="Avatar">
+                    <img src="@user?.GetAvatarUrl()" class="rounded-circle me-3 border border-2 border-purple" style="width:60px; height:60px; object-fit:cover;" alt="Avatar">
                     <div>
                         <h5 class="mb-0 fw-medium text-white">@user?.GetDisplayName()</h5>
                         <p class="mb-0 small text-secondary font-monospace">ID: @(user?.Id.ToString("D8"))</p>
@@ -47,7 +47,7 @@
                     <span>@nextLevel</span>
                 </div>
                 <div class="progress" style="height:6px; background:#333;">
-                    <div class="progress-bar bg-warning" style="width:@levelProgress.ToString("0")%"></div>
+                    <div class="progress-bar bg-purple" style="width:@levelProgress.ToString("0")%"></div>
                 </div>
                 @if (pointsToNext > 0)
                 {
@@ -75,19 +75,19 @@
         <div class="card bg-white border-light">
             <div class="list-group list-group-flush bg-transparent">
                 <a href="/profile" class="list-group-item list-group-item-action bg-transparent text-dark border-light">
-                    <i class="bi bi-person me-2 text-warning"></i>Hồ sơ của tôi
+                    <i class="bi bi-person me-2 text-purple"></i>Hồ sơ của tôi
                 </a>
                 <a href="/profile/edit" class="list-group-item list-group-item-action bg-transparent text-dark border-light">
-                    <i class="bi bi-pencil me-2 text-warning"></i>Chỉnh sửa hồ sơ
+                    <i class="bi bi-pencil me-2 text-purple"></i>Chỉnh sửa hồ sơ
                 </a>
                 <a href="/my-tickets" class="list-group-item list-group-item-action bg-transparent text-dark border-light">
-                    <i class="bi bi-ticket me-2 text-warning"></i>Vé của tôi
+                    <i class="bi bi-ticket me-2 text-purple"></i>Vé của tôi
                 </a>
                 <a href="/profile/transactions" class="list-group-item list-group-item-action bg-transparent text-dark border-light">
-                    <i class="bi bi-clock-history me-2 text-warning"></i>Lịch sử giao dịch
+                    <i class="bi bi-clock-history me-2 text-purple"></i>Lịch sử giao dịch
                 </a>
                 <a href="/profile/change-password" class="list-group-item list-group-item-action bg-transparent text-dark border-light">
-                    <i class="bi bi-shield-lock me-2 text-warning"></i>Đổi mật khẩu
+                    <i class="bi bi-shield-lock me-2 text-purple"></i>Đổi mật khẩu
                 </a>
                 <form method="post" action="/logout">
                     @Html.AntiForgeryToken()

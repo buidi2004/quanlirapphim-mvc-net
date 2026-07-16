@@ -18,6 +18,7 @@ export const TransactionHistoryScreen = ({ navigation }: any) => {
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState('all');
   const [transactions, setTransactions] = useState<TicketHistoryItem[]>([]);
+  const [summary, setSummary] = useState({ year: new Date().getFullYear(), totalSpent: 0 });
   const [loading, setLoading] = useState(true);
 
   React.useEffect(() => {
@@ -27,9 +28,15 @@ export const TransactionHistoryScreen = ({ navigation }: any) => {
   const fetchTransactions = async () => {
     try {
       setLoading(true);
-      const res = await TicketService.getMyTickets();
+      const [res, summaryRes] = await Promise.all([
+        TicketService.getMyTickets().catch(e => { console.log(e); return { success: false, data: [] }; }),
+        TicketService.getTicketSummary().catch(e => { console.log(e); return { success: false, data: undefined }; })
+      ]);
       if (res.success) {
         setTransactions(res.data);
+      }
+      if (summaryRes.success && summaryRes.data) {
+        setSummary(summaryRes.data);
       }
     } catch (error: any) {
       console.log('Error fetching transactions:', error?.message || error);
@@ -106,8 +113,8 @@ export const TransactionHistoryScreen = ({ navigation }: any) => {
       <View style={styles.summaryCard}>
         <Ionicons name="wallet-outline" size={24} color={Theme.colors.gold} />
         <View style={{ marginLeft: 12, flex: 1 }}>
-          <Text style={styles.summaryLabel}>Tổng đã chi tiêu (2026)</Text>
-          <Text style={styles.summaryValue}>1.250.000₫</Text>
+          <Text style={styles.summaryLabel}>Tổng đã chi tiêu ({summary.year})</Text>
+          <Text style={styles.summaryValue}>{summary.totalSpent.toLocaleString('vi-VN')}₫</Text>
         </View>
       </View>
 

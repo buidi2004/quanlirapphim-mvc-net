@@ -13,7 +13,7 @@ interface PromoModalProps {
 export const PromoModal: React.FC<PromoModalProps> = ({ 
   visible, 
   onClose,
-  imageUrl = 'https://picsum.photos/400/600' // Placeholder for testing
+  imageUrl
 }) => {
   return (
     <Modal
@@ -43,7 +43,7 @@ export const PromoModal: React.FC<PromoModalProps> = ({
               </TouchableOpacity>
               
               <Image 
-                source={require('../../../assets/images/promo-poster.png')}
+                source={imageUrl ? { uri: imageUrl } : require('../../../assets/images/promo-poster.png')}
                 style={styles.image}
                 contentFit="cover"
                 transition={200}

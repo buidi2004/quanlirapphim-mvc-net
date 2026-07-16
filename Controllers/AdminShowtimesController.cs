@@ -26,11 +26,11 @@ public class AdminShowtimesController(IShowtimeService showtimeService) : Contro
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Store(int movieId, int roomId, string showDate, string startTime, string endTime, decimal price)
+    public async Task<IActionResult> Store(int movieId, int roomId, string showDate, string startTime, string format, decimal price)
     {
         try
         {
-            await showtimeService.AddAsync(movieId, roomId, showDate, startTime, endTime, price);
+            await showtimeService.AddAsync(movieId, roomId, showDate, startTime, format, price);
             TempData["Success"] = "Thêm suất chiếu thành công!";
         }
         catch (Exception ex)
@@ -42,11 +42,11 @@ public class AdminShowtimesController(IShowtimeService showtimeService) : Contro
 
     [HttpPost("update")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Update(int id, int movieId, int roomId, string showDate, string startTime, string endTime, decimal price)
+    public async Task<IActionResult> Update(int id, int movieId, int roomId, string showDate, string startTime, string format, decimal price)
     {
         try
         {
-            await showtimeService.UpdateAsync(id, movieId, roomId, showDate, startTime, endTime, price);
+            await showtimeService.UpdateAsync(id, movieId, roomId, showDate, startTime, format, price);
             TempData["Success"] = "Cập nhật suất chiếu thành công!";
         }
         catch (Exception ex)

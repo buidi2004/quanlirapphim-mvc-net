@@ -19,6 +19,12 @@ public class FoodBeverageRepository(IDbConnection db) : IFoodBeverageRepository
         return (items, totalCount);
     }
 
+    public async Task<FoodBeverage?> GetByIdAsync(int id)
+    {
+        var sql = "SELECT id as Id, name as Name, description as Description, price as Price, image_url as ImageUrl, stock_quantity as StockQuantity FROM food_beverages WHERE id = @Id";
+        return await db.QueryFirstOrDefaultAsync<FoodBeverage>(sql, new { Id = id });
+    }
+
     public async Task<int> AddAsync(FoodBeverage foodBeverage)
     {
         var sql = "INSERT INTO food_beverages (name, description, price, image_url, stock_quantity) VALUES (@Name, @Description, @Price, @ImageUrl, @StockQuantity)";

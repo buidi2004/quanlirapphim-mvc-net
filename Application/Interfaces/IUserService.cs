@@ -18,4 +18,5 @@ public interface IUserService
     
     Task<CinemaXNet.Application.ViewModels.PaginatedList<dynamic>> GetPaginatedUsersAsync(int page, int pageSize);
     Task UpdateRoleAsync(int userId, string role);
+    Task DeleteAccountAsync(int userId);
 }

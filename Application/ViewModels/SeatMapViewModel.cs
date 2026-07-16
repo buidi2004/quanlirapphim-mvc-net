@@ -4,6 +4,7 @@ public class SeatMapViewModel
 {
     public int ShowtimeId { get; set; }
     public string MovieTitle { get; set; } = "";
+    public string CinemaName { get; set; } = "";
     public DateOnly ShowDate { get; set; }
     public TimeOnly StartTime { get; set; }
     public string RoomName { get; set; } = "";

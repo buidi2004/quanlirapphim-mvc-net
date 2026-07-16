@@ -21,7 +21,7 @@ export const NotFoundScreen = ({ navigation }: any) => (
       <Text style={styles.subtitle}>
         Trang bạn đang tìm kiếm đã bị xóa hoặc không bao giờ tồn tại.
       </Text>
-      <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('MainTabs')}>
+      <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('MainDrawer')}>
         <Ionicons name="home-outline" size={18} color="#000" />
         <Text style={styles.btnText}>Về trang chủ</Text>
       </TouchableOpacity>

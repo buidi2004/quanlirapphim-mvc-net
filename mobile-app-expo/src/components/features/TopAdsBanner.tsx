@@ -10,13 +10,21 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const BANNER_HEIGHT = 180;
 const ITEM_WIDTH = SCREEN_WIDTH / 1.15; // Exact 1.15 slides per view
 
+interface BannerItem {
+  id: number;
+  imageUrl?: string;
+  posterUrl?: string; // fallback for movie
+}
+
 interface TopAdsBannerProps {
-  movies?: Movie[];
+  banners?: BannerItem[];
+  movies?: any[]; // deprecated
   onPress: (id: number) => void;
 }
 
-export const TopAdsBanner: React.FC<TopAdsBannerProps> = ({ movies = [], onPress }) => {
-  if (!movies || movies.length === 0) {
+export const TopAdsBanner: React.FC<TopAdsBannerProps> = ({ banners, movies, onPress }) => {
+  const data = banners || movies || [];
+  if (!data || data.length === 0) {
     return null;
   }
 
@@ -29,7 +37,7 @@ export const TopAdsBanner: React.FC<TopAdsBannerProps> = ({ movies = [], onPress
         style={{ width: SCREEN_WIDTH }}
         autoPlay={true}
         autoPlayInterval={3000} // 3 seconds as requested
-        data={movies}
+        data={data}
         scrollAnimationDuration={1000}
         mode="parallax"
         modeConfig={{
@@ -37,9 +45,10 @@ export const TopAdsBanner: React.FC<TopAdsBannerProps> = ({ movies = [], onPress
           parallaxScrollingOffset: 40,
         }}
         renderItem={({ item }) => {
-          const imageUrl = item.posterUrl?.startsWith('http') 
-            ? item.posterUrl 
-            : `${IMAGE_BASE_URL}${item.posterUrl}`;
+          const imgSource = item.imageUrl || item.posterUrl || '';
+          const finalImageUrl = imgSource.startsWith('http') 
+            ? imgSource 
+            : `${IMAGE_BASE_URL}${imgSource}`;
 
           return (
             <TouchableOpacity 
@@ -48,7 +57,7 @@ export const TopAdsBanner: React.FC<TopAdsBannerProps> = ({ movies = [], onPress
               onPress={() => onPress(item.id)}
             >
               <Image
-                source={{ uri: imageUrl }}
+                source={{ uri: finalImageUrl }}
                 style={styles.bannerImage}
                 contentFit="cover"
                 transition={200}

@@ -7,6 +7,7 @@ public class Showtime
     public int RoomId { get; set; }
     public DateOnly ShowDate { get; set; }
     public TimeOnly StartTime { get; set; }
+    public string Format { get; set; } = "2D Phụ đề";
     public TimeOnly? EndTime { get; set; }
     public decimal Price { get; set; }
     public DateTime CreatedAt { get; set; }

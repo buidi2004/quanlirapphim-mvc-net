@@ -7,6 +7,27 @@
     var news       = ViewBag.News       as List<CinemaXNet.Application.ViewModels.NewsItemViewModel>       ?? new List<CinemaXNet.Application.ViewModels.NewsItemViewModel>();
 }
 
+<!-- Welcome Promo Modal -->
+<div class="modal fade" id="welcomePromoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 bg-transparent">
+            <div class="modal-body p-0 position-relative">
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" style="z-index: 10; filter: drop-shadow(0 0 4px rgba(0,0,0,0.5));" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="card border-0 rounded-4 overflow-hidden shadow-lg">
+                    <img src="/images/movies/lat-mat-7.jpg" class="w-100" style="height: 250px; object-fit: cover;" alt="Promo">
+                    <div class="card-body p-4 text-center bg-white">
+                        <span class="badge bg-danger mb-2">HOT DEAL</span>
+                        <h4 class="text-purple fw-bold mb-3">TẶNG NGAY 50K CHO THÀNH VIÊN MỚI</h4>
+                        <p class="text-secondary mb-4">Đăng ký thành viên CinemaX hôm nay và nhận ngay Voucher 50K áp dụng cho vé 2D bất kỳ!</p>
+                        <a href="/register" class="btn btn-purple btn-lg rounded-pill fw-bold w-100 shadow-sm mb-2">ĐĂNG KÝ NHẬN QUÀ</a>
+                        <button type="button" class="btn btn-link text-secondary text-decoration-none" data-bs-dismiss="modal">Không, cảm ơn</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- #1 Hero Carousel -->
 <div id="heroCarousel" class="carousel slide mb-4 shadow-lg" data-bs-ride="carousel" data-aos="fade-in" data-aos-duration="1500">
     <div class="carousel-indicators">
@@ -59,11 +80,11 @@
             </div>
         </div>
     </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon"></span>
+    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev" aria-label="Slide trước">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
     </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-        <span class="carousel-control-next-icon"></span>
+    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next" aria-label="Slide tiếp theo">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
     </button>
 </div>
 
@@ -121,7 +142,7 @@
                 var index = indexNS++;
                 <div class="col" data-aos="zoom-in" data-aos-delay="@((index % 5) * 100)">
                     <div class="movie-card-3d h-100">
-                        <div class="card bg-white border border-light h-100 shadow movie-card"
+                        <div class="card bg-white border border-light h-100 shadow movie-card hover-lift hover-glow"
                              onclick="location.href='/movies/@movie.Id'">
                             <div class="position-relative">
                                 <img src="@(movie.PosterUrl ?? "/images/movies/lat-mat-7.jpg")"
@@ -171,7 +192,7 @@
                 var index = indexCS++;
                 <div class="col" data-aos="flip-left" data-aos-delay="@((index % 5) * 100)">
                     <div class="movie-card-3d h-100">
-                        <div class="card bg-white border border-light h-100 shadow movie-card"
+                        <div class="card bg-white border border-light h-100 shadow movie-card hover-lift hover-glow"
                              onclick="location.href='/movies/@movie.Id'">
                             <div class="position-relative">
                                 <img src="@(movie.PosterUrl ?? "/images/movies/lat-mat-7.jpg")"
@@ -261,7 +282,7 @@
         @foreach (var promo in promotions) {
             var index = indexPR++;
             <div class="col-md-4" data-aos="zoom-in-up" data-aos-delay="@(index * 150)">
-                <div class="card promo-card bg-white shadow-sm border border-light border-0 overflow-hidden h-100" onclick="location.href='/promotions/@promo.Id'">
+                <div class="card promo-card bg-white shadow-sm border border-light border-0 overflow-hidden h-100 hover-lift hover-glow" onclick="location.href='/promotions/@promo.Id'">
                     <div class="card-body p-4 position-relative">
                         <div class="promo-ribbon">@(promo.DiscountType == "percent" ? $"{promo.DiscountValue}%" : "DEAL")</div>
                         <h5 class="text-warning fw-medium mb-2">@promo.Code</h5>
@@ -322,7 +343,7 @@
         </div>
     </div>
     <!-- Background Decor -->
-    <div class="position-absolute top-0 end-0 w-50 h-100 bg-warning rounded-circle opacity-10" style="filter: blur(100px); transform: translate(30%, -30%);"></div>
+    <div class="position-absolute top-0 end-0 w-50 h-100 bg-purple rounded-circle opacity-10" style="filter: blur(100px); transform: translate(30%, -30%);"></div>
 </div>
 
 <!-- #7 Tin Tức Mới Nhất -->
@@ -339,7 +360,7 @@
         @foreach (var n in news) {
             var index = indexN++;
             <div class="col-md-4" data-aos="fade-up" data-aos-delay="@(index * 150)">
-                <div class="card bg-white shadow-sm border border-light h-100 news-card overflow-hidden" onclick="location.href='/news/@n.Slug'">
+                <div class="card bg-white shadow-sm border border-light h-100 news-card overflow-hidden hover-lift hover-glow" onclick="location.href='/news/@n.Slug'">
                     <img src="@(n.ImageUrl ?? "/images/movies/mai.jpg")" class="card-img-top transition-all" style="height: 200px; object-fit: cover;" alt="@n.Title" loading="lazy" decoding="async">
                     <div class="card-body">
                         <span class="badge bg-secondary rounded-3 mb-2">@n.Category</span>
@@ -484,7 +505,7 @@
         <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
             <div class="card bg-white border border-light rounded-2 p-4 h-100 hover-shadow transition-all group-hover">
                 <div class="d-flex align-items-center mb-3">
-                    <div class="bg-light rounded-circle p-3 me-3"><i class="bi bi-building text-warning fs-3"></i></div>
+                    <div class="bg-light rounded-circle p-3 me-3"><i class="bi bi-building text-purple fs-3"></i></div>
                     <div>
                         <h5 class="text-dark fw-medium mb-1">CinemaX Landmark</h5>
                         <span class="badge bg-secondary text-dark">TP. Hồ Chí Minh</span>
@@ -497,7 +518,7 @@
         <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
             <div class="card bg-white border border-light rounded-2 p-4 h-100 hover-shadow transition-all group-hover">
                 <div class="d-flex align-items-center mb-3">
-                    <div class="bg-light rounded-circle p-3 me-3"><i class="bi bi-building text-warning fs-3"></i></div>
+                    <div class="bg-light rounded-circle p-3 me-3"><i class="bi bi-building text-purple fs-3"></i></div>
                     <div>
                         <h5 class="text-dark fw-medium mb-1">CinemaX Lotte</h5>
                         <span class="badge bg-secondary text-dark">Hà Nội</span>
@@ -510,7 +531,7 @@
         <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
             <div class="card bg-white border border-light rounded-2 p-4 h-100 hover-shadow transition-all group-hover">
                 <div class="d-flex align-items-center mb-3">
-                    <div class="bg-light rounded-circle p-3 me-3"><i class="bi bi-building text-warning fs-3"></i></div>
+                    <div class="bg-light rounded-circle p-3 me-3"><i class="bi bi-building text-purple fs-3"></i></div>
                     <div>
                         <h5 class="text-dark fw-medium mb-1">CinemaX Vincom</h5>
                         <span class="badge bg-secondary text-dark">Đà Nẵng</span>
@@ -525,6 +546,20 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Welcome Promo Pop-up Logic
+    const today = new Date().toDateString();
+    const lastShown = localStorage.getItem('promo_shown_date');
+    if (lastShown !== today) {
+        setTimeout(() => {
+            const modalEl = document.getElementById('welcomePromoModal');
+            if (modalEl) {
+                const promoModal = new bootstrap.Modal(modalEl);
+                promoModal.show();
+                localStorage.setItem('promo_shown_date', today);
+            }
+        }, 1500);
+    }
+
     const btnFindNearest = document.getElementById('btnFindNearestCinema');
     const container = document.getElementById('nearbyCinemasContainer');
 

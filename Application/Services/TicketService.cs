@@ -79,7 +79,7 @@ public class TicketService(
 
     public async Task<bool> ConfirmPaymentAsync(
         IEnumerable<int> ticketIds, int? userId,
-        string paymentMethod, decimal? totalPrice = null, string? promotionCode = null)
+        string paymentMethod, decimal? totalPrice = null, string? promotionCode = null, IEnumerable<(int FoodBeverageId, int Quantity, decimal Price)>? concessions = null)
     {
         var ids = ticketIds.ToList();
 
@@ -110,6 +110,29 @@ public class TicketService(
                         $"Ghế {ticket.SeatCode} vừa được người khác đặt. Vui lòng chọn ghế khác.");
             }
 
+            if (concessions != null && concessions.Any() && ids.Count > 0)
+            {
+                var firstTicketId = ids.First();
+                foreach (var conc in concessions)
+                {
+                    const string insertConcessionSql = @"
+                        INSERT INTO ticket_concessions (ticket_id, food_beverage_id, quantity, price)
+                        VALUES (@TicketId, @FoodBeverageId, @Quantity, @Price)";
+                    await db.ExecuteAsync(insertConcessionSql, new 
+                    {
+                        TicketId = firstTicketId,
+                        FoodBeverageId = conc.FoodBeverageId,
+                        Quantity = conc.Quantity,
+                        Price = conc.Price
+                    });
+                }
+            }
+
+            if (!string.IsNullOrEmpty(promotionCode))
+            {
+                await db.ExecuteAsync("UPDATE promotions SET used_count = used_count + 1 WHERE code = @Code", new { Code = promotionCode });
+            }
+
             // Update loyalty points and membership tier via Domain Event
             if (userId != null && totalPrice.HasValue && totalPrice.Value > 0)
             {
@@ -130,7 +153,7 @@ public class TicketService(
         }
     }
 
-    public Task<int> ReleaseExpiredHoldsAsync() =>
+    public Task<IEnumerable<(int ShowtimeId, string SeatCode)>> ReleaseExpiredHoldsAsync() =>
         ticketRepo.CancelExpiredHoldsAsync();
 
     public Task<IEnumerable<dynamic>> GetUserTicketsAsync(int userId) =>
@@ -186,6 +209,7 @@ public class TicketService(
         return new BookingConfirmViewModel
         {
             MovieTitle    = showtime!.Movie!.Title,
+            CinemaName    = showtime.Room!.Cinema?.Name ?? "CinemaX",
             ShowDate      = showtime.ShowDate,
             StartTime     = showtime.StartTime,
             RoomName      = showtime.Room!.Name,

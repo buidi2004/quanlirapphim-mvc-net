@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, StatusBar, TextInput, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
+import { ContactService } from '../../services/ContactService';
 
 export const ContactScreen = ({ navigation }: any) => {
   const [name, setName] = useState('');
@@ -10,21 +11,33 @@ export const ContactScreen = ({ navigation }: any) => {
   const [phone, setPhone] = useState('');
   const [topic, setTopic] = useState('Vấn đề đặt vé');
   const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!name || !email || !message) {
       Alert.alert('Lỗi', 'Vui lòng điền đầy đủ các trường bắt buộc (*)');
       return;
     }
     
-    Alert.alert(
-      'Thành công', 
-      'Yêu cầu hỗ trợ của bạn đã được gửi. Chúng tôi sẽ phản hồi trong vòng 24h.',
-      [
-        { text: 'Xem chi tiết yêu cầu', onPress: () => navigation.navigate('ContactDetail') },
-        { text: 'Về trang chủ', onPress: () => navigation.navigate('MainTabs') }
-      ]
-    );
+    try {
+      setLoading(true);
+      const res = await ContactService.sendContact({ name, email, phone, subject: topic, message });
+      if (res.success) {
+        Alert.alert(
+          'Thành công', 
+          res.message || 'Yêu cầu hỗ trợ của bạn đã được gửi. Chúng tôi sẽ phản hồi trong vòng 24h.',
+          [
+            { text: 'Về trang chủ', onPress: () => navigation.navigate('MainDrawer') }
+          ]
+        );
+      } else {
+        Alert.alert('Lỗi', res.error || 'Có lỗi xảy ra.');
+      }
+    } catch (e: any) {
+      Alert.alert('Lỗi', e.response?.data?.error || 'Không thể gửi yêu cầu hỗ trợ. Vui lòng thử lại sau.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -106,8 +119,12 @@ export const ContactScreen = ({ navigation }: any) => {
               />
             </View>
 
-            <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
-              <Text style={styles.submitBtnText}>GỬI YÊU CẦU HỖ TRỢ</Text>
+            <TouchableOpacity 
+              style={[styles.submitBtn, loading && { opacity: 0.7 }]} 
+              onPress={handleSubmit}
+              disabled={loading}
+            >
+              <Text style={styles.submitBtnText}>{loading ? 'ĐANG GỬI...' : 'GỬI YÊU CẦU HỖ TRỢ'}</Text>
             </TouchableOpacity>
           </View>
 

@@ -10,6 +10,11 @@ public class FoodBeverageService(IFoodBeverageRepository repository) : IFoodBeve
         return await repository.GetPagedAsync(page, pageSize);
     }
 
+    public async Task<FoodBeverage?> GetByIdAsync(int id)
+    {
+        return await repository.GetByIdAsync(id);
+    }
+
     public async Task<int> AddAsync(FoodBeverage foodBeverage)
     {
         return await repository.AddAsync(foodBeverage);

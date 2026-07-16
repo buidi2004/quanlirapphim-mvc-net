@@ -11,11 +11,14 @@ public interface ITicketRepository
     Task<int> CreateAsync(Ticket ticket);
     Task<int> UpdateStatusWithVersionAsync(int id, string newStatus, int expectedVersion,
         decimal? totalPrice = null, string? promotionCode = null);
-    Task<int> CancelExpiredHoldsAsync();
+    Task<IEnumerable<(int ShowtimeId, string SeatCode)>> CancelExpiredHoldsAsync();
     Task<IEnumerable<dynamic>> FindByUserIdAsync(int userId);
     Task<(int TotalTickets, int TotalMovies)> GetUserTicketStatsAsync(int userId);
     Task<IEnumerable<dynamic>> GetUserTransactionsAsync(int userId, string? status);
     Task<CinemaXNet.Application.ViewModels.TicketDetailViewModel?> GetTicketDetailAsync(int ticketId, int userId);
     Task<(IEnumerable<dynamic> Items, int TotalCount)> GetAdminPaginatedTicketsAsync(int page, int pageSize);
     Task<Showtime?> GetShowtimeByTicketIdAsync(int ticketId);
+    Task<bool> HasActiveTicketsForMovieAsync(int movieId);
+    Task<bool> HasActiveTicketsForShowtimeAsync(int showtimeId);
+    Task<bool> HasUserWatchedMovieAsync(int userId, int movieId);
 }

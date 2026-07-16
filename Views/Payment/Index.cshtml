@@ -2,8 +2,12 @@
 @{
     ViewData["Title"] = "Xác nhận thanh toán";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.HideBottomNav = true;
     var remainingSeconds = (int)Math.Max(0, (Model.HoldExpiryTime - DateTime.UtcNow).TotalSeconds);
 }
+<div class="container py-2">
+    @await Html.PartialAsync("_BookingStepper", 3)
+</div>
 
 <div class="row justify-content-center">
     <div class="col-lg-7">
@@ -19,7 +23,7 @@
         </div>
 
         <!-- Thông tin đặt vé -->
-        <div class="card border-0 shadow mb-4" style="background-color: #1a1a2e !important; border: 1px solid #2d2d44 !important;">
+        <div class="card border-0 shadow mb-4" style="background-color: #ffffff !important; border: 1px solid #e9ecef !important;">
             <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#paymentSummaryCollapse" aria-expanded="true" aria-controls="paymentSummaryCollapse" style="cursor: pointer;">
                 <h5 class="mb-0 fw-medium"><i class="bi bi-film me-2 text-warning"></i>Chi tiết đặt vé</h5>
                 <i class="bi bi-chevron-expand d-lg-none text-dark"></i>
@@ -62,7 +66,7 @@
                                 {
                                     foreach (var c in concessionsList)
                                     {
-                                        <li class="text-light d-flex justify-content-between mb-1">
+                                        <li class="text-dark d-flex justify-content-between mb-1">
                                             <span>@c.qty x @c.name</span>
                                             <span class="text-warning fw-medium">@((c.qty * c.price).ToString("N0"))₫</span>
                                         </li>
@@ -77,7 +81,7 @@
         </div>
 
         <!-- Mã giảm giá -->
-        <div class="card border-0 shadow mb-4" style="background-color: #1a1a2e !important; border: 1px solid #2d2d44 !important;">
+        <div class="card border-0 shadow mb-4" style="background-color: #ffffff !important; border: 1px solid #e9ecef !important;">
             <div class="card-body p-4">
                 <label class="form-label text-dark fw-medium">Mã giảm giá (Voucher)</label>
                 <div class="input-group">
@@ -94,7 +98,7 @@
         </div>
 
         <!-- Tổng tiền -->
-        <div class="card border-0 shadow mb-4" style="background-color: #1a1a2e !important; border: 1px solid #2d2d44 !important;">
+        <div class="card border-0 shadow mb-4" style="background-color: #ffffff !important; border: 1px solid #e9ecef !important;">
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between mb-2">
                     <span class="text-secondary">Tạm tính (@Model.Quantity vé):</span>
@@ -108,7 +112,7 @@
                 <hr class="border-light">
                 <div class="d-flex justify-content-between align-items-center">
                     <strong class="text-dark fs-5">TỔNG THANH TOÁN:</strong>
-                    <strong class="text-warning fs-3" id="total-display">@Model.TotalPrice.ToString("N0")₫</strong>
+                    <strong class="text-purple fs-3" id="total-display">@Model.TotalPrice.ToString("N0")₫</strong>
                 </div>
             </div>
         </div>

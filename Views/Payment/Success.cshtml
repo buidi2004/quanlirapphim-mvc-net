@@ -3,7 +3,11 @@
     var transactionId = ViewBag.TransactionId as string ?? "CXN-" + DateTime.Now.Ticks.ToString();
     ViewData["Title"] = "Đặt vé thành công!";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.HideBottomNav = true;
 }
+<div class="container py-2">
+    @await Html.PartialAsync("_BookingStepper", 4)
+</div>
 
 <div class="row justify-content-center py-5">
     <div class="col-md-10 text-center">
@@ -28,11 +32,11 @@
                     <h5 class="text-warning fw-medium mb-3" style="letter-spacing: 2px;">
                         <i class="bi bi-film me-2"></i>CINEMAX E-TICKET
                     </h5>
-                    <div class="text-start w-100 text-light">
-                        <p class="mb-1 text-truncate" title="@Model.MovieTitle"><span class="text-secondary small d-inline-block" style="width: 80px;">Phim:</span> <strong class="fs-5 text-white">@Model.MovieTitle</strong></p>
+                    <div class="text-start w-100 text-dark">
+                        <p class="mb-1 text-truncate" title="@Model.MovieTitle"><span class="text-secondary small d-inline-block" style="width: 80px;">Phim:</span> <strong class="fs-5 text-dark">@Model.MovieTitle</strong></p>
                         <p class="mb-1"><span class="text-secondary small d-inline-block" style="width: 80px;">Phòng:</span> <strong>@Model.RoomName</strong></p>
-                        <p class="mb-1"><span class="text-secondary small d-inline-block" style="width: 80px;">Suất:</span> <strong class="text-white">@Model.ShowDate.ToString("dd/MM/yyyy") - @Model.StartTime.ToString("HH:mm")</strong></p>
-                        <p class="mb-1"><span class="text-secondary small d-inline-block" style="width: 80px;">Ghế:</span> <strong class="text-warning fs-5">@(string.Join(", ", Model.SelectedSeats))</strong></p>
+                        <p class="mb-1"><span class="text-secondary small d-inline-block" style="width: 80px;">Suất:</span> <strong class="text-dark">@Model.ShowDate.ToString("dd/MM/yyyy") - @Model.StartTime.ToString("HH:mm")</strong></p>
+                        <p class="mb-1"><span class="text-secondary small d-inline-block" style="width: 80px;">Ghế:</span> <strong class="text-purple fs-5">@(string.Join(", ", Model.SelectedSeats))</strong></p>
                         <p class="mb-1 mt-2 border-top border-secondary pt-2"><span class="text-secondary small d-inline-block" style="width: 80px;">Mã GD:</span> <strong class="text-info font-monospace">@transactionId</strong></p>
                         <p class="mb-0 mt-3 text-center text-secondary small animate-pulse">
                             <i class="bi bi-hand-index-thumb me-1"></i> Chạm để quét mã QR

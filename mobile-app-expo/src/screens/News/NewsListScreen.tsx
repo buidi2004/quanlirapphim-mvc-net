@@ -6,39 +6,38 @@ import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
 import { LinearGradient } from 'expo-linear-gradient';
 
-const MOCK_NEWS = [
-  {
-    id: '1',
-    title: 'Review Dune: Part Two - Đỉnh Cao Khoa Học Viễn Tưởng',
-    summary: 'Phần 2 của siêu phẩm Dune mang đến trải nghiệm thị giác và âm thanh vô tiền khoáng hậu, vượt xa phần 1.',
-    category: 'Góc Điện Ảnh',
-    date: '12/07/2026',
-    image: 'https://cdn.galaxycine.vn/media/2024/2/29/dune-2-3_1709192451034.jpg',
-    isFeatured: true,
-  },
-  {
-    id: '2',
-    title: 'Lịch chiếu sớm Godzilla x Kong: Đế Chế Mới',
-    summary: 'Siêu phẩm quái vật được mong đợi nhất năm nay sẽ có các suất chiếu đặc biệt từ ngày 28/03.',
-    category: 'Khuyến Mãi',
-    date: '10/07/2026',
-    image: 'https://cdn.galaxycine.vn/media/2024/3/27/gxk-review-1_1711527878363.jpg',
-    isFeatured: false,
-  },
-  {
-    id: '3',
-    title: '5 Lý Do Bạn Phải Xem Kung Fu Panda 4',
-    summary: 'Po đã trở lại và lợi hại hơn xưa. Cùng khám phá những điểm thú vị trong phần phim mới nhất.',
-    category: 'Tin Tức',
-    date: '08/07/2026',
-    image: 'https://cdn.galaxycine.vn/media/2024/3/6/kfp4-review-2_1709712130612.jpg',
-    isFeatured: false,
-  }
-];
+import { AppService } from '../../services/AppService';
 
 export const NewsListScreen = ({ navigation }: any) => {
+  const [news, setNews] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
 
-  const renderFeatured = (item: typeof MOCK_NEWS[0]) => (
+  React.useEffect(() => {
+    fetchNews();
+  }, []);
+
+  const fetchNews = async () => {
+    try {
+      setLoading(true);
+      const res = await AppService.getNews();
+      if (res.success && res.data) {
+        setNews(res.data.map((x: any) => ({
+          id: x.id?.toString(),
+          title: x.title,
+          summary: x.summary,
+          category: x.category || 'Tin tức',
+          date: x.date,
+          image: x.imageUrl,
+          isFeatured: x.isFeatured
+        })));
+      }
+    } catch (e) {
+      console.log('Error fetching news', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const renderFeatured = (item: any) => (
     <TouchableOpacity 
       style={styles.featuredCard}
       onPress={() => navigation.navigate('NewsDetail', { news: item })}
@@ -55,7 +54,7 @@ export const NewsListScreen = ({ navigation }: any) => {
     </TouchableOpacity>
   );
 
-  const renderItem = ({ item }: { item: typeof MOCK_NEWS[0] }) => {
+  const renderItem = ({ item }: { item: any }) => {
     if (item.isFeatured) return renderFeatured(item);
 
     return (
@@ -92,13 +91,17 @@ export const NewsListScreen = ({ navigation }: any) => {
         <View style={{ width: 40 }} />
       </View>
 
-      <FlatList
-        data={MOCK_NEWS}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-        renderItem={renderItem}
-      />
+      {loading ? (
+        <Text style={{color: '#fff', textAlign: 'center', marginTop: 20}}>Đang tải danh sách tin tức...</Text>
+      ) : (
+        <FlatList
+          data={news}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          renderItem={renderItem}
+        />
+      )}
     </SafeAreaView>
   );
 };

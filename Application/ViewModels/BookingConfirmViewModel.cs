@@ -3,6 +3,7 @@ namespace CinemaXNet.Application.ViewModels;
 public class BookingConfirmViewModel
 {
     public string MovieTitle { get; set; } = "";
+    public string CinemaName { get; set; } = "";
     public DateOnly ShowDate { get; set; }
     public TimeOnly StartTime { get; set; }
     public string RoomName { get; set; } = "";

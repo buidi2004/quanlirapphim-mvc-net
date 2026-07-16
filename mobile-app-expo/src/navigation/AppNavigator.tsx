@@ -62,6 +62,9 @@ import { NotFoundScreen, ServerErrorScreen } from '../screens/Error/ErrorScreens
 import { SplashScreen } from '../screens/Splash/SplashScreen';
 import { OnboardingScreen } from '../screens/Onboarding/OnboardingScreen';
 
+// ── Staff ──
+import { ScannerScreen } from '../screens/Staff/ScannerScreen';
+
 // ── Experience & Static ──
 import { ExperienceDetailScreen } from '../screens/Experience/ExperienceDetailScreen';
 import { StaticPageScreen } from '../screens/Page/StaticPageScreen';
@@ -297,6 +300,9 @@ export const AppNavigator = () => {
 
           {/* Static Pages */}
           <Stack.Screen name="StaticPage" component={StaticPageScreen} />
+
+          {/* Staff */}
+          <Stack.Screen name="Scanner" component={ScannerScreen} />
         </Stack.Group>
 
         {/* ======================= */}

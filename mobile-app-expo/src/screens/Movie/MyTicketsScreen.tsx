@@ -116,7 +116,7 @@ export const MyTicketsScreen = ({ navigation }: any) => {
         <View style={styles.emptyContainer}>
           <Ionicons name="ticket-outline" size={80} color="#444" />
           <Text style={styles.emptyText}>Bạn chưa mua vé nào</Text>
-          <TouchableOpacity style={styles.bookBtn} onPress={() => navigation.navigate('MainTabs')}>
+          <TouchableOpacity style={styles.bookBtn} onPress={() => navigation.navigate('MainDrawer')}>
             <Text style={styles.bookBtnText}>Đặt Vé Ngay</Text>
           </TouchableOpacity>
         </View>

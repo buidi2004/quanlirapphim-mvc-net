@@ -103,7 +103,7 @@ public class TicketRepository(IDbConnection db) : ITicketRepository
         return await db.ExecuteAsync(sql.ToString(), param);
     }
 
-    public async Task<int> CancelExpiredHoldsAsync()
+    public async Task<IEnumerable<(int ShowtimeId, string SeatCode)>> CancelExpiredHoldsAsync()
     {
         const string sql = @"
             UPDATE tickets
@@ -193,7 +193,7 @@ public class TicketRepository(IDbConnection db) : ITicketRepository
     {
         var sql = """
             SELECT t.*, 
-                   m.title AS MovieTitle, m.poster_url AS PosterUrl, m.age_rating AS AgeRating, m.duration_minutes AS DurationMinutes,
+                   m.id AS MovieId, m.title AS MovieTitle, m.poster_url AS PosterUrl, m.age_rating AS AgeRating, m.duration_minutes AS DurationMinutes,
                    s.show_date AS ShowDate, s.start_time AS StartTime, s.price,
                    r.name AS RoomName,
                    c.name AS CinemaName
@@ -213,7 +213,7 @@ public class TicketRepository(IDbConnection db) : ITicketRepository
                 return vm;
             },
             new { Id = ticketId, UserId = userId },
-            splitOn: "MovieTitle"
+            splitOn: "MovieId"
         );
         return result.FirstOrDefault();
     }
@@ -224,7 +224,7 @@ public class TicketRepository(IDbConnection db) : ITicketRepository
         var count = await db.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM tickets");
         
         var sql = """
-            SELECT t.id, t.ticket_code, t.status, t.total_price, t.created_at, 
+            SELECT t.id, t.id as ticket_code, t.status, t.total_price, t.created_at, 
                    u.full_name, u.email, 
                    m.title AS MovieTitle, 
                    s.show_date, s.start_time
@@ -237,5 +237,34 @@ public class TicketRepository(IDbConnection db) : ITicketRepository
         """;
         var items = await db.QueryAsync<dynamic>(sql, new { limit = pageSize, offset });
         return (items, count);
+    }
+
+    public async Task<bool> HasActiveTicketsForMovieAsync(int movieId)
+    {
+        var sql = @"
+            SELECT COUNT(1) FROM tickets t
+            JOIN showtimes s ON t.showtime_id = s.id
+            WHERE s.movie_id = @movieId AND t.status IN ('paid', 'used')";
+        var count = await db.ExecuteScalarAsync<int>(sql, new { movieId });
+        return count > 0;
+    }
+
+    public async Task<bool> HasActiveTicketsForShowtimeAsync(int showtimeId)
+    {
+        var sql = @"
+            SELECT COUNT(1) FROM tickets
+            WHERE showtime_id = @showtimeId AND status IN ('paid', 'used')";
+        var count = await db.ExecuteScalarAsync<int>(sql, new { showtimeId });
+        return count > 0;
+    }
+
+    public async Task<bool> HasUserWatchedMovieAsync(int userId, int movieId)
+    {
+        var sql = @"
+            SELECT COUNT(1) FROM tickets t
+            JOIN showtimes s ON t.showtime_id = s.id
+            WHERE t.user_id = @userId AND s.movie_id = @movieId AND t.status = 'used'";
+        var count = await db.ExecuteScalarAsync<int>(sql, new { userId, movieId });
+        return count > 0;
     }
 }
