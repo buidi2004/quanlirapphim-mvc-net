@@ -339,9 +339,9 @@ const styles = StyleSheet.create({
 
   noteBox: {
     flexDirection: 'row', alignItems: 'flex-start', gap: 8,
-    backgroundColor: 'rgba(255,193,7,0.08)', borderRadius: Theme.radius.md,
+    backgroundColor: 'rgba(111,66,193,0.08)', borderRadius: Theme.radius.md,
     padding: 12, marginBottom: Theme.spacing.xl,
-    borderWidth: 1, borderColor: 'rgba(255,193,7,0.2)',
+    borderWidth: 1, borderColor: 'rgba(111,66,193,0.2)',
   },
   noteText: { color: Theme.colors.textSecondary, fontSize: 13, lineHeight: 20, flex: 1 },
 

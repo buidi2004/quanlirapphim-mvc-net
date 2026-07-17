@@ -191,8 +191,8 @@ const styles = StyleSheet.create({
   iconSection: { alignItems: 'center', paddingVertical: 30, gap: 10 },
   iconCircle: {
     width: 80, height: 80, borderRadius: 40,
-    backgroundColor: 'rgba(255,193,7,0.1)', justifyContent: 'center', alignItems: 'center',
-    borderWidth: 2, borderColor: 'rgba(255,193,7,0.3)',
+    backgroundColor: 'rgba(111,66,193,0.1)', justifyContent: 'center', alignItems: 'center',
+    borderWidth: 2, borderColor: 'rgba(111,66,193,0.3)',
   },
   iconTitle: { color: Theme.colors.textPrimary, fontSize: 20, fontWeight: 'bold' },
   iconSubtitle: { color: Theme.colors.textSecondary, fontSize: 13, textAlign: 'center' },

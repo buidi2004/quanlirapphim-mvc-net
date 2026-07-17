@@ -22,7 +22,7 @@ const MOCK_CONTACT = {
 };
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; icon: string }> = {
-  pending: { label: 'Đang chờ xử lý', color: Theme.colors.warning, bg: 'rgba(255,193,7,0.1)', icon: 'time-outline' },
+  pending: { label: 'Đang chờ xử lý', color: Theme.colors.warning, bg: 'rgba(111,66,193,0.1)', icon: 'time-outline' },
   processing: { label: 'Đang xử lý', color: Theme.colors.info, bg: 'rgba(13,202,240,0.1)', icon: 'reload-outline' },
   replied: { label: 'Đã phản hồi', color: Theme.colors.success, bg: 'rgba(25,135,84,0.1)', icon: 'checkmark-circle-outline' },
 };
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
 
   messageBox: {
     borderLeftWidth: 3, borderLeftColor: Theme.colors.warning,
-    backgroundColor: 'rgba(255,193,7,0.05)', padding: 14, borderRadius: Theme.radius.md,
+    backgroundColor: 'rgba(111,66,193,0.05)', padding: 14, borderRadius: Theme.radius.md,
   },
   messageText: { color: Theme.colors.textSecondary, fontSize: 14, lineHeight: 22 },
 
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
   replyHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
   replyAgentIcon: {
     width: 36, height: 36, borderRadius: 18,
-    backgroundColor: 'rgba(255,193,7,0.1)', justifyContent: 'center', alignItems: 'center',
+    backgroundColor: 'rgba(111,66,193,0.1)', justifyContent: 'center', alignItems: 'center',
   },
   replyAgentName: { color: Theme.colors.textPrimary, fontSize: 14, fontWeight: 'bold' },
   replyTime: { color: Theme.colors.textSecondary, fontSize: 11, marginTop: 2 },

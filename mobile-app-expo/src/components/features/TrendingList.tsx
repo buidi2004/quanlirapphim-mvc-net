@@ -66,7 +66,7 @@ const TrendingCard = ({ movie, rank, onPress }: { movie: Movie, rank: number, on
         
         <View style={styles.ratingRow}>
           <View style={styles.ratingChip}>
-            <Ionicons name="star" size={12} color="#ffc107" />
+            <Ionicons name="star" size={12} color="#6f42c1" />
             <Text style={styles.ratingText}>4.8/5</Text>
           </View>
           <Text style={styles.genre}>{movie.genre}</Text>

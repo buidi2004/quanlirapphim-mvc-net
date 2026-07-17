@@ -126,7 +126,7 @@ public class ShowtimeRepository(IDbConnection db) : IShowtimeRepository
             JOIN rooms r ON s.room_id = r.id 
             JOIN cinemas c ON r.cinema_id = c.id
             ORDER BY s.show_date DESC, s.start_time DESC
-            OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY
+            LIMIT @PageSize OFFSET @Offset
         ";
 
         var showtimes = await db.QueryAsync<Showtime, Movie, Room, Cinema, Showtime>(

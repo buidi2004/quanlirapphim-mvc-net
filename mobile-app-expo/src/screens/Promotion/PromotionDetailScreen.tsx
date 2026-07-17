@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
   copyBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 193, 7, 0.1)',
+    backgroundColor: 'rgba(111, 66, 193, 0.1)',
     borderRadius: Theme.radius.lg,
     padding: 20,
     borderWidth: 2,

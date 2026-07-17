@@ -21,7 +21,7 @@ public class ConcessionController : Controller
         {
             Name = "Combo Avatar: The Way of Water",
             Price = "299.000₫",
-            Image = "https://placehold.co/800x400/2a1a1a/e5a720?text=Combo+Avatar",
+            Image = "https://placehold.co/800x400/2a1a1a/6f42c1?text=Combo+Avatar",
             Video = "https://www.youtube.com/embed/o5F8MOz_IDw?autoplay=1&mute=1&loop=1&playlist=o5F8MOz_IDw",
             Description = @"
                 <p class=""fs-5 text-light"">Hòa mình vào thế giới Pandora diệu kỳ với <strong>Combo Avatar: The Way of Water</strong> độc quyền tại CinemaX. Không chỉ là một phần bắp nước thông thường, đây là một tác phẩm nghệ thuật dành riêng cho các fan hâm mộ chân chính của siêu phẩm đến từ đạo diễn James Cameron.</p>
@@ -39,7 +39,7 @@ public class ConcessionController : Controller
         {
             Name = "Combo Couple (Dành cho cặp đôi)",
             Price = "109.000₫",
-            Image = "https://placehold.co/800x400/2a1a1a/e5a720?text=Combo+Couple",
+            Image = "https://placehold.co/800x400/2a1a1a/6f42c1?text=Combo+Couple",
             Video = "https://www.youtube.com/embed/lM0hDngTzVw?autoplay=1&mute=1",
             Description = @"
                 <p class=""fs-5 text-light"">Chia sẻ khoảnh khắc ngọt ngào cùng người thương với <strong>Combo Couple</strong>. Tiết kiệm hơn 20% so với mua lẻ, đây là sự lựa chọn hoàn hảo cho buổi hẹn hò điện ảnh lãng mạn.</p>
@@ -57,7 +57,7 @@ public class ConcessionController : Controller
         {
             Name = "Dune Merchandise: Sandworm Bucket",
             Price = "399.000₫",
-            Image = "https://placehold.co/800x400/2a1a1a/e5a720?text=Dune+Merchandise",
+            Image = "https://placehold.co/800x400/2a1a1a/6f42c1?text=Dune+Merchandise",
             Video = "https://www.youtube.com/embed/Way9Dexny3w?autoplay=1&mute=1&loop=1&playlist=Way9Dexny3w",
             Description = @"
                 <p class=""fs-5 text-light"">Chào mừng đến với Arrakis! Trải nghiệm điện ảnh đỉnh cao cùng <strong>Exclusive Dune Sandworm Bucket</strong> - Xô đựng bắp tạo hình sâu cát huyền thoại cực kỳ chi tiết, đang gây bão trên toàn cầu.</p>

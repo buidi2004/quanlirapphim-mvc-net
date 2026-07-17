@@ -32,7 +32,7 @@ export const styles = StyleSheet.create({
     fontWeight: '900',
     textAlign: 'center',
     marginBottom: 10,
-    textShadowColor: 'rgba(255, 193, 7, 0.3)',
+    textShadowColor: 'rgba(111, 66, 193, 0.3)',
     textShadowOffset: { width: 0, height: 4 },
     textShadowRadius: 10,
   },

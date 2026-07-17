@@ -65,7 +65,7 @@ public class TicketService(
             transaction.Commit();
             return new HoldResult(ticketIds, expiryTime);
         }
-        catch (Microsoft.Data.Sqlite.SqliteException ex) when (ex.SqliteErrorCode == 19) // Constraint violation
+        catch (MySqlConnector.MySqlException ex) when (ex.ErrorCode == MySqlConnector.MySqlErrorCode.DuplicateKeyEntry) // Constraint violation
         {
             transaction.Rollback();
             throw new BusinessException("Ghế bạn chọn vừa bị người khác nhanh tay đặt trước. Vui lòng thử lại!");

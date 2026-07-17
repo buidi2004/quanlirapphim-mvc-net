@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   timerBanner: {
-    backgroundColor: 'rgba(255, 193, 7, 0.1)',
+    backgroundColor: 'rgba(111, 66, 193, 0.1)',
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
     borderRadius: Theme.radius.lg,
     marginBottom: Theme.spacing.md,
     borderWidth: 1,
-    borderColor: 'rgba(255, 193, 7, 0.3)',
+    borderColor: 'rgba(111, 66, 193, 0.3)',
     gap: 8,
   },
   timerLabel: {

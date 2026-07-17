@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   },
   cinemaIconBox: {
     width: 36, height: 36, borderRadius: 18,
-    backgroundColor: 'rgba(255,193,7,0.1)', justifyContent: 'center', alignItems: 'center',
+    backgroundColor: 'rgba(111,66,193,0.1)', justifyContent: 'center', alignItems: 'center',
   },
   cinemaName: { color: Theme.colors.textPrimary, fontSize: 14, fontWeight: 'bold', marginBottom: 2 },
   cinemaAddr: { color: Theme.colors.textSecondary, fontSize: 11 },
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
   timesRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   timeChip: {
     paddingHorizontal: 12, paddingVertical: 7, borderRadius: Theme.radius.md,
-    backgroundColor: 'rgba(255,193,7,0.1)', borderWidth: 1, borderColor: Theme.colors.warning,
+    backgroundColor: 'rgba(111,66,193,0.1)', borderWidth: 1, borderColor: Theme.colors.warning,
   },
   timeText: { color: Theme.colors.warning, fontSize: 13, fontWeight: 'bold' },
 

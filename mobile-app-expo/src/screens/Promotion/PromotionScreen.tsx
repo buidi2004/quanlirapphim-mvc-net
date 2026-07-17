@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
   },
   subHeader: {
     padding: Theme.spacing.md,
-    backgroundColor: 'rgba(255, 193, 7, 0.05)',
+    backgroundColor: 'rgba(111, 66, 193, 0.05)',
     borderBottomWidth: 1,
     borderBottomColor: Theme.colors.cardBorder,
   },

@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   web:
     image: cinemaxnet
@@ -12,19 +10,58 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Server=db;Port=3306;Database=cinemax;User=root;Password=secret;CharSet=utf8mb4;AllowUserVariables=true;
     depends_on:
-      - db
-  
+      db:
+        condition: service_healthy
+    networks:
+      - cinemax-network
+
   db:
     image: mysql:8.0
     restart: always
     ports:
       - "3306:3306"
     environment:
-      - MYSQL_ROOT_PASSWORD=secret
-      - MYSQL_DATABASE=cinemax
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: cinemax
+      MYSQL_CHARSET: utf8mb4
+      MYSQL_COLLATION: utf8mb4_unicode_ci
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-psecret"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - cinemax-network
+
+  mobile:
+    build:
+      context: ./mobile-app-expo
+      dockerfile: Dockerfile
+    restart: always
+    tty: true
+    stdin_open: true
+    ports:
+      - "8081:8081"
+    environment:
+      - REACT_NATIVE_PACKAGER_HOSTNAME=${LAN_IP:-127.0.0.1}
+      - EXPO_PUBLIC_API_URL=http://${LAN_IP:-127.0.0.1}:8080/api
+    depends_on:
+      web:
+        condition: service_started
+    networks:
+      - cinemax-network
+    volumes:
+      - ./mobile-app-expo:/app
+      - /app/node_modules
 
 volumes:
   mysql_data:
+
+networks:
+  cinemax-network:
+    driver: bridge

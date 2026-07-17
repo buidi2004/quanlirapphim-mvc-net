@@ -122,7 +122,7 @@ export const styles = StyleSheet.create({
   },
   quickLinkIcon: {
     width: 44, height: 44, borderRadius: Theme.radius.lg,
-    backgroundColor: 'rgba(255,193,7,0.1)',
+    backgroundColor: 'rgba(111,66,193,0.1)',
     justifyContent: 'center', alignItems: 'center',
   },
   quickLinkText: {

@@ -20,7 +20,7 @@ public class RoomRepository(IDbConnection db) : IRoomRepository
             FROM rooms r
             JOIN cinemas c ON r.cinema_id = c.id
             ORDER BY r.id DESC
-            OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY
+            LIMIT @PageSize OFFSET @Offset
         ";
 
         var rooms = await db.QueryAsync<Room, Cinema, Room>(

@@ -22,7 +22,7 @@ import { Theme } from '../../theme/tokens';
 import { styles } from './styles';
 
 const PROMOTION_BANNERS = [
-  { id: '1', iconName: 'gift-outline' as const, text: 'Mua 2 vé tặng 1 combo bắp nước', bg: 'rgba(255,193,7,0.12)', border: '#ffc107' },
+  { id: '1', iconName: 'gift-outline' as const, text: 'Mua 2 vé tặng 1 combo bắp nước', bg: 'rgba(111,66,193,0.12)', border: '#6f42c1' },
   { id: '2', iconName: 'people-outline' as const, text: 'Thứ 3 Vui Vẻ — Giảm 30% tất cả vé', bg: 'rgba(229,9,20,0.1)', border: '#e50914' },
 ];
 
@@ -66,6 +66,10 @@ export const HomeScreen = ({ navigation }: any) => {
     navigation.navigate('MovieDetail', { movieId: id });
   }, [navigation]);
 
+  const renderMovieItem = useCallback(({ item }: { item: Movie }) => (
+    <MovieCard movie={item} onPress={handleMoviePress} />
+  ), [handleMoviePress]);
+
   const handleSplashFinish = useCallback(() => {
     setShowSplash(false);
     setShowPromoModal(true);
@@ -86,7 +90,7 @@ export const HomeScreen = ({ navigation }: any) => {
         showsHorizontalScrollIndicator={false}
         data={data}
         keyExtractor={item => item.id.toString()}
-        renderItem={({ item }) => <MovieCard movie={item} onPress={handleMoviePress} />}
+        renderItem={renderMovieItem}
         contentContainerStyle={styles.listContent}
         snapToInterval={MOVIE_CARD_WIDTH + Theme.spacing.md}
         decelerationRate="fast"

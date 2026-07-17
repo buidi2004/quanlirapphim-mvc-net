@@ -23,8 +23,8 @@ const SLIDES = [
     iconName: "ticket-outline" as const,
     title: 'Đặt vé siêu nhanh',
     subtitle: 'Chọn ghế yêu thích, đặt bắp nước và thanh toán chỉ trong 60 giây. Không cần xếp hàng!',
-    color: '#ffc107',
-    bg: 'rgba(255,193,7,0.08)',
+    color: '#6f42c1',
+    bg: 'rgba(111,66,193,0.08)',
   },
   {
     id: '3',
