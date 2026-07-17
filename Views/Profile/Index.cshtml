@@ -17,7 +17,7 @@
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-start mb-4">
                     <div>
-                        <h6 class="text-warning fw-bold mb-0" style="letter-spacing: 2px;">CINEMAX REWARDS</h6>
+                        <h6 class="text-warning fw-medium mb-0" style="letter-spacing: 2px;">CINEMAX REWARDS</h6>
                         <span class="small text-light">Thành viên @user?.GetMemberLevelLabel()</span>
                     </div>
                     <i class="bi bi-award-fill text-warning fs-2 shadow-sm"></i>
@@ -26,7 +26,7 @@
                 <div class="d-flex align-items-center mb-4">
                     <img src="@user?.GetAvatarUrl()" class="rounded-circle me-3 border border-2 border-warning" style="width:60px; height:60px; object-fit:cover;" alt="Avatar">
                     <div>
-                        <h5 class="mb-0 fw-bold text-white">@user?.GetDisplayName()</h5>
+                        <h5 class="mb-0 fw-medium text-white">@user?.GetDisplayName()</h5>
                         <p class="mb-0 small text-secondary font-monospace">ID: @(user?.Id.ToString("D8"))</p>
                     </div>
                 </div>
@@ -58,13 +58,13 @@
             <div class="row g-2 text-center">
                 <div class="col-6">
                     <div class="bg-light rounded p-2">
-                        <div class="text-warning fw-bold">@stats?.TotalTickets</div>
+                        <div class="text-warning fw-medium">@stats?.TotalTickets</div>
                         <small class="text-secondary">Vé đã mua</small>
                     </div>
                 </div>
                 <div class="col-6">
                     <div class="bg-light rounded p-2">
-                        <div class="text-warning fw-bold">@stats?.TotalMovies</div>
+                        <div class="text-warning fw-medium">@stats?.TotalMovies</div>
                         <small class="text-secondary">Phim đã xem</small>
                     </div>
                 </div>
@@ -104,7 +104,7 @@
         <!-- Info details -->
         <div class="card bg-white border-light mb-4">
             <div class="card-body">
-                <h5 class="text-warning mb-3"><i class="bi bi-info-circle me-2"></i>Thông tin tài khoản</h5>
+                <h5 class="text-warning mb-3">Thông tin tài khoản</h5>
                 <dl class="row small mb-0">
                     <dt class="col-sm-4 text-secondary">Email</dt>
                     <dd class="col-sm-8 text-dark">@user?.Email</dd>
@@ -119,7 +119,7 @@
                         <dd class="col-sm-8 text-dark">@user.City</dd>
                     }
                     <dt class="col-sm-4 text-secondary">Tổng chi tiêu</dt>
-                    <dd class="col-sm-8 text-warning fw-bold">@user?.TotalSpent.ToString("N0")đ</dd>
+                    <dd class="col-sm-8 text-warning fw-medium">@user?.TotalSpent.ToString("N0")đ</dd>
                 </dl>
             </div>
         </div>
@@ -128,7 +128,7 @@
         <div class="card bg-white border-light">
             <div class="card-body">
                 <div class="d-flex justify-content-between mb-3">
-                    <h5 class="text-warning mb-0"><i class="bi bi-ticket-perforated me-2"></i>Vé gần đây</h5>
+                    <h5 class="text-warning mb-0">Vé gần đây</h5>
                     <a href="/my-tickets" class="btn btn-outline-warning btn-sm">Xem tất cả</a>
                 </div>
                 @if (!recentTickets.Any())
@@ -149,7 +149,7 @@
                                             <strong class="text-dark small">@ticket.MovieTitle</strong>
                                             @{
                                                 var badgeCls = ticket.status == "paid" ? "bg-success" :
-                                                               ticket.status == "holding" ? "bg-warning text-dark" : "bg-secondary";
+                                                               ticket.status == "holding" ? "bg-warning text-white" : "bg-secondary";
                                                 var statusLbl = ticket.status == "paid" ? "Đã thanh toán" :
                                                                 ticket.status == "holding" ? "Đang giữ" : "Đã hủy";
                                             }

@@ -36,7 +36,7 @@ body {
     height: 200%;
     background: radial-gradient(
         circle at 30% 40%,
-        rgba(255, 193, 7, 0.08) 0%,
+        rgba(111, 66, 193, 0.08) 0%,
         transparent 50%
     );
     pointer-events: none;
@@ -50,7 +50,7 @@ body {
     height: 150%;
     background: radial-gradient(
         circle at 70% 70%,
-        rgba(255, 193, 7, 0.05) 0%,
+        rgba(111, 66, 193, 0.05) 0%,
         transparent 40%
     );
     pointer-events: none;
@@ -58,8 +58,8 @@ body {
 .hero-banner h1 {
     font-size: 3.5rem;
     font-weight: 800;
-    color: #ffc107;
-    text-shadow: 0 4px 20px rgba(255, 193, 7, 0.3);
+    color: #6f42c1;
+    text-shadow: 0 4px 20px rgba(111, 66, 193, 0.3);
     position: relative;
     z-index: 1;
 }
@@ -90,7 +90,7 @@ body {
     overflow: hidden;
 }
 .movie-card:hover {
-    box-shadow: 0 20px 40px rgba(255, 193, 7, 0.2) !important;
+    box-shadow: 0 20px 40px rgba(111, 66, 193, 0.2) !important;
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -123,15 +123,15 @@ body {
     gap: 0.25rem;
 }
 .date-item:hover {
-    border-color: #ffc107;
+    border-color: #6f42c1;
     color: #fff;
 }
 .date-item.active {
-    background: #ffc107;
+    background: #6f42c1;
     color: #000;
     font-weight: 700;
-    border-color: #ffc107;
-    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+    border-color: #6f42c1;
+    box-shadow: 0 4px 12px rgba(111, 66, 193, 0.3);
 }
 .date-item .day-name {
     font-size: 0.7rem;
@@ -159,9 +159,9 @@ body {
     justify-content: space-between;
 }
 .showtime-card:hover {
-    border-color: #ffc107;
+    border-color: #6f42c1;
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(255, 193, 7, 0.15);
+    box-shadow: 0 8px 24px rgba(111, 66, 193, 0.15);
 }
 .showtime-card .time {
     font-size: 1.75rem;
@@ -170,7 +170,7 @@ body {
     font-family: 'Inter', sans-serif;
 }
 .showtime-card .price {
-    color: #ffc107;
+    color: #6f42c1;
     font-weight: 600;
 }
 .showtime-card .room-badge {
@@ -178,9 +178,9 @@ body {
     padding: 0.2rem 0.6rem;
     border-radius: 6px;
     font-size: 0.75rem;
-    background: rgba(255, 193, 7, 0.1);
-    border: 1px solid rgba(255, 193, 7, 0.3);
-    color: #ffc107;
+    background: rgba(111, 66, 193, 0.1);
+    border: 1px solid rgba(111, 66, 193, 0.3);
+    color: #6f42c1;
     font-family: monospace;
 }
 .showtime-card .seats-left {
@@ -212,8 +212,8 @@ body {
     border-radius: 0 0 50% 50% / 0 0 100% 100%;
     box-shadow:
         0 4px 20px rgba(255, 255, 255, 0.6),
-        0 8px 40px rgba(255, 193, 7, 0.25),
-        0 16px 80px rgba(255, 193, 7, 0.1);
+        0 8px 40px rgba(111, 66, 193, 0.25),
+        0 16px 80px rgba(111, 66, 193, 0.1);
 }
 .cinema-screen-label {
     letter-spacing: 6px;
@@ -297,7 +297,7 @@ body {
 
 /* Ghế đang giữ — Vàng mờ */
 .seat-btn.btn-warning:disabled {
-    background: #ffc107;
+    background: #6f42c1;
     color: #000;
     opacity: 0.6;
     cursor: not-allowed;
@@ -337,14 +337,14 @@ body {
     gap: 0.5rem;
     padding: 0.75rem 1.5rem;
     border-radius: 12px;
-    background: rgba(255, 193, 7, 0.1);
-    border: 1px solid rgba(255, 193, 7, 0.3);
+    background: rgba(111, 66, 193, 0.1);
+    border: 1px solid rgba(111, 66, 193, 0.3);
 }
 .timer-value {
     font-family: 'Courier New', monospace;
     font-size: 2rem;
     font-weight: 700;
-    color: #ffc107;
+    color: #6f42c1;
     letter-spacing: 2px;
 }
 
@@ -360,7 +360,7 @@ body {
     padding: 1rem;
     background: rgba(0, 0, 0, 0.95);
     backdrop-filter: blur(10px);
-    border-top: 1px solid rgba(255, 193, 7, 0.3);
+    border-top: 1px solid rgba(111, 66, 193, 0.3);
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
     transform: translateY(100%);
     transition: transform 0.3s ease;
@@ -378,7 +378,7 @@ body {
 .sticky-checkout .total-price {
     font-size: 1.25rem;
     font-weight: 700;
-    color: #ffc107;
+    color: #6f42c1;
 }
 @media (min-width: 992px) {
     .sticky-checkout {
@@ -423,12 +423,12 @@ body {
 }
 .ticket-front {
     background: linear-gradient(135deg, #e9ecef, #f8f9fa);
-    border: 1px solid #ffc107;
+    border: 1px solid #6f42c1;
     color: #fff;
 }
 .ticket-back {
     background: linear-gradient(135deg, #f8f9fa, #ced4da);
-    border: 1px solid #ffc107;
+    border: 1px solid #6f42c1;
     color: #fff;
     transform: rotateY(180deg);
 }
@@ -443,7 +443,7 @@ body {
     background-color: #fd7e14;
 }
 .badge-c13 {
-    background-color: #ffc107;
+    background-color: #6f42c1;
     color: #212529;
 }
 .badge-p {
@@ -454,12 +454,12 @@ body {
    Payment method hover effects
    ══════════════════════════════════════════════════════════ */
 .hover-border-warning:hover {
-    border-color: #ffc107 !important;
+    border-color: #6f42c1 !important;
     transition: border-color 0.2s ease;
 }
 .form-check:has(input:checked) {
-    border-color: #ffc107 !important;
-    background-color: rgba(255, 193, 7, 0.05) !important;
+    border-color: #6f42c1 !important;
+    background-color: rgba(111, 66, 193, 0.05) !important;
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -502,8 +502,8 @@ body {
    Utility micro-animations
    ══════════════════════════════════════════════════════════ */
 @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 5px rgba(255, 193, 7, 0.3); }
-    50%      { box-shadow: 0 0 20px rgba(255, 193, 7, 0.6); }
+    0%, 100% { box-shadow: 0 0 5px rgba(111, 66, 193, 0.3); }
+    50%      { box-shadow: 0 0 20px rgba(111, 66, 193, 0.6); }
 }
 .animate-pulse-glow {
     animation: pulse-glow 2s ease-in-out infinite;
@@ -587,32 +587,32 @@ body {
     background: rgba(26, 26, 46, 0.8);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 193, 7, 0.15);
+    border: 1px solid rgba(111, 66, 193, 0.15);
     border-radius: 16px;
 }
 
 /* ── Avatar Glow ──────────────────────────────── */
 .avatar-glow {
-    box-shadow: 0 0 20px rgba(255, 193, 7, 0.4), 0 0 40px rgba(255, 193, 7, 0.15);
+    box-shadow: 0 0 20px rgba(111, 66, 193, 0.4), 0 0 40px rgba(111, 66, 193, 0.15);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 .avatar-glow:hover {
     transform: scale(1.05);
-    box-shadow: 0 0 30px rgba(255, 193, 7, 0.6), 0 0 60px rgba(255, 193, 7, 0.25);
+    box-shadow: 0 0 30px rgba(111, 66, 193, 0.6), 0 0 60px rgba(111, 66, 193, 0.25);
 }
 
 /* ── Stat Mini Cards ──────────────────────────── */
 .stat-mini {
-    background: rgba(255, 193, 7, 0.05);
-    border: 1px solid rgba(255, 193, 7, 0.15);
+    background: rgba(111, 66, 193, 0.05);
+    border: 1px solid rgba(111, 66, 193, 0.15);
     transition: all 0.2s ease;
 }
-.stat-mini:hover { background: rgba(255, 193, 7, 0.1); transform: translateY(-2px); }
+.stat-mini:hover { background: rgba(111, 66, 193, 0.1); transform: translateY(-2px); }
 
 /* ── Total Spent Card ─────────────────────────── */
 .total-spent-card {
-    background: linear-gradient(135deg, rgba(255, 193, 7, 0.05), rgba(255, 193, 7, 0.02));
-    border: 1px solid rgba(255, 193, 7, 0.15);
+    background: linear-gradient(135deg, rgba(111, 66, 193, 0.05), rgba(111, 66, 193, 0.02));
+    border: 1px solid rgba(111, 66, 193, 0.15);
 }
 
 /* ── Cinema Cards ─────────────────────────────── */
@@ -621,8 +621,8 @@ body {
 }
 .cinema-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 12px 40px rgba(255, 193, 7, 0.2);
-    border-color: rgba(255, 193, 7, 0.3);
+    box-shadow: 0 12px 40px rgba(111, 66, 193, 0.2);
+    border-color: rgba(111, 66, 193, 0.3);
 }
 .cinema-card .cinema-img { transition: transform 0.5s ease; }
 .cinema-card:hover .cinema-img { transform: scale(1.05); }
@@ -636,27 +636,27 @@ body {
 .cinema-hero::before {
     content: ''; position: absolute; top: -50%; left: -50%;
     width: 200%; height: 200%;
-    background: radial-gradient(circle at 30% 40%, rgba(255, 193, 7, 0.06), transparent 50%);
+    background: radial-gradient(circle at 30% 40%, rgba(111, 66, 193, 0.06), transparent 50%);
     pointer-events: none;
 }
 
 /* ── Facility Badges ──────────────────────────── */
 .facility-badge {
-    background: rgba(255, 193, 7, 0.1); border: 1px solid rgba(255, 193, 7, 0.25);
-    color: #ffc107; font-size: 0.7rem; font-weight: 600;
+    background: rgba(111, 66, 193, 0.1); border: 1px solid rgba(111, 66, 193, 0.25);
+    color: #6f42c1; font-size: 0.7rem; font-weight: 600;
 }
 .facility-badge-lg {
-    background: rgba(255, 193, 7, 0.1); border: 1px solid rgba(255, 193, 7, 0.3);
-    color: #ffc107; font-weight: 600; transition: all 0.2s ease;
+    background: rgba(111, 66, 193, 0.1); border: 1px solid rgba(111, 66, 193, 0.3);
+    color: #6f42c1; font-weight: 600; transition: all 0.2s ease;
 }
-.facility-badge-lg:hover { background: rgba(255, 193, 7, 0.2); transform: scale(1.05); }
+.facility-badge-lg:hover { background: rgba(111, 66, 193, 0.2); transform: scale(1.05); }
 
 /* ── Info Items ────────────────────────────────── */
 .info-item {
     background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05);
     transition: all 0.2s ease;
 }
-.info-item:hover { background: rgba(255, 193, 7, 0.05); border-color: rgba(255, 193, 7, 0.15); }
+.info-item:hover { background: rgba(111, 66, 193, 0.05); border-color: rgba(111, 66, 193, 0.15); }
 
 /* ── Province Filter Buttons ──────────────────── */
 .province-btn { transition: all 0.2s ease; }
@@ -679,12 +679,12 @@ body {
 }
 .ticket-3d-front {
     background: linear-gradient(145deg, #ced4da, #dee2e6 50%, #ced4da);
-    border: 2px solid rgba(255, 193, 7, 0.3);
+    border: 2px solid rgba(111, 66, 193, 0.3);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 .ticket-3d-back {
     background: linear-gradient(145deg, #ced4da, #f8f9fa 50%, #ced4da);
-    border: 2px solid rgba(255, 193, 7, 0.3);
+    border: 2px solid rgba(111, 66, 193, 0.3);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     transform: rotateY(180deg);
 }
@@ -692,7 +692,7 @@ body {
 
 /* Tear line */
 .ticket-tear-line {
-    border-top: 2px dashed rgba(255, 193, 7, 0.3); position: relative;
+    border-top: 2px dashed rgba(111, 66, 193, 0.3); position: relative;
 }
 .ticket-tear-line::before, .ticket-tear-line::after {
     content: ''; position: absolute; top: -12px;
@@ -715,14 +715,14 @@ body {
 }
 
 /* ── QR Container ─────────────────────────────── */
-.qr-container { box-shadow: 0 4px 20px rgba(255, 193, 7, 0.3); }
+.qr-container { box-shadow: 0 4px 20px rgba(111, 66, 193, 0.3); }
 
 /* ── Ticket Item Hover ────────────────────────── */
 .ticket-item { cursor: pointer; transition: background 0.2s ease; }
-.ticket-item:hover { background: rgba(255, 193, 7, 0.05); }
+.ticket-item:hover { background: rgba(111, 66, 193, 0.05); }
 
 /* ── Search Bar Glow ──────────────────────────── */
-.search-bar-glow:focus-within { box-shadow: 0 0 20px rgba(255, 193, 7, 0.3); }
+.search-bar-glow:focus-within { box-shadow: 0 0 20px rgba(111, 66, 193, 0.3); }
 .search-hero {
     background: linear-gradient(135deg, #f8f9fa, #dee2e6, #ced4da);
     border-radius: 16px; border: 1px solid #222244; padding: 3rem 2rem;
@@ -747,8 +747,8 @@ body {
 }
 .promo-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(255, 193, 7, 0.15);
-    border-color: rgba(255, 193, 7, 0.3);
+    box-shadow: 0 12px 30px rgba(111, 66, 193, 0.15);
+    border-color: rgba(111, 66, 193, 0.3);
 }
 .promo-ribbon {
     position: absolute; top: 12px; right: -35px;
@@ -758,8 +758,8 @@ body {
     box-shadow: 0 2px 8px rgba(220, 53, 69, 0.4);
 }
 .promo-code-box {
-    background: rgba(255, 193, 7, 0.05);
-    border: 2px dashed rgba(255, 193, 7, 0.3);
+    background: rgba(111, 66, 193, 0.05);
+    border: 2px dashed rgba(111, 66, 193, 0.3);
     border-radius: 10px; padding: 0.75rem 1rem;
 }
 
@@ -770,26 +770,26 @@ body {
 }
 .news-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(255, 193, 7, 0.15);
-    border-color: rgba(255, 193, 7, 0.3);
+    box-shadow: 0 12px 30px rgba(111, 66, 193, 0.15);
+    border-color: rgba(111, 66, 193, 0.3);
 }
 .featured-news-card {
     border-radius: 16px; cursor: pointer; transition: all 0.3s ease;
-    border: 1px solid rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(111, 66, 193, 0.1);
 }
 .featured-news-card:hover {
-    box-shadow: 0 16px 40px rgba(255, 193, 7, 0.2);
-    border-color: rgba(255, 193, 7, 0.3);
+    box-shadow: 0 16px 40px rgba(111, 66, 193, 0.2);
+    border-color: rgba(111, 66, 193, 0.3);
 }
 
 /* ── Error Pages ──────────────────────────────── */
 .error-number {
-    text-shadow: 0 4px 40px rgba(255, 193, 7, 0.4);
+    text-shadow: 0 4px 40px rgba(111, 66, 193, 0.4);
     animation: error-pulse 3s ease-in-out infinite;
 }
 @keyframes error-pulse {
-    0%, 100% { text-shadow: 0 4px 40px rgba(255, 193, 7, 0.3); }
-    50%      { text-shadow: 0 4px 60px rgba(255, 193, 7, 0.6); }
+    0%, 100% { text-shadow: 0 4px 40px rgba(111, 66, 193, 0.3); }
+    50%      { text-shadow: 0 4px 60px rgba(111, 66, 193, 0.6); }
 }
 
 /* ── Contact Page ─────────────────────────────── */
@@ -802,13 +802,13 @@ body {
 
 /* ── Forgot Password Card ─────────────────────── */
 .forgot-pw-card {
-    border-radius: 20px; border: 1px solid rgba(255, 193, 7, 0.15);
+    border-radius: 20px; border: 1px solid rgba(111, 66, 193, 0.15);
 }
 .forgot-icon i { animation: float-hint 3s ease-in-out infinite; }
 
 /* ── Accordion Dark ───────────────────────────── */
 .accordion-button:not(.collapsed) {
-    background: rgba(255, 193, 7, 0.1); color: #ffc107; box-shadow: none;
+    background: rgba(111, 66, 193, 0.1); color: #6f42c1; box-shadow: none;
 }
 .accordion-button::after { filter: invert(1); }
 
@@ -832,7 +832,7 @@ main { animation: pageLoad 0.4s ease-out; }
 
 /* ?? N�ng c?p Giao di?n ?? */
 .quick-book-bar { backdrop-filter: blur(10px); background-color: rgba(255, 255, 255, 0.9) !important; }
-.experience-card:hover { transform: translateY(-10px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-color: #ffc107 !important; }
-.tier-card-inner { box-shadow: 0 10px 40px rgba(255, 193, 7, 0.2); }
+.experience-card:hover { transform: translateY(-10px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-color: #6f42c1 !important; }
+.tier-card-inner { box-shadow: 0 10px 40px rgba(111, 66, 193, 0.2); }
 
 

@@ -12,10 +12,10 @@
                 <img src="@(Model.ImageUrl ?? "https://images.unsplash.com/photo-1595769816263-9b910be24d5f?q=80&w=800")"
                      class="w-100 h-100" style="object-fit:cover; filter:brightness(.5);">
                 <div class="position-absolute inset-0 d-flex align-items-center justify-content-center flex-column">
-                    <div class="badge bg-warning text-dark px-4 py-2 mb-3" style="font-size:1.5rem;">
+                    <div class="badge bg-warning text-white px-4 py-2 mb-3" style="font-size:1.5rem;">
                         @Model.GetDiscountText()
                     </div>
-                    <h1 class="text-white fw-bold" style="letter-spacing:4px;">@Model.Code</h1>
+                    <h1 class="text-white fw-medium" style="letter-spacing:4px;">@Model.Code</h1>
                 </div>
             </div>
 
@@ -48,15 +48,15 @@
 
                 <div class="input-group mb-4">
                     <input type="text" value="@Model.Code" id="promoCodeInput"
-                           class="form-control bg-light border-warning text-warning fw-bold text-center"
+                           class="form-control bg-light border-warning text-warning fw-medium text-center"
                            style="letter-spacing:3px; font-size:1.2rem;" readonly>
-                    <button class="btn btn-warning fw-bold" onclick="copyPromoCode()">
+                    <button class="btn btn-warning fw-medium" onclick="copyPromoCode()">
                         <i class="bi bi-clipboard me-1"></i>Sao chép
                     </button>
                 </div>
 
                 <a href="/movies" class="btn btn-outline-warning w-100">
-                    <i class="bi bi-ticket-perforated me-2"></i>Dùng khi đặt vé ngay
+                    Dùng khi đặt vé ngay
                 </a>
             </div>
         </div>

@@ -36,13 +36,13 @@
     .seat-type-standard { background-color: transparent; border-color: #198754; color: #198754; }
     .seat-type-standard:hover:not(:disabled) { background-color: #198754; color: white; }
     
-    .seat-type-vip { background-color: transparent; border-color: #ffc107; color: #ffc107; border-width: 2px; }
-    .seat-type-vip:hover:not(:disabled) { background-color: #ffc107; color: black; }
+    .seat-type-vip { background-color: transparent; border-color: #6f42c1; color: #6f42c1; border-width: 2px; }
+    .seat-type-vip:hover:not(:disabled) { background-color: #6f42c1; color: black; }
     
     .seat-type-couple { background-color: transparent; border-color: #e83e8c; color: #e83e8c; width: 84px; grid-column: span 2; }
     .seat-type-couple:hover:not(:disabled) { background-color: #e83e8c; color: white; }
 
-    .seat-status-holding { background-color: #ffc107 !important; color: black !important; opacity: 0.6; cursor: not-allowed; border-color: #ffc107; }
+    .seat-status-holding { background-color: #6f42c1 !important; color: black !important; opacity: 0.6; cursor: not-allowed; border-color: #6f42c1; }
     .seat-status-paid { background-color: #dc3545 !important; color: white !important; opacity: 0.5; cursor: not-allowed; border-color: #dc3545; }
     .seat-status-broken { background-color: #dc3545 !important; color: white !important; opacity: 0.5; cursor: not-allowed; }
     
@@ -60,7 +60,7 @@
         <small class="text-white">Trống (Thường)</small>
     </div>
     <div class="d-flex align-items-center gap-2">
-        <div style="width:22px; height:22px; border:2px solid #ffc107; border-radius:4px;"></div>
+        <div style="width:22px; height:22px; border:2px solid #6f42c1; border-radius:4px;"></div>
         <small class="text-white">VIP</small>
     </div>
     <div class="d-flex align-items-center gap-2">
@@ -72,7 +72,7 @@
         <small class="text-white">Đang chọn</small>
     </div>
     <div class="d-flex align-items-center gap-2">
-        <div style="width:22px; height:22px; background:#ffc107; border-radius:4px; opacity:0.6;"></div>
+        <div style="width:22px; height:22px; background:#6f42c1; border-radius:4px; opacity:0.6;"></div>
         <small class="text-white">Đang giữ</small>
     </div>
     <div class="d-flex align-items-center gap-2">
@@ -146,7 +146,7 @@
         {
             var rowLabel = (char)('A' + row);
             <div class="d-flex justify-content-center align-items-center gap-2 mb-2">
-                <span class="text-secondary fw-bold" style="width: 20px;">@rowLabel</span>
+                <span class="text-secondary fw-medium" style="width: 20px;">@rowLabel</span>
 
                 @for (int col = 1; col <= Model.SeatsPerRow; col++)
                 {
@@ -171,7 +171,7 @@
                         @seatCode
                     </button>
                 }
-                <span class="text-secondary fw-bold ms-2" style="width: 20px;">@rowLabel</span>
+                <span class="text-secondary fw-medium ms-2" style="width: 20px;">@rowLabel</span>
             </div>
         }
     }

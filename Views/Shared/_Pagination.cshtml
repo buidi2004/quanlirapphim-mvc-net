@@ -37,7 +37,7 @@
             if (i == 1 || i == totalPages || Math.Abs(i - pageIndex) <= 2)
             {
                 <li class="page-item @(i == pageIndex ? "active" : "")">
-                    <a class="page-link shadow-sm @(i == pageIndex ? "bg-warning text-dark border-warning fw-bold" : "text-dark")" href="@GetUrl(i)">@i</a>
+                    <a class="page-link shadow-sm @(i == pageIndex ? "bg-warning text-white border-warning fw-medium" : "text-dark")" href="@GetUrl(i)">@i</a>
                 </li>
             }
             else if (i == pageIndex - 3 || i == pageIndex + 3)

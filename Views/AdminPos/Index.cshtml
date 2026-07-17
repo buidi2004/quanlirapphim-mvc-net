@@ -168,7 +168,7 @@
                 }
 
                 for (const [date, showtimes] of Object.entries(data)) {
-                    let dateHtml = `<div class="mb-1 fw-bold" style="font-size:12px;">${date}</div><div class="d-flex flex-wrap gap-1 mb-2">`;
+                    let dateHtml = `<div class="mb-1 fw-medium" style="font-size:12px;">${date}</div><div class="d-flex flex-wrap gap-1 mb-2">`;
                     showtimes.forEach(st => {
                         dateHtml += `<button class="btn btn-sm btn-outline-primary py-0 px-2 showtime-btn" onclick="event.stopPropagation(); loadSeatMap(${st.id}, ${st.price})">${st.startTime.substring(0,5)}</button>`;
                     });
@@ -216,7 +216,7 @@
                                     let extraStyle = '';
                                     
                                     if (seat.type === 'vip') {
-                                        extraStyle = 'border: 2px solid #ffc107;';
+                                        extraStyle = 'border: 2px solid #6f42c1;';
                                     } else if (seat.type === 'couple') {
                                         extraStyle = 'grid-column: span 2; width: 75px; background-color: #e83e8c; color: white; border: none;';
                                         if(statusClass === 'available') statusClass = '';
@@ -264,7 +264,7 @@
                         <div><div class="seat available d-inline-block align-middle m-0"></div> Trống</div>
                         <div><div class="seat selected d-inline-block align-middle m-0"></div> Đang chọn</div>
                         <div><div class="seat unavailable d-inline-block align-middle m-0"></div> Đã bán</div>
-                        <div><div class="seat d-inline-block align-middle m-0" style="border: 2px solid #ffc107;"></div> VIP</div>
+                        <div><div class="seat d-inline-block align-middle m-0" style="border: 2px solid #6f42c1;"></div> VIP</div>
                         <div><div class="seat d-inline-block align-middle m-0" style="width:75px; background-color: #e83e8c;"></div> Couple</div>
                     </div>
                 `;

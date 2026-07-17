@@ -6,7 +6,7 @@
 }
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-light">
-    <h1 class="h2 text-warning fw-bold">Quản Lý Vé Đã Đặt</h1>
+    <h1 class="h2 text-warning fw-medium">Quản Lý Vé Đã Đặt</h1>
 </div>
 
 <div class="card bg-white border border-light rounded shadow-sm">
@@ -50,7 +50,7 @@
                                     <small class="text-secondary">@t.start_time</small>
                                 }
                             </td>
-                            <td class="text-success fw-bold">@string.Format("{0:N0}₫", t.total_price)</td>
+                            <td class="text-success fw-medium">@string.Format("{0:N0}₫", t.total_price)</td>
                             <td>
                                 @if (t.status == "paid")
                                 {
@@ -58,7 +58,7 @@
                                 }
                                 else if (t.status == "pending")
                                 {
-                                    <span class="badge bg-warning text-dark">Chờ thanh toán</span>
+                                    <span class="badge bg-warning text-white">Chờ thanh toán</span>
                                 }
                                 else
                                 {

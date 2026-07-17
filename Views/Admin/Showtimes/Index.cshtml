@@ -8,8 +8,8 @@
 }
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-light">
-    <h1 class="h2 text-warning fw-bold">Quản Lý Suất Chiếu</h1>
-    <button type="button" class="btn btn-warning fw-bold btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#addShowtimeModal">
+    <h1 class="h2 text-warning fw-medium">Quản Lý Suất Chiếu</h1>
+    <button type="button" class="btn btn-warning fw-medium btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#addShowtimeModal">
         <i class="bi bi-plus-lg"></i> Thêm suất chiếu mới
     </button>
 </div>
@@ -63,7 +63,7 @@
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content bg-light text-dark border border-light shadow-lg">
                                     <div class="modal-header bg-white border-bottom border-light">
-                                        <h5 class="modal-title text-warning fw-bold">Sửa Suất Chiếu</h5>
+                                        <h5 class="modal-title text-warning fw-medium">Sửa Suất Chiếu</h5>
                                         <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
                                     </div>
                                     <form method="post" action="/admin/showtimes/update">
@@ -71,7 +71,7 @@
                                         <input type="hidden" name="id" value="@s.Id" />
                                         <div class="modal-body p-4 text-start">
                                             <div class="mb-3">
-                                                <label class="form-label text-dark fw-bold">Phim</label>
+                                                <label class="form-label text-dark fw-medium">Phim</label>
                                                 <select name="movieId" class="form-select bg-white text-dark border-light" required>
                                                     @foreach(var m in movies) {
                                                         <option value="@m.Id" selected="@(m.Id == s.MovieId)">@m.Title</option>
@@ -79,7 +79,7 @@
                                                 </select>
                                             </div>
                                             <div class="mb-3">
-                                                <label class="form-label text-dark fw-bold">Phòng chiếu</label>
+                                                <label class="form-label text-dark fw-medium">Phòng chiếu</label>
                                                 <select name="roomId" class="form-select bg-white text-dark border-light" required>
                                                     @foreach(var r in rooms) {
                                                         <option value="@r.Id" selected="@(r.Id == s.RoomId)">@r.Cinema?.Name - @r.Name</option>
@@ -88,28 +88,28 @@
                                             </div>
                                             <div class="row g-3 mb-3">
                                                 <div class="col-md-6">
-                                                    <label class="form-label text-dark fw-bold">Ngày chiếu</label>
+                                                    <label class="form-label text-dark fw-medium">Ngày chiếu</label>
                                                     <input type="date" name="showDate" value="@s.ShowDate.ToString("yyyy-MM-dd")" class="form-control bg-white text-dark border-light" required>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <label class="form-label text-dark fw-bold">Giá vé</label>
+                                                    <label class="form-label text-dark fw-medium">Giá vé</label>
                                                     <input type="number" name="price" value="@s.Price" class="form-control bg-white text-dark border-light" required>
                                                 </div>
                                             </div>
                                             <div class="row g-3 mb-3">
                                                 <div class="col-md-6">
-                                                    <label class="form-label text-dark fw-bold">Giờ bắt đầu</label>
+                                                    <label class="form-label text-dark fw-medium">Giờ bắt đầu</label>
                                                     <input type="time" name="startTime" value="@s.StartTime.ToString("HH:mm")" class="form-control bg-white text-dark border-light" required>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <label class="form-label text-dark fw-bold">Giờ kết thúc</label>
+                                                    <label class="form-label text-dark fw-medium">Giờ kết thúc</label>
                                                     <input type="time" name="endTime" value="@s.EndTime?.ToString("HH:mm")" class="form-control bg-white text-dark border-light" required>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="modal-footer bg-white border-top border-light">
                                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
-                                            <button type="submit" class="btn btn-info fw-bold">Cập nhật</button>
+                                            <button type="submit" class="btn btn-info fw-medium">Cập nhật</button>
                                         </div>
                                     </form>
                                 </div>
@@ -121,7 +121,7 @@
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content bg-light text-dark border border-light shadow-lg">
                                     <div class="modal-header bg-white border-bottom border-light">
-                                        <h5 class="modal-title text-danger fw-bold">Xác Nhận Xóa</h5>
+                                        <h5 class="modal-title text-danger fw-medium">Xác Nhận Xóa</h5>
                                         <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
                                     </div>
                                     <div class="modal-body p-4 text-start">
@@ -132,7 +132,7 @@
                                         <form method="post" action="/admin/showtimes/delete">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="id" value="@s.Id" />
-                                            <button type="submit" class="btn btn-danger fw-bold">Xóa</button>
+                                            <button type="submit" class="btn btn-danger fw-medium">Xóa</button>
                                         </form>
                                     </div>
                                 </div>
@@ -164,14 +164,14 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content bg-light text-dark border border-light shadow-lg">
             <div class="modal-header bg-white border-bottom border-light">
-                <h5 class="modal-title text-warning fw-bold">Thêm Suất Chiếu Mới</h5>
+                <h5 class="modal-title text-warning fw-medium">Thêm Suất Chiếu Mới</h5>
                 <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="post" action="/admin/showtimes">
                 @Html.AntiForgeryToken()
                 <div class="modal-body p-4 text-start">
                     <div class="mb-3">
-                        <label class="form-label text-dark fw-bold">Phim</label>
+                        <label class="form-label text-dark fw-medium">Phim</label>
                         <select name="movieId" class="form-select bg-white text-dark border-light" required>
                             @foreach(var m in movies) {
                                 <option value="@m.Id">@m.Title</option>
@@ -179,7 +179,7 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label text-dark fw-bold">Phòng chiếu</label>
+                        <label class="form-label text-dark fw-medium">Phòng chiếu</label>
                         <select name="roomId" class="form-select bg-white text-dark border-light" required>
                             @foreach(var r in rooms) {
                                 <option value="@r.Id">@r.Cinema?.Name - @r.Name</option>
@@ -188,28 +188,28 @@
                     </div>
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label text-dark fw-bold">Ngày chiếu</label>
+                            <label class="form-label text-dark fw-medium">Ngày chiếu</label>
                             <input type="date" name="showDate" class="form-control bg-white text-dark border-light" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label text-dark fw-bold">Giá vé</label>
+                            <label class="form-label text-dark fw-medium">Giá vé</label>
                             <input type="number" name="price" value="85000" class="form-control bg-white text-dark border-light" required>
                         </div>
                     </div>
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label text-dark fw-bold">Giờ bắt đầu</label>
+                            <label class="form-label text-dark fw-medium">Giờ bắt đầu</label>
                             <input type="time" name="startTime" class="form-control bg-white text-dark border-light" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label text-dark fw-bold">Giờ kết thúc</label>
+                            <label class="form-label text-dark fw-medium">Giờ kết thúc</label>
                             <input type="time" name="endTime" class="form-control bg-white text-dark border-light" required>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer bg-white border-top border-light">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-warning fw-bold">Thêm</button>
+                    <button type="submit" class="btn btn-warning fw-medium">Thêm</button>
                 </div>
             </form>
         </div>

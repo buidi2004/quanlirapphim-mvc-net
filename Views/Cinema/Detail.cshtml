@@ -8,8 +8,8 @@
 <div class="position-relative mb-5 rounded-3 overflow-hidden shadow-lg" style="height:320px;">
     <img src="@Model.GetImageUrl()" class="w-100 h-100" style="object-fit:cover; filter:brightness(.45);" alt="@Model.Name">
     <div class="position-absolute inset-0 d-flex flex-column justify-content-end p-4 p-md-5">
-        <span class="badge bg-warning text-dark mb-2" style="width:fit-content;">@Model.Province</span>
-        <h1 class="text-white fw-bold display-6 mb-2">@Model.Name</h1>
+        <span class="badge bg-warning text-white mb-2" style="width:fit-content;">@Model.Province</span>
+        <h1 class="text-white fw-medium display-6 mb-2">@Model.Name</h1>
         <p class="text-secondary mb-0">
             <i class="bi bi-geo-alt me-1"></i>@Model.GetFullAddress()
         </p>
@@ -21,7 +21,7 @@
     <div class="col-md-4">
         <div class="card bg-white border-light mb-3">
             <div class="card-body">
-                <h5 class="text-warning mb-3"><i class="bi bi-info-circle me-2"></i>Thông tin</h5>
+                <h5 class="text-warning mb-3">Thông tin</h5>
                 <ul class="list-unstyled text-secondary small">
                     @if (Model.Phone != null)
                     {
@@ -94,7 +94,7 @@
                         <div class="col-4">
                             <a href="/experiences/@exp.Item1" class="text-decoration-none">
                                 <div class="card bg-light border-light text-center p-3 h-100"
-                                     style="transition:.2s;" onmouseover="this.style.borderColor='#ffc107'"
+                                     style="transition:.2s;" onmouseover="this.style.borderColor='#6f42c1'"
                                      onmouseout="this.style.borderColor='#6c757d'">
                                     <i class="bi @exp.Item3 text-warning mb-2" style="font-size:1.5rem;"></i>
                                     <small class="text-dark">@exp.Item2</small>
@@ -116,7 +116,7 @@
                 {
                     var d = DateOnly.FromDateTime(DateTime.Today).AddDays(i);
                     var isSelected = d == ViewBag.ShowDate;
-                    <a href="?date=@d.ToString("yyyy-MM-dd")" class="btn btn-sm @(isSelected ? "btn-warning fw-bold text-dark" : "btn-outline-secondary text-white")">
+                    <a href="?date=@d.ToString("yyyy-MM-dd")" class="btn btn-sm @(isSelected ? "btn-warning fw-medium text-dark" : "btn-outline-secondary text-white")">
                         @d.ToString("dd/MM")
                     </a>
                 }
@@ -137,7 +137,7 @@
                     {
                         var movie = group.Key;
                         <div class="mb-4 bg-dark p-3 rounded border border-secondary border-opacity-25 shadow-sm">
-                            <h6 class="text-warning fw-bold mb-3 d-flex align-items-center">
+                            <h6 class="text-warning fw-medium mb-3 d-flex align-items-center">
                                 @movie.Title 
                                 @if(movie.AgeRating != null) {
                                     <span class="badge bg-danger ms-2">@movie.AgeRating</span>
@@ -147,7 +147,7 @@
                                 @foreach (var st in group)
                                 {
                                     <a href="/booking/seats?showtimeId=@st.Id" class="btn btn-outline-warning btn-sm shadow-sm">
-                                        <div class="fw-bold">@st.StartTime</div>
+                                        <div class="fw-medium">@st.StartTime</div>
                                         <small class="text-light" style="font-size: 0.7rem;">@string.Format("{0:N0}đ", st.Price)</small>
                                     </a>
                                 }

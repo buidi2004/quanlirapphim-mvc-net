@@ -1,11 +1,11 @@
 @model IEnumerable<CinemaXNet.Domain.Entities.Movie>
 
-<div class="card bg-white border-0 shadow-lg mb-5 rounded-4 overflow-hidden quick-book-bar" data-aos="fade-up" data-aos-delay="200" style="border: 1px solid rgba(255,193,7,0.3) !important; margin-top: 2rem; position: relative; z-index: 10;">
+<div class="card bg-white border-0 shadow-lg mb-5 rounded-2 overflow-hidden quick-book-bar" data-aos="fade-up" data-aos-delay="200" style="border: 1px solid rgba(255,193,7,0.3) !important; margin-top: 2rem; position: relative; z-index: 10;">
     <div class="card-body p-4">
         <form action="/booking/quick" method="GET" class="row g-3 align-items-end" id="quickBookingForm">
             <div class="col-md-3">
-                <label class="form-label text-warning fw-bold small"><i class="bi bi-film me-1"></i>Chọn Phim</label>
-                <select name="movieId" id="qb-movie" class="form-select bg-light border-0 text-dark rounded-pill" required>
+                <label class="form-label text-warning fw-medium small"><i class="bi bi-film me-1"></i>Chọn Phim</label>
+                <select name="movieId" id="qb-movie" class="form-select bg-light border-0 text-dark rounded-3" required>
                     <option value="">-- Chọn phim --</option>
                     @foreach (var m in Model) {
                         <option value="@m.Id">@m.Title</option>
@@ -13,25 +13,25 @@
                 </select>
             </div>
             <div class="col-md-3">
-                <label class="form-label text-warning fw-bold small"><i class="bi bi-geo-alt me-1"></i>Chọn Rạp</label>
-                <select name="cinemaId" id="qb-cinema" class="form-select bg-light border-0 text-dark rounded-pill" disabled required>
+                <label class="form-label text-warning fw-medium small"><i class="bi bi-geo-alt me-1"></i>Chọn Rạp</label>
+                <select name="cinemaId" id="qb-cinema" class="form-select bg-light border-0 text-dark rounded-3" disabled required>
                     <option value="">-- Chọn rạp --</option>
                 </select>
             </div>
             <div class="col-md-2">
-                <label class="form-label text-warning fw-bold small"><i class="bi bi-calendar3 me-1"></i>Ngày chiếu</label>
-                <select name="date" id="qb-date" class="form-select bg-light border-0 text-dark rounded-pill" disabled required>
+                <label class="form-label text-warning fw-medium small"><i class="bi bi-calendar3 me-1"></i>Ngày chiếu</label>
+                <select name="date" id="qb-date" class="form-select bg-light border-0 text-dark rounded-3" disabled required>
                     <option value="">-- Chọn ngày --</option>
                 </select>
             </div>
             <div class="col-md-2">
-                <label class="form-label text-warning fw-bold small"><i class="bi bi-clock me-1"></i>Suất chiếu</label>
-                <select name="showtimeId" id="qb-showtime" class="form-select bg-light border-0 text-dark rounded-pill" disabled required>
+                <label class="form-label text-warning fw-medium small"><i class="bi bi-clock me-1"></i>Suất chiếu</label>
+                <select name="showtimeId" id="qb-showtime" class="form-select bg-light border-0 text-dark rounded-3" disabled required>
                     <option value="">-- Chọn suất --</option>
                 </select>
             </div>
             <div class="col-md-2">
-                <button type="submit" id="qb-submit" class="btn btn-warning w-100 rounded-pill fw-bold" disabled><i class="bi bi-ticket-perforated me-1"></i>ĐẶT VÉ</button>
+                <button type="submit" id="qb-submit" class="btn btn-warning w-100 rounded-3 fw-medium" disabled>ĐẶT VÉ</button>
             </div>
         </form>
     </div>

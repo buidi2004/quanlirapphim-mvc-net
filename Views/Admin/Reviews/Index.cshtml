@@ -6,7 +6,7 @@
 }
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-light">
-    <h1 class="h2 text-warning fw-bold">Quản Lý Đánh Giá</h1>
+    <h1 class="h2 text-warning fw-medium">Quản Lý Đánh Giá</h1>
 </div>
 
 <div class="card bg-white border border-light rounded shadow-sm">
@@ -78,7 +78,7 @@
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content bg-light text-dark border border-light shadow-lg">
                                     <div class="modal-header bg-white border-bottom border-light">
-                                        <h5 class="modal-title text-danger fw-bold">Xác Nhận Xóa</h5>
+                                        <h5 class="modal-title text-danger fw-medium">Xác Nhận Xóa</h5>
                                         <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
                                     </div>
                                     <div class="modal-body p-4 text-start">
@@ -89,7 +89,7 @@
                                         <form method="post" action="/admin/reviews/delete">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="id" value="@r.id" />
-                                            <button type="submit" class="btn btn-danger fw-bold">Xóa</button>
+                                            <button type="submit" class="btn btn-danger fw-medium">Xóa</button>
                                         </form>
                                     </div>
                                 </div>

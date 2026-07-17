@@ -3,7 +3,7 @@
     ViewData["Title"] = "Chi tiết yêu cầu hỗ trợ #" + Model.id;
     Layout = "~/Views/Shared/_Layout.cshtml";
     string statusText = Model.status == "replied" ? "Đã phản hồi" : "Đang xử lý";
-    string statusBadgeClass = Model.status == "replied" ? "bg-success" : "bg-warning text-dark";
+    string statusBadgeClass = Model.status == "replied" ? "bg-success" : "bg-warning text-white";
 }
 
 <div class="container py-4">
@@ -21,13 +21,13 @@
             <div class="card shadow-sm border-0 mb-4 bg-body-tertiary">
                 <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center rounded-top">
                     <div>
-                        <h5 class="mb-0 fw-bold text-warning"><i class="bi bi-ticket-perforated me-2"></i>MÃ YÊU CẦU: #@Model.id</h5>
+                        <h5 class="mb-0 fw-medium text-warning">MÃ YÊU CẦU: #@Model.id</h5>
                         <small class="text-light opacity-75">Ngày gửi: @Convert.ToDateTime(Model.created_at).ToString("dd/MM/yyyy HH:mm")</small>
                     </div>
                     <span class="badge @statusBadgeClass fs-6 px-3 py-2 fw-semibold">@statusText</span>
                 </div>
                 <div class="card-body p-4 text-dark bg-white">
-                    <h5 class="card-title fw-bold text-dark border-bottom pb-2 mb-3">Thông Tin Khách Hàng</h5>
+                    <h5 class="card-title fw-medium text-dark border-bottom pb-2 mb-3">Thông Tin Khách Hàng</h5>
                     <div class="row mb-4">
                         <div class="col-md-6 mb-2">
                             <span class="text-secondary small d-block">Họ và tên</span>
@@ -47,8 +47,8 @@
                         </div>
                     </div>
 
-                    <h5 class="card-title fw-bold text-dark border-bottom pb-2 mb-3">Nội Dung Yêu Cầu</h5>
-                    <div class="p-3 bg-light rounded text-dark mb-4" style="white-space: pre-line; font-size: 0.95rem; border-left: 4px solid #ffc107;">
+                    <h5 class="card-title fw-medium text-dark border-bottom pb-2 mb-3">Nội Dung Yêu Cầu</h5>
+                    <div class="p-3 bg-light rounded text-dark mb-4" style="white-space: pre-line; font-size: 0.95rem; border-left: 4px solid #6f42c1;">
                         @Model.message
                     </div>
 
@@ -57,11 +57,11 @@
                         <div class="card border-warning bg-light-warning mb-3">
                             <div class="card-body p-4">
                                 <div class="d-flex align-items-center mb-3">
-                                    <div class="flex-shrink-0 bg-warning text-dark rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <div class="flex-shrink-0 bg-warning text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
                                         <i class="bi bi-headset fs-5"></i>
                                     </div>
                                     <div class="ms-3">
-                                        <h6 class="mb-0 fw-bold text-dark">Phản Hồi Từ CinemaX</h6>
+                                        <h6 class="mb-0 fw-medium text-dark">Phản Hồi Từ CinemaX</h6>
                                         <small class="text-secondary">Thời gian: @(string.IsNullOrEmpty(Model.replied_at) ? "" : Convert.ToDateTime(Model.replied_at).ToString("dd/MM/yyyy HH:mm"))</small>
                                     </div>
                                 </div>
@@ -74,7 +74,6 @@
                     else
                     {
                         <div class="alert alert-info border-0 d-flex align-items-center">
-                            <i class="bi bi-info-circle-fill me-2 fs-5"></i>
                             <div>
                                 Yêu cầu của bạn đang được đội ngũ chăm sóc khách hàng tiếp nhận và xử lý. Chúng tôi sẽ phản hồi lại bạn sớm nhất có thể (thông thường trong vòng 24 giờ). Vui lòng lưu lại đường dẫn của trang này để theo dõi tiến độ.
                             </div>
@@ -85,10 +84,10 @@
 
             <!-- Back/Action Button -->
             <div class="text-center">
-                <a href="/contact" class="btn btn-warning fw-bold px-4 rounded-pill">
+                <a href="/contact" class="btn btn-warning fw-medium px-4 rounded-3">
                     <i class="bi bi-envelope me-2"></i>Gửi yêu cầu mới
                 </a>
-                <a href="/" class="btn btn-outline-secondary fw-bold px-4 rounded-pill ms-2">
+                <a href="/" class="btn btn-outline-secondary fw-medium px-4 rounded-3 ms-2">
                     <i class="bi bi-house me-2"></i>Quay lại Trang chủ
                 </a>
             </div>

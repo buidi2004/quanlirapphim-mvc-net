@@ -20,7 +20,7 @@
 
     <!-- Cột phải: Thông tin chi tiết -->
     <div class="col-md-8 col-lg-9">
-        <h1 class="display-5 fw-bold text-dark mb-3">@Model.Title</h1>
+        <h1 class="display-5 fw-medium text-dark mb-3">@Model.Title</h1>
         
         <div class="d-flex flex-wrap gap-2 mb-4">
             @if (!string.IsNullOrEmpty(Model.AgeRating))
@@ -50,12 +50,12 @@
         </div>
 
         <div class="mb-4">
-            <button class="btn btn-outline-warning rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#trailerModal">
-                <i class="bi bi-play-circle me-2"></i>Xem Trailer
+            <button class="btn btn-outline-warning rounded-3 px-4" data-bs-toggle="modal" data-bs-target="#trailerModal">
+                Xem Trailer
             </button>
         </div>
 
-        <h5 class="text-warning border-start border-warning border-3 ps-2 mb-2 fw-bold">Mô tả phim</h5>
+        <h5 class="text-warning border-start border-warning border-3 ps-2 mb-2 fw-medium">Mô tả phim</h5>
         <p class="text-dark-50 lh-lg mb-4" style="text-align: justify; color: #ced4da;">
             @Html.Raw((!string.IsNullOrEmpty(Model.Description) ? Model.Description.Replace("\n", "<br/>") : "Chưa có thông tin mô tả chi tiết cho bộ phim này."))
         </p>
@@ -64,7 +64,7 @@
 
 <!-- Lịch chiếu trượt ngang + Thẻ suất chiếu đẹp -->
 <div class="card bg-white border border-light rounded p-4 shadow-lg">
-    <h3 class="h4 text-warning border-start border-warning border-4 ps-3 fw-bold mb-4">
+    <h3 class="h4 text-warning border-start border-warning border-4 ps-3 fw-medium mb-4">
         <i class="bi bi-calendar3 me-2"></i>LỊCH CHIẾU & SUẤT CHIẾU
     </h3>
 
@@ -124,7 +124,7 @@
                                 <div class="price">@showtime.FormattedPrice</div>
                             </div>
                             <a href="/booking/@showtime.Id"
-                               class="btn btn-warning w-100 fw-bold btn-select-showtime @(showtime.AvailableSeats == 0 ? "disabled btn-secondary text-muted" : "")">
+                               class="btn btn-warning w-100 fw-medium btn-select-showtime @(showtime.AvailableSeats == 0 ? "disabled btn-secondary text-muted" : "")">
                                 @(showtime.AvailableSeats == 0 ? "Hết vé" : "Chọn ghế")
                             </a>
                         </div>
@@ -137,7 +137,7 @@
 
 <!-- Reviews Section -->
 <div class="card bg-white border border-light rounded p-4 shadow-lg mt-4">
-    <h3 class="h4 text-warning border-start border-warning border-4 ps-3 fw-bold mb-4">
+    <h3 class="h4 text-warning border-start border-warning border-4 ps-3 fw-medium mb-4">
         <i class="bi bi-star-fill me-2"></i>ĐÁNH GIÁ PHIM
     </h3>
 
@@ -165,7 +165,7 @@
     else
     {
         <div class="alert bg-white shadow-sm text-dark border-light">
-            Vui lòng <a href="/login" class="text-warning text-decoration-none fw-bold">đăng nhập</a> để viết đánh giá cho bộ phim này.
+            Vui lòng <a href="/login" class="text-warning text-decoration-none fw-medium">đăng nhập</a> để viết đánh giá cho bộ phim này.
         </div>
     }
 

@@ -94,7 +94,7 @@
                 case 'paid': return '<span class="badge bg-success">Đã thanh toán</span>';
                 case 'used': return '<span class="badge bg-secondary">Đã sử dụng</span>';
                 case 'cancelled': return '<span class="badge bg-danger">Đã hủy</span>';
-                case 'holding': return '<span class="badge bg-warning text-dark">Đang giữ chỗ</span>';
+                case 'holding': return '<span class="badge bg-warning text-white">Đang giữ chỗ</span>';
                 default: return `<span class="badge bg-info">${status}</span>`;
             }
         }
@@ -128,18 +128,18 @@
 
                         html += `
                             <tr>
-                                <td class="fw-bold">#${t.TicketId}</td>
+                                <td class="fw-medium">#${t.TicketId}</td>
                                 <td>
                                     <div>${t.UserName || 'Khách Vãng Lai'}</div>
                                     <small class="text-muted">${t.UserEmail || ''} - ${t.UserPhone || ''}</small>
                                 </td>
-                                <td class="text-primary fw-bold">${t.MovieTitle}</td>
+                                <td class="text-primary fw-medium">${t.MovieTitle}</td>
                                 <td>
                                     <div>${t.ShowDate} ${t.StartTime.substring(0,5)}</div>
                                     <small class="text-muted">${t.RoomName}</small>
                                 </td>
-                                <td class="fw-bold text-center">${t.SeatCode}</td>
-                                <td class="text-success fw-bold text-end">${new Intl.NumberFormat('vi-VN').format(t.TotalPrice)}₫</td>
+                                <td class="fw-medium text-center">${t.SeatCode}</td>
+                                <td class="text-success fw-medium text-end">${new Intl.NumberFormat('vi-VN').format(t.TotalPrice)}₫</td>
                                 <td class="text-center">${getStatusBadge(t.Status)}</td>
                                 <td class="text-center">${actionHtml}</td>
                             </tr>

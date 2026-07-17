@@ -3,16 +3,16 @@
     ViewData["Title"] = "Chi Tiết Liên Hệ & Hỗ Trợ";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     string statusText = Model.status == "replied" ? "Đã trả lời" : "Chờ xử lý";
-    string statusBadgeClass = Model.status == "replied" ? "bg-success" : "bg-warning text-dark";
+    string statusBadgeClass = Model.status == "replied" ? "bg-success" : "bg-warning text-white";
 }
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-light">
-    <h1 class="h2 text-warning fw-bold">Chi Tiết Yêu Cầu Hỗ Trợ #@Model.id</h1>
+    <h1 class="h2 text-warning fw-medium">Chi Tiết Yêu Cầu Hỗ Trợ #@Model.id</h1>
     <div>
-        <a href="/admin/contacts" class="btn btn-outline-light btn-sm fw-bold">
+        <a href="/admin/contacts" class="btn btn-outline-light btn-sm fw-medium">
             <i class="bi bi-arrow-left me-1"></i> Quay lại
         </a>
-        <button type="button" class="btn btn-outline-danger btn-sm fw-bold ms-1" data-bs-toggle="modal" data-bs-target="#deleteContactModal">
+        <button type="button" class="btn btn-outline-danger btn-sm fw-medium ms-1" data-bs-toggle="modal" data-bs-target="#deleteContactModal">
             <i class="bi bi-trash me-1"></i> Xóa liên hệ
         </button>
     </div>
@@ -36,7 +36,7 @@
     <div class="col-md-7">
         <div class="card bg-white text-dark border-light rounded shadow-sm mb-4">
             <div class="card-header bg-white border-bottom border-light py-3">
-                <h5 class="card-title text-warning fw-bold mb-0">
+                <h5 class="card-title text-warning fw-medium mb-0">
                     <i class="bi bi-envelope-open me-2"></i>Nội Dung Gửi Đến
                 </h5>
             </div>
@@ -65,7 +65,7 @@
                 </div>
 
                 <div class="mb-2">
-                    <span class="text-secondary small d-block fw-bold mb-1">Nội dung tin nhắn:</span>
+                    <span class="text-secondary small d-block fw-medium mb-1">Nội dung tin nhắn:</span>
                     <div class="p-3 bg-light text-dark rounded border border-light" style="white-space: pre-line; min-height: 120px; font-size: 0.95rem;">
                         @Model.message
                     </div>
@@ -78,7 +78,7 @@
     <div class="col-md-5">
         <div class="card bg-white text-dark border-light rounded shadow-sm">
             <div class="card-header bg-white border-bottom border-light py-3 d-flex justify-content-between align-items-center">
-                <h5 class="card-title text-warning fw-bold mb-0">
+                <h5 class="card-title text-warning fw-medium mb-0">
                     <i class="bi bi-reply-all me-2"></i>Phản Hồi & Giải Quyết
                 </h5>
                 <span class="badge @statusBadgeClass">@statusText</span>
@@ -99,11 +99,11 @@
                     }
 
                     <div class="mb-3">
-                        <label class="form-label text-secondary small fw-bold">Nội dung phản hồi *</label>
+                        <label class="form-label text-secondary small fw-medium">Nội dung phản hồi *</label>
                         <textarea name="replyMessage" rows="8" class="form-control bg-white text-dark border-light" placeholder="Nhập câu trả lời gửi đến khách hàng..." required>@Model.reply_message</textarea>
                     </div>
 
-                    <button type="submit" class="btn btn-warning fw-bold w-100">
+                    <button type="submit" class="btn btn-warning fw-medium w-100">
                         <i class="bi bi-send me-1"></i> @(Model.status == "replied" ? "Cập nhật câu trả lời" : "Gửi phản hồi")
                     </button>
                 </form>
@@ -117,7 +117,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content bg-light text-dark border border-light shadow-lg">
             <div class="modal-header bg-white border-bottom border-light">
-                <h5 class="modal-title text-danger fw-bold">Xác Nhận Xóa Yêu Cầu</h5>
+                <h5 class="modal-title text-danger fw-medium">Xác Nhận Xóa Yêu Cầu</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-4 text-start">
@@ -128,7 +128,7 @@
                 <form method="post" action="/admin/contacts/delete">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="id" value="@Model.id" />
-                    <button type="submit" class="btn btn-danger fw-bold">Xóa vĩnh viễn</button>
+                    <button type="submit" class="btn btn-danger fw-medium">Xóa vĩnh viễn</button>
                 </form>
             </div>
         </div>

@@ -8,7 +8,7 @@
     --admin-surface: rgba(25, 25, 40, 0.7);
     --admin-surface-hover: rgba(40, 40, 60, 0.8);
     --admin-border: rgba(255, 255, 255, 0.1);
-    --admin-accent: #ffc107; /* Bootstrap Warning/Gold */
+    --admin-accent: #6f42c1; /* Bootstrap Warning/Gold */
     --admin-accent-glow: rgba(255, 193, 7, 0.4);
     --admin-text: #e0e0e0;
     --admin-text-muted: #8b8b99;
@@ -62,7 +62,7 @@ body.admin-body {
 
 .admin-sidebar .nav-link.active {
     color: var(--admin-bg) !important;
-    background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%) !important;
+    background: linear-gradient(135deg, #6f42c1 0%, #59359a 100%) !important;
     box-shadow: 0 4px 15px var(--admin-accent-glow);
     font-weight: 600;
     transform: translateX(4px);

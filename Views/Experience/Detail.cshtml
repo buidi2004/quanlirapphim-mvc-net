@@ -10,7 +10,7 @@
     <div class="position-absolute inset-0 d-flex flex-column align-items-center justify-content-center text-center p-4">
         <i class="bi @item?.Icon text-warning mb-3" style="font-size:3rem;"></i>
         <span class="badge @item?.BadgeColor px-3 py-2 mb-3" style="font-size:.9rem;">CinemaX</span>
-        <h1 class="text-white fw-bold display-5 mb-2">@item?.Name</h1>
+        <h1 class="text-white fw-medium display-5 mb-2">@item?.Name</h1>
         <p class="text-secondary fs-5 fst-italic">@item?.Slogan</p>
     </div>
 </div>
@@ -29,7 +29,7 @@
                 {
                     <div class="col-md-4">
                         <div class="card bg-light border-light h-100 p-4 text-center"
-                             style="transition:.2s;" onmouseover="this.style.borderColor='#ffc107'"
+                             style="transition:.2s;" onmouseover="this.style.borderColor='#6f42c1'"
                              onmouseout="this.style.borderColor='#6c757d'">
                             <i class="bi @feature.Icon text-info mb-3" style="font-size:2rem;"></i>
                             <h6 class="text-white mb-2">@feature.Title</h6>
@@ -49,8 +49,8 @@
         }
 
         <div class="text-center mt-5">
-            <a href="/movies" class="btn btn-warning btn-lg fw-bold px-5 rounded-pill">
-                <i class="bi bi-ticket-perforated me-2"></i>ĐẶT VÉ NGAY
+            <a href="/movies" class="btn btn-warning btn-lg fw-medium px-5 rounded-3">
+                ĐẶT VÉ NGAY
             </a>
         </div>
     </div>
@@ -64,7 +64,7 @@
                 if (exp.Slug == item?.Slug) continue;
                 <a href="/experiences/@exp.Slug" class="text-decoration-none">
                     <div class="card bg-white border-light p-3 d-flex flex-row gap-3"
-                         style="transition:.2s;" onmouseover="this.style.borderColor='#ffc107'"
+                         style="transition:.2s;" onmouseover="this.style.borderColor='#6f42c1'"
                          onmouseout="this.style.borderColor='#6c757d'">
                         <i class="bi @exp.Icon text-warning" style="font-size:1.5rem; width:30px;"></i>
                         <div>

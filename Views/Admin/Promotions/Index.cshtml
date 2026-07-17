@@ -6,8 +6,8 @@
 }
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-light">
-    <h1 class="h2 text-warning fw-bold">Quản Lý Khuyến Mãi</h1>
-    <button type="button" class="btn btn-warning fw-bold btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#addPromoModal">
+    <h1 class="h2 text-warning fw-medium">Quản Lý Khuyến Mãi</h1>
+    <button type="button" class="btn btn-warning fw-medium btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#addPromoModal">
         <i class="bi bi-plus-lg"></i> Thêm mã mới
     </button>
 </div>
@@ -71,7 +71,7 @@
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content bg-light text-dark border border-light shadow-lg">
                                     <div class="modal-header bg-white border-bottom border-light">
-                                        <h5 class="modal-title text-warning fw-bold">Sửa Mã: @p.code</h5>
+                                        <h5 class="modal-title text-warning fw-medium">Sửa Mã: @p.code</h5>
                                         <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
                                     </div>
                                     <form method="post" action="/admin/promotions/update">
@@ -79,29 +79,29 @@
                                         <input type="hidden" name="id" value="@p.id" />
                                         <div class="modal-body p-4 text-start">
                                             <div class="mb-3">
-                                                <label class="form-label text-dark fw-bold">Mã Code (Tối đa 20 ký tự)</label>
+                                                <label class="form-label text-dark fw-medium">Mã Code (Tối đa 20 ký tự)</label>
                                                 <input type="text" name="code" value="@p.code" class="form-control bg-white text-dark border-light" required>
                                             </div>
                                             <div class="mb-3">
-                                                <label class="form-label text-dark fw-bold">Tiêu đề</label>
+                                                <label class="form-label text-dark fw-medium">Tiêu đề</label>
                                                 <input type="text" name="title" value="@p.title" class="form-control bg-white text-dark border-light" required>
                                             </div>
                                             <div class="mb-3">
-                                                <label class="form-label text-dark fw-bold">Phần trăm giảm (vd: 10, 20)</label>
+                                                <label class="form-label text-dark fw-medium">Phần trăm giảm (vd: 10, 20)</label>
                                                 <input type="number" step="0.01" name="discountPercent" value="@p.discount_percent" class="form-control bg-white text-dark border-light" required>
                                             </div>
                                             <div class="row g-3 mb-3">
                                                 <div class="col-md-6">
-                                                    <label class="form-label text-dark fw-bold">Từ ngày</label>
+                                                    <label class="form-label text-dark fw-medium">Từ ngày</label>
                                                     <input type="date" name="validFrom" value="@Convert.ToDateTime(p.valid_from).ToString("yyyy-MM-dd")" class="form-control bg-white text-dark border-light" required>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <label class="form-label text-dark fw-bold">Đến ngày</label>
+                                                    <label class="form-label text-dark fw-medium">Đến ngày</label>
                                                     <input type="date" name="validTo" value="@Convert.ToDateTime(p.valid_to).ToString("yyyy-MM-dd")" class="form-control bg-white text-dark border-light" required>
                                                 </div>
                                             </div>
                                             <div class="mb-3">
-                                                <label class="form-label text-dark fw-bold">Mô tả chi tiết</label>
+                                                <label class="form-label text-dark fw-medium">Mô tả chi tiết</label>
                                                 <textarea name="description" rows="3" class="form-control bg-white text-dark border-light">@p.description</textarea>
                                             </div>
                                             <div class="form-check form-switch">
@@ -113,7 +113,7 @@
                                         </div>
                                         <div class="modal-footer bg-white border-top border-light">
                                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
-                                            <button type="submit" class="btn btn-info fw-bold">Cập nhật</button>
+                                            <button type="submit" class="btn btn-info fw-medium">Cập nhật</button>
                                         </div>
                                     </form>
                                 </div>
@@ -125,7 +125,7 @@
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content bg-light text-dark border border-light shadow-lg">
                                     <div class="modal-header bg-white border-bottom border-light">
-                                        <h5 class="modal-title text-danger fw-bold">Xác Nhận Xóa</h5>
+                                        <h5 class="modal-title text-danger fw-medium">Xác Nhận Xóa</h5>
                                         <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
                                     </div>
                                     <div class="modal-body p-4 text-start">
@@ -136,7 +136,7 @@
                                         <form method="post" action="/admin/promotions/delete">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="id" value="@p.id" />
-                                            <button type="submit" class="btn btn-danger fw-bold">Xóa</button>
+                                            <button type="submit" class="btn btn-danger fw-medium">Xóa</button>
                                         </form>
                                     </div>
                                 </div>
@@ -155,36 +155,36 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content bg-light text-dark border border-light shadow-lg">
             <div class="modal-header bg-white border-bottom border-light">
-                <h5 class="modal-title text-warning fw-bold">Thêm Mã Khuyến Mãi</h5>
+                <h5 class="modal-title text-warning fw-medium">Thêm Mã Khuyến Mãi</h5>
                 <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="post" action="/admin/promotions">
                 @Html.AntiForgeryToken()
                 <div class="modal-body p-4 text-start">
                     <div class="mb-3">
-                        <label class="form-label text-dark fw-bold">Mã Code (Tối đa 20 ký tự)</label>
+                        <label class="form-label text-dark fw-medium">Mã Code (Tối đa 20 ký tự)</label>
                         <input type="text" name="code" class="form-control bg-white text-dark border-light" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label text-dark fw-bold">Tiêu đề</label>
+                        <label class="form-label text-dark fw-medium">Tiêu đề</label>
                         <input type="text" name="title" class="form-control bg-white text-dark border-light" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label text-dark fw-bold">Phần trăm giảm (vd: 10, 20)</label>
+                        <label class="form-label text-dark fw-medium">Phần trăm giảm (vd: 10, 20)</label>
                         <input type="number" step="0.01" name="discountPercent" class="form-control bg-white text-dark border-light" required>
                     </div>
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label text-dark fw-bold">Từ ngày</label>
+                            <label class="form-label text-dark fw-medium">Từ ngày</label>
                             <input type="date" name="validFrom" class="form-control bg-white text-dark border-light" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label text-dark fw-bold">Đến ngày</label>
+                            <label class="form-label text-dark fw-medium">Đến ngày</label>
                             <input type="date" name="validTo" class="form-control bg-white text-dark border-light" required>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label text-dark fw-bold">Mô tả chi tiết</label>
+                        <label class="form-label text-dark fw-medium">Mô tả chi tiết</label>
                         <textarea name="description" rows="3" class="form-control bg-white text-dark border-light"></textarea>
                     </div>
                     <div class="form-check form-switch">
@@ -195,7 +195,7 @@
                 </div>
                 <div class="modal-footer bg-white border-top border-light">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-warning fw-bold">Thêm</button>
+                    <button type="submit" class="btn btn-warning fw-medium">Thêm</button>
                 </div>
             </form>
         </div>

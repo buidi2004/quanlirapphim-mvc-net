@@ -10,10 +10,10 @@
 <div class="row justify-content-center">
     <div class="col-md-8 col-lg-6" data-aos="fade-down" data-aos-duration="1000">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <a href="/my-tickets" class="btn btn-outline-secondary rounded-pill">
+            <a href="/my-tickets" class="btn btn-outline-secondary rounded-3">
                 <i class="bi bi-arrow-left me-1"></i>Về danh sách
             </a>
-            <h4 class="text-warning fw-bold mb-0">Vé Chi Tiết</h4>
+            <h4 class="text-warning fw-medium mb-0">Vé Chi Tiết</h4>
         </div>
 
         <!-- Vùng chứa vé 3D -->
@@ -24,10 +24,10 @@
                     <div class="ticket-front-content">
                         <div class="ticket-top d-flex justify-content-between align-items-center mb-3">
                             <div>
-                                <h4 class="text-warning fw-bold mb-0"><i class="bi bi-camera-reels me-1"></i>CinemaX</h4>
+                                <h4 class="text-warning fw-medium mb-0"><i class="bi bi-camera-reels me-1"></i>CinemaX</h4>
                                 <small class="text-secondary">Electronic Ticket</small>
                             </div>
-                            <span class="badge @(Model.Ticket.Status == "paid" ? "bg-success" : "bg-warning text-dark") rounded-pill px-3 py-2">
+                            <span class="badge @(Model.Ticket.Status == "paid" ? "bg-success" : "bg-warning text-white") rounded-3 px-3 py-2">
                                 <i class="bi bi-check-circle me-1"></i>@(Model.Ticket.Status == "paid" ? "Đã thanh toán" : "Đang giữ")
                             </span>
                         </div>
@@ -35,7 +35,7 @@
                         <div class="ticket-tear-line my-3"></div>
 
                         <div class="mb-3">
-                            <h3 class="text-dark fw-bold mb-1">@Model.MovieTitle</h3>
+                            <h3 class="text-dark fw-medium mb-1">@Model.MovieTitle</h3>
                             <span class="badge bg-danger me-1">@Model.AgeRating</span>
                             <span class="text-secondary">@Model.DurationMinutes phút</span>
                         </div>
@@ -94,21 +94,21 @@
                 <!-- MẶT SAU — MÃ QR -->
                 <div class="ticket-3d-back">
                     <div class="ticket-back-content text-center py-4">
-                        <h5 class="text-warning fw-bold mb-3"><i class="bi bi-qr-code me-2"></i>MÃ VÉ ĐIỆN TỬ</h5>
+                        <h5 class="text-warning fw-medium mb-3"><i class="bi bi-qr-code me-2"></i>MÃ VÉ ĐIỆN TỬ</h5>
 
-                        <div class="qr-container bg-white p-4 rounded-4 d-inline-block mx-auto mb-3">
+                        <div class="qr-container bg-white p-4 rounded-2 d-inline-block mx-auto mb-3">
                             <div id="qr-code" data-ticket-code="@ticketCode"></div>
                         </div>
 
                         <div class="ticket-code-display mb-3">
-                            <span class="font-monospace text-warning fs-4 fw-bold letter-spacing-2">@ticketCode</span>
+                            <span class="font-monospace text-warning fs-4 fw-medium letter-spacing-2">@ticketCode</span>
                         </div>
 
                         <p class="text-secondary small mb-2">Đưa mã QR này cho nhân viên soát vé</p>
-                        <p class="text-secondary small"><i class="bi bi-info-circle me-1"></i>Mã vé có hiệu lực đến @Model.ShowDate</p>
+                        <p class="text-secondary small">Mã vé có hiệu lực đến @Model.ShowDate</p>
 
                         <div class="d-flex gap-2 justify-content-center mt-3">
-                            <button class="btn btn-outline-warning rounded-pill btn-sm" onclick="shareTicket()">
+                            <button class="btn btn-outline-warning rounded-3 btn-sm" onclick="shareTicket()">
                                 <i class="bi bi-share me-1"></i>Chia sẻ
                             </button>
                         </div>
@@ -124,7 +124,7 @@
         <!-- Thông tin bổ sung -->
         <div class="card bg-light border-0 shadow-lg">
             <div class="card-header bg-white border-bottom border-light">
-                <h5 class="mb-0 text-warning"><i class="bi bi-info-circle me-2"></i>Thông tin đặt vé</h5>
+                <h5 class="mb-0 text-warning">Thông tin đặt vé</h5>
             </div>
             <div class="card-body">
                 <div class="row g-3">
@@ -138,13 +138,13 @@
                     </div>
                     <div class="col-sm-6">
                         <small class="text-secondary d-block">Trạng thái</small>
-                        <span class="badge @(Model.Ticket.Status == "paid" ? "bg-success" : "bg-warning text-dark")">
+                        <span class="badge @(Model.Ticket.Status == "paid" ? "bg-success" : "bg-warning text-white")">
                             @(Model.Ticket.Status == "paid" ? "Đã thanh toán" : Model.Ticket.Status)
                         </span>
                     </div>
                     <div class="col-sm-6">
                         <small class="text-secondary d-block">Giá vé</small>
-                        <span class="text-warning fw-bold">@Model.Ticket.TotalPrice.ToString("N0")₫</span>
+                        <span class="text-warning fw-medium">@Model.Ticket.TotalPrice.ToString("N0")₫</span>
                     </div>
                 </div>
             </div>

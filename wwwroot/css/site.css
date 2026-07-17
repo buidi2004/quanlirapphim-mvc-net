@@ -1,3 +1,11 @@
+:root {
+  --bs-warning: #6f42c1 !important;
+  --bs-warning-rgb: 111, 66, 193 !important;
+  --bs-warning-text-emphasis: #3e256b !important;
+  --bs-warning-bg-subtle: #e2d9f3 !important;
+  --bs-warning-border-subtle: #b7a1e1 !important;
+}
+
 html {
   font-size: 14px;
 }
@@ -28,4 +36,84 @@ body {
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
+}
+
+/* KHOÁ MÀU VÀNG CỦA BOOTSTRAP */
+.btn-warning {
+    --bs-btn-color: #fff !important;
+    --bs-btn-bg: #6f42c1 !important;
+    --bs-btn-border-color: #6f42c1 !important;
+    --bs-btn-hover-color: #fff !important;
+    --bs-btn-hover-bg: #59359a !important;
+    --bs-btn-hover-border-color: #533190 !important;
+    --bs-btn-active-color: #fff !important;
+    --bs-btn-active-bg: #533190 !important;
+    --bs-btn-active-border-color: #4e2e86 !important;
+}
+
+.btn-outline-warning {
+    --bs-btn-color: #6f42c1 !important;
+    --bs-btn-border-color: #6f42c1 !important;
+    --bs-btn-hover-color: #fff !important;
+    --bs-btn-hover-bg: #6f42c1 !important;
+    --bs-btn-hover-border-color: #6f42c1 !important;
+    --bs-btn-active-color: #fff !important;
+    --bs-btn-active-bg: #6f42c1 !important;
+    --bs-btn-active-border-color: #6f42c1 !important;
+}
+
+.text-warning, .bg-warning, .border-warning {
+    color: #6f42c1 !important;
+}
+.bg-warning {
+    background-color: #6f42c1 !important;
+    color: white !important;
+}
+.border-warning {
+    border-color: #6f42c1 !important;
+}
+
+/* =========================================
+   OVERRIDE MOVIE CARD EFFECT TO GLOWING BORDER
+   ========================================= */
+.movie-card-3d {
+    perspective: none !important;
+}
+.movie-card {
+    position: relative !important;
+    border-radius: 12px !important;
+    z-index: 1 !important;
+    background: #fff !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+    transform: none !important; /* override JS if it stuck */
+    cursor: pointer;
+}
+/* Hiệu ứng viền chạy từ 2 bên */
+.movie-card::before {
+    content: "" !important;
+    position: absolute !important;
+    inset: -3px !important;
+    border-radius: 15px !important;
+    background: linear-gradient(
+        45deg, 
+        #6f42c1, transparent 40%, 
+        transparent 60%, #6f42c1
+    ) !important;
+    background-size: 200% 200% !important;
+    z-index: -1 !important;
+    opacity: 0 !important;
+    transition: opacity 0.3s ease !important;
+}
+.movie-card:hover::before {
+    opacity: 1 !important;
+    animation: border-glow-run 2s linear infinite !important;
+}
+.movie-card:hover {
+    transform: translateY(-8px) !important;
+    box-shadow: 0 15px 30px rgba(111, 66, 193, 0.25) !important;
+}
+@keyframes border-glow-run {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }

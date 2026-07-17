@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom shadow-sm">
     <div class="container">
-        <a class="navbar-brand fw-bold text-warning fs-3" href="/">
+        <a class="navbar-brand fw-medium text-warning fs-3" href="/">
             <i class="bi bi-film"></i> CinemaX
         </a>
 
@@ -10,72 +10,25 @@
 
         <div class="collapse navbar-collapse" id="navMenu">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <!-- Mega Menu: Phim -->
-                <li class="nav-item dropdown position-static">
+                <!-- Standard Dropdown: Phim -->
+                <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMovies" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Phim
                     </a>
-                    <div class="dropdown-menu w-100 shadow border-0 rounded-0 mt-0 bg-dark" aria-labelledby="navbarDropdownMovies" style="border-top: 2px solid #ffc107 !important;">
-                        <div class="container p-4">
-                            <div class="row w-100">
-                                <div class="col-md-3">
-                                    <h6 class="text-warning fw-bold mb-3 border-bottom border-secondary pb-2">THỂ LOẠI</h6>
-                                    <ul class="list-unstyled">
-                                        <li><a href="/movies" class="text-light text-decoration-none d-block py-1 custom-hover">Phim Đang Chiếu</a></li>
-                                        <li><a href="/movies?status=coming_soon" class="text-light text-decoration-none d-block py-1 custom-hover">Phim Sắp Chiếu</a></li>
-                                        <li><a href="/movies?genre=Hành động" class="text-light text-decoration-none d-block py-1 custom-hover">Hành Động</a></li>
-                                        <li><a href="/movies?genre=Khoa học viễn tưởng" class="text-light text-decoration-none d-block py-1 custom-hover">Viễn Tưởng</a></li>
-                                        <li><a href="/movies?genre=Kinh dị" class="text-light text-decoration-none d-block py-1 custom-hover">Kinh Dị</a></li>
-                                    </ul>
-                                </div>
-                                <div class="col-md-9">
-                                    <h6 class="text-warning fw-bold mb-3 border-bottom border-secondary pb-2">PHIM ĐANG HOT</h6>
-                                    <div class="row g-3">
-                                        <!-- Hardcoded trending for demo to avoid DB hit on every page load -->
-                                        <div class="col-3">
-                                            <div class="card bg-transparent border-0 position-relative group-hover overflow-hidden rounded">
-                                                <img src="/images/movies/dao-pho-piano.jpg" class="img-fluid rounded" alt="Dune">
-                                                <div class="position-absolute w-100 h-100 top-0 start-0 bg-dark bg-opacity-50 opacity-0 d-flex align-items-center justify-content-center transition-all" style="backdrop-filter: blur(2px);">
-                                                    <a href="/booking/fast" class="btn btn-warning btn-sm fw-bold">Mua Vé</a>
-                                                </div>
-                                            </div>
-                                            <p class="text-light text-center small mt-2 fw-bold text-truncate">Dune: Part Two</p>
-                                        </div>
-                                        <div class="col-3">
-                                            <div class="card bg-transparent border-0 position-relative group-hover overflow-hidden rounded">
-                                                <img src="/images/movies/mai.jpg" class="img-fluid rounded" alt="Oppenheimer">
-                                                <div class="position-absolute w-100 h-100 top-0 start-0 bg-dark bg-opacity-50 opacity-0 d-flex align-items-center justify-content-center transition-all" style="backdrop-filter: blur(2px);">
-                                                    <a href="/booking/fast" class="btn btn-warning btn-sm fw-bold">Mua Vé</a>
-                                                </div>
-                                            </div>
-                                            <p class="text-light text-center small mt-2 fw-bold text-truncate">Oppenheimer</p>
-                                        </div>
-                                        <div class="col-3">
-                                            <div class="card bg-transparent border-0 position-relative group-hover overflow-hidden rounded">
-                                                <img src="/images/movies/ke-an-danh.jpg" class="img-fluid rounded" alt="Nighthawk">
-                                                <div class="position-absolute w-100 h-100 top-0 start-0 bg-dark bg-opacity-50 opacity-0 d-flex align-items-center justify-content-center transition-all" style="backdrop-filter: blur(2px);">
-                                                    <a href="/movies/3" class="btn btn-outline-light btn-sm fw-bold">Chi Tiết</a>
-                                                </div>
-                                            </div>
-                                            <p class="text-light text-center small mt-2 fw-bold text-truncate">The Nighthawk</p>
-                                        </div>
-                                        <div class="col-3 d-flex align-items-center justify-content-center">
-                                            <a href="/movies" class="text-warning text-decoration-none d-flex flex-column align-items-center">
-                                                <div class="bg-warning text-dark rounded-circle p-3 mb-2 shadow">
-                                                    <i class="bi bi-arrow-right fs-4"></i>
-                                                </div>
-                                                <span class="small fw-bold">Xem Tất Cả</span>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <ul class="dropdown-menu shadow border-0" aria-labelledby="navbarDropdownMovies" style="min-width: 200px;">
+                        <li><h6 class="dropdown-header text-warning fw-medium">Danh mục</h6></li>
+                        <li><a class="dropdown-item py-2" href="/movies">Phim Đang Chiếu</a></li>
+                        <li><a class="dropdown-item py-2" href="/movies?status=coming_soon">Phim Sắp Chiếu</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header text-warning fw-medium">Thể loại</h6></li>
+                        <li><a class="dropdown-item py-2" href="/movies?genre=Hành động">Hành Động</a></li>
+                        <li><a class="dropdown-item py-2" href="/movies?genre=Khoa học viễn tưởng">Viễn Tưởng</a></li>
+                        <li><a class="dropdown-item py-2" href="/movies?genre=Kinh dị">Kinh Dị</a></li>
+                    </ul>
                 </li>
                 
                 <li class="nav-item">
-                    <a class="nav-link text-warning fw-bold" href="/booking/fast">
+                    <a class="nav-link text-warning fw-medium" href="/booking/fast">
                         <i class="bi bi-lightning-charge-fill me-1"></i>Đặt Vé Nhanh
                     </a>
                 </li>
@@ -122,13 +75,13 @@
                             </span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow" style="width: 320px;">
-                            <li><h6 class="dropdown-header fw-bold">Thông báo mới</h6></li>
+                            <li><h6 class="dropdown-header fw-medium">Thông báo mới</h6></li>
                             <li>
                                 <a class="dropdown-item py-2 text-wrap" href="#">
                                     <div class="d-flex align-items-start">
-                                        <div class="bg-warning text-dark rounded-circle p-2 me-3 mt-1"><i class="bi bi-ticket-perforated"></i></div>
+                                        <div class="bg-warning text-white rounded-circle p-2 me-3 mt-1"><i class="bi bi-ticket-perforated"></i></div>
                                         <div>
-                                            <p class="mb-0 fw-bold small">Nhắc lịch xem phim</p>
+                                            <p class="mb-0 fw-medium small">Nhắc lịch xem phim</p>
                                             <p class="mb-0 small text-secondary" style="font-size: 0.8rem;">Dune: Part Two sẽ chiếu trong 2 giờ nữa tại Landmark 81.</p>
                                         </div>
                                     </div>
@@ -140,14 +93,14 @@
                                     <div class="d-flex align-items-start">
                                         <div class="bg-info text-white rounded-circle p-2 me-3 mt-1"><i class="bi bi-star"></i></div>
                                         <div>
-                                            <p class="mb-0 fw-bold small">Điểm thưởng cập nhật</p>
+                                            <p class="mb-0 fw-medium small">Điểm thưởng cập nhật</p>
                                             <p class="mb-0 small text-secondary" style="font-size: 0.8rem;">Bạn vừa được cộng 5,000 điểm từ giao dịch gần nhất.</p>
                                         </div>
                                     </div>
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-center small text-primary fw-bold" href="#">Xem tất cả thông báo</a></li>
+                            <li><a class="dropdown-item text-center small text-primary fw-medium" href="#">Xem tất cả thông báo</a></li>
                         </ul>
                     </li>
 
@@ -177,7 +130,7 @@
                             </li>
                             <li>
                                 <a class="dropdown-item" href="/my-tickets">
-                                    <i class="bi bi-ticket-perforated me-2"></i>Vé của tôi
+                                    Vé của tôi
                                 </a>
                             </li>
                             <li>

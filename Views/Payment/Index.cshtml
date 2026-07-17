@@ -10,7 +10,7 @@
 
         <!-- Countdown Timer -->
         <div class="alert alert-warning border-0 shadow-lg d-flex align-items-center mb-4 p-3"
-             role="alert" style="background-color: #382c0f; color: #ffc107;">
+             role="alert" style="background-color: #382c0f; color: #6f42c1;">
             <i class="bi bi-clock-history me-3 fs-3 animate-pulse"></i>
             <div class="timer-container ms-auto">
                 <span class="d-block small text-secondary me-2">Thời gian giữ ghế:</span>
@@ -21,12 +21,12 @@
         <!-- Thông tin đặt vé -->
         <div class="card border-0 shadow mb-4" style="background-color: #1a1a2e !important; border: 1px solid #2d2d44 !important;">
             <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#paymentSummaryCollapse" aria-expanded="true" aria-controls="paymentSummaryCollapse" style="cursor: pointer;">
-                <h5 class="mb-0 fw-bold"><i class="bi bi-film me-2 text-warning"></i>Chi tiết đặt vé</h5>
+                <h5 class="mb-0 fw-medium"><i class="bi bi-film me-2 text-warning"></i>Chi tiết đặt vé</h5>
                 <i class="bi bi-chevron-expand d-lg-none text-dark"></i>
             </div>
             <div id="paymentSummaryCollapse" class="collapse d-lg-block show">
                 <div class="card-body p-4">
-                    <h4 class="text-warning fw-bold mb-3">@Model.MovieTitle</h4>
+                    <h4 class="text-warning fw-medium mb-3">@Model.MovieTitle</h4>
                     <div class="row g-2 mb-3">
                         <div class="col-sm-6 text-secondary">
                             <i class="bi bi-calendar3 me-2 text-dark"></i>Ngày chiếu: <span class="text-dark fw-semibold">@Model.ShowDate.ToString("dd/MM/yyyy")</span>
@@ -43,7 +43,7 @@
                     </div>
                     <hr class="border-light">
                     <div class="mb-0">
-                        <label class="text-secondary small fw-bold d-block mb-2">Ghế ngồi đã chọn:</label>
+                        <label class="text-secondary small fw-medium d-block mb-2">Ghế ngồi đã chọn:</label>
                         @foreach (var seat in Model.SelectedSeats)
                         {
                             <span class="badge bg-success fs-6 me-2 shadow-sm">@seat</span>
@@ -54,7 +54,7 @@
                     {
                         <hr class="border-light">
                         <div class="mb-0">
-                            <label class="text-secondary small fw-bold d-block mb-2">Bắp/Nước đã chọn:</label>
+                            <label class="text-secondary small fw-medium d-block mb-2">Bắp/Nước đã chọn:</label>
                             <ul class="list-unstyled mb-0">
                             @{
                                 var concessionsList = ViewBag.Concessions as List<CinemaXNet.Controllers.ConcessionCartItem>;
@@ -64,7 +64,7 @@
                                     {
                                         <li class="text-light d-flex justify-content-between mb-1">
                                             <span>@c.qty x @c.name</span>
-                                            <span class="text-warning fw-bold">@((c.qty * c.price).ToString("N0"))₫</span>
+                                            <span class="text-warning fw-medium">@((c.qty * c.price).ToString("N0"))₫</span>
                                         </li>
                                     }
                                 }
@@ -79,13 +79,13 @@
         <!-- Mã giảm giá -->
         <div class="card border-0 shadow mb-4" style="background-color: #1a1a2e !important; border: 1px solid #2d2d44 !important;">
             <div class="card-body p-4">
-                <label class="form-label text-dark fw-bold">Mã giảm giá (Voucher)</label>
+                <label class="form-label text-dark fw-medium">Mã giảm giá (Voucher)</label>
                 <div class="input-group">
                     <input type="text" id="promo-input"
                            class="form-control bg-light text-dark border-light py-2"
                            placeholder="Nhập mã giảm giá (ví dụ: GIAM20)..."
                            value="@(Model.PromotionCode ?? "")">
-                    <button class="btn btn-warning fw-bold px-4" id="btn-apply-promo" type="button">
+                    <button class="btn btn-warning fw-medium px-4" id="btn-apply-promo" type="button">
                         Áp dụng
                     </button>
                 </div>
@@ -103,7 +103,7 @@
                 <div class="d-flex justify-content-between mb-2" id="discount-row"
                      style="@(Model.Discount > 0 ? "" : "display:none!important")">
                     <span class="text-success">Giảm giá:</span>
-                    <span class="text-success fw-bold" id="discount-display">-@Model.Discount.ToString("N0")₫</span>
+                    <span class="text-success fw-medium" id="discount-display">-@Model.Discount.ToString("N0")₫</span>
                 </div>
                 <hr class="border-light">
                 <div class="d-flex justify-content-between align-items-center">
@@ -120,12 +120,11 @@
             <input type="hidden" name="promotionCode" id="final-promo" value="@(Model.PromotionCode ?? "")">
 
             <div class="mb-4">
-                <label class="form-label fw-bold text-dark mb-3">Phương thức thanh toán</label>
+                <label class="form-label fw-medium text-dark mb-3">Phương thức thanh toán</label>
                 <div class="d-grid gap-3">
                     <div class="form-check bg-white rounded p-3 border border-light shadow-sm">
                         <input class="form-check-input ms-0 me-3" type="radio" name="paymentMethod" id="pay-vnpay" value="vnpay" required>
                         <label class="form-check-label text-dark w-100" for="pay-vnpay" style="cursor: pointer;">
-                            <i class="bi bi-credit-card me-2 text-primary fs-5"></i>
                             <strong class="fs-6">VNPay</strong>
                             <small class="text-secondary d-block mt-1">Thẻ ATM nội địa, Internet Banking, Quét mã QR</small>
                         </label>
@@ -149,7 +148,7 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-warning w-100 btn-lg fw-bold py-3 shadow mb-4" id="btn-pay-submit">
+            <button type="submit" class="btn btn-warning w-100 btn-lg fw-medium py-3 shadow mb-4" id="btn-pay-submit">
                 <i class="bi bi-check-circle me-2"></i>XÁC NHẬN THANH TOÁN
             </button>
         </form>

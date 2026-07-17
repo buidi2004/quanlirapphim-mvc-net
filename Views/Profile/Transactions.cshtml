@@ -40,7 +40,7 @@ else
             @foreach (var t in transactions)
             {
                 var badgeCls = t.status == "paid"      ? "bg-success"
-                             : t.status == "holding"   ? "bg-warning text-dark"
+                             : t.status == "holding"   ? "bg-warning text-white"
                              : "bg-secondary";
                 var statusLbl = t.status == "paid"      ? "Đã thanh toán"
                               : t.status == "holding"   ? "Đang giữ"
@@ -62,7 +62,7 @@ else
                         </div>
                         <div class="text-end">
                             <span class="badge @badgeCls mb-1">@statusLbl</span>
-                            <div class="text-warning fw-bold">@((decimal)t.TotalPrice).ToString("N0")đ</div>
+                            <div class="text-warning fw-medium">@((decimal)t.TotalPrice).ToString("N0")đ</div>
                             <div class="text-secondary" style="font-size:.7rem;">@t.BookedAt</div>
                         </div>
                     </div>

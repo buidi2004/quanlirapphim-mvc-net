@@ -7,8 +7,8 @@
 }
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-light">
-    <h1 class="h2 text-warning fw-bold">Quản Lý Phim</h1>
-    <button type="button" class="btn btn-warning fw-bold btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#addMovieModal">
+    <h1 class="h2 text-warning fw-medium">Quản Lý Phim</h1>
+    <button type="button" class="btn btn-warning fw-medium btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#addMovieModal">
         <i class="bi bi-plus-lg"></i> Thêm phim mới
     </button>
 </div>
@@ -94,7 +94,7 @@
                             <div class="modal-dialog modal-lg modal-dialog-centered">
                                 <div class="modal-content bg-light text-dark border border-light shadow-lg">
                                     <div class="modal-header bg-white border-bottom border-light">
-                                        <h5 class="modal-title text-warning fw-bold"><i class="bi bi-pencil-square me-2"></i>Sửa Phim: @movie.Title</h5>
+                                        <h5 class="modal-title text-warning fw-medium"><i class="bi bi-pencil-square me-2"></i>Sửa Phim: @movie.Title</h5>
                                         <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
                                     </div>
 
@@ -104,11 +104,11 @@
                                         <div class="modal-body p-4 text-start">
                                             <div class="row g-3">
                                                 <div class="col-md-6">
-                                                    <label class="form-label text-dark fw-bold">Tiêu đề phim</label>
+                                                    <label class="form-label text-dark fw-medium">Tiêu đề phim</label>
                                                     <input type="text" name="title" value="@movie.Title" class="form-control bg-white text-dark border-light" required>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <label class="form-label text-dark fw-bold">Thể loại</label>
+                                                    <label class="form-label text-dark fw-medium">Thể loại</label>
                                                     <select name="genre" class="form-select bg-white text-dark border-light">
                                                         <option value="Hành động" selected="@(movie.Genre == "Hành động")">Hành động</option>
                                                         <option value="Hài" selected="@(movie.Genre == "Hài")">Hài</option>
@@ -119,7 +119,7 @@
                                                     </select>
                                                 </div>
                                                 <div class="col-md-4">
-                                                    <label class="form-label text-dark fw-bold">Trạng thái</label>
+                                                    <label class="form-label text-dark fw-medium">Trạng thái</label>
                                                     <select name="status" class="form-select bg-white text-dark border-light">
                                                         <option value="coming_soon" selected="@(movie.Status == "coming_soon")">Sắp chiếu</option>
                                                         <option value="now_showing" selected="@(movie.Status == "now_showing")">Đang chiếu</option>
@@ -127,11 +127,11 @@
                                                     </select>
                                                 </div>
                                                 <div class="col-md-4">
-                                                    <label class="form-label text-dark fw-bold">Thời lượng (phút)</label>
+                                                    <label class="form-label text-dark fw-medium">Thời lượng (phút)</label>
                                                     <input type="number" name="durationMinutes" value="@movie.DurationMinutes" class="form-control bg-white text-dark border-light" required min="1">
                                                 </div>
                                                 <div class="col-md-4">
-                                                    <label class="form-label text-dark fw-bold">Giới hạn độ tuổi</label>
+                                                    <label class="form-label text-dark fw-medium">Giới hạn độ tuổi</label>
                                                     <select name="ageRating" class="form-select bg-white text-dark border-light">
                                                         <option value="P" selected="@(movie.AgeRating == "P")">P - Mọi lứa tuổi</option>
                                                         <option value="C13" selected="@(movie.AgeRating == "C13")">C13 - Trên 13 tuổi</option>
@@ -140,18 +140,18 @@
                                                     </select>
                                                 </div>
                                                 <div class="col-12">
-                                                    <label class="form-label text-dark fw-bold">Ảnh Poster phim mới (để trống nếu giữ cũ)</label>
+                                                    <label class="form-label text-dark fw-medium">Ảnh Poster phim mới (để trống nếu giữ cũ)</label>
                                                     <input type="file" name="poster" class="form-control bg-white text-dark border-light" accept="image/*">
                                                 </div>
                                                 <div class="col-12">
-                                                    <label class="form-label text-dark fw-bold">Mô tả chi tiết</label>
+                                                    <label class="form-label text-dark fw-medium">Mô tả chi tiết</label>
                                                     <textarea name="description" rows="4" class="form-control bg-white text-dark border-light">@movie.Description</textarea>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="modal-footer bg-white border-top border-light">
                                             <button type="button" class="btn btn-outline-secondary text-dark fw-semibold" data-bs-dismiss="modal">Hủy</button>
-                                            <button type="submit" class="btn btn-info fw-bold px-4">Cập nhật</button>
+                                            <button type="submit" class="btn btn-info fw-medium px-4">Cập nhật</button>
                                         </div>
                                     </form>
                                 </div>
@@ -163,7 +163,7 @@
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content bg-light text-dark border border-light shadow-lg">
                                     <div class="modal-header bg-white border-bottom border-light">
-                                        <h5 class="modal-title text-danger fw-bold"><i class="bi bi-exclamation-triangle me-2"></i>Xác Nhận Xóa</h5>
+                                        <h5 class="modal-title text-danger fw-medium"><i class="bi bi-exclamation-triangle me-2"></i>Xác Nhận Xóa</h5>
                                         <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
                                     </div>
                                     <div class="modal-body p-4 text-start">
@@ -175,7 +175,7 @@
                                         <form method="post" action="/admin/movies/delete">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="id" value="@movie.Id" />
-                                            <button type="submit" class="btn btn-danger fw-bold px-4">Xóa</button>
+                                            <button type="submit" class="btn btn-danger fw-medium px-4">Xóa</button>
                                         </form>
                                     </div>
                                 </div>
@@ -194,7 +194,7 @@
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content bg-light text-dark border border-light shadow-lg">
             <div class="modal-header bg-white border-bottom border-light">
-                <h5 class="modal-title text-warning fw-bold"><i class="bi bi-film me-2"></i>Thêm Phim Mới</h5>
+                <h5 class="modal-title text-warning fw-medium"><i class="bi bi-film me-2"></i>Thêm Phim Mới</h5>
                 <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
             </div>
 
@@ -203,11 +203,11 @@
                 <div class="modal-body p-4">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label text-dark fw-bold">Tiêu đề phim</label>
+                            <label class="form-label text-dark fw-medium">Tiêu đề phim</label>
                             <input type="text" name="title" class="form-control bg-white text-dark border-light" required placeholder="Nhập tiêu đề...">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label text-dark fw-bold">Thể loại</label>
+                            <label class="form-label text-dark fw-medium">Thể loại</label>
                             <select name="genre" class="form-select bg-white text-dark border-light">
                                 <option value="Hành động">Hành động</option>
                                 <option value="Hài">Hài</option>
@@ -218,7 +218,7 @@
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label text-dark fw-bold">Trạng thái</label>
+                            <label class="form-label text-dark fw-medium">Trạng thái</label>
                             <select name="status" class="form-select bg-white text-dark border-light">
                                 <option value="coming_soon">Sắp chiếu</option>
                                 <option value="now_showing">Đang chiếu</option>
@@ -226,11 +226,11 @@
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label text-dark fw-bold">Thời lượng (phút)</label>
+                            <label class="form-label text-dark fw-medium">Thời lượng (phút)</label>
                             <input type="number" name="durationMinutes" class="form-control bg-white text-dark border-light" required min="1" placeholder="Ví dụ: 120">
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label text-dark fw-bold">Giới hạn độ tuổi</label>
+                            <label class="form-label text-dark fw-medium">Giới hạn độ tuổi</label>
                             <select name="ageRating" class="form-select bg-white text-dark border-light">
                                 <option value="P">P - Mọi lứa tuổi</option>
                                 <option value="C13">C13 - Trên 13 tuổi</option>
@@ -239,19 +239,19 @@
                             </select>
                         </div>
                         <div class="col-12">
-                            <label class="form-label text-dark fw-bold">Ảnh Poster phim</label>
+                            <label class="form-label text-dark fw-medium">Ảnh Poster phim</label>
                             <input type="file" name="poster" class="form-control bg-white text-dark border-light" accept="image/*">
                             <small class="text-secondary">Hỗ trợ các định dạng ảnh JPEG, PNG, WEBP.</small>
                         </div>
                         <div class="col-12">
-                            <label class="form-label text-dark fw-bold">Mô tả chi tiết</label>
+                            <label class="form-label text-dark fw-medium">Mô tả chi tiết</label>
                             <textarea name="description" rows="4" class="form-control bg-white text-dark border-light" placeholder="Tóm tắt nội dung phim..."></textarea>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer bg-white border-top border-light">
                     <button type="button" class="btn btn-outline-secondary text-dark fw-semibold" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-warning fw-bold px-4">Lưu lại</button>
+                    <button type="submit" class="btn btn-warning fw-medium px-4">Lưu lại</button>
                 </div>
             </form>
         </div>

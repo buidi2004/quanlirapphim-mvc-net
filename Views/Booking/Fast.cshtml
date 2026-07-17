@@ -6,13 +6,13 @@
 }
 
 <div class="container py-4">
-    <h2 class="text-warning fw-bold mb-4"><i class="bi bi-lightning-charge-fill me-2"></i>ĐẶT VÉ NHANH</h2>
+    <h2 class="text-warning fw-medium mb-4"><i class="bi bi-lightning-charge-fill me-2"></i>ĐẶT VÉ NHANH</h2>
 
-    <div class="row g-0 rounded-4 overflow-hidden border border-secondary border-opacity-25 shadow-lg bg-dark">
+    <div class="row g-0 rounded-2 overflow-hidden border border-secondary border-opacity-25 shadow-lg bg-dark">
         <!-- Bước 1: Chọn Phim -->
         <div class="col-md-3 border-end border-secondary border-opacity-25 matrix-col">
             <div class="bg-dark p-3 border-bottom border-secondary border-opacity-25 text-center">
-                <h5 class="text-white mb-0 fw-bold">1. CHỌN PHIM</h5>
+                <h5 class="text-white mb-0 fw-medium">1. CHỌN PHIM</h5>
             </div>
             <div class="list-group list-group-flush custom-scroll" style="height: 500px; overflow-y: auto;">
                 @foreach (var m in movies)
@@ -21,7 +21,7 @@
                         <div class="d-flex align-items-center">
                             <img src="@m.PosterUrl" class="rounded me-3" style="width: 40px; height: 60px; object-fit: cover;">
                             <div>
-                                <h6 class="mb-1 fw-bold">@m.Title</h6>
+                                <h6 class="mb-1 fw-medium">@m.Title</h6>
                                 <small class="text-secondary"><span class="badge bg-danger me-1">@m.AgeRating</span> @m.DurationMinutes phút</small>
                             </div>
                         </div>
@@ -33,7 +33,7 @@
         <!-- Bước 2: Chọn Rạp -->
         <div class="col-md-3 border-end border-secondary border-opacity-25 matrix-col">
             <div class="bg-dark p-3 border-bottom border-secondary border-opacity-25 text-center">
-                <h5 class="text-white mb-0 fw-bold">2. CHỌN RẠP</h5>
+                <h5 class="text-white mb-0 fw-medium">2. CHỌN RẠP</h5>
             </div>
             <div class="list-group list-group-flush custom-scroll" id="cinema-list" style="height: 500px; overflow-y: auto;">
                 <div class="p-4 text-center text-secondary fst-italic">
@@ -46,7 +46,7 @@
         <!-- Bước 3: Chọn Ngày -->
         <div class="col-md-3 border-end border-secondary border-opacity-25 matrix-col">
             <div class="bg-dark p-3 border-bottom border-secondary border-opacity-25 text-center">
-                <h5 class="text-white mb-0 fw-bold">3. CHỌN NGÀY</h5>
+                <h5 class="text-white mb-0 fw-medium">3. CHỌN NGÀY</h5>
             </div>
             <div class="list-group list-group-flush custom-scroll" id="date-list" style="height: 500px; overflow-y: auto;">
                 <div class="p-4 text-center text-secondary fst-italic">
@@ -59,7 +59,7 @@
         <!-- Bước 4: Chọn Giờ -->
         <div class="col-md-3 matrix-col">
             <div class="bg-dark p-3 border-bottom border-secondary border-opacity-25 text-center">
-                <h5 class="text-white mb-0 fw-bold">4. CHỌN SUẤT</h5>
+                <h5 class="text-white mb-0 fw-medium">4. CHỌN SUẤT</h5>
             </div>
             <div class="p-3 custom-scroll" id="time-list" style="height: 500px; overflow-y: auto;">
                 <div class="p-4 text-center text-secondary fst-italic">
@@ -76,7 +76,7 @@
     .custom-scroll::-webkit-scrollbar { width: 6px; }
     .custom-scroll::-webkit-scrollbar-track { background: #212529; }
     .custom-scroll::-webkit-scrollbar-thumb { background: #495057; border-radius: 4px; }
-    .list-group-item.active { background-color: #333 !important; border-left: 4px solid #ffc107 !important; color: #fff !important; }
+    .list-group-item.active { background-color: #333 !important; border-left: 4px solid #6f42c1 !important; color: #fff !important; }
     .list-group-item:hover:not(.active) { background-color: rgba(255,193,7,0.1) !important; cursor: pointer; }
     .time-btn { transition: all 0.2s; }
     .time-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(255,193,7,0.2); }
@@ -154,7 +154,7 @@
                 data.forEach(d => {
                     const btn = document.createElement('button');
                     btn.className = 'list-group-item list-group-item-action bg-dark text-light border-0 py-3 date-item';
-                    btn.innerHTML = `<i class="bi bi-calendar-event me-2 text-warning"></i>${d.formatted}`;
+                    btn.innerHTML = `${d.formatted}`;
                     btn.onclick = () => {
                         document.querySelectorAll('.date-item').forEach(i => i.classList.remove('active'));
                         btn.classList.add('active');
@@ -187,7 +187,7 @@
                 data.forEach(st => {
                     const a = document.createElement('a');
                     a.href = `/booking/seats?showtimeId=${st.id}`;
-                    a.className = 'btn btn-outline-warning time-btn fw-bold';
+                    a.className = 'btn btn-outline-warning time-btn fw-medium';
                     a.style.width = 'calc(50% - 0.25rem)';
                     a.innerHTML = st.time;
                     container.appendChild(a);

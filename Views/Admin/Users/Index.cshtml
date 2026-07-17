@@ -6,7 +6,7 @@
 }
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-light">
-    <h1 class="h2 text-warning fw-bold">Quản Lý Người Dùng</h1>
+    <h1 class="h2 text-warning fw-medium">Quản Lý Người Dùng</h1>
 </div>
 
 <div class="card bg-white border border-light rounded shadow-sm">
@@ -64,7 +64,7 @@
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content bg-light text-dark border border-light shadow-lg">
                                     <div class="modal-header bg-white border-bottom border-light">
-                                        <h5 class="modal-title text-warning fw-bold">Phân Quyền Người Dùng</h5>
+                                        <h5 class="modal-title text-warning fw-medium">Phân Quyền Người Dùng</h5>
                                         <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
                                     </div>
                                     <form method="post" action="/admin/users/update-role">
@@ -72,7 +72,7 @@
                                         <input type="hidden" name="id" value="@u.id" />
                                         <div class="modal-body p-4 text-start">
                                             <div class="mb-3">
-                                                <label class="form-label text-dark fw-bold">Phân quyền cho: @u.full_name</label>
+                                                <label class="form-label text-dark fw-medium">Phân quyền cho: @u.full_name</label>
                                                 <select name="role" class="form-select bg-white text-dark border-light">
                                                     <option value="customer" selected="@(u.role == "customer")">Khách hàng</option>
                                                     <option value="admin" selected="@(u.role == "admin")">Quản trị viên (Admin)</option>
@@ -81,7 +81,7 @@
                                         </div>
                                         <div class="modal-footer bg-white border-top border-light">
                                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
-                                            <button type="submit" class="btn btn-warning fw-bold">Cập nhật</button>
+                                            <button type="submit" class="btn btn-warning fw-medium">Cập nhật</button>
                                         </div>
                                     </form>
                                 </div>

@@ -6,8 +6,8 @@
 }
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-light">
-    <h1 class="h2 text-warning fw-bold">Quản Lý Luật Giá Vé (Dynamic Pricing)</h1>
-    <button class="btn btn-warning fw-bold btn-sm shadow-sm" disabled>
+    <h1 class="h2 text-warning fw-medium">Quản Lý Luật Giá Vé (Dynamic Pricing)</h1>
+    <button class="btn btn-warning fw-medium btn-sm shadow-sm" disabled>
         <i class="bi bi-plus-lg"></i> Thêm luật mới (Sắp ra mắt)
     </button>
 </div>
@@ -46,7 +46,7 @@
                                 @if(rule.adjustment_type == "Percent") { <span>Theo phần trăm (%)</span> }
                                 else { <span>Cộng/Trừ tiền mặt</span> }
                             </td>
-                            <td class="@(rule.adjustment_value > 0 ? "text-danger" : "text-success fw-bold")">
+                            <td class="@(rule.adjustment_value > 0 ? "text-danger" : "text-success fw-medium")">
                                 @(rule.adjustment_value > 0 ? "+" : "")@rule.adjustment_value @(rule.adjustment_type == "Percent" ? "%" : "VND")
                             </td>
                             <td>

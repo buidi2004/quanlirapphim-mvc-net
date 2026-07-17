@@ -14,14 +14,14 @@
 
 <div class="row justify-content-center">
     <div class="col-lg-10" data-aos="fade-up">
-        <div class="card bg-light border-0 shadow-lg promo-detail-card overflow-hidden rounded-4">
+        <div class="card bg-light border-0 shadow-lg promo-detail-card overflow-hidden rounded-2">
             <!-- Banner Image -->
             <div style="height: 500px; background: url('@Model.Image') center/cover no-repeat; position: relative;">
                 <div class="position-absolute bottom-0 start-0 p-5 w-100" style="background: linear-gradient(transparent, rgba(0,0,0,0.95));">
-                    <h1 class="text-warning fw-bold mb-2 display-5">
+                    <h1 class="text-warning fw-medium mb-2 display-5">
                         @Model.Name
                     </h1>
-                    <span class="badge bg-danger fs-4 px-4 py-2 rounded-pill mt-2">
+                    <span class="badge bg-danger fs-4 px-4 py-2 rounded-3 mt-2">
                         Giá chỉ: @Model.Price
                     </span>
                 </div>
@@ -33,7 +33,7 @@
                             @Html.Raw(Model.Description)
                         </div>
                         <div class="mt-5 text-center text-md-start">
-                            <a href="/movies" class="btn btn-warning btn-lg px-5 rounded-pill fw-bold">
+                            <a href="/movies" class="btn btn-warning btn-lg px-5 rounded-3 fw-medium">
                                 <i class="bi bi-cart-plus me-2"></i>MUA KÈM VÉ NGAY
                             </a>
                         </div>

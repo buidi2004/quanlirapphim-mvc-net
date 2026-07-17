@@ -12,8 +12,8 @@
                  class="w-100 h-100" style="object-fit:cover;">
         </div>
 
-        <span class="badge bg-warning text-dark mb-2">@article?.Category</span>
-        <h1 class="text-white fw-bold mb-2" style="font-size:1.6rem;">@article?.Title</h1>
+        <span class="badge bg-warning text-white mb-2">@article?.Category</span>
+        <h1 class="text-white fw-medium mb-2" style="font-size:1.6rem;">@article?.Title</h1>
         <p class="text-secondary small mb-4">
             <i class="bi bi-calendar3 me-1"></i>@article?.PublishedAt
         </p>
@@ -41,7 +41,7 @@
             {
                 <a href="/news/@r.Slug" class="text-decoration-none">
                     <div class="card bg-white border-light d-flex flex-row gap-3 p-2 h-100"
-                         style="transition:.2s;" onmouseover="this.style.borderColor='#ffc107'"
+                         style="transition:.2s;" onmouseover="this.style.borderColor='#6f42c1'"
                          onmouseout="this.style.borderColor='#6c757d'">
                         <img src="@(r.ImageUrl ?? "https://images.unsplash.com/photo-1478720568477-152d9b164e26?q=80&w=200")"
                              style="width:75px;height:60px;object-fit:cover;" class="rounded flex-shrink-0">
@@ -57,8 +57,8 @@
         <div class="card bg-white border-light mt-4 p-3 text-center">
             <h6 class="text-warning mb-2">Đặt vé xem phim</h6>
             <p class="text-secondary small mb-3">Trải nghiệm điện ảnh đỉnh cao</p>
-            <a href="/movies" class="btn btn-warning btn-sm fw-bold">
-                <i class="bi bi-ticket-perforated me-1"></i>Đặt vé ngay
+            <a href="/movies" class="btn btn-warning btn-sm fw-medium">
+                Đặt vé ngay
             </a>
         </div>
     </div>

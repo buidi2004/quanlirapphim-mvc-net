@@ -8,7 +8,7 @@
 <div class="mb-5">
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h4 text-warning border-start border-warning border-4 ps-3 fw-bold mb-0">
+        <h1 class="h4 text-warning border-start border-warning border-4 ps-3 fw-medium mb-0">
             <i class="bi bi-geo-alt-fill me-2"></i>HỆ THỐNG RẠP CINEMAX
         </h1>
         <!-- Filter by province -->
@@ -42,7 +42,7 @@
     @if (!cinemas.Any())
     {
         <div class="alert alert-secondary border-0">
-            <i class="bi bi-info-circle me-2"></i>Không tìm thấy rạp nào.
+            Không tìm thấy rạp nào.
         </div>
     }
     else
@@ -60,7 +60,7 @@
                                  onerror="this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=800'">
                             <div class="position-absolute bottom-0 start-0 end-0 p-2"
                                  style="background:linear-gradient(transparent,rgba(0,0,0,.8));">
-                                <span class="badge bg-warning text-dark me-1">@cinema.Province</span>
+                                <span class="badge bg-warning text-white me-1">@cinema.Province</span>
                                 @if (cinema.Distance.HasValue)
                                 {
                                     <span class="badge bg-info text-dark">
@@ -70,7 +70,7 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <h5 class="card-title text-dark fw-bold mb-1">@cinema.Name</h5>
+                            <h5 class="card-title text-dark fw-medium mb-1">@cinema.Name</h5>
                             <p class="text-secondary small mb-2">
                                 <i class="bi bi-geo-alt me-1"></i>@cinema.GetFullAddress()
                             </p>
@@ -98,7 +98,7 @@
                         </div>
                         <div class="card-footer bg-transparent border-light">
                             <a href="/cinemas/@cinema.Slug" class="btn btn-outline-warning btn-sm w-100">
-                                <i class="bi bi-info-circle me-1"></i>Xem chi tiết
+                                Xem chi tiết
                             </a>
                         </div>
                     </div>
@@ -132,7 +132,7 @@ document.getElementById('btnFindNearest').addEventListener('click', function() {
                         <div class="card bg-light border-warning border-opacity-50 p-3 h-100">
                             <h6 class="text-dark mb-1">${c.name}</h6>
                             <p class="text-secondary small mb-1">${c.address}</p>
-                            <span class="badge bg-warning text-dark"><i class="bi bi-geo-alt me-1"></i>${c.distance} km</span>
+                            <span class="badge bg-warning text-white"><i class="bi bi-geo-alt me-1"></i>${c.distance} km</span>
                             <a href="/cinemas/${c.slug}" class="btn btn-outline-warning btn-sm mt-2">Xem chi tiết</a>
                         </div>
                     </div>`).join('')}</div>`;

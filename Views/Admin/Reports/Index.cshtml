@@ -7,9 +7,9 @@
 }
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-light">
-    <h1 class="h2 text-warning fw-bold">Báo Cáo Doanh Thu</h1>
+    <h1 class="h2 text-warning fw-medium">Báo Cáo Doanh Thu</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
-        <a href="/admin/reports/export" class="btn btn-sm btn-outline-success fw-bold">
+        <a href="/admin/reports/export" class="btn btn-sm btn-outline-success fw-medium">
             <i class="bi bi-file-earmark-arrow-down me-1"></i> Xuất CSV
         </a>
     </div>
@@ -20,7 +20,7 @@
         <div class="card bg-white border border-warning shadow">
             <div class="card-body">
                 <h5 class="card-title text-secondary">Tổng Doanh Thu</h5>
-                <h2 class="text-warning fw-bold">@string.Format("{0:N0}₫", totalRevenue)</h2>
+                <h2 class="text-warning fw-medium">@string.Format("{0:N0}₫", totalRevenue)</h2>
             </div>
         </div>
     </div>
@@ -52,7 +52,7 @@
                         <tr>
                             <td><strong class="text-dark">@r.MovieTitle</strong></td>
                             <td>@r.TotalTickets vé</td>
-                            <td class="text-end text-success fw-bold">@string.Format("{0:N0}₫", r.TotalRevenue)</td>
+                            <td class="text-end text-success fw-medium">@string.Format("{0:N0}₫", r.TotalRevenue)</td>
                         </tr>
                     }
                 }
