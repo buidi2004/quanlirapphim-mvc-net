@@ -40,13 +40,16 @@ export interface CinemaShowtimeGroup {
     roomName: string;
     startTime: string;
     endTime: string;
+    format?: string;
     price: number;
   }[];
 }
 
 export interface CinemaShowtimesResponse {
   success: boolean;
-  date: string;
-  data: CinemaShowtimeGroup[];
+  data: {
+    date: string;
+    items: CinemaShowtimeGroup[];
+  };
   error?: string;
 }

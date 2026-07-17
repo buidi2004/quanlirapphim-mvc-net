@@ -1,10 +1,10 @@
-<nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom shadow-sm">
+<nav class="navbar navbar-expand-lg shadow-sm sticky-top" style="z-index: 1050; position: sticky !important; border-bottom: 1px solid rgba(124, 58, 237, 0.1);">
     <div class="container">
         <a class="navbar-brand fw-medium text-warning fs-3" href="/">
             <i class="bi bi-film"></i> CinemaX
         </a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
@@ -49,18 +49,17 @@
                 </li>
             </ul>
 
-            <!-- Search mini -->
-            <form class="d-flex me-3 d-none d-lg-flex" action="/search" method="GET">
+            <form class="d-flex me-3 d-none d-lg-flex search-form-premium" action="/search" method="GET">
                 <div class="input-group input-group-sm">
-                    <input type="text" name="q" class="form-control" placeholder="Tìm phim..." style="width: 160px;">
-                    <button type="submit" class="btn btn-outline-warning btn-sm"><i class="bi bi-search"></i></button>
+                    <input type="text" name="q" class="form-control border-end-0" placeholder="Tìm phim, rạp..." style="width: 200px;">
+                    <button type="submit" class="btn border-start-0 text-muted" aria-label="Tìm kiếm"><i class="bi bi-search"></i></button>
                 </div>
             </form>
 
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
                 <!-- Theme Toggle -->
                 <li class="nav-item me-2">
-                    <button id="themeToggleBtn" class="btn btn-sm btn-outline-secondary" title="Đổi giao diện">
+                    <button id="themeToggleBtn" class="btn btn-sm btn-outline-secondary" title="Đổi giao diện" aria-label="Đổi giao diện">
                         <i class="bi bi-moon-stars"></i>
                     </button>
                 </li>
@@ -68,7 +67,7 @@
                 {
                     <!-- Notifications -->
                     <li class="nav-item dropdown me-2 d-flex align-items-center">
-                        <a class="nav-link position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Thông báo">
+                        <a class="nav-link position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Thông báo" aria-label="Thông báo">
                             <i class="bi bi-bell fs-5"></i>
                             <span class="position-absolute top-25 start-75 translate-middle p-1 bg-danger border border-light rounded-circle" style="margin-top: 5px;">
                                 <span class="visually-hidden">New alerts</span>
@@ -107,7 +106,7 @@
                     @if (User.IsInRole("admin"))
                     {
                         <li class="nav-item d-flex align-items-center">
-                            <a class="nav-link text-warning fw-semibold me-2" href="/admin/dashboard">
+                            <a class="nav-link text-purple fw-semibold me-2" href="/admin/dashboard">
                                 <i class="bi bi-speedometer2"></i> Admin Panel
                             </a>
                         </li>
@@ -156,7 +155,7 @@
                         <a class="nav-link me-3" href="/login">Đăng nhập</a>
                     </li>
                     <li class="nav-item">
-                        <a class="btn btn-sm btn-warning fw-semibold" href="/register">Đăng ký</a>
+                        <a class="btn btn-sm btn-purple fw-semibold" href="/register">Đăng ký</a>
                     </li>
                 }
             </ul>

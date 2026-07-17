@@ -53,12 +53,12 @@ export const OnboardingScreen = ({ navigation }: any) => {
 
   const handleStart = async () => {
     await AsyncStorage.setItem('@onboarding_done', 'true');
-    navigation.replace('MainTabs');
+    navigation.replace('MainDrawer');
   };
 
   const handleSkip = async () => {
     await AsyncStorage.setItem('@onboarding_done', 'true');
-    navigation.replace('MainTabs');
+    navigation.replace('MainDrawer');
   };
 
   const isLast = activeIndex === SLIDES.length - 1;

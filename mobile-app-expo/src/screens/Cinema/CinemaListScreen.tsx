@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, StatusBar, Linking 
 import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
 import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withTiming, withSequence } from 'react-native-reanimated';
+import * as Location from 'expo-location';
 
 import { CinemaService } from '../../services/CinemaService';
 import { Cinema } from '../../models/Cinema';
@@ -23,25 +24,49 @@ export const CinemaListScreen = ({ navigation }: any) => {
   }, []);
 
   useEffect(() => {
-    if (activeCity) {
+    if (activeCity === 'Gần Bạn') {
+      fetchNearestCinemas();
+    } else if (activeCity) {
       fetchCinemas(activeCity);
     }
   }, [activeCity]);
+
+  const fetchNearestCinemas = async () => {
+    setLoading(true);
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        alert('Cần quyền truy cập vị trí để tìm rạp gần bạn nhất.');
+        if (cities.length > 1) setActiveCity(cities[1]);
+        setLoading(false);
+        return;
+      }
+      const location = await Location.getCurrentPositionAsync({});
+      const res = await CinemaService.getNearestCinemas(location.coords.latitude, location.coords.longitude, 10);
+      if (res.success) {
+        setCinemas(res.data);
+      }
+    } catch (e: any) {
+      console.log('Error fetching nearest cinemas:', e?.message || e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchProvinces = async () => {
     try {
       const res = await CinemaService.getProvinces();
       if (res.success && res.data.length > 0) {
-        setCities(res.data);
-        if (!res.data.includes(activeCity)) {
-           setActiveCity(res.data[0]);
+        setCities(['Gần Bạn', ...res.data]);
+        if (!res.data.includes(activeCity) && activeCity !== 'Gần Bạn') {
+           setActiveCity('Gần Bạn');
         }
       } else {
         // Fallback
-        setCities(['Hồ Chí Minh', 'Hà Nội', 'Đà Nẵng']);
+        setCities(['Gần Bạn', 'Hồ Chí Minh', 'Hà Nội', 'Đà Nẵng']);
       }
     } catch (e) {
-      setCities(['Hồ Chí Minh', 'Hà Nội', 'Đà Nẵng']);
+      setCities(['Gần Bạn', 'Hồ Chí Minh', 'Hà Nội', 'Đà Nẵng']);
     }
   };
 
@@ -114,10 +139,19 @@ export const CinemaListScreen = ({ navigation }: any) => {
           contentContainerStyle={styles.cityList}
           renderItem={({ item }) => (
             <TouchableOpacity
-              style={[styles.cityChip, activeCity === item && styles.cityChipActive]}
+              style={[
+                styles.cityChip, 
+                activeCity === item && styles.cityChipActive,
+                item === 'Gần Bạn' && { borderColor: Theme.colors.warning, backgroundColor: activeCity === 'Gần Bạn' ? 'rgba(255,193,7,0.1)' : 'transparent' }
+              ]}
               onPress={() => setActiveCity(item)}
             >
-              <Text style={[styles.cityChipText, activeCity === item && styles.cityChipTextActive]}>{item}</Text>
+              {item === 'Gần Bạn' && <Ionicons name="location" size={14} color={activeCity === 'Gần Bạn' ? Theme.colors.warning : Theme.colors.textSecondary} style={{marginRight: 4}} />}
+              <Text style={[
+                styles.cityChipText, 
+                activeCity === item && styles.cityChipTextActive,
+                item === 'Gần Bạn' && activeCity === 'Gần Bạn' && { color: Theme.colors.warning }
+              ]}>{item}</Text>
             </TouchableOpacity>
           )}
         />
@@ -163,6 +197,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   cityChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,

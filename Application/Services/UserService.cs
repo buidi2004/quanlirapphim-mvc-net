@@ -9,9 +9,9 @@ public class UserService(IUserRepository userRepo) : IUserService
 {
     public async Task<User> AuthenticateAsync(string email, string password)
     {
-        var user = await userRepo.FindByEmailAsync(email);
+        var user = await userRepo.FindByEmailAsync(email) ?? await userRepo.FindByUsernameAsync(email);
         if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
-            throw new BusinessException("Email hoặc mật khẩu không chính xác.");
+            throw new BusinessException("Email/Tên đăng nhập hoặc mật khẩu không chính xác.");
         return user;
     }
 
@@ -114,4 +114,6 @@ public class UserService(IUserRepository userRepo) : IUserService
     }
 
     public Task UpdateRoleAsync(int userId, string role) => userRepo.UpdateRoleAsync(userId, role);
+
+    public Task DeleteAccountAsync(int userId) => userRepo.DeleteAsync(userId);
 }

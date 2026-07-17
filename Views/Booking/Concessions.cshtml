@@ -1,6 +1,7 @@
 @{
     ViewData["Title"] = "Chọn Bắp Nước";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.HideBottomNav = true;
 }
 
 <div class="container py-4">
@@ -9,12 +10,12 @@
     <div class="row g-4">
         <!-- Left Column: Concessions List -->
         <div class="col-lg-8">
-            <div class="card border-0 shadow-sm" style="background-color: #1a1a2e !important; border: 1px solid #2d2d44 !important;">
+            <div class="card border-0 shadow-sm" style="background-color: #ffffff !important; border: 1px solid #e9ecef !important;">
                 <div class="card-body p-4">
-                    <h5 class="text-white mb-4 border-bottom border-secondary pb-2">Danh Sách Combo</h5>
+                    <h5 class="text-dark mb-4 border-bottom border-light pb-2">Danh Sách Combo</h5>
                     
                     <!-- Combo 1 -->
-                    <div class="card mb-3 bg-dark border-secondary group-hover overflow-hidden transition-all shadow-sm">
+                    <div class="card mb-3 bg-white border-light group-hover overflow-hidden transition-all shadow-sm">
                         <div class="row g-0 align-items-center">
                             <div class="col-md-4">
                                 <img src="https://placehold.co/400x300/2a1a1a/6f42c1?text=Combo+Couple" class="img-fluid rounded-start h-100 object-fit-cover" alt="Combo Couple">
@@ -25,7 +26,7 @@
                                     <p class="card-text small text-secondary mb-4">2 Ly nước ngọt (Size M) + 1 Bắp lớn (Size L)</p>
                                     
                                     <div class="mt-auto d-flex justify-content-between align-items-end">
-                                        <div class="text-white">
+                                        <div class="text-dark">
                                             <div class="text-secondary text-decoration-line-through small">130.000₫</div>
                                             <div class="fs-4 fw-medium">109.000₫</div>
                                         </div>
@@ -41,7 +42,7 @@
                     </div>
                     
                     <!-- Combo 2 -->
-                    <div class="card mb-3 bg-dark border-secondary group-hover overflow-hidden transition-all shadow-sm">
+                    <div class="card mb-3 bg-white border-light group-hover overflow-hidden transition-all shadow-sm">
                         <div class="row g-0 align-items-center">
                             <div class="col-md-4">
                                 <img src="https://placehold.co/400x300/2a1a1a/6f42c1?text=Combo+Avatar" class="img-fluid rounded-start h-100 object-fit-cover" alt="Combo Avatar">
@@ -84,11 +85,11 @@
                 </div>
                 <div id="orderSummaryCollapse" class="collapse d-lg-block show">
                     <div class="card-body p-4">
-                        <div id="cart-items" class="mb-3 text-light">
+                        <div id="cart-items" class="mb-3 text-dark">
                             <div class="text-secondary fst-italic text-center py-3">Chưa có sản phẩm nào</div>
                         </div>
                         
-                        <hr class="border-secondary">
+                        <hr class="border-light">
                         
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <span class="text-secondary fs-6">Tạm tính Bắp Nước:</span>
@@ -112,6 +113,20 @@
     </div>
 </div>
 
+<!-- Sticky Checkout — Mobile only -->
+<div class="sticky-checkout" id="sticky-checkout">
+    <div class="checkout-info">
+        <div>
+            <span class="text-secondary small">Tổng bắp nước</span>
+            <span class="total-price d-block text-purple" id="sticky-concession-total">0₫</span>
+        </div>
+        <button class="btn btn-purple fw-bold px-4 shadow-sm" id="sticky-btn-pay"
+                onclick="document.getElementById('concessions-form').requestSubmit();">
+            Bỏ qua <i class="bi bi-arrow-right ms-1"></i>
+        </button>
+    </div>
+</div>
+
 @section Scripts {
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -124,6 +139,14 @@
                     total += items[key].qty * items[key].price;
                 }
                 document.getElementById("concession-total").innerText = total.toLocaleString("vi-VN") + "₫";
+                document.getElementById("sticky-concession-total").innerText = total.toLocaleString("vi-VN") + "₫";
+                
+                const stickyBtn = document.getElementById("sticky-btn-pay");
+                if (total > 0) {
+                    stickyBtn.innerHTML = 'Thanh toán <i class="bi bi-arrow-right ms-1"></i>';
+                } else {
+                    stickyBtn.innerHTML = 'Bỏ qua <i class="bi bi-arrow-right ms-1"></i>';
+                }
                 
                 // Render cart items
                 const cartContainer = document.getElementById("cart-items");
@@ -134,7 +157,7 @@
                     if (items[key].qty > 0) {
                         hasItems = true;
                         cartContainer.innerHTML += `
-                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom border-secondary border-opacity-25">
+                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom border-light border-opacity-25">
                                 <div>
                                     <div class="fw-medium text-light">${items[key].name}</div>
                                     <small class="text-warning">${items[key].qty} x ${(items[key].price).toLocaleString("vi-VN")}₫</small>

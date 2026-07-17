@@ -1,6 +1,6 @@
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, StatusBar, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, StatusBar, Platform, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
 import QRCode from 'react-native-qrcode-svg';
@@ -67,7 +67,12 @@ export const PaymentSuccessScreen = ({ route, navigation }: any) => {
       {/* Confetti */}
       <ConfettiCannon count={100} origin={{ x: width / 2, y: -10 }} fadeOut fallSpeed={3000} />
 
-      <View style={styles.content}>
+      <ScrollView 
+        style={{ flex: 1 }} 
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+      >
         <View style={styles.successHeader}>
           <View style={styles.iconCircle}>
             <Ionicons name="checkmark-circle" size={80} color="#4CAF50" />
@@ -144,13 +149,13 @@ export const PaymentSuccessScreen = ({ route, navigation }: any) => {
           </Animated.View>
           
         </TouchableOpacity>
-      </View>
+      </ScrollView>
 
       <View style={styles.bottomActions}>
         <TouchableOpacity style={styles.primaryBtn} onPress={() => navigation.navigate('MyTickets')}>
           <Text style={styles.primaryBtnText}>VÉ CỦA TÔI</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.secondaryBtn} onPress={() => navigation.navigate('MainTabs')}>
+        <TouchableOpacity style={styles.secondaryBtn} onPress={() => navigation.navigate('MainDrawer')}>
           <Text style={styles.secondaryBtnText}>Về trang chủ</Text>
         </TouchableOpacity>
       </View>
@@ -164,10 +169,11 @@ const styles = StyleSheet.create({
     backgroundColor: Theme.colors.background,
   },
   content: {
-    flex: 1,
+    flexGrow: 1,
     alignItems: 'center',
     paddingTop: 40,
     paddingHorizontal: 20,
+    paddingBottom: 20,
   },
   successHeader: {
     alignItems: 'center',

@@ -39,8 +39,6 @@ export const MovieCard: React.FC<Props> = ({ movie, onPress, style, hideText }) 
         {/* Ảnh Poster dùng expo-image siêu mượt, tự handle cache & lỗi */}
         <AnimatedImage 
           source={{ uri: movie?.posterUrl?.startsWith('http') ? movie.posterUrl : `${IMAGE_BASE_URL}${movie?.posterUrl}` }} 
-          // @ts-ignore: sharedTransitionTag is injected by Reanimated
-          sharedTransitionTag={`poster-${movie.id}`}
           style={styles.poster}
           contentFit="cover"
           transition={200}

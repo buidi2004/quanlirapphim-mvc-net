@@ -29,6 +29,12 @@ public class UserRepository(IDbConnection db) : IUserRepository
         return await db.QueryFirstOrDefaultAsync<User>(sql, new { email });
     }
 
+    public async Task<User?> FindByUsernameAsync(string username)
+    {
+        var sql = BaseSelect + " WHERE username = @username";
+        return await db.QueryFirstOrDefaultAsync<User>(sql, new { username });
+    }
+
     public async Task<int> CreateAsync(User user)
     {
         const string sql = @"
@@ -99,4 +105,13 @@ public class UserRepository(IDbConnection db) : IUserRepository
 
     public Task UpdateRoleAsync(int userId, string role) =>
         db.ExecuteAsync("UPDATE users SET role = @Role WHERE id = @Id", new { Role = role, Id = userId });
+
+    public async Task DeleteAsync(int userId)
+    {
+        await db.ExecuteAsync("DELETE FROM tickets WHERE user_id = @Id", new { Id = userId });
+        await db.ExecuteAsync("DELETE FROM reviews WHERE user_id = @Id", new { Id = userId });
+        await db.ExecuteAsync("DELETE FROM audit_logs WHERE user_id = @Id", new { Id = userId });
+        await db.ExecuteAsync("DELETE FROM notifications WHERE user_id = @Id", new { Id = userId });
+        await db.ExecuteAsync("DELETE FROM users WHERE id = @Id", new { Id = userId });
+    }
 }

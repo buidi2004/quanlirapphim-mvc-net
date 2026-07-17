@@ -9,21 +9,69 @@ import QRCode from 'react-native-qrcode-svg';
 
 const { width } = Dimensions.get('window');
 
-const MOCK_USER = {
-  displayName: 'Nguyễn Văn A',
-  avatarUrl: 'https://i.pravatar.cc/300?img=11',
-  memberLevel: 'Gold',
-  id: 1234,
-  points: 1500000,
-  nextLevel: 'Platinum',
-  pointsToNext: 500000,
-  ticketsBought: 12,
-  moviesWatched: 8,
-};
+import { useFocusEffect } from '@react-navigation/native';
+import { AuthService } from '../../services/AuthService';
+import { User } from '../../models/User';
+import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
 
 export const ProfileScreen = ({ navigation }: any) => {
 
-  const progress = MOCK_USER.points / (MOCK_USER.points + MOCK_USER.pointsToNext);
+  const [user, setUser] = React.useState<User | null>(null);
+  const [loading, setLoading] = React.useState(true);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadProfile();
+    }, [])
+  );
+
+  const loadProfile = async () => {
+    try {
+      setLoading(true);
+      const res = await AuthService.getProfile();
+      if (res.success && res.data) {
+        setUser(res.data.user);
+      } else {
+        navigation.navigate('Login');
+      }
+    } catch (e) {
+      console.log('Error loading profile', e);
+      navigation.navigate('Login');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await AuthService.logout();
+    } catch (e) {
+      console.log('Logout error on server', e);
+    } finally {
+      if (Platform.OS === 'web') {
+        localStorage.removeItem('userToken');
+        localStorage.removeItem('refreshToken');
+      } else {
+        await SecureStore.deleteItemAsync('userToken');
+        await SecureStore.deleteItemAsync('refreshToken');
+      }
+      navigation.navigate('Login');
+    }
+  };
+
+  if (loading || !user) {
+    return (
+      <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+         <StatusBar barStyle="light-content" backgroundColor={Theme.colors.background} />
+         <Text style={{color: '#fff'}}>Đang tải hồ sơ...</Text>
+      </SafeAreaView>
+    );
+  }
+
+  const nextLevelPoints = user.memberLevel === 'Platinum' ? 0 : 500000;
+  const progress = nextLevelPoints > 0 ? user.loyaltyPoints / (user.loyaltyPoints + nextLevelPoints) : 1;
+  const nextLevelName = user.memberLevel === 'Platinum' ? 'Diamond' : 'Platinum';
 
   return (
     <SafeAreaView style={styles.container}>
@@ -48,23 +96,23 @@ export const ProfileScreen = ({ navigation }: any) => {
           <View style={styles.loyaltyHeader}>
             <View>
               <Text style={styles.loyaltyBrand}>CINEMAX REWARDS</Text>
-              <Text style={styles.loyaltyLevel}>Thành viên {MOCK_USER.memberLevel}</Text>
+              <Text style={styles.loyaltyLevel}>Thành viên {user.memberLevel || 'Standard'}</Text>
             </View>
             <Ionicons name="trophy" size={28} color={Theme.colors.gold} />
           </View>
 
           <View style={styles.loyaltyBody}>
             <View style={styles.loyaltyUser}>
-              <Image source={{ uri: MOCK_USER.avatarUrl }} style={styles.avatar} contentFit="cover" />
+              <Image source={{ uri: user.avatarUrl || 'https://i.pravatar.cc/300' }} style={styles.avatar} contentFit="cover" />
               <View>
-                <Text style={styles.loyaltyName}>{MOCK_USER.displayName}</Text>
-                <Text style={styles.loyaltyId}>ID: {MOCK_USER.id.toString().padStart(8, '0')}</Text>
+                <Text style={styles.loyaltyName}>{user.fullName || user.username}</Text>
+                <Text style={styles.loyaltyId}>ID: {user.id.toString().padStart(8, '0')}</Text>
               </View>
             </View>
 
             <View style={styles.qrContainer}>
               <View style={styles.qrBg}>
-                <QRCode value={`CXN-${MOCK_USER.id}`} size={60} color="#000" backgroundColor="#fff" />
+                <QRCode value={`CXN-${user.id}`} size={60} color="#000" backgroundColor="#fff" />
               </View>
               <Text style={styles.qrText}>Mã tích điểm</Text>
             </View>
@@ -74,31 +122,34 @@ export const ProfileScreen = ({ navigation }: any) => {
         {/* Progress Bar */}
         <View style={styles.progressContainer}>
           <View style={styles.progressHeader}>
-            <Text style={styles.levelText}>{MOCK_USER.memberLevel}</Text>
-            <Text style={styles.levelText}>{MOCK_USER.nextLevel}</Text>
+            <Text style={styles.levelText}>{user.memberLevel || 'Standard'}</Text>
+            <Text style={styles.levelText}>{nextLevelName}</Text>
           </View>
           <View style={styles.progressBarBg}>
             <View style={[styles.progressBarFill, { width: `${progress * 100}%` }]} />
           </View>
           <Text style={styles.progressHint}>
-            Còn <Text style={{color: Theme.colors.gold, fontWeight: 'bold'}}>{MOCK_USER.pointsToNext.toLocaleString('vi-VN')}₫</Text> để lên {MOCK_USER.nextLevel}
+            Còn <Text style={{color: Theme.colors.gold, fontWeight: 'bold'}}>{nextLevelPoints > 0 ? nextLevelPoints.toLocaleString('vi-VN') : 0}₫</Text> để lên {nextLevelName}
           </Text>
         </View>
 
         {/* Stats */}
         <View style={styles.statsRow}>
           <View style={styles.statCard}>
-            <Text style={styles.statValue}>{MOCK_USER.ticketsBought}</Text>
+            <Text style={styles.statValue}>{Math.floor(user.totalSpent / 100000) || 0}</Text>
             <Text style={styles.statLabel}>Vé đã mua</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={styles.statValue}>{MOCK_USER.moviesWatched}</Text>
-            <Text style={styles.statLabel}>Phim đã xem</Text>
+            <Text style={styles.statValue}>{user.loyaltyPoints}</Text>
+            <Text style={styles.statLabel}>Điểm tích luỹ</Text>
           </View>
         </View>
 
         {/* Menu Items */}
         <View style={styles.menuContainer}>
+          {(user.role === 'admin' || user.role === 'cinema_manager' || user.role === 'staff') && (
+            <MenuItem icon="qr-code-outline" title="Quét Vé Cửa (Staff)" onPress={() => navigation.navigate('Scanner')} />
+          )}
           <MenuItem icon="create-outline" title="Chỉnh sửa hồ sơ" onPress={() => navigation.navigate('EditProfile')} />
           <MenuItem icon="ticket-outline" title="Vé của tôi" onPress={() => navigation.navigate('MyTickets')} />
           <MenuItem icon="receipt-outline" title="Lịch sử giao dịch" onPress={() => navigation.navigate('TransactionHistory')} />
@@ -106,7 +157,7 @@ export const ProfileScreen = ({ navigation }: any) => {
           <MenuItem icon="notifications-outline" title="Thông báo" onPress={() => navigation.navigate('Notification')} />
           <MenuItem icon="settings-outline" title="Cài đặt" onPress={() => navigation.navigate('Settings')} />
           <MenuItem icon="headset-outline" title="Liên hệ & Hỗ trợ" onPress={() => navigation.navigate('Contact')} />
-          <MenuItem icon="log-out-outline" title="Đăng xuất" isDestructive onPress={() => {}} />
+          <MenuItem icon="log-out-outline" title="Đăng xuất" isDestructive onPress={handleLogout} />
         </View>
 
 

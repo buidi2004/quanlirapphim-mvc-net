@@ -25,8 +25,57 @@ html {
   min-height: 100%;
 }
 
-body {
-  margin-bottom: 60px;
+:root {
+  --bg-primary: #F8F9FA; /* Trắng xám nhạt */
+  --text-primary: #0F172A;
+  --accent-purple: #7C3AED;
+  --accent-black: #1E293B;
+  
+  --font-heading: 'Space Grotesk', 'Inter', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+body, input, button, select, textarea {
+  margin-bottom: 0;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.9rem; /* Reduced from 0.95rem */
+  line-height: 1.6;
+}
+
+/* Custom Purple/Black Utilities */
+.text-purple { color: var(--accent-purple) !important; }
+.bg-purple { background-color: var(--accent-purple) !important; color: white !important; }
+.border-purple { border-color: var(--accent-purple) !important; }
+
+.btn-purple {
+    background-color: var(--accent-purple) !important;
+    color: white !important;
+    border: none;
+}
+.btn-purple:hover {
+    background-color: #6D28D9 !important; /* darker purple */
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+}
+.btn-outline-purple {
+    color: var(--accent-purple) !important;
+    border: 1px solid var(--accent-purple) !important;
+    background-color: transparent;
+}
+.btn-outline-purple:hover {
+    background-color: var(--accent-purple) !important;
+    color: white !important;
+}
+
+h1, h2, h3, h4, h5, h6, .display-1, .display-2, .display-3, .display-4, .display-5, .display-6 {
+  font-family: var(--font-heading);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {

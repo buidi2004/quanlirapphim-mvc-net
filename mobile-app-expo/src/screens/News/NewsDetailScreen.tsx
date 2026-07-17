@@ -89,7 +89,7 @@ export const NewsDetailScreen = ({ route, navigation }: any) => {
 
       {/* CTA Button */}
       <View style={[styles.stickyBottom, { paddingBottom: insets.bottom + Theme.spacing.lg }]}>
-        <TouchableOpacity style={styles.bookBtn} onPress={() => navigation.navigate('MainTabs')}>
+        <TouchableOpacity style={styles.bookBtn} onPress={() => navigation.navigate('MainDrawer')}>
           <Ionicons name="ticket" size={20} color="#000" style={{ marginRight: 8 }} />
           <Text style={styles.bookBtnText}>Đặt vé xem phim ngay</Text>
         </TouchableOpacity>

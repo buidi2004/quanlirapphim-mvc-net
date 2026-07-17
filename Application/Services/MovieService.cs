@@ -72,6 +72,7 @@ public class MovieService(
                 Price          = dynamicPrice,
                 FormattedPrice = showtime.GetFormattedPrice(),
                 RoomName       = showtime.Room.Name,
+                Format         = showtime.Format,
                 AvailableSeats = Math.Max(0, totalSeats - activeCount)
             });
         }
@@ -89,6 +90,7 @@ public class MovieService(
         {
             ShowtimeId   = showtime.Id,
             MovieTitle   = showtime.Movie!.Title,
+            CinemaName   = showtime.Room!.Cinema?.Name ?? "CinemaX",
             ShowDate     = showtime.ShowDate,
             StartTime    = showtime.StartTime,
             RoomName     = showtime.Room!.Name,
@@ -105,6 +107,10 @@ public class MovieService(
     public Task<int> UpdateMovieAsync(int id, CinemaXNet.Domain.Entities.Movie movie) =>
         movieRepo.UpdateAsync(id, movie);
 
-    public Task<int> DeleteMovieAsync(int id) =>
-        movieRepo.DeleteAsync(id);
+    public async Task<int> DeleteMovieAsync(int id)
+    {
+        if (await ticketRepo.HasActiveTicketsForMovieAsync(id))
+            throw new BusinessException("Không thể xóa phim này vì đã có vé được thanh toán.");
+        return await movieRepo.DeleteAsync(id);
+    }
 }

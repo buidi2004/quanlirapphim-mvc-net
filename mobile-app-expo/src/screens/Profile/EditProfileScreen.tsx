@@ -37,14 +37,34 @@ export const EditProfileScreen = ({ route, navigation }: any) => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      // If the user picked a new local image, you would normally upload it to an S3 or your backend first.
-      // For this demo, we'll just send the text fields.
+      let finalAvatarUrl = user.avatarUrl || '';
+
+      if (avatarUri && !avatarUri.startsWith('http')) {
+        const localUri = avatarUri;
+        const filename = localUri.split('/').pop() || 'avatar.jpg';
+        const match = /\.(\w+)$/.exec(filename);
+        const type = match ? `image/${match[1]}` : `image`;
+
+        const formData = new FormData();
+        formData.append('file', { uri: localUri, name: filename, type } as any);
+
+        const uploadRes = await AuthService.uploadAvatar(formData);
+        if (uploadRes.success && uploadRes.data?.url) {
+          finalAvatarUrl = uploadRes.data.url;
+        } else {
+          Alert.alert('Lỗi', uploadRes.error || 'Tải ảnh lên thất bại.');
+          setSaving(false);
+          return;
+        }
+      }
+
       const res = await AuthService.updateProfile({
         fullName: name,
         phone: phone,
         gender: gender,
         city: user.city || '',
-        dateOfBirth: user.dateOfBirth || ''
+        dateOfBirth: user.dateOfBirth || '',
+        avatarUrl: finalAvatarUrl
       });
       if (res.success) {
         Alert.alert('Thành công', 'Đã cập nhật hồ sơ.', [

@@ -37,13 +37,7 @@ const getNext7Days = () => {
   });
 };
 
-const MOCK_CAST = [
-  { name: 'Robert Downey Jr.', role: 'Tony Stark', avatar: 'https://i.pravatar.cc/80?img=1' },
-  { name: 'Chris Evans', role: 'Steve Rogers', avatar: 'https://i.pravatar.cc/80?img=2' },
-  { name: 'Scarlett Johansson', role: 'Black Widow', avatar: 'https://i.pravatar.cc/80?img=5' },
-  { name: 'Mark Ruffalo', role: 'Bruce Banner', avatar: 'https://i.pravatar.cc/80?img=3' },
-  { name: 'Thor Hemsworth', role: 'Thor', avatar: 'https://i.pravatar.cc/80?img=4' },
-];
+
 
 const GENRE_CHIPS = ['Hành động', 'Khoa học', 'Siêu anh hùng', 'Phiêu lưu'];
 
@@ -82,15 +76,28 @@ export const MovieDetailScreen = ({ route, navigation }: any) => {
   }));
 
   useEffect(() => { fetchDetail(); }, [movieId]);
+  useEffect(() => { fetchShowtimes(); }, [selectedDate, movieId]);
 
   const fetchDetail = async () => {
     try {
       setLoading(true);
-      const res = await MovieService.getMovieDetail(movieId);
+      const res = await MovieService.getMovieDetail(movieId, selectedDate);
       if (res.success && res.data) { setData(res.data); }
       else { setError(res.error || 'Lỗi lấy thông tin phim'); }
     } catch { setError('Mất kết nối Internet.'); }
     finally { setLoading(false); }
+  };
+
+  const fetchShowtimes = async () => {
+    if (!data) return; // Only fetch if we already have the base movie data
+    try {
+      const res = await MovieService.getMovieShowtimes(movieId, selectedDate);
+      if (res.success && res.data) {
+        setData(prev => prev ? { ...prev, showtimes: res.data.showtimes } : null);
+      }
+    } catch (e) {
+      console.log('Error fetching showtimes for date:', e);
+    }
   };
 
   const handleShare = async () => {
@@ -107,7 +114,12 @@ export const MovieDetailScreen = ({ route, navigation }: any) => {
       Alert.alert('Chọn suất chiếu', 'Vui lòng chọn một suất chiếu trước khi đặt vé.');
       return;
     }
-    navigation.navigate('SeatSelection', { showtimeId: selectedShowtime.id });
+    navigation.navigate('SeatSelection', {
+      showtimeId: selectedShowtime.id,
+      movieTitle: data?.movie?.title,
+      cinemaName: selectedShowtime.cinemaName,
+      showTime: selectedShowtime.startTime,
+    });
   };
 
   if (loading) return (
@@ -191,8 +203,6 @@ export const MovieDetailScreen = ({ route, navigation }: any) => {
           <Animated.View style={[styles.posterHeader, headerAnimatedStyle]}>
             <AnimatedImage 
               source={{ uri: posterUrl }} 
-              // @ts-ignore: sharedTransitionTag is injected by Reanimated
-              sharedTransitionTag={`poster-${movieId}`}
               style={styles.posterImage} 
               contentFit="cover" 
             />
@@ -320,7 +330,7 @@ export const MovieDetailScreen = ({ route, navigation }: any) => {
                     <Text style={[styles.timeText, selectedShowtime?.id === item.id && styles.timeTextActive]}>
                       {item.startTime}
                     </Text>
-                    <Text style={{ color: Theme.colors.textSecondary, fontSize: 10, marginTop: 2 }}>2D</Text>
+                    <Text style={{ color: Theme.colors.textSecondary, fontSize: 10, marginTop: 2 }}>{item.format || '2D Phụ đề'}</Text>
                   </TouchableOpacity>
                 ))}
               </View>

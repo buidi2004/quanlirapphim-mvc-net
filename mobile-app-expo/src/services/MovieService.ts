@@ -20,7 +20,7 @@ export const MovieService = {
     return response.data;
   },
 
-  getMovieShowtimes: async (id: number, date?: string): Promise<{ success: boolean; date: string; showtimes: ShowtimeSummary[]; error?: string }> => {
+  getMovieShowtimes: async (id: number, date?: string): Promise<{ success: boolean; data: { date: string; showtimes: ShowtimeSummary[] }; error?: string }> => {
     let url = `/movies/${id}/showtimes`;
     if (date) {
       url += `?date=${date}`;

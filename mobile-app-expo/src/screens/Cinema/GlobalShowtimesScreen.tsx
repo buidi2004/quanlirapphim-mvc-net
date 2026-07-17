@@ -2,7 +2,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, SectionList, TouchableOpacity,
-  StatusBar, ScrollView,
+  StatusBar, ScrollView, Alert, ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
@@ -20,60 +20,7 @@ const getNext14Days = () => {
   });
 };
 
-const SECTIONS_DATA = [
-  {
-    province: 'TP. Hồ Chí Minh',
-    cinemas: [
-      {
-        id: 1,
-        name: 'CinemaX Landmark 81',
-        address: 'Tầng 10, Landmark 81, Bình Thạnh',
-        movies: [
-          { id: 1, title: 'Avengers: Endgame', rating: 'C13', durationMinutes: 181, times: ['10:30', '13:15', '16:00', '19:30', '21:45'] },
-          { id: 2, title: 'Dune: Part Two', rating: 'C13', durationMinutes: 166, times: ['14:00', '19:30'] },
-        ],
-      },
-      {
-        id: 2,
-        name: 'CinemaX Vincom Đồng Khởi',
-        address: 'Tầng 8, Vincom Center, Q.1',
-        movies: [
-          { id: 3, title: 'Deadpool & Wolverine', rating: 'C18', durationMinutes: 127, times: ['11:00', '14:00', '17:00', '20:00'] },
-          { id: 4, title: 'Inside Out 2', rating: 'P', durationMinutes: 100, times: ['09:00', '11:30', '14:00'] },
-        ],
-      },
-    ],
-  },
-  {
-    province: 'Hà Nội',
-    cinemas: [
-      {
-        id: 3,
-        name: 'CinemaX Vincom Bà Triệu',
-        address: 'Tầng 5, Vincom, Hai Bà Trưng',
-        movies: [
-          { id: 5, title: 'Oppenheimer', rating: 'C18', durationMinutes: 180, times: ['10:00', '14:00', '18:00'] },
-          { id: 2, title: 'Dune: Part Two', rating: 'C13', durationMinutes: 166, times: ['12:00', '16:00', '20:00'] },
-        ],
-      },
-    ],
-  },
-  {
-    province: 'Đà Nẵng',
-    cinemas: [
-      {
-        id: 4,
-        name: 'CinemaX Vincom Đà Nẵng',
-        address: 'Tầng 6, Vincom, Sơn Trà',
-        movies: [
-          { id: 1, title: 'Avengers: Endgame', rating: 'C13', durationMinutes: 181, times: ['11:00', '14:30', '18:00'] },
-        ],
-      },
-    ],
-  },
-];
-
-const PROVINCES = ['TP.HCM', 'Hà Nội', 'Đà Nẵng'];
+import { CinemaService } from '../../services/CinemaService';
 
 export const GlobalShowtimesScreen = ({ navigation }: any) => {
   const [selectedDate, setSelectedDate] = useState(getNext14Days()[0].dateString);
@@ -85,10 +32,32 @@ export const GlobalShowtimesScreen = ({ navigation }: any) => {
     return Theme.colors.badgeP;
   };
 
-  const sections = SECTIONS_DATA.map(s => ({
-    title: s.province,
-    data: s.cinemas,
-  }));
+  const [sections, setSections] = useState<any[]>([]);
+  const [provinces, setProvinces] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  React.useEffect(() => {
+    fetchData();
+  }, [selectedDate]);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const res = await CinemaService.getGlobalShowtimes(selectedDate);
+      if (res.success && res.data) {
+        const mappedSections = res.data.map((s: any) => ({
+          title: s.province,
+          data: s.cinemas,
+        }));
+        setSections(mappedSections);
+        setProvinces(res.data.map((s: any) => s.province));
+      }
+    } catch (e) {
+      console.log('Error fetching global showtimes', e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -123,7 +92,7 @@ export const GlobalShowtimesScreen = ({ navigation }: any) => {
       {/* Province Jump Links */}
       <View style={styles.provinceBar}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 16 }}>
-          {PROVINCES.map(p => (
+          {provinces.map(p => (
             <TouchableOpacity key={p} style={styles.provinceChip}>
               <Text style={styles.provinceText}>{p}</Text>
             </TouchableOpacity>
@@ -132,6 +101,12 @@ export const GlobalShowtimesScreen = ({ navigation }: any) => {
       </View>
 
       {/* SectionList */}
+      {loading ? (
+        <View style={[styles.emptyContainer, { paddingTop: 40 }]}>
+          <ActivityIndicator size="large" color={Theme.colors.warning} />
+          <Text style={{ color: Theme.colors.textSecondary, marginTop: 10 }}>Đang tải lịch chiếu...</Text>
+        </View>
+      ) : (
       <SectionList
         sections={sections}
         keyExtractor={(item, index) => `${item.id}-${index}`}
@@ -159,7 +134,7 @@ export const GlobalShowtimesScreen = ({ navigation }: any) => {
               <Ionicons name="chevron-forward" size={16} color="#444" />
             </TouchableOpacity>
 
-            {cinema.movies.map(movie => (
+            {cinema.movies.map((movie: any) => (
               <View key={movie.id} style={styles.movieBlock}>
                 <View style={styles.movieInfoRow}>
                   <Text style={styles.movieTitle} numberOfLines={1}>{movie.title}</Text>
@@ -169,15 +144,30 @@ export const GlobalShowtimesScreen = ({ navigation }: any) => {
                   <Text style={styles.duration}>{movie.durationMinutes}ph</Text>
                 </View>
                 <View style={styles.timesRow}>
-                  {movie.times.map(t => (
+                  {movie.times.map((t: any) => (
                     <TouchableOpacity
-                      key={t}
+                      key={t.time + t.format}
                       style={styles.timeChip}
-                      onPress={() => navigation.navigate('SeatSelection', {
-                        showTime: t, movieTitle: movie.title, cinemaName: cinema.name,
-                      })}
+                      onPress={() => {
+                        Alert.alert(
+                          `${t.time} — ${movie.title}`,
+                          'Để đặt vé, vui lòng sử dụng tính năng Đặt vé nhanh để chọn phim, rạp và suất chiếu.',
+                          [
+                            { text: 'Huỷ', style: 'cancel' },
+                            {
+                              text: '🎟 Đặt vé nhanh',
+                              onPress: () =>
+                                navigation.navigate('MainDrawer', {
+                                  screen: 'MainTabsDrawer',
+                                  params: { screen: 'BookingTab' },
+                                } as any),
+                            },
+                          ]
+                        );
+                      }}
                     >
-                      <Text style={styles.timeText}>{t}</Text>
+                      <Text style={styles.timeText}>{t.time}</Text>
+                      <Text style={{ fontSize: 9, color: Theme.colors.textMuted, textAlign: 'center', marginTop: 2 }}>{t.format || '2D'}</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -192,6 +182,7 @@ export const GlobalShowtimesScreen = ({ navigation }: any) => {
           </View>
         }
       />
+      )}
     </SafeAreaView>
   );
 };

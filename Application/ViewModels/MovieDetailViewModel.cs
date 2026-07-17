@@ -13,6 +13,7 @@ public class ShowtimeSummary
     public decimal Price { get; set; }
     public string FormattedPrice { get; set; } = "";
     public string RoomName { get; set; } = "";
+    public string Format { get; set; } = "2D Phụ đề";
     public int AvailableSeats { get; set; }
 }
 

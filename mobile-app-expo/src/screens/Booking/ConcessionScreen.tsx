@@ -7,33 +7,7 @@ import { Concession, ConcessionItem } from '../../components/features/Concession
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Seat } from '../../models/Booking';
 
-const MOCK_CONCESSIONS: Concession[] = [
-  {
-    id: 'c1',
-    name: 'Combo Couple',
-    description: '2 Nước ngọt cỡ lớn + 1 Bắp rang bơ phô mai cỡ lớn',
-    originalPrice: 130000,
-    price: 109000,
-    imageUrl: 'https://cdn.galaxycine.vn/media/2023/12/28/combo-2-big_1703746684074.png'
-  },
-  {
-    id: 'c2',
-    name: 'Combo Avatar',
-    description: '1 Ly nước tạo hình nhân vật + 1 Bắp cỡ lớn',
-    originalPrice: 299000,
-    price: 299000,
-    imageUrl: 'https://cdn.galaxycine.vn/media/2022/11/24/combo-avatar-2-1_1669282361139.jpg',
-    isLimited: true
-  },
-  {
-    id: 'c3',
-    name: 'Bắp Ngọt Cỡ Lớn',
-    description: '1 Bắp rang bơ vị ngọt',
-    originalPrice: 65000,
-    price: 59000,
-    imageUrl: 'https://cdn.galaxycine.vn/media/2021/11/03/bap-ngot_1635921867140.png'
-  }
-];
+import { BookingService } from '../../services/BookingService';
 
 export const ConcessionScreen = ({ route, navigation }: any) => {
   const showtimeId = route.params?.showtimeId || 0;
@@ -42,15 +16,45 @@ export const ConcessionScreen = ({ route, navigation }: any) => {
   const insets = useSafeAreaInsets();
   
   const [quantities, setQuantities] = useState<{[key: string]: number}>({});
-  const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 phút
+  const [timeLeft, setTimeLeft] = useState(route.params?.remainingSeconds || 15 * 60);
+  const [concessions, setConcessions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchConcessions();
+  }, []);
+
+  const fetchConcessions = async () => {
+    try {
+      setLoading(true);
+      const res = await BookingService.getConcessions();
+      if (res.success && res.data) {
+        setConcessions(res.data.map((x: any) => ({
+          id: x.id.toString(),
+          name: x.name,
+          description: x.description,
+          price: x.price,
+          originalPrice: x.price,
+          imageUrl: x.imageUrl
+        })));
+      }
+    } catch (e) {
+      console.log('Error fetching concessions', e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setTimeLeft(prev => {
+      setTimeLeft((prev: number) => {
         if (prev <= 1) {
           clearInterval(timer);
           Alert.alert('Hết thời gian', 'Phiên giữ ghế của bạn đã hết hạn.', [
-            { text: 'Quay lại', onPress: () => navigation.navigate('MainTabs') }
+            {
+              text: 'Về trang chủ',
+              onPress: () => navigation.reset({ index: 0, routes: [{ name: 'MainDrawer' }] }),
+            }
           ]);
           return 0;
         }
@@ -67,7 +71,7 @@ export const ConcessionScreen = ({ route, navigation }: any) => {
     }));
   };
 
-  const totalConcessionPrice = MOCK_CONCESSIONS.reduce((sum, item) => {
+  const totalConcessionPrice = concessions.reduce((sum, item) => {
     return sum + (item.price * (quantities[item.id] || 0));
   }, 0);
 
@@ -75,13 +79,26 @@ export const ConcessionScreen = ({ route, navigation }: any) => {
   const totalItems = Object.values(quantities).reduce((a, b) => a + b, 0);
 
   const handleNext = () => {
-    navigation.navigate('Payment', { 
-      selectedSeats, 
-      showtimeId, 
+    // Build name map: { [id]: name } để PaymentScreen hiển thị tên sản phẩm
+    const concessionNames: { [key: string]: string } = {};
+    concessions.forEach((item: any) => {
+      concessionNames[item.id] = item.name;
+    });
+
+    navigation.navigate('Payment', {
+      selectedSeats,
+      showtimeId,
       ticketIds,
       concessions: quantities,
+      concessionNames,
       seatPrice,
-      concessionPrice: totalConcessionPrice
+      concessionPrice: totalConcessionPrice,
+      remainingSeconds: timeLeft,
+      movieTitle: route.params?.movieTitle,
+      roomName: route.params?.roomName,
+      showDate: route.params?.showDate,
+      startTime: route.params?.startTime,
+      cinemaName: route.params?.cinemaName
     });
   };
 
@@ -108,14 +125,18 @@ export const ConcessionScreen = ({ route, navigation }: any) => {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {MOCK_CONCESSIONS.map(item => (
-          <ConcessionItem 
-            key={item.id}
-            item={item}
-            quantity={quantities[item.id] || 0}
-            onQuantityChange={(delta) => handleQuantityChange(item.id, delta)}
-          />
-        ))}
+        {loading ? (
+          <Text style={{color: '#fff', textAlign: 'center'}}>Đang tải danh sách bắp nước...</Text>
+        ) : (
+          concessions.map(item => (
+            <ConcessionItem 
+              key={item.id}
+              item={item}
+              quantity={quantities[item.id] || 0}
+              onQuantityChange={(delta) => handleQuantityChange(item.id, delta)}
+            />
+          ))
+        )}
       </ScrollView>
 
       {/* Sticky Bottom */}

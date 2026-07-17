@@ -13,4 +13,9 @@ public class ScannerService(IScannerRepository repository) : IScannerService
     {
         await repository.UpdateTicketStatusAsync(ticketId, status);
     }
+
+    public async Task UpdateConcessionStatusAsync(int ticketId, string concessionStatus)
+    {
+        await repository.UpdateConcessionStatusAsync(ticketId, concessionStatus);
+    }
 }

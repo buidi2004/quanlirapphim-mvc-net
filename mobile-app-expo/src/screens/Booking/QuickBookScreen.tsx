@@ -12,6 +12,20 @@ import { IMAGE_BASE_URL } from '../../api/apiClient';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
+const getNext7Days = () => {
+  const dayNames = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() + i);
+    return {
+      dateString: d.toISOString().split('T')[0],
+      dayName: i === 0 ? 'Hôm nay' : dayNames[d.getDay()],
+      dayNumber: d.getDate(),
+      month: d.getMonth() + 1,
+    };
+  });
+};
+
 const STEPS = [
   { id: 1, label: 'Phim', icon: 'film-outline' },
   { id: 2, label: 'Rạp', icon: 'business-outline' },
@@ -19,45 +33,10 @@ const STEPS = [
   { id: 4, label: 'Suất', icon: 'time-outline' },
 ];
 
-// Mock data
-const MOCK_MOVIES = [
-  { id: 1, title: 'Avengers: Endgame', posterUrl: 'https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg', genre: 'Hành động', durationMinutes: 181, ageRating: 'C13' },
-  { id: 2, title: 'Dune: Part Two', posterUrl: 'https://image.tmdb.org/t/p/w500/czembW0Rk1Ke7lCJGahbOhdCuhV.jpg', genre: 'Khoa học', durationMinutes: 166, ageRating: 'C13' },
-  { id: 3, title: 'Deadpool & Wolverine', posterUrl: 'https://image.tmdb.org/t/p/w500/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg', genre: 'Hành động', durationMinutes: 127, ageRating: 'C18' },
-  { id: 4, title: 'Inside Out 2', posterUrl: 'https://image.tmdb.org/t/p/w500/vpnVM9B6NMmQpWeZvzLvDESb2QY.jpg', genre: 'Hoạt hình', durationMinutes: 100, ageRating: 'P' },
-  { id: 5, title: 'Oppenheimer', posterUrl: 'https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg', genre: 'Tiểu sử', durationMinutes: 180, ageRating: 'C18' },
-];
-
-const MOCK_CINEMAS = [
-  { id: 1, name: 'CinemaX Landmark 81', address: 'Tầng 10, Landmark 81, Bình Thạnh, TP.HCM' },
-  { id: 2, name: 'CinemaX Vincom Đồng Khởi', address: 'Tầng 8, Vincom Center, Q.1, TP.HCM' },
-  { id: 3, name: 'CinemaX Aeon Mall Bình Tân', address: 'Tầng 3, Aeon Mall, Bình Tân, TP.HCM' },
-];
-
-const getNext7Days = () => {
-  const days = [];
-  const dayNames = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
-  for (let i = 0; i < 7; i++) {
-    const d = new Date();
-    d.setDate(d.getDate() + i);
-    days.push({
-      dateString: d.toISOString().split('T')[0],
-      dayName: i === 0 ? 'Hôm nay' : dayNames[d.getDay()],
-      dayNumber: d.getDate(),
-      month: d.getMonth() + 1,
-    });
-  }
-  return days;
-};
-
-const MOCK_SHOWTIMES = [
-  { id: 1, time: '09:15', room: 'Phòng 1', format: '2D', seatsLeft: 42 },
-  { id: 2, time: '11:30', room: 'Phòng IMAX', format: 'IMAX', seatsLeft: 18 },
-  { id: 3, time: '14:00', room: 'Phòng 2', format: '2D', seatsLeft: 56 },
-  { id: 4, time: '16:45', room: 'Phòng Dolby', format: 'Dolby', seatsLeft: 30 },
-  { id: 5, time: '19:30', room: 'Phòng IMAX', format: 'IMAX', seatsLeft: 4 },
-  { id: 6, time: '21:00', room: 'Phòng 3', format: '2D', seatsLeft: 61 },
-];
+import { MovieService } from '../../services/MovieService';
+import { CinemaService } from '../../services/CinemaService';
+import { Movie } from '../../models/Movie';
+import { Cinema, CinemaShowtimeGroup } from '../../models/Cinema';
 
 export const QuickBookScreen = ({ navigation }: any) => {
   const [step, setStep] = useState(1);
@@ -67,13 +46,68 @@ export const QuickBookScreen = ({ navigation }: any) => {
   const [selectedDate, setSelectedDate] = useState(getNext7Days()[0].dateString);
   const [loadingCinemas, setLoadingCinemas] = useState(false);
 
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [cinemas, setCinemas] = useState<Cinema[]>([]);
+  const [showtimes, setShowtimes] = useState<any[]>([]);
+
+  const [loadingMovies, setLoadingMovies] = useState(true);
+  const [loadingShowtimes, setLoadingShowtimes] = useState(false);
+
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    fetchMovies();
+    fetchCinemas();
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, []);
+
+  const fetchMovies = async () => {
+    try {
+      setLoadingMovies(true);
+      const res = await MovieService.getMovies('now_showing');
+      if (res.success && res.data) {
+        setMovies(res.data);
+      }
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoadingMovies(false);
+    }
+  };
+
+  const fetchCinemas = async () => {
+    try {
+      setLoadingCinemas(true);
+      const res = await CinemaService.getCinemas();
+      if (res.success && res.data) {
+        setCinemas(res.data);
+      }
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoadingCinemas(false);
+    }
+  };
+
+  const fetchShowtimes = async (cinemaId: number, dateStr: string) => {
+    try {
+      setLoadingShowtimes(true);
+      const res = await CinemaService.getCinemaShowtimes(cinemaId, dateStr);
+      if (res.success && res.data && res.data.items) {
+        const group = res.data.items.find(g => g.movie.id === selectedMovie?.id);
+        setShowtimes(group ? group.showtimes : []);
+      } else {
+        setShowtimes([]);
+      }
+    } catch (e) {
+      console.log(e);
+      setShowtimes([]);
+    } finally {
+      setLoadingShowtimes(false);
+    }
+  };
 
   const days = getNext7Days();
 
@@ -84,8 +118,7 @@ export const QuickBookScreen = ({ navigation }: any) => {
 
   const handleMovieSelect = (movie: any) => {
     setSelectedMovie(movie);
-    setLoadingCinemas(true);
-    timerRef.current = setTimeout(() => { setLoadingCinemas(false); goToStep(2); }, 600);
+    goToStep(2);
   };
 
   const handleCinemaSelect = (cinema: any) => {
@@ -95,6 +128,9 @@ export const QuickBookScreen = ({ navigation }: any) => {
 
   const handleDateSelect = (date: string) => {
     setSelectedDate(date);
+    if (selectedCinema) {
+      fetchShowtimes(selectedCinema.id, date);
+    }
     goToStep(4);
   };
 
@@ -104,8 +140,8 @@ export const QuickBookScreen = ({ navigation }: any) => {
       movieTitle: selectedMovie?.title,
       cinemaName: selectedCinema?.name,
       showDate: selectedDate,
-      showTime: showtime.time,
-      roomName: showtime.room,
+      showTime: showtime.startTime,
+      roomName: showtime.roomName,
     });
   };
 
@@ -180,8 +216,14 @@ export const QuickBookScreen = ({ navigation }: any) => {
         {step === 1 && (
           <>
             <Text style={styles.stepTitle}>Chọn phim bạn muốn xem</Text>
+            {loadingMovies ? (
+              <View style={styles.loadingBox}>
+                <ActivityIndicator size="large" color={Theme.colors.warning} />
+                <Text style={styles.loadingText}>Đang tải phim...</Text>
+              </View>
+            ) : (
             <FlatList
-              data={MOCK_MOVIES}
+              data={movies}
               keyExtractor={item => item.id.toString()}
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{ paddingBottom: 20 }}
@@ -191,14 +233,14 @@ export const QuickBookScreen = ({ navigation }: any) => {
                   onPress={() => handleMovieSelect(item)}
                 >
                   <Image
-                    source={{ uri: item.posterUrl }}
+                    source={{ uri: item.posterUrl?.startsWith('http') ? item.posterUrl : `${IMAGE_BASE_URL}${item.posterUrl}` }}
                     style={styles.movieThumb}
                     contentFit="cover"
                   />
                   <View style={styles.movieInfo}>
                     <Text style={styles.movieTitle} numberOfLines={2}>{item.title}</Text>
                     <Text style={styles.movieMeta}>{item.genre} · {item.durationMinutes} phút</Text>
-                    <View style={[styles.ageBadge, { backgroundColor: getAgeBadgeColor(item.ageRating) }]}>
+                    <View style={[styles.ageBadge, { backgroundColor: getAgeBadgeColor(item.ageRating ?? '') }]}>
                       <Text style={styles.ageBadgeText}>{item.ageRating}</Text>
                     </View>
                   </View>
@@ -206,6 +248,7 @@ export const QuickBookScreen = ({ navigation }: any) => {
                 </TouchableOpacity>
               )}
             />
+            )}
           </>
         )}
 
@@ -220,7 +263,7 @@ export const QuickBookScreen = ({ navigation }: any) => {
               </View>
             ) : (
               <FlatList
-                data={MOCK_CINEMAS}
+                data={cinemas}
                 keyExtractor={item => item.id.toString()}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ paddingBottom: 20 }}
@@ -276,8 +319,18 @@ export const QuickBookScreen = ({ navigation }: any) => {
           <>
             <Text style={styles.stepTitle}>Chọn suất chiếu</Text>
             <Text style={styles.stepSubtitle}>{selectedDate}</Text>
+            {loadingShowtimes ? (
+              <View style={styles.loadingBox}>
+                <ActivityIndicator size="large" color={Theme.colors.warning} />
+                <Text style={styles.loadingText}>Đang tải suất chiếu...</Text>
+              </View>
+            ) : showtimes.length === 0 ? (
+              <View style={styles.loadingBox}>
+                <Text style={styles.loadingText}>Không có suất chiếu nào vào ngày này.</Text>
+              </View>
+            ) : (
             <FlatList
-              data={MOCK_SHOWTIMES}
+              data={showtimes}
               keyExtractor={item => item.id.toString()}
               showsVerticalScrollIndicator={false}
               numColumns={2}
@@ -285,20 +338,21 @@ export const QuickBookScreen = ({ navigation }: any) => {
               contentContainerStyle={{ paddingBottom: 20 }}
               renderItem={({ item }) => (
                 <TouchableOpacity
-                  style={[styles.showtimeCard, item.seatsLeft <= 5 && styles.showtimeCardLow]}
+                  style={[styles.showtimeCard]}
                   onPress={() => handleShowtimeSelect(item)}
                 >
-                  <Text style={styles.showtimeTime}>{item.time}</Text>
-                  <Text style={styles.showtimeRoom}>{item.room}</Text>
+                  <Text style={styles.showtimeTime}>{item.startTime}</Text>
+                  <Text style={styles.showtimeRoom}>{item.roomName}</Text>
                   <View style={styles.showtimeFormatBadge}>
-                    <Text style={styles.showtimeFormat}>{item.format}</Text>
+                    <Text style={styles.showtimeFormat}>{item.format || '2D Phụ đề'}</Text>
                   </View>
-                  <Text style={[styles.showtimeSeats, item.seatsLeft <= 5 && styles.showtimeSeatsLow]}>
-                    {item.seatsLeft <= 5 ? `⚠ Còn ${item.seatsLeft} ghế` : `Còn ${item.seatsLeft} ghế`}
+                  <Text style={[styles.showtimeSeats]}>
+                    Giá vé: {item.price.toLocaleString('vi-VN')}₫
                   </Text>
                 </TouchableOpacity>
               )}
             />
+            )}
           </>
         )}
       </Reanimated.View>

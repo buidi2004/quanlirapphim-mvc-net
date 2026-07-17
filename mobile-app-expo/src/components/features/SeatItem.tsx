@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming, withSequence } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Haptics from 'expo-haptics';
 import { Seat } from '../../models/Booking';
 import { Theme } from '../../theme/tokens';
 
@@ -37,6 +38,7 @@ export const SeatItem: React.FC<Props> = ({ seat, isSelected, onSelect }) => {
 
   const handlePress = () => {
     if (isUnavailable) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     onSelect(seat);
   };
 

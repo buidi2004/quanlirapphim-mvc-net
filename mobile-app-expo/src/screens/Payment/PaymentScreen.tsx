@@ -3,12 +3,14 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, StatusBar, Alert, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { GlassView, isGlassEffectAPIAvailable } from 'expo-glass-effect';
+import * as WebBrowser from 'expo-web-browser';
 import { Theme } from '../../theme/tokens';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Seat } from '../../models/Booking';
 import { Image } from 'expo-image';
 import { GlassHeader } from '../../components/ui/GlassHeader';
 import { BookingService } from '../../services/BookingService';
+import { NotificationService } from '../../services/NotificationService';
 
 const PAYMENT_METHODS = [
   { id: 'momo', name: 'Ví MoMo', icon: 'https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png' },
@@ -22,11 +24,17 @@ export const PaymentScreen = ({ route, navigation }: any) => {
   const showtimeId = route.params?.showtimeId || 0;
   const ticketIds = route.params?.ticketIds || [];
   const concessions = route.params?.concessions || {};
+  const concessionNames: { [key: string]: string } = route.params?.concessionNames || {};
   const seatPrice = route.params?.seatPrice || 0;
   const concessionPrice = route.params?.concessionPrice || 0;
+  const movieTitle = route.params?.movieTitle || 'Đang cập nhật';
+  const roomName = route.params?.roomName || 'Đang cập nhật';
+  const showDate = route.params?.showDate;
+  const startTime = route.params?.startTime || 'Đang cập nhật';
+  const cinemaName = route.params?.cinemaName || 'Đang cập nhật';
   const insets = useSafeAreaInsets();
   
-  const [timeLeft, setTimeLeft] = useState(12 * 60 + 34); // Mock 12:34
+  const [timeLeft, setTimeLeft] = useState(route.params?.remainingSeconds || 15 * 60);
   const [discountCode, setDiscountCode] = useState('');
   const [discountAmount, setDiscountAmount] = useState(0);
   const [selectedMethod, setSelectedMethod] = useState('momo');
@@ -35,11 +43,14 @@ export const PaymentScreen = ({ route, navigation }: any) => {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setTimeLeft(prev => {
+      setTimeLeft((prev: number) => {
         if (prev <= 1) {
           clearInterval(timer);
           Alert.alert('Hết thời gian', 'Phiên giữ ghế của bạn đã hết hạn.', [
-            { text: 'Quay lại', onPress: () => navigation.navigate('MainTabs') }
+            {
+              text: 'Về trang chủ',
+              onPress: () => navigation.reset({ index: 0, routes: [{ name: 'MainDrawer' }] }),
+            }
           ]);
           return 0;
         }
@@ -61,8 +72,8 @@ export const PaymentScreen = ({ route, navigation }: any) => {
     setPromoLoading(true);
     try {
       const res: any = await BookingService.applyPromo({
-        code: discountCode,
-        subtotal: seatPrice + concessionPrice
+        promoCode: discountCode,
+        totalPrice: seatPrice + concessionPrice
       });
       if (res.success && res.data) {
         setDiscountAmount(res.data.discount || 0);
@@ -89,23 +100,67 @@ export const PaymentScreen = ({ route, navigation }: any) => {
 
     setLoading(true);
     try {
-      const res: any = await BookingService.confirmBooking({
+      const concessionsArray = Object.keys(concessions).map(id => ({
+        id: parseInt(id),
+        quantity: concessions[id]
+      })).filter(c => c.quantity > 0);
+
+      const requestPayload = {
         ticketIds: ticketIds,
         paymentMethod: selectedMethod,
-        totalPrice: totalAmount,
-        promotionCode: discountCode || undefined
-      });
+        promoCode: discountCode || undefined,
+        concessions: concessionsArray
+      };
 
-      if (res.success) {
-        navigation.navigate('PaymentSuccess', { 
-          transactionId: res.data?.transactionId || `CXN-${Math.floor(Math.random() * 1000000)}`,
-          movieTitle: 'Avengers Endgame', // Should ideally pass these from previous screens
-          room: 'IMAX 3',
-          time: '10/07 - 15:30',
-          seats: (selectedSeats as Seat[]).map(s => s.code).join(', ')
-        });
+      if (selectedMethod === 'vnpay') {
+        // VNPay Sandbox Mock flow
+        const res: any = await BookingService.createPaymentUrl(requestPayload);
+        if (res.success && res.data?.paymentUrl) {
+          const result = await WebBrowser.openBrowserAsync(res.data.paymentUrl);
+          
+          if (result.type === 'cancel' || result.type === 'dismiss') {
+            // Check status manually after browser is closed
+            const statusRes: any = await BookingService.getPaymentStatus(
+              res.data.txnRef,
+              requestPayload
+            );
+            
+              if (statusRes.success) {
+                if (showDate && startTime) {
+                  NotificationService.scheduleShowtimeReminder(movieTitle, showDate, startTime, roomName);
+                }
+                navigation.navigate('PaymentSuccess', { 
+                transactionId: statusRes.data?.transactionId || `CXN-${Math.floor(Math.random() * 1000000)}`,
+                movieTitle: movieTitle,
+                room: roomName,
+                time: startTime,
+                seats: (selectedSeats as Seat[]).map(s => s.code).join(', ')
+              });
+            } else {
+              Alert.alert('Thanh toán thất bại', statusRes.message || 'Giao dịch bị huỷ.');
+            }
+          }
+        } else {
+           Alert.alert('Lỗi', res.message || 'Không thể tạo URL thanh toán.');
+        }
       } else {
-        Alert.alert('Thanh toán thất bại', res.message || 'Có lỗi xảy ra khi thanh toán.');
+        // Direct confirmation for MoMo/ZaloPay mock
+        const res: any = await BookingService.confirmBooking(requestPayload);
+
+        if (res.success) {
+          if (showDate && startTime) {
+            NotificationService.scheduleShowtimeReminder(movieTitle, showDate, startTime, roomName);
+          }
+          navigation.navigate('PaymentSuccess', { 
+            transactionId: res.data?.transactionId || `CXN-${Math.floor(Math.random() * 1000000)}`,
+            movieTitle: movieTitle,
+            room: roomName,
+            time: startTime,
+            seats: (selectedSeats as Seat[]).map(s => s.code).join(', ')
+          });
+        } else {
+          Alert.alert('Thanh toán thất bại', res.message || 'Có lỗi xảy ra khi thanh toán.');
+        }
       }
     } catch (e: any) {
       console.log('Payment error:', e?.message || e);
@@ -140,15 +195,15 @@ export const PaymentScreen = ({ route, navigation }: any) => {
           <Text style={styles.sectionTitle}>Chi tiết đặt vé</Text>
           <View style={styles.row}>
             <Text style={styles.label}>Phim:</Text>
-            <Text style={styles.value}>Avengers Endgame</Text>
+            <Text style={styles.value}>{movieTitle}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.label}>Suất chiếu:</Text>
-            <Text style={styles.value}>10/07/2026 - 15:30</Text>
+            <Text style={styles.value}>{startTime}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.label}>Phòng chiếu:</Text>
-            <Text style={styles.value}>Phòng IMAX 3</Text>
+            <Text style={styles.value}>{roomName}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.label}>Số lượng:</Text>
@@ -165,7 +220,10 @@ export const PaymentScreen = ({ route, navigation }: any) => {
               <Text style={styles.sectionTitle}>Bắp nước</Text>
               {Object.keys(concessions).map(key => concessions[key] > 0 && (
                 <View key={key} style={styles.row}>
-                  <Text style={styles.label}>{concessions[key]}x Sản phẩm</Text>
+                  <Text style={styles.label}>
+                    {concessionNames[key] || 'Sản phẩm'}
+                  </Text>
+                  <Text style={styles.value}>{concessions[key]}x</Text>
                 </View>
               ))}
             </>

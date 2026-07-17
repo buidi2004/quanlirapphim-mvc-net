@@ -18,9 +18,36 @@ public class AdminScannerController(IScannerService scannerService) : Controller
     [HttpPost("api/scan")]
     public async Task<IActionResult> ScanTicket([FromBody] ScanRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.TicketId) || !int.TryParse(request.TicketId, out int ticketId))
+        if (string.IsNullOrWhiteSpace(request.TicketId))
         {
             return BadRequest(new { error = "Mã vé không hợp lệ." });
+        }
+
+        int ticketId = 0;
+        // Kiểm tra xem QR code có phải là chuỗi JSON do Mobile App tạo ra không
+        if (request.TicketId.Trim().StartsWith("{"))
+        {
+            try
+            {
+                var payload = System.Text.Json.JsonSerializer.Deserialize<System.Text.Json.Nodes.JsonObject>(request.TicketId);
+                if (payload != null && payload.ContainsKey("code"))
+                {
+                    ticketId = payload["code"]?.GetValue<int>() ?? 0;
+                }
+            }
+            catch
+            {
+                // Fallback nếu JSON lỗi
+            }
+        }
+        else
+        {
+            int.TryParse(request.TicketId, out ticketId);
+        }
+
+        if (ticketId <= 0)
+        {
+            return BadRequest(new { error = "Mã vé không hợp lệ hoặc sai định dạng." });
         }
 
         var ticket = await scannerService.GetTicketDetailsForScanAsync(ticketId);

@@ -162,6 +162,17 @@ public static class DatabaseInitializer
         """);
 
         db.Execute("""
+            CREATE TABLE IF NOT EXISTS ticket_concessions (
+                id               INT AUTO_INCREMENT PRIMARY KEY,
+                ticket_id        INT           NOT NULL,
+                food_beverage_id INT           NOT NULL,
+                quantity         INT           NOT NULL CHECK (quantity > 0),
+                price            DECIMAL(18,2) NOT NULL CHECK (price >= 0),
+                FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE,
+                FOREIGN KEY (food_beverage_id) REFERENCES food_beverages(id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+        db.Execute("""
             CREATE TABLE IF NOT EXISTS reviews (
                 id         INT AUTO_INCREMENT PRIMARY KEY,
                 movie_id   INT           NOT NULL,
@@ -231,6 +242,30 @@ public static class DatabaseInitializer
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         """);
 
+        db.Execute("""
+            CREATE TABLE IF NOT EXISTS news (
+                id           INT AUTO_INCREMENT PRIMARY KEY,
+                title        VARCHAR(300)  NOT NULL,
+                slug         VARCHAR(300)  NOT NULL UNIQUE,
+                excerpt      TEXT,
+                content      TEXT,
+                image_url    VARCHAR(500),
+                created_at   DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        """);
+
+        db.Execute("""
+            CREATE TABLE IF NOT EXISTS notifications (
+                id           INT AUTO_INCREMENT PRIMARY KEY,
+                title        VARCHAR(300)  NOT NULL,
+                message      TEXT          NOT NULL,
+                type         VARCHAR(50)   NOT NULL,
+                is_read      TINYINT(1)    NOT NULL DEFAULT 0,
+                user_id      INT           NOT NULL,
+                created_at   DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
         // ── Seed if empty ───────────────────────────────────────────────────
         var userCount = db.ExecuteScalar<int>("SELECT COUNT(*) FROM users");
         if (userCount == 0) SeedData(db);
@@ -238,11 +273,11 @@ public static class DatabaseInitializer
 
     private static void SeedData(IDbConnection db)
     {
-        // Admin — password: "admin123"
+        // Admin — password: "123456"
         db.Execute("""
             INSERT INTO users (username, email, password_hash, role, full_name)
             VALUES ('admin', 'admin@cinemax.com',
-                    '$2a$11$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy',
+                    '$2a$11$WV0rA/w3NI7a/1/vhi/8XeOAMJDPi6qS/oNRKrrFPfAppH82ZhUJe',
                     'admin', 'Quản trị viên');
         """);
 
@@ -349,13 +384,13 @@ public static class DatabaseInitializer
         var tomorrow = DateTime.Today.AddDays(1).ToString("yyyy-MM-dd");
 
         db.Execute($"""
-            INSERT INTO showtimes (movie_id, room_id, show_date, start_time, price) VALUES
-            (1, 1, '{today}',    '14:00:00', 90000),
-            (1, 3, '{today}',    '19:30:00', 140000),
-            (1, 1, '{tomorrow}', '10:00:00', 90000),
-            (2, 2, '{today}',    '16:00:00', 85000),
-            (2, 3, '{today}',    '21:00:00', 140000),
-            (2, 2, '{tomorrow}', '13:30:00', 85000);
+            INSERT INTO showtimes (movie_id, room_id, show_date, start_time, format, price) VALUES
+            (1, 1, '{today}',    '14:00:00', '2D Phụ đề', 90000),
+            (1, 3, '{today}',    '19:30:00', 'IMAX 3D', 140000),
+            (1, 1, '{tomorrow}', '10:00:00', '2D Phụ đề', 90000),
+            (2, 2, '{today}',    '16:00:00', '2D Phụ đề', 85000),
+            (2, 3, '{today}',    '21:00:00', 'IMAX 2D', 140000),
+            (2, 2, '{tomorrow}', '13:30:00', '2D Phụ đề', 85000);
         """);
 
         // Sample promotions
@@ -387,6 +422,22 @@ public static class DatabaseInitializer
             INSERT INTO pricing_rules (name, condition_type, condition_value, adjustment_type, adjustment_value, is_active) VALUES
             ('Giảm giá Khung giờ vàng (Trước 12h)', 'TimeOfDay', '00:00-11:59', 'Percent', -10, 1),
             ('Phụ thu Cuối tuần (T7, CN)', 'DayOfWeek', 'Saturday,Sunday', 'Fixed', 20000, 1);
+        """);
+
+        // Seed News
+        db.Execute("""
+            INSERT INTO news (title, slug, excerpt, content, image_url) VALUES
+            ('Khuyến mãi cực nóng: Đồng giá vé 45k', 'khuyen-mai-cuc-nong-dong-gia-ve-45k', 'Đồng giá vé 45k cho tất cả các suất chiếu sau 22h', 'Đồng giá vé 45k cho tất cả các suất chiếu sau 22h tại tất cả các cụm rạp CinemaX.', 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800'),
+            ('Review Dune 2: Đỉnh cao thị giác', 'review-dune-2-dinh-cao-thi-giac', 'Một trong những tác phẩm sci-fi hoành tráng nhất thập kỷ', 'Một trong những tác phẩm sci-fi hoành tráng nhất thập kỷ, mang lại trải nghiệm điện ảnh không thể nào quên.', 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800'),
+            ('Top 5 phim rạp đáng xem tháng này', 'top-5-phim-rap-dang-xem-thang-nay', 'Danh sách những bộ phim không thể bỏ lỡ trong tháng', 'Danh sách những bộ phim không thể bỏ lỡ trong tháng, từ hành động đến tình cảm, đáp ứng mọi sở thích của bạn.', 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=800');
+        """);
+
+        // Seed Notifications for user_id = 2 (user1)
+        db.Execute("""
+            INSERT INTO notifications (title, message, type, is_read, user_id, created_at) VALUES
+            ('Giao dịch thành công', 'Bạn đã mua thành công 2 vé phim Dune: Part Two.', 'ticket', 0, 2, datetime('now', '-10 minutes')),
+            ('Khuyến mãi mới', 'Giảm 50% bắp nước cho khách hàng thành viên thứ 3 hàng tuần.', 'promo', 1, 2, datetime('now', '-2 hours')),
+            ('Lịch chiếu thay đổi', 'Suất chiếu Avengers: Endgame đã được dời sang phòng chiếu IMAX.', 'system', 1, 2, datetime('now', '-1 days'));
         """);
     }
 }

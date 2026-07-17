@@ -1,8 +1,13 @@
 import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, StatusBar, ScrollView, Switch, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, StatusBar, ScrollView, Switch, Alert, Platform, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
+import { AuthService } from '../../services/AuthService';
+import * as SecureStore from 'expo-secure-store';
+import * as Haptics from 'expo-haptics';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants from 'expo-constants';
 
 export const SettingsScreen = ({ navigation }: any) => {
   const [darkMode, setDarkMode] = useState(true);
@@ -11,7 +16,39 @@ export const SettingsScreen = ({ navigation }: any) => {
   const [emailPromo, setEmailPromo] = useState(false);
   const [remindMovie, setRemindMovie] = useState(true);
 
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const settingsStr = await AsyncStorage.getItem('@user_settings');
+        if (settingsStr) {
+          const s = JSON.parse(settingsStr);
+          if (s.darkMode !== undefined) setDarkMode(s.darkMode);
+          if (s.systemTheme !== undefined) setSystemTheme(s.systemTheme);
+          if (s.pushNotif !== undefined) setPushNotif(s.pushNotif);
+          if (s.emailPromo !== undefined) setEmailPromo(s.emailPromo);
+          if (s.remindMovie !== undefined) setRemindMovie(s.remindMovie);
+        }
+      } catch (e) {
+        console.log('Error loading settings', e);
+      }
+    };
+    loadSettings();
+  }, []);
+
+  const handleToggle = (key: string, setter: React.Dispatch<React.SetStateAction<boolean>>, value: boolean) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setter(value);
+    
+    // Lưu vào storage không block luồng chính
+    AsyncStorage.getItem('@user_settings').then(str => {
+      const s = str ? JSON.parse(str) : {};
+      s[key] = value;
+      AsyncStorage.setItem('@user_settings', JSON.stringify(s));
+    });
+  };
+
   const handleDeleteAccount = () => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
     Alert.alert(
       'Xác nhận xóa tài khoản',
       'Bạn có chắc chắn muốn xóa tài khoản không? Hành động này không thể hoàn tác và mọi điểm thưởng, lịch sử giao dịch sẽ bị xóa.',
@@ -20,8 +57,26 @@ export const SettingsScreen = ({ navigation }: any) => {
         { 
           text: 'Xóa tài khoản', 
           style: 'destructive',
-          onPress: () => {
-            Alert.alert('Thành công', 'Tài khoản của bạn đã được đánh dấu xóa. Bạn sẽ bị đăng xuất.');
+          onPress: async () => {
+            try {
+              const res = await AuthService.deleteAccount();
+              if (res.success) {
+                if (Platform.OS === 'web') {
+                  localStorage.removeItem('userToken');
+                  localStorage.removeItem('refreshToken');
+                } else {
+                  await SecureStore.deleteItemAsync('userToken');
+                  await SecureStore.deleteItemAsync('refreshToken');
+                }
+                Alert.alert('Thành công', 'Tài khoản của bạn đã được xóa. Bạn sẽ bị đăng xuất.', [
+                  { text: 'OK', onPress: () => navigation.reset({ index: 0, routes: [{ name: 'Login' }] }) }
+                ]);
+              } else {
+                Alert.alert('Lỗi', res.error || 'Xóa tài khoản thất bại.');
+              }
+            } catch (e: any) {
+              Alert.alert('Lỗi', e.message || 'Lỗi kết nối.');
+            }
           }
         }
       ]
@@ -33,9 +88,14 @@ export const SettingsScreen = ({ navigation }: any) => {
       <StatusBar barStyle="light-content" backgroundColor={Theme.colors.background} />
       
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+        <Pressable 
+          style={({ pressed }) => [styles.backBtn, pressed && { opacity: 0.7, transform: [{ scale: 0.9 }] }]} 
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            navigation.goBack();
+          }}>
           <Ionicons name="chevron-back" size={24} color="#fff" />
-        </TouchableOpacity>
+        </Pressable>
         <Text style={styles.headerTitle}>CÀI ĐẶT</Text>
         <View style={{ width: 40 }} />
       </View>
@@ -53,9 +113,10 @@ export const SettingsScreen = ({ navigation }: any) => {
               </View>
               <Switch 
                 value={darkMode} 
-                onValueChange={setDarkMode}
-                trackColor={{ false: '#333', true: Theme.colors.gold }}
+                onValueChange={(v) => handleToggle('darkMode', setDarkMode, v)}
+                trackColor={{ false: '#3e3e3e', true: Theme.colors.gold }}
                 thumbColor="#fff"
+                ios_backgroundColor="#3e3e3e"
               />
             </View>
             <View style={styles.divider} />
@@ -66,9 +127,10 @@ export const SettingsScreen = ({ navigation }: any) => {
               </View>
               <Switch 
                 value={systemTheme} 
-                onValueChange={setSystemTheme}
-                trackColor={{ false: '#333', true: Theme.colors.gold }}
+                onValueChange={(v) => handleToggle('systemTheme', setSystemTheme, v)}
+                trackColor={{ false: '#3e3e3e', true: Theme.colors.gold }}
                 thumbColor="#fff"
+                ios_backgroundColor="#3e3e3e"
               />
             </View>
           </View>
@@ -85,9 +147,10 @@ export const SettingsScreen = ({ navigation }: any) => {
               </View>
               <Switch 
                 value={pushNotif} 
-                onValueChange={setPushNotif}
-                trackColor={{ false: '#333', true: Theme.colors.gold }}
+                onValueChange={(v) => handleToggle('pushNotif', setPushNotif, v)}
+                trackColor={{ false: '#3e3e3e', true: Theme.colors.gold }}
                 thumbColor="#fff"
+                ios_backgroundColor="#3e3e3e"
               />
             </View>
             <View style={styles.divider} />
@@ -98,9 +161,10 @@ export const SettingsScreen = ({ navigation }: any) => {
               </View>
               <Switch 
                 value={emailPromo} 
-                onValueChange={setEmailPromo}
-                trackColor={{ false: '#333', true: Theme.colors.gold }}
+                onValueChange={(v) => handleToggle('emailPromo', setEmailPromo, v)}
+                trackColor={{ false: '#3e3e3e', true: Theme.colors.gold }}
                 thumbColor="#fff"
+                ios_backgroundColor="#3e3e3e"
               />
             </View>
             <View style={styles.divider} />
@@ -111,9 +175,10 @@ export const SettingsScreen = ({ navigation }: any) => {
               </View>
               <Switch 
                 value={remindMovie} 
-                onValueChange={setRemindMovie}
-                trackColor={{ false: '#333', true: Theme.colors.gold }}
+                onValueChange={(v) => handleToggle('remindMovie', setRemindMovie, v)}
+                trackColor={{ false: '#3e3e3e', true: Theme.colors.gold }}
                 thumbColor="#fff"
+                ios_backgroundColor="#3e3e3e"
               />
             </View>
           </View>
@@ -128,48 +193,67 @@ export const SettingsScreen = ({ navigation }: any) => {
                 <Ionicons name="information-circle-outline" size={20} color="#fff" />
                 <Text style={styles.rowText}>Phiên bản</Text>
               </View>
-              <Text style={styles.versionText}>1.0.0 (Build 42)</Text>
+              <Text style={styles.versionText}>{Constants.expoConfig?.version || '1.0.0'} (Build {Constants.expoConfig?.ios?.buildNumber || Constants.expoConfig?.android?.versionCode || '1'})</Text>
             </View>
             <View style={styles.divider} />
-            <TouchableOpacity style={styles.rowLink}>
+            <Pressable 
+              style={({ pressed }) => [styles.rowLink, pressed && { opacity: 0.8, transform: [{ scale: 0.98 }] }]} 
+              onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}>
               <View style={styles.rowLeft}>
                 <Ionicons name="star-outline" size={20} color="#fff" />
                 <Text style={styles.rowText}>Đánh giá ứng dụng</Text>
               </View>
               <Ionicons name="chevron-forward" size={16} color="#666" />
-            </TouchableOpacity>
+            </Pressable>
             <View style={styles.divider} />
-            <TouchableOpacity style={styles.rowLink} onPress={() => navigation.navigate('StaticPage', { page: 'faq' })}>
+            <Pressable 
+              style={({ pressed }) => [styles.rowLink, pressed && { opacity: 0.8, transform: [{ scale: 0.98 }] }]} 
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                navigation.navigate('StaticPage', { page: 'faq' });
+              }}>
               <View style={styles.rowLeft}>
                 <Ionicons name="help-circle-outline" size={20} color="#fff" />
                 <Text style={styles.rowText}>Câu hỏi thường gặp</Text>
               </View>
               <Ionicons name="chevron-forward" size={16} color="#666" />
-            </TouchableOpacity>
+            </Pressable>
             <View style={styles.divider} />
-            <TouchableOpacity style={styles.rowLink} onPress={() => navigation.navigate('StaticPage', { page: 'terms' })}>
+            <Pressable 
+              style={({ pressed }) => [styles.rowLink, pressed && { opacity: 0.8, transform: [{ scale: 0.98 }] }]} 
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                navigation.navigate('StaticPage', { page: 'terms' });
+              }}>
               <View style={styles.rowLeft}>
                 <Ionicons name="document-text-outline" size={20} color="#fff" />
                 <Text style={styles.rowText}>Điều khoản sử dụng</Text>
               </View>
               <Ionicons name="chevron-forward" size={16} color="#666" />
-            </TouchableOpacity>
+            </Pressable>
             <View style={styles.divider} />
-            <TouchableOpacity style={styles.rowLink} onPress={() => navigation.navigate('StaticPage', { page: 'privacy' })}>
+            <Pressable 
+              style={({ pressed }) => [styles.rowLink, pressed && { opacity: 0.8, transform: [{ scale: 0.98 }] }]} 
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                navigation.navigate('StaticPage', { page: 'privacy' });
+              }}>
               <View style={styles.rowLeft}>
                 <Ionicons name="shield-checkmark-outline" size={20} color="#fff" />
                 <Text style={styles.rowText}>Chính sách bảo mật</Text>
               </View>
               <Ionicons name="chevron-forward" size={16} color="#666" />
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
 
         {/* Delete Account */}
-        <TouchableOpacity style={styles.deleteBtn} onPress={handleDeleteAccount}>
+        <Pressable 
+          style={({ pressed }) => [styles.deleteBtn, pressed && { opacity: 0.8, transform: [{ scale: 0.98 }] }]} 
+          onPress={handleDeleteAccount}>
           <Ionicons name="trash-outline" size={20} color="#ff3b30" />
           <Text style={styles.deleteBtnText}>Yêu cầu xóa tài khoản</Text>
-        </TouchableOpacity>
+        </Pressable>
 
       </ScrollView>
     </SafeAreaView>

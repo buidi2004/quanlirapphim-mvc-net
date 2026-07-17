@@ -5,6 +5,7 @@ namespace CinemaXNet.Application.ViewModels;
 public class TicketDetailViewModel
 {
     public Ticket Ticket { get; set; } = null!;
+    public int MovieId { get; set; }
     public string MovieTitle { get; set; } = "";
     public string? PosterUrl { get; set; }
     public string? AgeRating { get; set; }

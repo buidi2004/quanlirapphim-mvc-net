@@ -1,4 +1,6 @@
 using CinemaXNet.Application.Interfaces;
+using Microsoft.AspNetCore.SignalR;
+using CinemaXNet.Hubs;
 
 namespace CinemaXNet.Infrastructure.Services;
 
@@ -20,10 +22,24 @@ public class HoldExpiryBackgroundService(
             {
                 using var scope          = scopeFactory.CreateScope();
                 var ticketService        = scope.ServiceProvider.GetRequiredService<ITicketService>();
-                var cancelled            = await ticketService.ReleaseExpiredHoldsAsync();
+                var cancelledSeats       = await ticketService.ReleaseExpiredHoldsAsync();
+                var cancelledList        = cancelledSeats.ToList();
 
-                if (cancelled > 0)
-                    logger.LogInformation("Cancelled {Count} expired hold(s).", cancelled);
+                if (cancelledList.Count > 0)
+                {
+                    logger.LogInformation("Cancelled {Count} expired hold(s).", cancelledList.Count);
+                    
+                    var hubContext = scope.ServiceProvider.GetRequiredService<IHubContext<SeatHub>>();
+                    var groups = cancelledList.GroupBy(x => x.ShowtimeId);
+                    
+                    foreach (var group in groups)
+                    {
+                        var seatCodes = group.Select(x => x.SeatCode).ToList();
+                        await hubContext.Clients.Group(group.Key.ToString()).SendAsync("SeatReleased", new {
+                            SeatCodes = seatCodes
+                        });
+                    }
+                }
             }
             catch (Exception ex)
             {

@@ -97,7 +97,7 @@ export const PromotionDetailScreen = ({ route, navigation }: any) => {
 
       {/* Sticky Bottom */}
       <View style={[styles.stickyBottom, { paddingBottom: insets.bottom + Theme.spacing.lg }]}>
-        <TouchableOpacity style={styles.bookBtn} onPress={() => navigation.navigate('MainTabs')}>
+        <TouchableOpacity style={styles.bookBtn} onPress={() => navigation.navigate('MainDrawer')}>
           <Ionicons name="ticket-outline" size={20} color="#000" style={{ marginRight: 8 }} />
           <Text style={styles.bookBtnText}>Dùng khi đặt vé ngay</Text>
         </TouchableOpacity>

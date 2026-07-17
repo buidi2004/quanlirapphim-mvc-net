@@ -11,8 +11,8 @@
 
 <div class="card bg-white border border-light rounded shadow-sm">
     <div class="table-responsive">
-        <table class="table table-dark table-hover mb-0 align-middle">
-            <thead class="text-uppercase" style="background-color: #111;">
+        <table class="table table-striped table-hover mb-0 align-middle">
+            <thead class="text-uppercase" class="table-light">
                 <tr>
                     <th scope="col">Người dùng</th>
                     <th scope="col">Phim</th>
@@ -39,7 +39,7 @@
                         <tr>
                             <td><strong class="text-dark">@r.full_name</strong></td>
                             <td><strong class="text-info">@r.movie_title</strong></td>
-                            <td class="text-warning">
+                            <td class="text-purple">
                                 @for (int i = 0; i < Convert.ToInt32(r.rating); i++)
                                 {
                                     <i class="bi bi-star-fill"></i>
@@ -63,7 +63,7 @@
                                 <form method="post" action="/admin/reviews/toggle" class="d-inline">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="id" value="@r.id" />
-                                    <button type="submit" class="btn btn-sm btn-outline-warning" title="Duyệt / Ẩn">
+                                    <button type="submit" class="btn btn-sm btn-outline-purple" title="Duyệt / Ẩn">
                                         <i class="bi bi-eye"></i>
                                     </button>
                                 </form>

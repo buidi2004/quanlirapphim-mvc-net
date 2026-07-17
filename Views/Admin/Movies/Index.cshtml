@@ -23,8 +23,8 @@
 <!-- Movies list table -->
 <div class="card bg-white border border-light rounded shadow-sm">
     <div class="table-responsive">
-        <table class="table table-dark table-hover mb-0 align-middle">
-            <thead class="text-uppercase" style="background-color: #111;">
+        <table class="table table-striped table-hover mb-0 align-middle">
+            <thead class="text-uppercase" class="table-light">
                 <tr>
                     <th scope="col" style="width: 80px;">Poster</th>
                     <th scope="col">Tiêu đề</th>
@@ -110,20 +110,20 @@
                                                 <div class="col-md-6">
                                                     <label class="form-label text-dark fw-medium">Thể loại</label>
                                                     <select name="genre" class="form-select bg-white text-dark border-light">
-                                                        <option value="Hành động" selected="@(movie.Genre == "Hành động")">Hành động</option>
-                                                        <option value="Hài" selected="@(movie.Genre == "Hài")">Hài</option>
-                                                        <option value="Kinh dị" selected="@(movie.Genre == "Kinh dị")">Kinh dị</option>
-                                                        <option value="Tình cảm" selected="@(movie.Genre == "Tình cảm")">Tình cảm</option>
-                                                        <option value="Viễn tưởng" selected="@(movie.Genre == "Viễn tưởng")">Viễn tưởng</option>
-                                                        <option value="Hoạt hình" selected="@(movie.Genre == "Hoạt hình")">Hoạt hình</option>
+                                                        <!option value="Hành động" @(movie.Genre == "Hành động" ? "selected" : null)>Hành động</!option>
+                                                        <!option value="Hài" @(movie.Genre == "Hài" ? "selected" : null)>Hài</!option>
+                                                        <!option value="Kinh dị" @(movie.Genre == "Kinh dị" ? "selected" : null)>Kinh dị</!option>
+                                                        <!option value="Tình cảm" @(movie.Genre == "Tình cảm" ? "selected" : null)>Tình cảm</!option>
+                                                        <!option value="Viễn tưởng" @(movie.Genre == "Viễn tưởng" ? "selected" : null)>Viễn tưởng</!option>
+                                                        <!option value="Hoạt hình" @(movie.Genre == "Hoạt hình" ? "selected" : null)>Hoạt hình</!option>
                                                     </select>
                                                 </div>
                                                 <div class="col-md-4">
                                                     <label class="form-label text-dark fw-medium">Trạng thái</label>
                                                     <select name="status" class="form-select bg-white text-dark border-light">
-                                                        <option value="coming_soon" selected="@(movie.Status == "coming_soon")">Sắp chiếu</option>
-                                                        <option value="now_showing" selected="@(movie.Status == "now_showing")">Đang chiếu</option>
-                                                        <option value="ended" selected="@(movie.Status == "ended")">Dừng chiếu</option>
+                                                        <!option value="coming_soon" @(movie.Status == "coming_soon" ? "selected" : null)>Sắp chiếu</!option>
+                                                        <!option value="now_showing" @(movie.Status == "now_showing" ? "selected" : null)>Đang chiếu</!option>
+                                                        <!option value="ended" @(movie.Status == "ended" ? "selected" : null)>Dừng chiếu</!option>
                                                     </select>
                                                 </div>
                                                 <div class="col-md-4">
@@ -133,10 +133,10 @@
                                                 <div class="col-md-4">
                                                     <label class="form-label text-dark fw-medium">Giới hạn độ tuổi</label>
                                                     <select name="ageRating" class="form-select bg-white text-dark border-light">
-                                                        <option value="P" selected="@(movie.AgeRating == "P")">P - Mọi lứa tuổi</option>
-                                                        <option value="C13" selected="@(movie.AgeRating == "C13")">C13 - Trên 13 tuổi</option>
-                                                        <option value="C16" selected="@(movie.AgeRating == "C16")">C16 - Trên 16 tuổi</option>
-                                                        <option value="C18" selected="@(movie.AgeRating == "C18")">C18 - Trên 18 tuổi</option>
+                                                        <!option value="P" @(movie.AgeRating == "P" ? "selected" : null)>P - Mọi lứa tuổi</!option>
+                                                        <!option value="C13" @(movie.AgeRating == "C13" ? "selected" : null)>C13 - Trên 13 tuổi</!option>
+                                                        <!option value="C16" @(movie.AgeRating == "C16" ? "selected" : null)>C16 - Trên 16 tuổi</!option>
+                                                        <!option value="C18" @(movie.AgeRating == "C18" ? "selected" : null)>C18 - Trên 18 tuổi</!option>
                                                     </select>
                                                 </div>
                                                 <div class="col-12">
@@ -209,20 +209,20 @@
                         <div class="col-md-6">
                             <label class="form-label text-dark fw-medium">Thể loại</label>
                             <select name="genre" class="form-select bg-white text-dark border-light">
-                                <option value="Hành động">Hành động</option>
-                                <option value="Hài">Hài</option>
-                                <option value="Kinh dị">Kinh dị</option>
-                                <option value="Tình cảm">Tình cảm</option>
-                                <option value="Viễn tưởng">Viễn tưởng</option>
-                                <option value="Hoạt hình">Hoạt hình</option>
+                                <!option value="Hành động">Hành động</!option>
+                                <!option value="Hài">Hài</!option>
+                                <!option value="Kinh dị">Kinh dị</!option>
+                                <!option value="Tình cảm">Tình cảm</!option>
+                                <!option value="Viễn tưởng">Viễn tưởng</!option>
+                                <!option value="Hoạt hình">Hoạt hình</!option>
                             </select>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label text-dark fw-medium">Trạng thái</label>
                             <select name="status" class="form-select bg-white text-dark border-light">
-                                <option value="coming_soon">Sắp chiếu</option>
-                                <option value="now_showing">Đang chiếu</option>
-                                <option value="ended">Dừng chiếu</option>
+                                <!option value="coming_soon">Sắp chiếu</!option>
+                                <!option value="now_showing">Đang chiếu</!option>
+                                <!option value="ended">Dừng chiếu</!option>
                             </select>
                         </div>
                         <div class="col-md-4">
@@ -232,10 +232,10 @@
                         <div class="col-md-4">
                             <label class="form-label text-dark fw-medium">Giới hạn độ tuổi</label>
                             <select name="ageRating" class="form-select bg-white text-dark border-light">
-                                <option value="P">P - Mọi lứa tuổi</option>
-                                <option value="C13">C13 - Trên 13 tuổi</option>
-                                <option value="C16">C16 - Trên 16 tuổi</option>
-                                <option value="C18">C18 - Trên 18 tuổi</option>
+                                <!option value="P">P - Mọi lứa tuổi</!option>
+                                <!option value="C13">C13 - Trên 13 tuổi</!option>
+                                <!option value="C16">C16 - Trên 16 tuổi</!option>
+                                <!option value="C18">C18 - Trên 18 tuổi</!option>
                             </select>
                         </div>
                         <div class="col-12">

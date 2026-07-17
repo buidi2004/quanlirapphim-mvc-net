@@ -5,22 +5,32 @@ import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
 import { LinearGradient } from 'expo-linear-gradient';
 
+import { AuthService } from '../../services/AuthService';
+
 export const ForgotPasswordScreen = ({ navigation }: any) => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const handleReset = () => {
+  const handleReset = async () => {
     if (!email) {
       Alert.alert('Lỗi', 'Vui lòng nhập địa chỉ email của bạn.');
       return;
     }
     
     setLoading(true);
-    setTimeout(() => {
+    try {
+      const res = await AuthService.forgotPassword(email);
+      if (res.success) {
+        Alert.alert('Thành công', res.message || 'Link đặt lại mật khẩu đã được gửi vào email của bạn. Vui lòng kiểm tra hộp thư đến.', [
+          { text: 'OK', onPress: () => navigation.navigate('Login') }
+        ]);
+      } else {
+        Alert.alert('Lỗi', res.message || 'Không thể gửi link khôi phục mật khẩu.');
+      }
+    } catch (e: any) {
+      Alert.alert('Lỗi', e.message || 'Đã có lỗi xảy ra. Vui lòng thử lại sau.');
+    } finally {
       setLoading(false);
-      Alert.alert('Thành công', 'Link đặt lại mật khẩu đã được gửi vào email của bạn. Vui lòng kiểm tra hộp thư đến.', [
-        { text: 'OK', onPress: () => navigation.navigate('Login') }
-      ]);
-    }, 1500);
+    }
   };
 
   return (

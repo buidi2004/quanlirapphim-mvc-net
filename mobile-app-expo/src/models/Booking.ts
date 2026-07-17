@@ -14,6 +14,7 @@ export interface SeatMapResponse {
     movieTitle: string;
     cinemaName: string;
     roomName: string;
+    showDate: string;
     startTime: string;
     basePrice: number;
     seats: Seat[];
@@ -30,45 +31,53 @@ export interface HoldSeatsRequest {
 
 export interface HoldSeatsResponse {
   success: boolean;
-  ticketIds: number[];
-  expiryTime: string;
-  remainingSeconds: number;
+  data: {
+    holdResult: {
+      ticketIds: number[];
+      expiryTime: string;
+      remainingSeconds: number;
+    }
+  };
   error?: string;
 }
 
 export interface ApplyPromoRequest {
-  code: string;
-  subtotal: number;
+  promoCode: string;
+  totalPrice: number;
 }
 
 export interface ApplyPromoResponse {
   success: boolean;
-  discount: number;
-  totalPrice: number;
+  data: {
+    discount: number;
+    finalPrice: number;
+  };
   error?: string;
 }
 
 export interface ConfirmBookingRequest {
   ticketIds: number[];
   paymentMethod: string;
-  totalPrice: number;
-  promotionCode?: string;
+  promoCode?: string;
+  concessions?: { id: number; quantity: number }[];
 }
 
 export interface ConfirmBookingResponse {
   success: boolean;
-  transactionId?: string;
-  bookingDetail?: {
-    movieTitle: string;
-    cinemaName: string;
-    roomName: string;
-    startTime: string;
-    seats: string[];
-    subtotal: number;
-    discount: number;
-    totalPrice: number;
-    paymentMethod: string;
-    bookingDate: string;
+  data?: {
+    transactionId?: string;
+    bookingDetail?: {
+      movieTitle: string;
+      cinemaName: string;
+      roomName: string;
+      startTime: string;
+      seats: string[];
+      subtotal: number;
+      discount: number;
+      totalPrice: number;
+      paymentMethod: string;
+      bookingDate: string;
+    };
   };
   error?: string;
 }

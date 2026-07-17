@@ -9,6 +9,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { MovieService } from '../../services/MovieService';
 import { Movie } from '../../models/Movie';
+import { AppService } from '../../services/AppService';
+import { IMAGE_BASE_URL } from '../../api/apiClient';
 import { MovieCard, MOVIE_CARD_WIDTH } from '../../components/features/MovieCard';
 import { TopAdsBanner } from '../../components/features/TopAdsBanner';
 import { GlassSurface } from '../../components/ui/GlassSurface';
@@ -29,8 +31,9 @@ const PROMOTION_BANNERS = [
 
 export const HomeScreen = ({ navigation }: any) => {
   const insets = useSafeAreaInsets();
-  const [nowShowing, setNowShowing] = useState<Movie[]>([]);
+  const [nowShowing, setNowShowing] = useState<Movie[]>([]); 
   const [comingSoon, setComingSoon] = useState<Movie[]>([]);
+  const [banners, setBanners] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showPromoModal, setShowPromoModal] = useState(false);
@@ -49,12 +52,14 @@ export const HomeScreen = ({ navigation }: any) => {
     try {
       setLoading(true);
       setError(null);
-      const [nowRes, soonRes] = await Promise.all([
+      const [nowRes, soonRes, newsRes] = await Promise.all([
         MovieService.getMovies('now_showing', 1),
         MovieService.getMovies('coming_soon', 1),
+        AppService.getNews().catch(() => ({ data: [] })), // prevent banner failure from breaking movies
       ]);
       setNowShowing(nowRes.data || []);
       setComingSoon(soonRes.data || []);
+      setBanners(newsRes.data || []);
     } catch {
       setError('Mất kết nối Internet hoặc Lỗi máy chủ.');
     } finally {
@@ -75,7 +80,10 @@ export const HomeScreen = ({ navigation }: any) => {
     setShowPromoModal(true);
   }, []);
 
-  const topAdsMovies = useMemo(() => nowShowing.slice(0, 5), [nowShowing]);
+  const topAdsBanners = useMemo(() => {
+    if (banners.length > 0) return banners.slice(0, 5);
+    return nowShowing.slice(0, 5);
+  }, [banners, nowShowing]);
 
   const renderSection = (title: string, data: Movie[], navigateTo?: string) => (
     <View style={styles.sectionContainer}>
@@ -108,9 +116,7 @@ export const HomeScreen = ({ navigation }: any) => {
         style={[styles.floatingHeader, { paddingTop: Math.max(insets.top, 40) }]}
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <TouchableOpacity onPress={() => navigation.openDrawer()} style={{ padding: 4 }}>
-            <Ionicons name="menu" size={28} color="#fff" />
-          </TouchableOpacity>
+          <View style={{ padding: 4, width: 28 }} />
           <Text style={styles.logo}>CinemaX</Text>
         </View>
         <View style={styles.headerActions}>
@@ -130,7 +136,7 @@ export const HomeScreen = ({ navigation }: any) => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.avatarButton}
-            onPress={() => navigation.navigate('ProfileTab')}
+            onPress={() => navigation.openDrawer()}
           >
             <Ionicons name="person-circle" size={32} color="#fff" />
           </TouchableOpacity>
@@ -141,7 +147,24 @@ export const HomeScreen = ({ navigation }: any) => {
         {/* Spacer for Floating Header */}
         <View style={{ height: Math.max(insets.top, 40) + 60 }} />
         
-        <TopAdsBanner movies={topAdsMovies} onPress={handleMoviePress} />
+        <TopAdsBanner banners={topAdsBanners} onPress={(id) => {
+          if (banners.length === 0) {
+            handleMoviePress(id);
+          } else {
+            const selected = banners.find(b => b.id === id);
+            if (selected) {
+              const mappedNews = {
+                id: selected.id,
+                title: selected.title,
+                summary: selected.summary,
+                category: 'Tin tức', 
+                date: new Date(selected.date).toLocaleDateString('vi-VN'),
+                image: selected.imageUrl?.startsWith('http') ? selected.imageUrl : `${IMAGE_BASE_URL}${selected.imageUrl}`
+              };
+              navigation.navigate('NewsDetail', { news: mappedNews });
+            }
+          }
+        }} />
 
         {/* Promotion Strip */}
         <ScrollView
@@ -244,11 +267,14 @@ export const HomeScreen = ({ navigation }: any) => {
         )}
       </ScrollView>
 
-      {/* Promotion Modal */}
-      <PromoModal 
-        visible={showPromoModal} 
-        onClose={() => setShowPromoModal(false)} 
-      />
+      {/* Promotion Modal - Chỉ hiển thị khi đã load xong dữ liệu phim để có ảnh thật */}
+      {showPromoModal && nowShowing.length > 0 && nowShowing[0].posterUrl && (
+        <PromoModal 
+          visible={showPromoModal} 
+          onClose={() => setShowPromoModal(false)} 
+          imageUrl={nowShowing[0].posterUrl.startsWith('http') ? nowShowing[0].posterUrl : `${IMAGE_BASE_URL}${nowShowing[0].posterUrl}`}
+        />
+      )}
 
       {/* FIXED: Prevent infinite re-render loop by using memoized callback */}
       {showSplash && <VideoSplashScreen onFinish={handleSplashFinish} />}

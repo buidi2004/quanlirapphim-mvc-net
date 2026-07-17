@@ -16,6 +16,11 @@ export const CinemaService = {
     return response.data;
   },
 
+  getGlobalShowtimes: async (date: string): Promise<any> => {
+    const response = await apiClient.get('/cinemas/global-showtimes', { params: { date } });
+    return response.data;
+  },
+
   getNearestCinemas: async (lat: number, lng: number, limit: number = 3): Promise<CinemasResponse> => {
     const response = await apiClient.get<CinemasResponse>(`/cinemas/nearest?lat=${lat}&lng=${lng}&limit=${limit}`);
     return response.data;

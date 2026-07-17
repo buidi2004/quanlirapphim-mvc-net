@@ -6,28 +6,37 @@ import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
 import * as Clipboard from 'expo-clipboard';
 
-const MOCK_PROMOS = [
-  {
-    id: '1',
-    code: 'GIAM20',
-    title: 'Giảm 20% giá vé thứ 3 vui vẻ',
-    discount: '20%',
-    expiry: '30/12/2026',
-    remaining: 45,
-    image: 'https://cdn.galaxycine.vn/media/2023/12/27/1125x400_1703648589278.jpg',
-  },
-  {
-    id: '2',
-    code: 'NEWUSER50',
-    title: 'Giảm 50k cho bạn mới',
-    discount: '50K',
-    expiry: '15/08/2026',
-    remaining: 120,
-    image: 'https://cdn.galaxycine.vn/media/2024/2/1/1125x400_1706781283621.jpg',
-  },
-];
+import { AppService } from '../../services/AppService';
 
 export const PromotionScreen = ({ navigation }: any) => {
+  const [promos, setPromos] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    fetchPromos();
+  }, []);
+
+  const fetchPromos = async () => {
+    try {
+      setLoading(true);
+      const res = await AppService.getPromotions();
+      if (res.success && res.data) {
+        setPromos(res.data.map((x: any) => ({
+          id: x.id?.toString(),
+          code: x.code || 'CODE',
+          title: x.name || x.title,
+          discount: x.discountAmount ? `${x.discountAmount}k` : 'Sale',
+          expiry: x.endDate || 'N/A',
+          remaining: 99,
+          image: x.imageUrl || 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800'
+        })));
+      }
+    } catch (e) {
+      console.log('Error fetching promos', e);
+    } finally {
+      setLoading(false);
+    }
+  };
   const copyPromoCode = async (code: string) => {
     await Clipboard.setStringAsync(code);
     if (Platform.OS === 'android') {
@@ -38,7 +47,7 @@ export const PromotionScreen = ({ navigation }: any) => {
     }
   };
 
-  const renderPromoCard = ({ item }: { item: typeof MOCK_PROMOS[0] }) => (
+  const renderPromoCard = ({ item }: { item: any }) => (
     <TouchableOpacity 
       style={styles.card}
       onPress={() => navigation.navigate('PromotionDetail', { promo: item })}
@@ -96,13 +105,17 @@ export const PromotionScreen = ({ navigation }: any) => {
         <Text style={styles.subHeaderText}>Đừng bỏ lỡ deal hot nhất! 🎫</Text>
       </View>
 
-      <FlatList
-        data={MOCK_PROMOS}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-        renderItem={renderPromoCard}
-      />
+      {loading ? (
+        <Text style={{color: '#fff', textAlign: 'center', marginTop: 20}}>Đang tải danh sách khuyến mãi...</Text>
+      ) : (
+        <FlatList
+          data={promos}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          renderItem={renderPromoCard}
+        />
+      )}
     </SafeAreaView>
   );
 };

@@ -2,12 +2,17 @@
 @{
     ViewData["Title"] = "Chọn ghế — " + Model.MovieTitle;
     Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.HideBottomNav = true;
 }
+
+<div class="container py-4">
+    @await Html.PartialAsync("_BookingStepper", 1)
+</div>
 
 <div class="row g-4">
     <!-- Cột trái: Sơ đồ ghế -->
     <div class="col-lg-8">
-        <div class="card border-0 shadow-lg" style="background-color: #1a1a2e !important; border: 1px solid #2d2d44 !important;">
+        <div class="card border-0 shadow-lg" style="background-color: #ffffff !important; border: 1px solid #e9ecef !important;">
             <div class="card-header bg-white border-bottom border-light p-3">
                 <h5 class="mb-1 text-warning fw-medium">
                     <i class="bi bi-grid-3x3-gap me-2"></i>CHỌN GHẾ NGỒI
@@ -27,7 +32,7 @@
 
     <!-- Cột phải: Thông tin đặt vé -->
     <div class="col-lg-4">
-        <div class="card border-0 shadow-lg sticky-top" style="top: 20px; background-color: #1a1a2e !important; border: 1px solid #2d2d44 !important;">
+        <div class="card border-0 shadow-lg sticky-top" style="top: 20px; background-color: #ffffff !important; border: 1px solid #e9ecef !important;">
             <div class="card-header bg-white border-bottom border-light p-3">
                 <h5 class="mb-0 fw-medium"><i class="bi bi-receipt me-2 text-warning"></i>THÔNG TIN ĐẶT VÉ</h5>
             </div>

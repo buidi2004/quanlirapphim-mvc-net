@@ -9,7 +9,9 @@ import { Theme } from '../../theme/tokens';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ReactNativeZoomableView } from '@openspacelabs/react-native-zoomable-view';
 import { Ionicons } from '@expo/vector-icons';
-import { ActivityIndicator } from 'react-native';
+import { ActivityIndicator, Platform } from 'react-native';
+import * as signalR from '@microsoft/signalr';
+import { API_BASE_URL } from '../../api/apiClient';
 
 const { width } = Dimensions.get('window');
 
@@ -25,6 +27,48 @@ export const SeatSelectionScreen = ({ route, navigation }: any) => {
 
   useEffect(() => {
     fetchSeatMap();
+    
+    // SignalR Connection
+    const hubUrl = `${API_BASE_URL}/seathub`;
+    const connection = new signalR.HubConnectionBuilder()
+      .withUrl(hubUrl)
+      .withAutomaticReconnect()
+      .build();
+
+    connection.start().then(() => {
+      console.log('SignalR Connected');
+      connection.invoke('JoinShowtimeGroup', Number(showtimeId));
+    }).catch(err => console.log('SignalR Connection Error: ', err));
+
+    connection.on('SeatHeld', (payload) => {
+      // payload.seatCodes is an array of strings e.g. ["C4", "C5"]
+      setData(prev => {
+        if (!prev) return prev;
+        const newSeats = prev.seats.map(s => 
+          payload.seatCodes.includes(s.code) 
+            ? { ...s, status: 'locked' } // Update status to locked
+            : s
+        );
+        return { ...prev, seats: newSeats };
+      });
+    });
+
+    connection.on('SeatReleased', (payload) => {
+      setData(prev => {
+        if (!prev) return prev;
+        const newSeats = prev.seats.map(s => 
+          payload.seatCodes.includes(s.code) 
+            ? { ...s, status: 'available' } // Revert status to available
+            : s
+        );
+        return { ...prev, seats: newSeats };
+      });
+    });
+
+    return () => {
+      connection.invoke('LeaveShowtimeGroup', Number(showtimeId)).catch(e => console.log(e));
+      connection.stop();
+    };
   }, [showtimeId]);
 
   const fetchSeatMap = async () => {
@@ -62,7 +106,7 @@ export const SeatSelectionScreen = ({ route, navigation }: any) => {
     setHolding(true);
     try {
       const res: any = await BookingService.holdSeats({
-        showtimeId: parseInt(showtimeId),
+        showtimeId: Number(showtimeId),
         seatCodes: selectedSeats.map(s => s.code)
       });
       
@@ -71,7 +115,14 @@ export const SeatSelectionScreen = ({ route, navigation }: any) => {
         navigation.navigate('Concession', { 
           selectedSeats, 
           showtimeId, 
-          ticketIds: holdResult.ticketIds 
+          ticketIds: holdResult.ticketIds,
+          expiryTime: holdResult.expiryTime,
+          remainingSeconds: holdResult.remainingSeconds,
+          movieTitle: data?.movieTitle,
+          roomName: data?.roomName,
+          showDate: data?.showDate,
+          startTime: data?.startTime,
+          cinemaName: data?.cinemaName
         });
       } else {
         Alert.alert('Lỗi', res.message || 'Không thể giữ ghế, vui lòng thử lại.');

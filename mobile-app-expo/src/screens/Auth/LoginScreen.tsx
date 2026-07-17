@@ -4,6 +4,7 @@ import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform
 import * as SecureStore from 'expo-secure-store';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
+import * as LocalAuthentication from 'expo-local-authentication';
 import { AuthService } from '../../services/AuthService';
 import { styles } from './styles';
 import { Theme } from '../../theme/tokens';
@@ -13,16 +14,48 @@ export const LoginScreen = ({ navigation }: any) => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isBiometricSupported, setIsBiometricSupported] = useState(false);
 
-  const handleLogin = async () => {
-    if (!email || !password) {
+  React.useEffect(() => {
+    (async () => {
+      const compatible = await LocalAuthentication.hasHardwareAsync();
+      const hasSavedCredentials = await SecureStore.getItemAsync('savedEmail');
+      setIsBiometricSupported(compatible && !!hasSavedCredentials);
+    })();
+  }, []);
+
+  const handleBiometricAuth = async () => {
+    try {
+      const result = await LocalAuthentication.authenticateAsync({
+        promptMessage: 'Đăng nhập vào CinemaX',
+        fallbackLabel: 'Sử dụng mật khẩu',
+      });
+      if (result.success) {
+        const savedEmail = await SecureStore.getItemAsync('savedEmail');
+        const savedPassword = await SecureStore.getItemAsync('savedPassword');
+        if (savedEmail && savedPassword) {
+          setEmail(savedEmail);
+          setPassword(savedPassword);
+          await handleLogin(savedEmail, savedPassword);
+        }
+      }
+    } catch (e) {
+      console.log('Biometric auth error', e);
+    }
+  };
+
+  const handleLogin = async (overrideEmail?: string, overridePassword?: string) => {
+    const e = overrideEmail || email;
+    const p = overridePassword || password;
+
+    if (!e || !p) {
       setError('Vui lòng nhập đầy đủ email và mật khẩu');
       return;
     }
     try {
       setLoading(true);
       setError(null);
-      const res = await AuthService.login(email, password);
+      const res = await AuthService.login(e, p);
       if (res.success && res.data?.token) {
         if (Platform.OS === 'web') {
           localStorage.setItem('userToken', res.data.token);
@@ -32,8 +65,10 @@ export const LoginScreen = ({ navigation }: any) => {
           if (res.data.refreshToken) {
             await SecureStore.setItemAsync('refreshToken', res.data.refreshToken);
           }
+          await SecureStore.setItemAsync('savedEmail', e);
+          await SecureStore.setItemAsync('savedPassword', p);
         }
-        navigation.replace('MainTabs');
+        navigation.replace('MainDrawer');
       } else {
         setError(res.message || 'Đăng nhập thất bại');
       }
@@ -72,11 +107,10 @@ export const LoginScreen = ({ navigation }: any) => {
               <Ionicons name="mail-outline" size={20} color="#888" style={styles.inputIcon} />
               <TextInput 
                 style={styles.input}
-                placeholder="Email của bạn..."
+                placeholder="Email hoặc Tên đăng nhập..."
                 placeholderTextColor="#aaa"
                 value={email}
                 onChangeText={setEmail}
-                keyboardType="email-address"
                 autoCapitalize="none"
               />
             </View>
@@ -97,9 +131,16 @@ export const LoginScreen = ({ navigation }: any) => {
               <Text style={styles.forgotText}>Quên mật khẩu?</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
+            <TouchableOpacity style={styles.button} onPress={() => handleLogin()} disabled={loading}>
               {loading ? <ActivityIndicator color="#000" /> : <Text style={styles.buttonText}>ĐĂNG NHẬP</Text>}
             </TouchableOpacity>
+
+            {isBiometricSupported && (
+              <TouchableOpacity style={{ marginTop: 20, alignItems: 'center' }} onPress={handleBiometricAuth}>
+                <Ionicons name="finger-print-outline" size={40} color={Theme.colors.warning} />
+                <Text style={{ color: Theme.colors.warning, fontSize: 12, marginTop: 4 }}>Đăng nhập bằng vân tay/FaceID</Text>
+              </TouchableOpacity>
+            )}
 
             <TouchableOpacity onPress={() => navigation.navigate('Register')}>
               <Text style={styles.linkText}>

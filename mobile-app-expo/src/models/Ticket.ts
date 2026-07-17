@@ -19,6 +19,7 @@ export interface MyTicketsResponse {
 export interface TicketDetail {
   id: number;
   showtimeId: number;
+  movieId: number;
   seatCode: string;
   status: string;
   totalPrice: number;

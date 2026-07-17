@@ -5,16 +5,19 @@ import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../theme/tokens';
 import { LinearGradient } from 'expo-linear-gradient';
 
+import { AuthService } from '../../services/AuthService';
+
 export const ResetPasswordScreen = ({ navigation }: any) => {
+  const [token, setToken] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleReset = () => {
-    if (!password || !confirmPassword) {
-      Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin.');
+  const handleReset = async () => {
+    if (!token || !password || !confirmPassword) {
+      Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin (Token và Mật khẩu).');
       return;
     }
     if (password.length < 8) {
@@ -26,13 +29,21 @@ export const ResetPasswordScreen = ({ navigation }: any) => {
       return;
     }
     
-    setLoading(true);
-    setTimeout(() => {
+    try {
+      setLoading(true);
+      const res = await AuthService.resetPassword(token, password);
+      if (res.success) {
+        Alert.alert('Thành công', res.message || 'Mật khẩu của bạn đã được cập nhật thành công.', [
+          { text: 'Đăng nhập', onPress: () => navigation.navigate('Login') }
+        ]);
+      } else {
+        Alert.alert('Lỗi', res.error || 'Token không hợp lệ hoặc đã hết hạn.');
+      }
+    } catch (e: any) {
+      Alert.alert('Lỗi', e.response?.data?.error || 'Không thể đặt lại mật khẩu. Vui lòng thử lại.');
+    } finally {
       setLoading(false);
-      Alert.alert('Thành công', 'Mật khẩu của bạn đã được cập nhật thành công. Vui lòng đăng nhập lại.', [
-        { text: 'Đăng nhập', onPress: () => navigation.navigate('Login') }
-      ]);
-    }, 1500);
+    }
   };
 
   return (
@@ -53,6 +64,19 @@ export const ResetPasswordScreen = ({ navigation }: any) => {
           </View>
 
           <View style={styles.form}>
+            <View style={styles.inputGroup}>
+              <View style={styles.inputIconWrapper}>
+                <Ionicons name="key-outline" size={20} color="#888" />
+              </View>
+              <TextInput
+                style={styles.input}
+                placeholder="Mã xác nhận (Token từ email)"
+                placeholderTextColor="#666"
+                value={token}
+                onChangeText={setToken}
+              />
+            </View>
+
             <View style={styles.inputGroup}>
               <View style={styles.inputIconWrapper}>
                 <Ionicons name="lock-closed-outline" size={20} color="#888" />

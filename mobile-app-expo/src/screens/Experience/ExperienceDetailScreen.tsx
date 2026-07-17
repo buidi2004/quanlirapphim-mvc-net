@@ -128,7 +128,10 @@ export const ExperienceDetailScreen = ({ navigation, route }: any) => {
           {/* CTA */}
           <TouchableOpacity
             style={[styles.bookBtn, { backgroundColor: exp.accent }]}
-            onPress={() => navigation.navigate('QuickBook')}
+            onPress={() => navigation.navigate('MainDrawer', {
+                screen: 'MainTabsDrawer',
+                params: { screen: 'BookingTab' },
+              } as any)}
           >
             <Ionicons name="ticket-outline" size={20} color="#fff" />
             <Text style={styles.bookBtnText}>🎟 ĐẶT VÉ NGAY</Text>

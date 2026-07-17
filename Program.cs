@@ -4,6 +4,8 @@ using CinemaXNet.Infrastructure.Repositories;
 using CinemaXNet.Application.Interfaces;
 using CinemaXNet.Application.Services;
 using CinemaXNet.Application.Interfaces;
+using CinemaXNet.Application.Services;
+using CinemaXNet.Hubs;
 using CinemaXNet.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -24,6 +26,7 @@ builder.Host.UseSerilog((ctx, lc) => lc
 
 // ── MVC ────────────────────────────────────────────────────────────────────
 builder.Services.AddControllersWithViews();
+builder.Services.AddSignalR();
 
 // ── Session ────────────────────────────────────────────────────────────────
 builder.Services.AddDistributedMemoryCache();
@@ -112,6 +115,7 @@ builder.Services.AddScoped<IFoodBeverageRepository, FoodBeverageRepository>();
 builder.Services.AddScoped<IScannerRepository, ScannerRepository>();
 builder.Services.AddScoped<IRefundRepository, RefundRepository>();
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
 // Đăng ký Services
 builder.Services.AddScoped<IJwtService, JwtService>();
@@ -137,6 +141,7 @@ builder.Services.AddScoped<IFoodBeverageService, FoodBeverageService>();
 builder.Services.AddScoped<IScannerService, ScannerService>();
 builder.Services.AddScoped<IRefundService, RefundService>();
 builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 // ── AutoMapper & MediatR ──────────────────────────────────────────────────
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
@@ -202,6 +207,8 @@ app.UseCors("AllowAll");
 app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapHub<SeatHub>("/seathub");
 
 // ── Routes ─────────────────────────────────────────────────────────────────
 // Attribute routes (defined in controllers with [Route] and [HttpGet/Post]) take priority.

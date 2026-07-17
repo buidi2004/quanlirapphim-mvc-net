@@ -3,13 +3,15 @@ using CinemaXNet.Application.Responses;
 using CinemaXNet.Application.DTOs;
 using CinemaXNet.Domain.Constants;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 using AutoMapper;
 
 namespace CinemaXNet.Controllers.Api;
 
 [ApiController]
 [Route("api/movies")]
-public class MovieApiController(IMovieService movieService, IReviewRepository reviewRepo, IMapper mapper) : ControllerBase
+public class MovieApiController(IMovieService movieService, IReviewRepository reviewRepo, ITicketRepository ticketRepo, IMapper mapper) : ControllerBase
 {
     [HttpGet("")]
     [ResponseCache(Duration = 300)] // Cache for 5 mins to optimize mobile load
@@ -40,5 +42,38 @@ public class MovieApiController(IMovieService movieService, IReviewRepository re
         var showDate = DateOnly.TryParse(date, out var d) ? d : DateOnly.FromDateTime(DateTime.Today);
         var showtimes = await movieService.GetShowtimesByDateAsync(id, showDate);
         return Ok(ApiResponse<object>.Ok(new { date = showDate.ToString("yyyy-MM-dd"), showtimes }));
+    }
+
+    public class ReviewRequest
+    {
+        public int Rating { get; set; }
+        public string Comment { get; set; } = "";
+    }
+
+    [HttpPost("{id}/reviews")]
+    [Authorize]
+    public async Task<IActionResult> AddReview(int id, [FromBody] ReviewRequest req)
+    {
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out var userId))
+            return Unauthorized(ApiResponse<object>.Fail("Invalid user token"));
+
+        var hasWatched = await ticketRepo.HasUserWatchedMovieAsync(userId, id);
+        if (!hasWatched)
+            return BadRequest(ApiResponse<object>.Fail("Bạn cần mua vé và xem phim này trước khi đánh giá."));
+
+        var username = User.FindFirst(ClaimTypes.Name)?.Value ?? "User";
+
+        var review = new CinemaXNet.Domain.Entities.Review
+        {
+            MovieId = id,
+            UserId = userId,
+            Rating = req.Rating,
+            Comment = req.Comment,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await reviewRepo.AddReviewAsync(review);
+        return Ok(ApiResponse<object>.Ok(new { message = "Đánh giá thành công" }));
     }
 }

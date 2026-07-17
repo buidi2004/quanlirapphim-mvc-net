@@ -1,0 +1,36 @@
+@model int
+<div class="booking-stepper d-flex justify-content-between align-items-center mb-4 position-relative px-2 px-md-5 mt-3">
+    <!-- Background line -->
+    <div class="stepper-line position-absolute top-50 start-0 w-100 bg-white border-top border-light" style="height: 4px; z-index: 1; transform: translateY(-15px);">
+        <!-- Active line -->
+        <div class="bg-purple h-100 transition-all shadow-sm" style="width: @((Model - 1) * 33.33)%;"></div>
+    </div>
+    
+    <div class="stepper-step text-center position-relative z-2 bg-transparent" style="background-color: var(--bg-primary) !important;">
+        <div class="stepper-circle mx-auto mb-2 rounded-circle d-flex align-items-center justify-content-center @(Model >= 1 ? "bg-purple text-white shadow-sm" : "bg-white text-secondary border border-light")" style="width: 36px; height: 36px; font-weight: bold; border: 2px solid @(Model >= 1 ? "var(--accent-purple)" : "#e2e8f0");">
+            @(Model > 1 ? Html.Raw("<i class='bi bi-check-lg'></i>") : "1")
+        </div>
+        <div class="stepper-label small fw-bold @(Model >= 1 ? "text-purple" : "text-secondary")">Chọn Ghế</div>
+    </div>
+    
+    <div class="stepper-step text-center position-relative z-2 bg-transparent" style="background-color: var(--bg-primary) !important; padding: 0 10px;">
+        <div class="stepper-circle mx-auto mb-2 rounded-circle d-flex align-items-center justify-content-center @(Model >= 2 ? "bg-purple text-white shadow-sm" : "bg-white text-secondary border border-light")" style="width: 36px; height: 36px; font-weight: bold; border: 2px solid @(Model >= 2 ? "var(--accent-purple)" : "#e2e8f0");">
+            @(Model > 2 ? Html.Raw("<i class='bi bi-check-lg'></i>") : "2")
+        </div>
+        <div class="stepper-label small fw-bold @(Model >= 2 ? "text-purple" : "text-secondary")">Bắp Nước</div>
+    </div>
+    
+    <div class="stepper-step text-center position-relative z-2 bg-transparent" style="background-color: var(--bg-primary) !important; padding: 0 10px;">
+        <div class="stepper-circle mx-auto mb-2 rounded-circle d-flex align-items-center justify-content-center @(Model >= 3 ? "bg-purple text-white shadow-sm" : "bg-white text-secondary border border-light")" style="width: 36px; height: 36px; font-weight: bold; border: 2px solid @(Model >= 3 ? "var(--accent-purple)" : "#e2e8f0");">
+            @(Model > 3 ? Html.Raw("<i class='bi bi-check-lg'></i>") : "3")
+        </div>
+        <div class="stepper-label small fw-bold @(Model >= 3 ? "text-purple" : "text-secondary")">Thanh Toán</div>
+    </div>
+    
+    <div class="stepper-step text-center position-relative z-2 bg-transparent" style="background-color: var(--bg-primary) !important; padding: 0 10px;">
+        <div class="stepper-circle mx-auto mb-2 rounded-circle d-flex align-items-center justify-content-center @(Model >= 4 ? "bg-purple text-white shadow-sm" : "bg-white text-secondary border border-light")" style="width: 36px; height: 36px; font-weight: bold; border: 2px solid @(Model >= 4 ? "var(--accent-purple)" : "#e2e8f0");">
+            4
+        </div>
+        <div class="stepper-label small fw-bold @(Model >= 4 ? "text-purple" : "text-secondary")">Hoàn Tất</div>
+    </div>
+</div>
