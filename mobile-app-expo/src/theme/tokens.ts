@@ -10,8 +10,8 @@ export const DarkColors = {
   accentLight: 'rgba(229,9,20,0.15)',
   gold: '#FFD700',
   goldLight: 'rgba(255,215,0,0.15)',
-  warning: '#ffc107',
-  warningLight: 'rgba(255,193,7,0.12)',
+  warning: '#6f42c1',
+  warningLight: 'rgba(111,66,193,0.12)',
 
   // Dark theme (default)
   background: '#0d0d0d',
@@ -83,16 +83,16 @@ export const Spacing = {
   xxl: 48,
 };
 
-// iOS-Native Rounded Corners — Chuẩn bo cong kiểu iOS
+// iOS-Native Rounded Corners — Chuẩn bo cong kiểu iOS (Tối giản hơn)
 export const Radius = {
-  xs: 6,      // Badge nhỏ, seat ghế
-  sm: 8,      // Badge, small chips
-  md: 12,     // Input fields, small buttons
-  btn: 14,    // Buttons chính (CTA)
-  lg: 16,     // Cards nhỏ, section items
-  card: 20,   // Cards lớn (movie card, payment card, promo card)
-  xl: 24,     // Sections, modals, bottom sheets
-  dock: 28,   // Floating Dock Tab Bar
+  xs: 4,      // Badge nhỏ, seat ghế
+  sm: 6,      // Badge, small chips
+  md: 8,      // Input fields, small buttons
+  btn: 8,     // Buttons chính (CTA)
+  lg: 10,     // Cards nhỏ, section items
+  card: 12,   // Cards lớn (movie card, payment card, promo card)
+  xl: 16,     // Sections, modals, bottom sheets
+  dock: 20,   // Floating Dock Tab Bar
   pill: 999,  // Rounded pill (tags, status chips)
 };
 
@@ -128,12 +128,12 @@ export const Shadows = {
 };
 
 export const Typography = {
-  hero: { fontSize: 28, fontWeight: '800' as const, letterSpacing: -0.5 },
-  sectionTitle: { fontSize: 18, fontWeight: '700' as const, letterSpacing: 0.5 },
-  cardTitle: { fontSize: 16, fontWeight: '700' as const },
+  hero: { fontSize: 28, fontWeight: '700' as const, letterSpacing: -0.5 },
+  sectionTitle: { fontSize: 18, fontWeight: '600' as const, letterSpacing: 0.5 },
+  cardTitle: { fontSize: 16, fontWeight: '600' as const },
   body: { fontSize: 14, fontWeight: '400' as const, lineHeight: 22 },
   caption: { fontSize: 12, fontWeight: '400' as const },
-  price: { fontSize: 20, fontWeight: '800' as const },
+  price: { fontSize: 20, fontWeight: '700' as const },
 };
 
 // Backward compat alias

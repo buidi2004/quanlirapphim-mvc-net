@@ -242,7 +242,7 @@ export const AppNavigator = () => {
         }}
       >
         {/* Main Drawer (Wraps Tabs) */}
-        <Stack.Screen name="MainDrawer" component={MainDrawerNavigator} />
+        <Stack.Screen name="MainTabs" component={MainDrawerNavigator} />
 
         {/* ======================= */}
         {/* DEFAULT SLIDE GROUP     */}

@@ -10,7 +10,7 @@ public class MovieRepository(IDbConnection db) : IMovieRepository
 {
     public async Task<Movie?> FindByIdAsync(int id)
     {
-        const string sql = "SELECT id, title, poster_url AS PosterUrl, genre, status, duration_minutes AS DurationMinutes, description, age_rating AS AgeRating, director AS Director, [cast] AS Cast, created_at AS CreatedAt FROM movies WHERE id = @id";
+        const string sql = "SELECT id, title, poster_url AS PosterUrl, genre, status, duration_minutes AS DurationMinutes, description, age_rating AS AgeRating, director AS Director, `cast` AS `Cast`, created_at AS CreatedAt FROM movies WHERE id = @id";
         return await db.QueryFirstOrDefaultAsync<Movie>(sql, new { id });
     }
 
@@ -75,7 +75,7 @@ public class MovieRepository(IDbConnection db) : IMovieRepository
         var sql = @"
             SELECT id, title, poster_url AS PosterUrl, genre, status,
                    duration_minutes AS DurationMinutes, age_rating AS AgeRating,
-                   director AS Director, [cast] AS Cast
+                   director AS Director, `cast` AS `Cast`
             FROM movies WHERE 1=1
             AND (LOWER(title) LIKE @q OR LOWER(genre) LIKE @q OR LOWER(description) LIKE @q)";
 
@@ -97,9 +97,9 @@ public class MovieRepository(IDbConnection db) : IMovieRepository
     public async Task<int> CreateAsync(Movie movie)
     {
         const string sql = @"
-            INSERT INTO movies (title, poster_url, genre, status, duration_minutes, description, age_rating, director, [cast])
+            INSERT INTO movies (title, poster_url, genre, status, duration_minutes, description, age_rating, director, `cast`)
             VALUES (@Title, @PosterUrl, @Genre, @Status, @DurationMinutes, @Description, @AgeRating, @Director, @Cast);
-            SELECT last_insert_rowid();";
+            SELECT LAST_INSERT_ID();";
         return await db.ExecuteScalarAsync<int>(sql, movie);
     }
 
@@ -115,7 +115,7 @@ public class MovieRepository(IDbConnection db) : IMovieRepository
                 description = @Description, 
                 age_rating = @AgeRating,
                 director = @Director,
-                [cast] = @Cast
+                `cast` = @Cast
             WHERE id = @Id";
         movie.Id = id;
         return await db.ExecuteAsync(sql, movie);

@@ -55,7 +55,7 @@ public class TicketRepository(IDbConnection db) : ITicketRepository
         const string sql = @"
             INSERT INTO tickets (showtime_id, user_id, seat_code, status, hold_expiry_time, total_price, version)
             VALUES (@ShowtimeId, @UserId, @SeatCode, @Status, @HoldExpiryTime, @TotalPrice, @Version);
-            SELECT last_insert_rowid();";
+            SELECT LAST_INSERT_ID();";
         return await db.ExecuteScalarAsync<int>(sql, ticket);
     }
 
@@ -108,7 +108,7 @@ public class TicketRepository(IDbConnection db) : ITicketRepository
         const string sql = @"
             UPDATE tickets
             SET status = 'cancelled', hold_expiry_time = NULL
-            WHERE status = 'holding' AND hold_expiry_time < datetime('now')";
+            WHERE status = 'holding' AND hold_expiry_time < NOW()";
         return await db.ExecuteAsync(sql);
     }
 

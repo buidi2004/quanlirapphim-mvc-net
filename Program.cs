@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.Data.Sqlite;
+using MySqlConnector;
 using Serilog;
 using CinemaXNet.Infrastructure.Middleware;
 using System.Reflection;
@@ -81,11 +81,11 @@ builder.Services.AddCors(options =>
                         .AllowCredentials());
 });
 
-// ── Database (Dapper + SQLite) ────────────────────────────────────
+// ── Database (Dapper + MySQL) ─────────────────────────────────────
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
-builder.Services.AddScoped<IDbConnection>(_ => new SqliteConnection(connectionString));
+builder.Services.AddScoped<IDbConnection>(_ => new MySqlConnection(connectionString));
 
-// Initialize SQLite database schema and seed data
+// Initialize MySQL database schema and seed data
 DatabaseInitializer.Initialize(connectionString);
 Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 Dapper.SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());

@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
   showtimeDuration: { color: Theme.colors.textSecondary, fontSize: 12 },
   timesRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   timeChip: {
-    backgroundColor: 'rgba(255,193,7,0.1)', paddingHorizontal: 14, paddingVertical: 8,
+    backgroundColor: 'rgba(111,66,193,0.1)', paddingHorizontal: 14, paddingVertical: 8,
     borderRadius: Theme.radius.md, borderWidth: 1, borderColor: Theme.colors.warning,
   },
   timeText: { color: Theme.colors.warning, fontSize: 14, fontWeight: 'bold' },

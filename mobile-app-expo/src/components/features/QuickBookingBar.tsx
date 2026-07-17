@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   iconContainer: {
-    backgroundColor: 'rgba(255, 193, 7, 0.1)', // gold with opacity
+    backgroundColor: 'rgba(111, 66, 193, 0.1)', // gold with opacity
     padding: 10,
     borderRadius: 12,
   },

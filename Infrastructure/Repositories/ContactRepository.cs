@@ -27,7 +27,7 @@ public class ContactRepository(IDbConnection db) : IContactRepository
         var sql = @"
             INSERT INTO contacts (name, email, phone, subject, message, status)
             VALUES (@name, @email, @phone, @subject, @message, 'pending');
-            SELECT last_insert_rowid();";
+            SELECT LAST_INSERT_ID();";
         return await db.QuerySingleAsync<int>(sql, (object)contact);
     }
 

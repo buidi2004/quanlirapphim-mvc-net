@@ -66,13 +66,13 @@ public class CinemaRepository(IDbConnection db) : ICinemaRepository
 
     public async Task<int> CreateAsync(Cinema cinema)
     {
-        var sql = "INSERT INTO cinemas (name, address, province, phone) VALUES (@Name, @Address, @Province, @Phone); SELECT last_insert_rowid();";
+        var sql = "INSERT INTO cinemas (name, address, province, phone) VALUES (@Name, @Address, @Province, @Phone); SELECT LAST_INSERT_ID();";
         return await db.ExecuteScalarAsync<int>(sql, cinema);
     }
 
     public async Task<int> UpdateAsync(int id, Cinema cinema)
     {
-        var sql = "UPDATE cinemas SET name = @Name, address = @Address, province = @Province, phone = @Phone, updated_at = datetime('now') WHERE id = @Id";
+        var sql = "UPDATE cinemas SET name = @Name, address = @Address, province = @Province, phone = @Phone, updated_at = NOW() WHERE id = @Id";
         cinema.Id = id;
         return await db.ExecuteAsync(sql, cinema);
     }

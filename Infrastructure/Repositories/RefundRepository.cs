@@ -17,7 +17,7 @@ public class RefundRepository(IDbConnection db) : IRefundRepository
             JOIN movies m ON s.movie_id = m.id
             JOIN rooms r ON s.room_id = r.id
             JOIN users u ON t.user_id = u.id
-            WHERE (CAST(t.id AS TEXT) = @query OR u.email LIKE @queryLike OR u.phone LIKE @queryLike)
+            WHERE (CAST(t.id AS CHAR) = @query OR u.email LIKE @queryLike OR u.phone LIKE @queryLike)
             ORDER BY t.booked_at DESC
             LIMIT 20
         """;

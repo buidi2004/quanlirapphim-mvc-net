@@ -8,6 +8,8 @@
 **/.toolstarget
 **/.vs
 **/.vscode
+**/.kiro
+**/.agents
 **/*.*proj.user
 **/*.dbmdl
 **/*.jfm
@@ -26,8 +28,33 @@
 **/TestResults
 **/web.Debug.config
 **/web.Release.config
+
+# SQLite files (no longer needed)
+cinema_db.db
 cinema_db.db-wal
 cinema_db.db-shm
 
+# Documentation & scripts (not needed in container)
+*.md
+*.txt
+*.py
+*.sh
+backup.sql
+dl.py
+download-images.js
+download-images.py
+fetch-posters.js
+get-wiki-images.js
+search-wiki.js
+test-e2e.js
+wiki-download.js
+package.json
+package-lock.json
+
+# Mobile app & tests
 mobile-app-expo/
+tests/
 quanlirapphim-mvc-net-main/
+
+# Logs
+logs.txt

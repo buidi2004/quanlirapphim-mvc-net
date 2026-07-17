@@ -1,246 +1,234 @@
 using System.Data;
 using Dapper;
-using Microsoft.Data.Sqlite;
+using MySqlConnector;
 
 namespace CinemaXNet.Infrastructure.Data;
 
 /// <summary>
-/// Tạo schema SQLite và seed dữ liệu mẫu khi app khởi động lần đầu.
+/// Tạo schema MySQL và seed dữ liệu mẫu khi app khởi động lần đầu.
 /// </summary>
 public static class DatabaseInitializer
 {
     public static void Initialize(string connectionString)
     {
-        using var db = new SqliteConnection(connectionString);
+        using var db = new MySqlConnection(connectionString);
         db.Open();
-
-        // FK enforcement
-        db.Execute("PRAGMA foreign_keys = ON;");
-        db.Execute("PRAGMA journal_mode = WAL;");
 
         // ── Tables ─────────────────────────────────────────────────────────
         db.Execute("""
             CREATE TABLE IF NOT EXISTS users (
-                id               INTEGER PRIMARY KEY AUTOINCREMENT,
-                username         TEXT    NOT NULL,
-                email            TEXT    NOT NULL UNIQUE,
-                password_hash    TEXT    NOT NULL,
-                role             TEXT    NOT NULL DEFAULT 'user'
-                                          CHECK (role IN ('admin','cinema_manager','staff','user')),
-                full_name        TEXT,
-                phone            TEXT,
-                avatar_url       TEXT,
-                date_of_birth    TEXT,
-                gender           TEXT    NOT NULL DEFAULT 'other',
-                city             TEXT,
-                member_level     TEXT    NOT NULL DEFAULT 'bronze',
-                total_spent      REAL    NOT NULL DEFAULT 0,
-                loyalty_points   INTEGER NOT NULL DEFAULT 0,
-                reset_token      TEXT,
-                reset_token_expiry TEXT,
-                refresh_token    TEXT,
-                refresh_token_expiry TEXT,
-                created_at       TEXT    NOT NULL DEFAULT (datetime('now')),
-                updated_at       TEXT    NOT NULL DEFAULT (datetime('now'))
-            );
+                id               INT AUTO_INCREMENT PRIMARY KEY,
+                username         VARCHAR(100)  NOT NULL,
+                email            VARCHAR(255)  NOT NULL UNIQUE,
+                password_hash    VARCHAR(255)  NOT NULL,
+                role             VARCHAR(20)   NOT NULL DEFAULT 'user',
+                full_name        VARCHAR(200),
+                phone            VARCHAR(20),
+                avatar_url       VARCHAR(500),
+                date_of_birth    VARCHAR(20),
+                gender           VARCHAR(10)   NOT NULL DEFAULT 'other',
+                city             VARCHAR(100),
+                member_level     VARCHAR(20)   NOT NULL DEFAULT 'bronze',
+                total_spent      DECIMAL(18,2) NOT NULL DEFAULT 0,
+                loyalty_points   INT           NOT NULL DEFAULT 0,
+                reset_token      VARCHAR(255),
+                reset_token_expiry VARCHAR(50),
+                refresh_token    VARCHAR(500),
+                refresh_token_expiry VARCHAR(50),
+                created_at       DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at       DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         """);
 
         db.Execute("""
             CREATE TABLE IF NOT EXISTS movies (
-                id               INTEGER PRIMARY KEY AUTOINCREMENT,
-                title            TEXT    NOT NULL,
-                poster_url       TEXT,
-                genre            TEXT,
-                status           TEXT    NOT NULL DEFAULT 'coming_soon'
-                                          CHECK (status IN ('now_showing','coming_soon','ended')),
-                duration_minutes INTEGER NOT NULL CHECK (duration_minutes > 0),
+                id               INT AUTO_INCREMENT PRIMARY KEY,
+                title            VARCHAR(300)  NOT NULL,
+                poster_url       VARCHAR(500),
+                genre            VARCHAR(100),
+                status           VARCHAR(20)   NOT NULL DEFAULT 'coming_soon',
+                duration_minutes INT           NOT NULL,
                 description      TEXT,
-                age_rating       TEXT,
-                director         TEXT,
-                cast             TEXT,
-                created_at       TEXT    NOT NULL DEFAULT (datetime('now'))
-            );
+                age_rating       VARCHAR(10),
+                director         VARCHAR(200),
+                `cast`           TEXT,
+                created_at       DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         """);
 
         db.Execute("""
             CREATE TABLE IF NOT EXISTS cinemas (
-                id             INTEGER PRIMARY KEY AUTOINCREMENT,
-                name           TEXT    NOT NULL,
-                slug           TEXT    NOT NULL UNIQUE,
-                province       TEXT    NOT NULL,
-                district       TEXT    NOT NULL,
-                address        TEXT    NOT NULL,
-                phone          TEXT,
-                email          TEXT,
-                latitude       REAL,
-                longitude      REAL,
-                image_url      TEXT,
-                opening_hours  TEXT    NOT NULL DEFAULT '08:00 - 23:30',
+                id             INT AUTO_INCREMENT PRIMARY KEY,
+                name           VARCHAR(200)  NOT NULL,
+                slug           VARCHAR(200)  NOT NULL UNIQUE,
+                province       VARCHAR(100)  NOT NULL,
+                district       VARCHAR(100)  NOT NULL,
+                address        VARCHAR(500)  NOT NULL,
+                phone          VARCHAR(20),
+                email          VARCHAR(255),
+                latitude       DOUBLE,
+                longitude      DOUBLE,
+                image_url      VARCHAR(500),
+                opening_hours  VARCHAR(50)   NOT NULL DEFAULT '08:00 - 23:30',
                 description    TEXT,
                 facilities     TEXT,
-                is_active      INTEGER NOT NULL DEFAULT 1,
-                created_at     TEXT    NOT NULL DEFAULT (datetime('now'))
-            );
+                is_active      TINYINT(1)    NOT NULL DEFAULT 1,
+                created_at     DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         """);
 
         db.Execute("""
             CREATE TABLE IF NOT EXISTS rooms (
-                id            INTEGER PRIMARY KEY AUTOINCREMENT,
-                cinema_id     INTEGER REFERENCES cinemas(id) DEFAULT 1,
-                name          TEXT    NOT NULL UNIQUE,
-                total_rows    INTEGER NOT NULL CHECK (total_rows > 0),
-                seats_per_row INTEGER NOT NULL CHECK (seats_per_row > 0),
-                layout_json   TEXT
-            );
+                id            INT AUTO_INCREMENT PRIMARY KEY,
+                cinema_id     INT DEFAULT 1,
+                name          VARCHAR(100)  NOT NULL UNIQUE,
+                total_rows    INT           NOT NULL,
+                seats_per_row INT           NOT NULL,
+                layout_json   TEXT,
+                FOREIGN KEY (cinema_id) REFERENCES cinemas(id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         """);
 
         db.Execute("""
             CREATE TABLE IF NOT EXISTS showtimes (
-                id          INTEGER PRIMARY KEY AUTOINCREMENT,
-                movie_id    INTEGER NOT NULL REFERENCES movies(id) ON DELETE CASCADE,
-                room_id     INTEGER NOT NULL REFERENCES rooms(id),
-                show_date   TEXT    NOT NULL,
-                start_time  TEXT    NOT NULL,
-                price       REAL    NOT NULL CHECK (price >= 0),
-                created_at  TEXT    NOT NULL DEFAULT (datetime('now')),
-                UNIQUE (room_id, show_date, start_time)
-            );
+                id          INT AUTO_INCREMENT PRIMARY KEY,
+                movie_id    INT           NOT NULL,
+                room_id     INT           NOT NULL,
+                show_date   VARCHAR(20)   NOT NULL,
+                start_time  VARCHAR(20)   NOT NULL,
+                price       DECIMAL(18,2) NOT NULL,
+                created_at  DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE KEY uk_room_date_time (room_id, show_date, start_time),
+                FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE CASCADE,
+                FOREIGN KEY (room_id) REFERENCES rooms(id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         """);
 
         db.Execute("""
             CREATE TABLE IF NOT EXISTS tickets (
-                id               INTEGER PRIMARY KEY AUTOINCREMENT,
-                showtime_id      INTEGER NOT NULL REFERENCES showtimes(id) ON DELETE CASCADE,
-                user_id          INTEGER NOT NULL REFERENCES users(id),
-                seat_code        TEXT    NOT NULL,
-                status           TEXT    NOT NULL DEFAULT 'holding'
-                                          CHECK (status IN ('holding','paid','cancelled','used')),
-                hold_expiry_time TEXT,
-                total_price      REAL    NOT NULL DEFAULT 0 CHECK (total_price >= 0),
-                promotion_code   TEXT,
-                version          INTEGER NOT NULL DEFAULT 0,
-                booked_at        TEXT    NOT NULL DEFAULT (datetime('now'))
-            );
+                id               INT AUTO_INCREMENT PRIMARY KEY,
+                showtime_id      INT           NOT NULL,
+                user_id          INT           NOT NULL,
+                seat_code        VARCHAR(10)   NOT NULL,
+                status           VARCHAR(20)   NOT NULL DEFAULT 'holding',
+                hold_expiry_time VARCHAR(50),
+                total_price      DECIMAL(18,2) NOT NULL DEFAULT 0,
+                promotion_code   VARCHAR(50),
+                version          INT           NOT NULL DEFAULT 0,
+                booked_at        DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (showtime_id) REFERENCES showtimes(id) ON DELETE CASCADE,
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         """);
 
         db.Execute("""
             CREATE TABLE IF NOT EXISTS promotions (
-                id             INTEGER PRIMARY KEY AUTOINCREMENT,
-                code           TEXT    NOT NULL UNIQUE,
-                discount_type  TEXT    NOT NULL CHECK (discount_type IN ('percent','fixed')),
-                discount_value REAL    NOT NULL CHECK (discount_value > 0),
-                max_uses       INTEGER,
-                used_count     INTEGER NOT NULL DEFAULT 0,
-                expires_at     TEXT,
-                is_active      INTEGER NOT NULL DEFAULT 1
-            );
+                id             INT AUTO_INCREMENT PRIMARY KEY,
+                code           VARCHAR(50)   NOT NULL UNIQUE,
+                discount_type  VARCHAR(20)   NOT NULL,
+                discount_value DECIMAL(18,2) NOT NULL,
+                max_uses       INT,
+                used_count     INT           NOT NULL DEFAULT 0,
+                expires_at     VARCHAR(50),
+                is_active      TINYINT(1)    NOT NULL DEFAULT 1
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         """);
-
-
 
         db.Execute("""
             CREATE TABLE IF NOT EXISTS contacts (
-                id            INTEGER PRIMARY KEY AUTOINCREMENT,
-                name          TEXT    NOT NULL,
-                email         TEXT    NOT NULL,
-                phone         TEXT,
-                subject       TEXT,
-                message       TEXT    NOT NULL,
-                is_read       INTEGER NOT NULL DEFAULT 0,
-                status        TEXT    NOT NULL DEFAULT 'pending',
+                id            INT AUTO_INCREMENT PRIMARY KEY,
+                name          VARCHAR(200)  NOT NULL,
+                email         VARCHAR(255)  NOT NULL,
+                phone         VARCHAR(20),
+                subject       VARCHAR(300),
+                message       TEXT          NOT NULL,
+                is_read       TINYINT(1)    NOT NULL DEFAULT 0,
+                status        VARCHAR(20)   NOT NULL DEFAULT 'pending',
                 reply_message TEXT,
-                replied_at    TEXT,
-                created_at    TEXT    NOT NULL DEFAULT (datetime('now'))
-            );
+                replied_at    VARCHAR(50),
+                created_at    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         """);
-
-        try { db.Execute("ALTER TABLE contacts ADD COLUMN phone TEXT;"); } catch {}
-        try { db.Execute("ALTER TABLE contacts ADD COLUMN status TEXT NOT NULL DEFAULT 'pending';"); } catch {}
-        try { db.Execute("ALTER TABLE contacts ADD COLUMN reply_message TEXT;"); } catch {}
-        try { db.Execute("ALTER TABLE contacts ADD COLUMN replied_at TEXT;"); } catch {}
-        try { db.Execute("ALTER TABLE users ADD COLUMN refresh_token TEXT;"); } catch {}
-        try { db.Execute("ALTER TABLE users ADD COLUMN refresh_token_expiry TEXT;"); } catch {}
-        try { db.Execute("ALTER TABLE movies ADD COLUMN director TEXT;"); } catch {}
-        try { db.Execute("ALTER TABLE movies ADD COLUMN cast TEXT;"); } catch {}
-
-        db.Execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_seat ON tickets (showtime_id, seat_code) WHERE status IN ('holding', 'paid');");
 
         db.Execute("""
             CREATE TABLE IF NOT EXISTS food_beverages (
-                id             INTEGER PRIMARY KEY AUTOINCREMENT,
-                name           TEXT    NOT NULL,
+                id             INT AUTO_INCREMENT PRIMARY KEY,
+                name           VARCHAR(200)  NOT NULL,
                 description    TEXT,
-                price          REAL    NOT NULL CHECK (price >= 0),
-                image_url      TEXT,
-                stock_quantity INTEGER NOT NULL DEFAULT 0
-            );
+                price          DECIMAL(18,2) NOT NULL,
+                image_url      VARCHAR(500),
+                stock_quantity INT           NOT NULL DEFAULT 0
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         """);
 
         db.Execute("""
             CREATE TABLE IF NOT EXISTS reviews (
-                id         INTEGER PRIMARY KEY AUTOINCREMENT,
-                movie_id   INTEGER NOT NULL REFERENCES movies(id) ON DELETE CASCADE,
-                user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-                rating     INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
-                comment    TEXT    NOT NULL,
-                created_at TEXT    NOT NULL DEFAULT (datetime('now'))
-            );
+                id         INT AUTO_INCREMENT PRIMARY KEY,
+                movie_id   INT           NOT NULL,
+                user_id    INT           NOT NULL,
+                rating     INT           NOT NULL,
+                comment    TEXT          NOT NULL,
+                created_at DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE CASCADE,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         """);
 
         db.Execute("""
             CREATE TABLE IF NOT EXISTS audit_logs (
-                id           INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id      INTEGER NOT NULL REFERENCES users(id),
-                action       TEXT    NOT NULL,
-                entity_name  TEXT,
-                entity_id    TEXT,
+                id           INT AUTO_INCREMENT PRIMARY KEY,
+                user_id      INT           NOT NULL,
+                action       VARCHAR(100)  NOT NULL,
+                entity_name  VARCHAR(100),
+                entity_id    VARCHAR(50),
                 details      TEXT,
-                created_at   TEXT    NOT NULL DEFAULT (datetime('now'))
-            );
+                created_at   DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         """);
 
         db.Execute("""
             CREATE TABLE IF NOT EXISTS membership_tiers (
-                id               INTEGER PRIMARY KEY AUTOINCREMENT,
-                name             TEXT    NOT NULL UNIQUE,
-                min_spent        REAL    NOT NULL DEFAULT 0,
-                discount_percent REAL    NOT NULL DEFAULT 0,
+                id               INT AUTO_INCREMENT PRIMARY KEY,
+                name             VARCHAR(50)   NOT NULL UNIQUE,
+                min_spent        DECIMAL(18,2) NOT NULL DEFAULT 0,
+                discount_percent DECIMAL(5,2)  NOT NULL DEFAULT 0,
                 benefits         TEXT
-            );
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         """);
 
         db.Execute("""
             CREATE TABLE IF NOT EXISTS pricing_rules (
-                id               INTEGER PRIMARY KEY AUTOINCREMENT,
-                name             TEXT    NOT NULL,
-                condition_type   TEXT    NOT NULL CHECK (condition_type IN ('DayOfWeek', 'TimeOfDay')),
-                condition_value  TEXT    NOT NULL,
-                adjustment_type  TEXT    NOT NULL CHECK (adjustment_type IN ('Percent', 'Fixed')),
-                adjustment_value REAL    NOT NULL,
-                is_active        INTEGER NOT NULL DEFAULT 1
-            );
+                id               INT AUTO_INCREMENT PRIMARY KEY,
+                name             VARCHAR(200)  NOT NULL,
+                condition_type   VARCHAR(20)   NOT NULL,
+                condition_value  VARCHAR(100)  NOT NULL,
+                adjustment_type  VARCHAR(20)   NOT NULL,
+                adjustment_value DECIMAL(18,2) NOT NULL,
+                is_active        TINYINT(1)    NOT NULL DEFAULT 1
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         """);
 
         db.Execute("""
             CREATE TABLE IF NOT EXISTS marketing_campaigns (
-                id              INTEGER PRIMARY KEY AUTOINCREMENT,
-                name            TEXT    NOT NULL,
-                type            TEXT    NOT NULL CHECK (type IN ('Email', 'SMS')),
-                target_audience TEXT    NOT NULL CHECK (target_audience IN ('All', 'VIP', 'Inactive')),
-                content         TEXT    NOT NULL,
-                status          TEXT    NOT NULL DEFAULT 'Draft' CHECK (status IN ('Draft', 'Scheduled', 'Sent')),
-                scheduled_at    TEXT,
-                sent_count      INTEGER NOT NULL DEFAULT 0,
-                created_at      TEXT    NOT NULL DEFAULT (datetime('now'))
-            );
+                id              INT AUTO_INCREMENT PRIMARY KEY,
+                name            VARCHAR(200)  NOT NULL,
+                type            VARCHAR(10)   NOT NULL,
+                target_audience VARCHAR(20)   NOT NULL,
+                content         TEXT          NOT NULL,
+                status          VARCHAR(20)   NOT NULL DEFAULT 'Draft',
+                scheduled_at    VARCHAR(50),
+                sent_count      INT           NOT NULL DEFAULT 0,
+                created_at      DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         """);
 
         db.Execute("""
             CREATE TABLE IF NOT EXISTS settings (
-                id            INTEGER PRIMARY KEY AUTOINCREMENT,
-                setting_key   TEXT    NOT NULL UNIQUE,
+                id            INT AUTO_INCREMENT PRIMARY KEY,
+                setting_key   VARCHAR(100)  NOT NULL UNIQUE,
                 setting_value TEXT
-            );
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         """);
 
         // ── Seed if empty ───────────────────────────────────────────────────
@@ -345,7 +333,7 @@ public static class DatabaseInitializer
              'Câu chuyện về cuộc đời và những tranh cãi xung quanh cha đẻ của bom nguyên tử J. Robert Oppenheimer.',
              'C16'),
             ('The Nighthawk',
-             'https://placehold.co/400x600/1a1a2e/ffc107?text=The+Nighthawk',
+             'https://placehold.co/400x600/1a1a2e/6f42c1?text=The+Nighthawk',
              'Hành động', 'coming_soon', 124,
              'Người hùng bóng đêm với bộ giáp công nghệ tối tân đứng lên chống lại liên minh tội phạm ngầm.',
              'P'),
@@ -376,8 +364,6 @@ public static class DatabaseInitializer
             ('GIAM20',  'percent', 20, 100, 1),
             ('GIAM50K', 'fixed',   50000, 50, 1);
         """);
-
-
 
         // Seed Food and Beverages
         db.Execute("""

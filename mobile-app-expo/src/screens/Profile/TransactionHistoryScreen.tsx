@@ -45,7 +45,7 @@ export const TransactionHistoryScreen = ({ navigation }: any) => {
       case 'paid':
         return <View style={[styles.statusBadge, { backgroundColor: 'rgba(76, 175, 80, 0.2)' }]}><Text style={[styles.statusText, { color: '#4CAF50' }]}>✅ Đã TT</Text></View>;
       case 'holding':
-        return <View style={[styles.statusBadge, { backgroundColor: 'rgba(255, 193, 7, 0.2)' }]}><Text style={[styles.statusText, { color: Theme.colors.gold }]}>⏳ Đang giữ</Text></View>;
+        return <View style={[styles.statusBadge, { backgroundColor: 'rgba(111, 66, 193, 0.2)' }]}><Text style={[styles.statusText, { color: Theme.colors.gold }]}>⏳ Đang giữ</Text></View>;
       case 'cancelled':
         return <View style={[styles.statusBadge, { backgroundColor: 'rgba(244, 67, 54, 0.2)' }]}><Text style={[styles.statusText, { color: '#F44336' }]}>❌ Đã hủy</Text></View>;
       default:
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     borderColor: Theme.colors.cardBorder,
   },
   tabActive: {
-    backgroundColor: 'rgba(255, 193, 7, 0.1)',
+    backgroundColor: 'rgba(111, 66, 193, 0.1)',
     borderColor: Theme.colors.gold,
   },
   tabText: {
@@ -192,10 +192,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     margin: Theme.spacing.md,
     padding: 16,
-    backgroundColor: 'rgba(255, 193, 7, 0.05)',
+    backgroundColor: 'rgba(111, 66, 193, 0.05)',
     borderRadius: Theme.radius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255, 193, 7, 0.2)',
+    borderColor: 'rgba(111, 66, 193, 0.2)',
   },
   summaryLabel: {
     color: Theme.colors.textSecondary,

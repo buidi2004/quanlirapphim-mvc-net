@@ -13,7 +13,7 @@ public class SettingRepository(IDbConnection db) : ISettingRepository
 
     public async Task AddOrUpdateAsync(string key, string value)
     {
-        var sql = "INSERT OR REPLACE INTO settings (setting_key, setting_value) VALUES (@Key, @Value)";
+        var sql = "INSERT INTO settings (setting_key, setting_value) VALUES (@Key, @Value) ON DUPLICATE KEY UPDATE setting_value = @Value";
         await db.ExecuteAsync(sql, new { Key = key, Value = value });
     }
 }

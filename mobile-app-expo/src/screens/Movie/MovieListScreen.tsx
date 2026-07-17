@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     borderColor: Theme.colors.cardBorder,
   },
   statusTabActive: {
-    backgroundColor: 'rgba(255, 193, 7, 0.1)',
+    backgroundColor: 'rgba(111, 66, 193, 0.1)',
     borderColor: Theme.colors.gold,
   },
   statusTabText: {

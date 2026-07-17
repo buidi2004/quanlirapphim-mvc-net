@@ -1,5 +1,5 @@
 const axios = require('axios');
-const API_URL = 'http://localhost:5062/api';
+const API_URL = 'http://localhost:8080/api';
 let token = '';
 
 async function runTests() {

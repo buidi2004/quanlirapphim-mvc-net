@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#1a1a1a',
   },
   unreadCard: {
-    backgroundColor: 'rgba(255, 193, 7, 0.05)',
+    backgroundColor: 'rgba(111, 66, 193, 0.05)',
   },
   iconBox: {
     width: 48,

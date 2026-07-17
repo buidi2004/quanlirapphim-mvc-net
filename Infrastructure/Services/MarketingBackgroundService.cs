@@ -1,6 +1,6 @@
 using System.Data;
 using Dapper;
-using Microsoft.Data.Sqlite;
+using MySqlConnector;
 
 namespace CinemaXNet.Infrastructure.Services;
 
@@ -32,7 +32,7 @@ public class MarketingBackgroundService(IServiceProvider serviceProvider, ILogge
         // Since IDbConnection is scoped, we must resolve it from a new scope
         var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
         var connectionString = configuration.GetConnectionString("DefaultConnection");
-        using var db = new SqliteConnection(connectionString);
+        using var db = new MySqlConnection(connectionString);
         await db.OpenAsync(stoppingToken);
 
         var sql = @"

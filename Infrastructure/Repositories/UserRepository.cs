@@ -34,7 +34,7 @@ public class UserRepository(IDbConnection db) : IUserRepository
         const string sql = @"
             INSERT INTO users (username, email, password_hash, role)
             VALUES (@Username, @Email, @PasswordHash, @Role);
-            SELECT last_insert_rowid();";
+            SELECT LAST_INSERT_ID();";
         return await db.ExecuteScalarAsync<int>(sql, user);
     }
 
@@ -43,10 +43,10 @@ public class UserRepository(IDbConnection db) : IUserRepository
     {
         var sql = avatarUrl != null
             ? @"UPDATE users SET full_name=@fullName, phone=@phone, date_of_birth=@dateOfBirth,
-                    gender=@gender, city=@city, avatar_url=@avatarUrl, updated_at=datetime('now')
+                    gender=@gender, city=@city, avatar_url=@avatarUrl, updated_at=NOW()
                 WHERE id=@userId"
             : @"UPDATE users SET full_name=@fullName, phone=@phone, date_of_birth=@dateOfBirth,
-                    gender=@gender, city=@city, updated_at=datetime('now')
+                    gender=@gender, city=@city, updated_at=NOW()
                 WHERE id=@userId";
 
         return db.ExecuteAsync(sql, new { fullName, phone, dateOfBirth, gender, city, avatarUrl, userId });
@@ -54,7 +54,7 @@ public class UserRepository(IDbConnection db) : IUserRepository
 
     public Task UpdatePasswordAsync(int userId, string newHash) =>
         db.ExecuteAsync(
-            "UPDATE users SET password_hash=@newHash, updated_at=datetime('now') WHERE id=@userId",
+            "UPDATE users SET password_hash=@newHash, updated_at=NOW() WHERE id=@userId",
             new { newHash, userId });
 
     public Task SetResetTokenAsync(int userId, string token, string expiry) =>
@@ -64,7 +64,7 @@ public class UserRepository(IDbConnection db) : IUserRepository
 
     public async Task<User?> FindByResetTokenAsync(string token)
     {
-        var sql = BaseSelect + " WHERE reset_token = @token AND reset_token_expiry > datetime('now')";
+        var sql = BaseSelect + " WHERE reset_token = @token AND reset_token_expiry > NOW()";
         return await db.QueryFirstOrDefaultAsync<User>(sql, new { token });
     }
 
@@ -85,7 +85,7 @@ public class UserRepository(IDbConnection db) : IUserRepository
 
     public async Task<User?> FindByRefreshTokenAsync(string token)
     {
-        var sql = BaseSelect + " WHERE refresh_token = @token AND refresh_token_expiry > datetime('now')";
+        var sql = BaseSelect + " WHERE refresh_token = @token AND refresh_token_expiry > NOW()";
         return await db.QueryFirstOrDefaultAsync<User>(sql, new { token });
     }
 
