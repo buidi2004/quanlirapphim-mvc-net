@@ -11,6 +11,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
       - ConnectionStrings__DefaultConnection=Server=db;Port=3306;Database=cinemax;User=root;Password=secret;CharSet=utf8mb4;AllowUserVariables=true;
+      - DOTNET_gcServer=0
     depends_on:
       db:
         condition: service_healthy
@@ -19,6 +20,7 @@ services:
 
   db:
     image: mysql:8.0
+    command: --innodb-buffer-pool-size=64M --max-connections=50
     restart: always
     ports:
       - "3306:3306"
@@ -50,6 +52,7 @@ services:
     environment:
       - REACT_NATIVE_PACKAGER_HOSTNAME=${LAN_IP:-127.0.0.1}
       - EXPO_PUBLIC_API_URL=http://${LAN_IP:-127.0.0.1}:8080/api
+      - NODE_OPTIONS=--max-old-space-size=1024
     depends_on:
       web:
         condition: service_started
@@ -57,11 +60,11 @@ services:
       - cinemax-network
     volumes:
       - ./mobile-app-expo:/app
-      - /app/node_modules
+      - mobile_node_modules:/app/node_modules
 
 volumes:
   mysql_data:
-
+  mobile_node_modules:
 networks:
   cinemax-network:
     driver: bridge

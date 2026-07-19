@@ -50,28 +50,28 @@ public class TicketRepository(IDbConnection db) : ITicketRepository
         );
     }
 
-    public async Task<int> CreateAsync(Ticket ticket)
+    public async Task<int> CreateAsync(Ticket ticket, System.Data.IDbTransaction? transaction = null)
     {
         const string sql = @"
             INSERT INTO tickets (showtime_id, user_id, seat_code, status, hold_expiry_time, total_price, version)
             VALUES (@ShowtimeId, @UserId, @SeatCode, @Status, @HoldExpiryTime, @TotalPrice, @Version);
             SELECT LAST_INSERT_ID();";
-        return await db.ExecuteScalarAsync<int>(sql, ticket);
+        return await db.ExecuteScalarAsync<int>(sql, ticket, transaction);
     }
 
-    public async Task<Ticket?> FindByIdAsync(int id)
+    public async Task<Ticket?> FindByIdAsync(int id, System.Data.IDbTransaction? transaction = null)
     {
         const string sql = @"
             SELECT id, showtime_id AS ShowtimeId, user_id AS UserId, seat_code AS SeatCode,
                    status, hold_expiry_time AS HoldExpiryTime, total_price AS TotalPrice,
                    promotion_code AS PromotionCode, version, booked_at AS BookedAt
             FROM tickets WHERE id = @id";
-        return await db.QueryFirstOrDefaultAsync<Ticket>(sql, new { id });
+        return await db.QueryFirstOrDefaultAsync<Ticket>(sql, new { id }, transaction);
     }
 
     public async Task<int> UpdateStatusWithVersionAsync(
         int id, string newStatus, int expectedVersion,
-        decimal? totalPrice = null, string? promotionCode = null)
+        decimal? totalPrice = null, string? promotionCode = null, System.Data.IDbTransaction? transaction = null)
     {
         var sql = new StringBuilder(@"
             UPDATE tickets
@@ -100,16 +100,28 @@ public class TicketRepository(IDbConnection db) : ITicketRepository
 
         sql.Append(" WHERE id = @id AND version = @expectedVersion");
 
-        return await db.ExecuteAsync(sql.ToString(), param);
+        return await db.ExecuteAsync(sql.ToString(), param, transaction);
     }
 
     public async Task<IEnumerable<(int ShowtimeId, string SeatCode)>> CancelExpiredHoldsAsync()
     {
-        const string sql = @"
-            UPDATE tickets
-            SET status = 'cancelled', hold_expiry_time = NULL
+        // Lấy danh sách ghế sắp bị hủy trước khi UPDATE
+        const string selectSql = @"
+            SELECT showtime_id AS ShowtimeId, seat_code AS SeatCode
+            FROM tickets
             WHERE status = 'holding' AND hold_expiry_time < NOW()";
-        return await db.ExecuteAsync(sql);
+        var expired = (await db.QueryAsync<(int ShowtimeId, string SeatCode)>(selectSql)).ToList();
+
+        if (expired.Count > 0)
+        {
+            const string updateSql = @"
+                UPDATE tickets
+                SET status = 'cancelled', hold_expiry_time = NULL
+                WHERE status = 'holding' AND hold_expiry_time < NOW()";
+            await db.ExecuteAsync(updateSql);
+        }
+
+        return expired;
     }
 
     public async Task<IEnumerable<dynamic>> FindByUserIdAsync(int userId)

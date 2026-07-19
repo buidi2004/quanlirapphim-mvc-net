@@ -3,8 +3,6 @@ using CinemaXNet.Infrastructure.Data;
 using CinemaXNet.Infrastructure.Repositories;
 using CinemaXNet.Application.Interfaces;
 using CinemaXNet.Application.Services;
-using CinemaXNet.Application.Interfaces;
-using CinemaXNet.Application.Services;
 using CinemaXNet.Hubs;
 using CinemaXNet.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -146,15 +144,6 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 // ── AutoMapper & MediatR ──────────────────────────────────────────────────
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
-
-builder.Services.AddScoped<IUserService,      UserService>();
-builder.Services.AddScoped<IMovieService,     MovieService>();
-builder.Services.AddScoped<ITicketService,    TicketService>();
-builder.Services.AddScoped<IPaymentService,   PaymentService>();
-builder.Services.AddScoped<IPromotionService, PromotionService>();
-builder.Services.AddScoped<ICinemaService,    CinemaService>();
-builder.Services.AddScoped<IJwtService,       JwtService>();
-builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 // ── Background Service (thay cron job PHP) ────────────────────────────────
 builder.Services.AddHostedService<HoldExpiryBackgroundService>();

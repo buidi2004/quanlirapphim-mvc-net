@@ -6,7 +6,7 @@
 
 <div class="row justify-content-center">
     <div class="col-md-7">
-        <div class="card bg-white border-purple shadow-lg">
+        <div class="card bg-white border-primary shadow-lg">
             <!-- Hero image -->
             <div class="position-relative" style="height:250px; overflow:hidden;">
                 <img src="@(Model.ImageUrl ?? "https://images.unsplash.com/photo-1595769816263-9b910be24d5f?q=80&w=800")"
@@ -23,21 +23,21 @@
                 <div class="row g-3 text-center mb-4">
                     <div class="col-4">
                         <div class="bg-light rounded p-3">
-                            <i class="bi bi-calendar3 text-purple d-block mb-1" style="font-size:1.3rem;"></i>
+                            <i class="bi bi-calendar3 text-primary d-block mb-1" style="font-size:1.3rem;"></i>
                             <small class="text-secondary d-block">HSD</small>
                             <strong class="text-dark small">@Model.ExpiresAt</strong>
                         </div>
                     </div>
                     <div class="col-4">
                         <div class="bg-light rounded p-3">
-                            <i class="bi bi-people text-purple d-block mb-1" style="font-size:1.3rem;"></i>
+                            <i class="bi bi-people text-primary d-block mb-1" style="font-size:1.3rem;"></i>
                             <small class="text-secondary d-block">Đã dùng</small>
                             <strong class="text-dark small">@Model.UsedCount lượt</strong>
                         </div>
                     </div>
                     <div class="col-4">
                         <div class="bg-light rounded p-3">
-                            <i class="bi bi-check-circle text-purple d-block mb-1" style="font-size:1.3rem;"></i>
+                            <i class="bi bi-check-circle text-primary d-block mb-1" style="font-size:1.3rem;"></i>
                             <small class="text-secondary d-block">Còn lại</small>
                             <strong class="text-dark small">
                                 @(Model.MaxUses.HasValue ? (Model.MaxUses - Model.UsedCount) + " lượt" : "Không giới hạn")
@@ -50,12 +50,12 @@
                     <input type="text" value="@Model.Code" id="promoCodeInput"
                            class="form-control bg-light border-warning text-warning fw-medium text-center"
                            style="letter-spacing:3px; font-size:1.2rem;" readonly>
-                    <button class="btn btn-warning fw-medium" onclick="copyPromoCode()">
+                    <button class="btn btn-primary fw-medium" onclick="copyPromoCode()">
                         <i class="bi bi-clipboard me-1"></i>Sao chép
                     </button>
                 </div>
 
-                <a href="/movies" class="btn btn-outline-warning w-100">
+                <a href="/movies" class="btn btn-outline-primary w-100">
                     Dùng khi đặt vé ngay
                 </a>
             </div>
@@ -76,10 +76,10 @@ function copyPromoCode() {
     navigator.clipboard.writeText(code).then(() => {
         const btn = event.currentTarget;
         btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Đã sao chép!';
-        btn.classList.replace('btn-purple', 'btn-success');
+        btn.classList.replace('btn-primary', 'btn-success');
         setTimeout(() => {
             btn.innerHTML = '<i class="bi bi-clipboard me-1"></i>Sao chép';
-            btn.classList.replace('btn-success', 'btn-purple');
+            btn.classList.replace('btn-success', 'btn-primary');
         }, 2000);
     });
 }

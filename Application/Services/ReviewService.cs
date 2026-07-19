@@ -20,8 +20,7 @@ public class ReviewService(IReviewRepository reviewRepository) : IReviewService
         var review = await reviewRepository.GetReviewByIdAsync(id);
         if (review != null)
         {
-            // In SQLite, bool is stored as 1/0 or true/false depending on the driver, but typically int 0 or 1.
-            // Assuming it's numeric in this DB:
+            // MySQL TINYINT(1) trả về int 0 hoặc 1 qua Dapper:
             bool currentStatus = review.is_approved == 1 || review.is_approved == true || review.is_approved == "1";
             bool newStatus = !currentStatus;
             await reviewRepository.ToggleStatusAsync(id, newStatus);

@@ -1,6 +1,7 @@
 export type RootStackParamList = {
   // ── Drawer & Tabs ──
   MainDrawer: { screen?: string; params?: object } | undefined;
+  MainTabs: undefined;
 
   // ── Auth Flow ──
   Login: undefined;
@@ -61,6 +62,9 @@ export type RootStackParamList = {
 
   // ── Static Pages ──
   StaticPage: { page: 'membership' | 'faq' | 'terms' | 'privacy' };
+
+  // ── Staff ──
+  Scanner: undefined;
 };
 
 // Types for Bottom Tabs

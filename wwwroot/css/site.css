@@ -1,13 +1,28 @@
 :root {
-  --bs-warning: #6f42c1 !important;
-  --bs-warning-rgb: 111, 66, 193 !important;
-  --bs-warning-text-emphasis: #3e256b !important;
-  --bs-warning-bg-subtle: #e2d9f3 !important;
-  --bs-warning-border-subtle: #b7a1e1 !important;
+  /* BookMyShow Style Tokens */
+  --color-primary: #F84464;
+  --color-primary-dark: #D8324F;
+  --color-bg-light: #F5F5F5;
+  --color-bg-white: #FFFFFF;
+  --color-text-primary: #1F2533;
+  --color-text-secondary: #6B7280;
+  --color-success: #1DB954;
+  --color-disabled: #D1D5DB;
+
+  --font-family-base: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  
+  /* Bootstrap overrides */
+  --bs-primary: #F84464;
+  --bs-primary-rgb: 248, 68, 100;
+  --bs-body-bg: #F5F5F5;
+  --bs-body-color: #1F2533;
+  --bs-font-sans-serif: var(--font-family-base);
 }
 
 html {
   font-size: 14px;
+  position: relative;
+  min-height: 100%;
 }
 
 @media (min-width: 768px) {
@@ -16,153 +31,142 @@ html {
   }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
-:root {
-  --bg-primary: #F8F9FA; /* Trắng xám nhạt */
-  --text-primary: #0F172A;
-  --accent-purple: #7C3AED;
-  --accent-black: #1E293B;
-  
-  --font-heading: 'Space Grotesk', 'Inter', sans-serif;
-  --font-body: 'Inter', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-}
-
 body, input, button, select, textarea {
   margin-bottom: 0;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  font-family: var(--font-body);
-  font-size: 0.9rem; /* Reduced from 0.95rem */
+  background-color: var(--color-bg-light);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-base);
+  font-size: 14px; /* Default body text size */
   line-height: 1.6;
 }
 
-/* Custom Purple/Black Utilities */
-.text-purple { color: var(--accent-purple) !important; }
-.bg-purple { background-color: var(--accent-purple) !important; color: white !important; }
-.border-purple { border-color: var(--accent-purple) !important; }
-
-.btn-purple {
-    background-color: var(--accent-purple) !important;
-    color: white !important;
-    border: none;
-}
-.btn-purple:hover {
-    background-color: #6D28D9 !important; /* darker purple */
-    color: white !important;
-    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
-}
-.btn-outline-purple {
-    color: var(--accent-purple) !important;
-    border: 1px solid var(--accent-purple) !important;
-    background-color: transparent;
-}
-.btn-outline-purple:hover {
-    background-color: var(--accent-purple) !important;
-    color: white !important;
-}
-
 h1, h2, h3, h4, h5, h6, .display-1, .display-2, .display-3, .display-4, .display-5, .display-6 {
-  font-family: var(--font-heading);
+  font-family: var(--font-family-base);
+  color: var(--color-text-primary);
 }
 
-.font-mono {
-  font-family: var(--font-mono);
+h1 { font-size: 28px; font-weight: 700; line-height: 1.3; }
+h2 { font-size: 20px; font-weight: 600; }
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem var(--color-primary);
+  border-color: var(--color-primary);
 }
 
+/* Custom Primary Utilities (BookMyShow Red) */
+.text-primary-custom { color: var(--color-primary) !important; }
+.bg-primary-custom { background-color: var(--color-primary) !important; color: white !important; }
+.border-primary-custom { border-color: var(--color-primary) !important; }
+.text-secondary-custom { color: var(--color-text-secondary) !important; }
+
+.btn-primary, .btn-purple {
+    background-color: var(--color-primary) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 6px !important; /* Flat CTA pattern */
+    box-shadow: none !important; /* No shadow */
+}
+.btn-primary:hover, .btn-purple:hover {
+    background-color: var(--color-primary-dark) !important;
+    color: white !important;
+}
+.btn-outline-primary, .btn-outline-purple {
+    color: var(--color-primary) !important;
+    border: 1px solid var(--color-primary) !important;
+    background-color: transparent !important;
+    border-radius: 6px !important;
+}
+.btn-outline-primary:hover, .btn-outline-purple:hover {
+    background-color: var(--color-primary) !important;
+    color: white !important;
+}
+
+/* KHOÁ MÀU VÀNG CỦA BOOTSTRAP CHUYỂN SANG ĐỎ THEO BOOKMYSHOW NẾU DÙNG NHIỀU */
+.btn-warning {
+    background-color: var(--color-primary) !important;
+    color: white !important;
+    border-color: var(--color-primary) !important;
+}
+.btn-warning:hover {
+    background-color: var(--color-primary-dark) !important;
+    color: white !important;
+}
+.text-warning { color: var(--color-primary) !important; }
+.bg-warning { background-color: var(--color-primary) !important; color: white !important; }
+.border-warning { border-color: var(--color-primary) !important; }
+
+/* KHOÁ MÀU TÍM CŨ (.text-purple, .bg-purple) TRỎ VỀ ĐỎ LUÔN ĐỂ KHÔNG SÓT */
+.text-purple { color: var(--color-primary) !important; }
+.bg-purple { background-color: var(--color-primary) !important; color: white !important; }
+.border-purple { border-color: var(--color-primary) !important; }
+
+/* =========================================
+   UI PATTERNS 
+   ========================================= */
+
+/* Thẻ phim bo góc 8-12px, nền trắng */
+.movie-card {
+    position: relative;
+    border-radius: 12px;
+    background: var(--color-bg-white);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    overflow: hidden;
+    /* remove old border glow */
+}
+.movie-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+.movie-poster {
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    width: 100%;
+}
+
+/* Tab chọn ngày / Suất chiếu pill */
+.date-pill, .showtime-pill {
+    border: 1px solid #E5E7EB;
+    border-radius: 20px;
+    background: var(--color-bg-white);
+    color: var(--color-text-primary);
+    padding: 8px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.date-pill.active, .showtime-pill.active, .showtime-pill:hover {
+    background-color: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+
+/* Ghế ngồi */
+.seat {
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    margin: 4px;
+    cursor: pointer;
+    border: 1px solid var(--color-success); /* Còn trống */
+    background: transparent;
+}
+.seat.selected {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+.seat.sold {
+    background-color: var(--color-disabled);
+    border-color: var(--color-disabled);
+    cursor: not-allowed;
+}
+
+/* Form inputs */
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
+  color: var(--color-text-secondary);
   text-align: end;
 }
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
-}
-
-/* KHOÁ MÀU VÀNG CỦA BOOTSTRAP */
-.btn-warning {
-    --bs-btn-color: #fff !important;
-    --bs-btn-bg: #6f42c1 !important;
-    --bs-btn-border-color: #6f42c1 !important;
-    --bs-btn-hover-color: #fff !important;
-    --bs-btn-hover-bg: #59359a !important;
-    --bs-btn-hover-border-color: #533190 !important;
-    --bs-btn-active-color: #fff !important;
-    --bs-btn-active-bg: #533190 !important;
-    --bs-btn-active-border-color: #4e2e86 !important;
-}
-
-.btn-outline-warning {
-    --bs-btn-color: #6f42c1 !important;
-    --bs-btn-border-color: #6f42c1 !important;
-    --bs-btn-hover-color: #fff !important;
-    --bs-btn-hover-bg: #6f42c1 !important;
-    --bs-btn-hover-border-color: #6f42c1 !important;
-    --bs-btn-active-color: #fff !important;
-    --bs-btn-active-bg: #6f42c1 !important;
-    --bs-btn-active-border-color: #6f42c1 !important;
-}
-
-.text-warning, .bg-warning, .border-warning {
-    color: #6f42c1 !important;
-}
-.bg-warning {
-    background-color: #6f42c1 !important;
-    color: white !important;
-}
-.border-warning {
-    border-color: #6f42c1 !important;
-}
-
-/* =========================================
-   OVERRIDE MOVIE CARD EFFECT TO GLOWING BORDER
-   ========================================= */
-.movie-card-3d {
-    perspective: none !important;
-}
-.movie-card {
-    position: relative !important;
-    border-radius: 12px !important;
-    z-index: 1 !important;
-    background: #fff !important;
-    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
-    transform: none !important; /* override JS if it stuck */
-    cursor: pointer;
-}
-/* Hiệu ứng viền chạy từ 2 bên */
-.movie-card::before {
-    content: "" !important;
-    position: absolute !important;
-    inset: -3px !important;
-    border-radius: 15px !important;
-    background: linear-gradient(
-        45deg, 
-        #6f42c1, transparent 40%, 
-        transparent 60%, #6f42c1
-    ) !important;
-    background-size: 200% 200% !important;
-    z-index: -1 !important;
-    opacity: 0 !important;
-    transition: opacity 0.3s ease !important;
-}
-.movie-card:hover::before {
-    opacity: 1 !important;
-    animation: border-glow-run 2s linear infinite !important;
-}
-.movie-card:hover {
-    transform: translateY(-8px) !important;
-    box-shadow: 0 15px 30px rgba(111, 66, 193, 0.25) !important;
-}
-@keyframes border-glow-run {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
 }

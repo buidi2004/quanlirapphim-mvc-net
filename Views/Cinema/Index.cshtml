@@ -33,7 +33,7 @@
 
     <!-- Find nearest button -->
     <div class="mb-4">
-        <button id="btnFindNearest" class="btn btn-outline-purple btn-sm">
+        <button id="btnFindNearest" class="btn btn-outline-primary btn-sm">
             <i class="bi bi-crosshair me-1"></i>Tìm rạp gần tôi nhất
         </button>
         <div id="nearestResult" class="mt-3 d-none"></div>
@@ -97,7 +97,7 @@
                             </div>
                         </div>
                         <div class="card-footer bg-transparent border-light">
-                            <a href="/cinemas/@cinema.Slug" class="btn btn-outline-warning btn-sm w-100">
+                            <a href="/cinemas/@cinema.Slug" class="btn btn-outline-primary btn-sm w-100">
                                 Xem chi tiết
                             </a>
                         </div>
@@ -126,14 +126,14 @@ document.getElementById('btnFindNearest').addEventListener('click', function() {
             const el   = document.getElementById('nearestResult');
 
             if (data.success && data.data.length > 0) {
-                el.innerHTML = `<h6 class="text-purple mb-3"><i class="bi bi-geo-alt-fill me-1"></i>Rạp gần bạn nhất:</h6>
+                el.innerHTML = `<h6 class="text-primary mb-3"><i class="bi bi-geo-alt-fill me-1"></i>Rạp gần bạn nhất:</h6>
                 <div class="row g-3">${data.data.map(c => `
                     <div class="col-md-4">
-                        <div class="card bg-light border-purple border-opacity-50 p-3 h-100">
+                        <div class="card bg-light border-primary border-opacity-50 p-3 h-100">
                             <h6 class="text-dark mb-1">${c.name}</h6>
                             <p class="text-secondary small mb-1">${c.address}</p>
                             <span class="badge bg-warning text-white"><i class="bi bi-geo-alt me-1"></i>${c.distance} km</span>
-                            <a href="/cinemas/${c.slug}" class="btn btn-outline-warning btn-sm mt-2">Xem chi tiết</a>
+                            <a href="/cinemas/${c.slug}" class="btn btn-outline-primary btn-sm mt-2">Xem chi tiết</a>
                         </div>
                     </div>`).join('')}</div>`;
                 el.classList.remove('d-none');

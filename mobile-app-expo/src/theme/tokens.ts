@@ -8,7 +8,7 @@ export const DarkColors = {
   // Brand
   accent: '#e50914',
   accentLight: 'rgba(229,9,20,0.15)',
-  gold: '#FFD700',
+  gold: '#ff00ddff',
   goldLight: 'rgba(255,215,0,0.15)',
   warning: '#6f42c1',
   warningLight: 'rgba(111,66,193,0.12)',
@@ -39,7 +39,7 @@ export const DarkColors = {
   seatAvailable: '#2d2d44',
   seatSelected: '#e50914',
   seatBooked: '#6c757d',
-  seatVipBorder: '#FFD700',
+  seatVipBorder: '#9900ffff',
 
   // Glass / Blur effect colors
   glass: {

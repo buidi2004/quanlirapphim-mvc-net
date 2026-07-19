@@ -1,0 +1,264 @@
+@model CinemaXNet.Application.ViewModels.MovieDetailViewModel
+@{
+    var selectedDate = ViewBag.SelectedDate as DateOnly? ?? DateOnly.FromDateTime(DateTime.Today);
+    var daysOfWeek = new string[] { "CN", "Th 2", "Th 3", "Th 4", "Th 5", "Th 6", "Th 7" };
+    
+    var allProvinces = new[] {
+        "Hồ Chí Minh", "Hà Nội", "Đà Nẵng", "Cần Thơ", "Đồng Nai", "Hải Phòng", 
+        "Quảng Ninh", "Bà Rịa-Vũng Tàu", "Bình Định", "Bình Dương", "Đắk Lắk", 
+        "Trà Vinh", "Yên Bái", "Vĩnh Long", "Kiên Giang", "Hà Tĩnh", "Phú Yên", 
+        "Đồng Tháp", "Bạc Liêu", "Hưng Yên", "Khánh Hòa", "Kon Tum", "Lạng Sơn", 
+        "Nghệ An", "Phú Thọ", "Quảng Ngãi", "Sóc Trăng", "Sơn La", "Tây Ninh", 
+        "Thái Nguyên", "Tiền Giang", "Gia Lai", "Ninh Thuận", "Bình Thuận"
+    };
+    
+    var activeProvince = Model.GroupedShowtimes.FirstOrDefault()?.Province;
+}
+
+<style>
+    .bms-container {
+        background-color: var(--color-bg-white);
+        color: var(--color-text-primary);
+        font-family: var(--font-family-base);
+    }
+    
+    /* Date List */
+    .bms-date-list {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 12px;
+        padding: 16px 0;
+        border-bottom: 1px solid #E5E7EB;
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+    }
+    .bms-date-list::-webkit-scrollbar {
+        display: none;
+    }
+    .bms-date-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-width: 60px;
+        text-decoration: none;
+    }
+    .bms-date-month { font-size: 0.75rem; text-transform: uppercase; }
+    .bms-date-day { font-size: 1.5rem; font-weight: bold; line-height: 1.2; }
+    .bms-date-dow { font-size: 0.75rem; }
+    
+    /* Provinces */
+    .bms-prov-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 16px 0;
+        border-bottom: 1px solid #E5E7EB;
+    }
+    .bms-prov-item {
+        font-size: 0.85rem;
+        cursor: pointer;
+        padding: 6px 12px;
+        border-radius: 20px;
+        border: 1px solid transparent;
+        color: var(--color-text-primary);
+        transition: all 0.2s;
+    }
+    .bms-prov-item.active {
+        background-color: var(--color-primary);
+        color: #fff;
+    }
+    .bms-prov-item:not(.active):hover {
+        background-color: var(--color-bg-light);
+    }
+    .bms-prov-item.disabled {
+        color: var(--color-text-secondary);
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* Filters */
+    .bms-filter-list {
+        display: flex;
+        gap: 8px;
+        padding: 16px 0;
+    }
+    .bms-filter-chip {
+        font-size: 0.75rem;
+        padding: 4px 10px;
+        border-radius: 12px;
+        border: 1px solid #E5E7EB;
+        color: var(--color-text-secondary);
+        cursor: pointer;
+    }
+    .bms-filter-chip.active {
+        border-color: var(--color-primary);
+        color: var(--color-primary);
+        background-color: rgba(248, 68, 100, 0.05);
+    }
+    
+    /* Cinemas */
+    .bms-cinema-item {
+        padding: 20px 0;
+        border-bottom: 1px solid #E5E7EB;
+    }
+    .bms-cinema-item:last-child {
+        border-bottom: none;
+    }
+    .bms-cinema-name {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--color-text-primary);
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .bms-format-name {
+        font-size: 0.85rem;
+        color: var(--color-text-secondary);
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .bms-time-box {
+        text-decoration: none;
+        display: inline-block;
+        margin-right: 12px;
+        margin-bottom: 12px;
+    }
+    .bms-time-box.disabled {
+        opacity: 0.5;
+        pointer-events: none;
+        filter: grayscale(1);
+    }
+</style>
+
+<div class="bms-container px-3 py-2" id="showtimes-section">
+    <!-- Date Picker (BookMyShow pattern: Horizontal pill slider) -->
+    <div class="bms-date-list">
+        @for (int i = 0; i < 14; i++)
+        {
+            var currentDate = DateOnly.FromDateTime(DateTime.Today.AddDays(i));
+            var dateVal = currentDate.ToString("yyyy-MM-dd");
+            var monthStr = "Th " + currentDate.Month;
+            var dayStr = currentDate.Day.ToString("D2");
+            var dow = (i == 0) ? "Hôm nay" : daysOfWeek[(int)currentDate.DayOfWeek];
+            var isActive = currentDate == selectedDate;
+            
+            <a href="javascript:void(0)" class="date-pill bms-date-item @(isActive ? "active" : "")" onclick="loadBmsShowtimes(@Model.Id, '@dateVal')">
+                <span class="bms-date-month">@monthStr</span>
+                <span class="bms-date-day">@dayStr</span>
+                <span class="bms-date-dow">@dow</span>
+            </a>
+        }
+    </div>
+
+    <!-- Provinces -->
+    <div class="bms-prov-list">
+        @foreach (var p in allProvinces)
+        {
+            var hasShowtimes = Model.GroupedShowtimes.Any(x => x.Province == p);
+            var isActive = hasShowtimes && p == activeProvince;
+            var classes = isActive ? "bms-prov-item active" : (hasShowtimes ? "bms-prov-item" : "bms-prov-item disabled");
+            
+            <div class="@classes" @(hasShowtimes ? $"onclick=\"selectBmsProvince('{p}')\"" : "") data-prov="@p">
+                @p
+            </div>
+        }
+    </div>
+
+    @if (Model.Status != "now_showing")
+    {
+        <div class="text-center py-5">
+            <h5 class="fw-normal text-secondary">Phim hiện không ở trạng thái "Đang chiếu" nên không có suất chiếu.</h5>
+        </div>
+    }
+    else if (!Model.Showtimes.Any())
+    {
+        <div class="text-center py-5">
+            <h5 class="fw-normal text-secondary">Không có suất chiếu nào vào ngày @selectedDate.ToString("dd/MM/yyyy").</h5>
+        </div>
+    }
+    else
+    {
+        <!-- Formats Filter -->
+        <div class="bms-filter-list">
+            <div class="bms-filter-chip active">Tất cả</div>
+            <div class="bms-filter-chip">2D</div>
+            <div class="bms-filter-chip">3D</div>
+            <div class="bms-filter-chip">IMAX</div>
+        </div>
+
+        <!-- Cinemas Content -->
+        <div class="bms-content">
+            @foreach (var prov in Model.GroupedShowtimes)
+            {
+                <div class="bms-prov-pane @(prov.Province == activeProvince ? "" : "d-none")" id="pane-@prov.Province.Replace(" ", "-")">
+                    @foreach (var cinema in prov.Cinemas)
+                    {
+                        <div class="bms-cinema-item">
+                            <div class="bms-cinema-name">
+                                <i class="bi bi-heart text-secondary fs-5 cursor-pointer"></i> 
+                                @cinema.CinemaName
+                            </div>
+                            
+                            @{
+                                var formatGroups = cinema.Showtimes.GroupBy(s => s.Format).ToList();
+                            }
+                            
+                            @foreach (var fg in formatGroups)
+                            {
+                                <div class="bms-format-name">
+                                    <span class="badge bg-secondary text-white opacity-75">@fg.Key</span> Phụ đề Tiếng Việt
+                                </div>
+                                <div class="d-flex flex-wrap">
+                                    @foreach (var st in fg)
+                                    {
+                                        var isPast = st.ShowDate == DateOnly.FromDateTime(DateTime.Today) && st.StartTime < TimeOnly.FromDateTime(DateTime.Now);
+                                        var isFull = st.AvailableSeats == 0;
+                                        var disabledClass = (isPast || isFull) ? "disabled" : "";
+                                        var link = (isPast || isFull) ? "javascript:void(0)" : $"/booking/{st.Id}";
+                                        
+                                        <a href="@link" class="showtime-pill bms-time-box @disabledClass">
+                                            @st.StartTime.ToString("HH:mm")
+                                        </a>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<script>
+    function loadBmsShowtimes(movieId, date) {
+        if (typeof loadBookingModal === 'function' && document.getElementById('homeBookingModalContainer')) {
+            loadBookingModal(movieId, date);
+        } else {
+            window.location.href = `/movies/${movieId}?date=${date}#showtimes-section`;
+        }
+    }
+
+    function selectBmsProvince(provName) {
+        document.querySelectorAll('.bms-prov-item:not(.disabled)').forEach(el => {
+            if (el.dataset.prov === provName) {
+                el.classList.add('active');
+            } else {
+                el.classList.remove('active');
+            }
+        });
+        
+        document.querySelectorAll('.bms-prov-pane').forEach(el => el.classList.add('d-none'));
+        
+        const paneId = 'pane-' + provName.replace(/\s+/g, '-');
+        const pane = document.getElementById(paneId);
+        if (pane) pane.classList.remove('d-none');
+    }
+</script>

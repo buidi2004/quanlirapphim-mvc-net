@@ -25,7 +25,7 @@
                                class="form-control bg-white bg-opacity-50 text-dark border-light @(ViewData.ModelState["Username"]?.Errors.Count > 0 ? "is-invalid" : "")"
                                placeholder="Nhập tên người dùng..."
                                value="@Model.Username" required>
-                        <span asp-validation-for="Username" class="invalid-feedback text-purple"></span>
+                        <span asp-validation-for="Username" class="invalid-feedback text-primary"></span>
                     </div>
 
                     <div class="mb-3">
@@ -34,7 +34,7 @@
                                class="form-control bg-white bg-opacity-50 text-dark border-light @(ViewData.ModelState["Email"]?.Errors.Count > 0 ? "is-invalid" : "")"
                                placeholder="name@example.com"
                                value="@Model.Email" required>
-                        <span asp-validation-for="Email" class="invalid-feedback text-purple"></span>
+                        <span asp-validation-for="Email" class="invalid-feedback text-primary"></span>
                     </div>
 
                     <div class="mb-3">
@@ -42,7 +42,7 @@
                         <input type="password" name="Password"
                                class="form-control bg-white bg-opacity-50 text-dark border-light @(ViewData.ModelState["Password"]?.Errors.Count > 0 ? "is-invalid" : "")"
                                placeholder="Tối thiểu 6 ký tự" required>
-                        <span asp-validation-for="Password" class="invalid-feedback text-purple"></span>
+                        <span asp-validation-for="Password" class="invalid-feedback text-primary"></span>
                     </div>
 
                     <div class="mb-4">
@@ -50,15 +50,15 @@
                         <input type="password" name="ConfirmPassword"
                                class="form-control bg-white bg-opacity-50 text-dark border-light @(ViewData.ModelState["ConfirmPassword"]?.Errors.Count > 0 ? "is-invalid" : "")"
                                placeholder="Xác nhận mật khẩu" required>
-                        <span asp-validation-for="ConfirmPassword" class="invalid-feedback text-purple"></span>
+                        <span asp-validation-for="ConfirmPassword" class="invalid-feedback text-primary"></span>
                     </div>
 
-                <button type="submit" class="btn btn-warning w-100 fw-medium py-2 shadow mb-3">
+                <button type="submit" class="btn btn-primary w-100 fw-medium py-2 shadow mb-3">
                     ĐĂNG KÝ
                 </button>
 
                     <p class="text-center text-dark small mb-0 opacity-75">
-                        Đã có tài khoản? <a href="/login" class="text-purple text-decoration-none fw-bold">Đăng nhập ngay</a>
+                        Đã có tài khoản? <a href="/login" class="text-primary text-decoration-none fw-bold">Đăng nhập ngay</a>
                     </p>
                 </form>
             </div>

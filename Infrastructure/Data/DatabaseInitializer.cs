@@ -73,7 +73,8 @@ public static class DatabaseInitializer
                 description    TEXT,
                 facilities     TEXT,
                 is_active      TINYINT(1)    NOT NULL DEFAULT 1,
-                created_at     DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP
+                created_at     DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at     DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         """);
 
@@ -96,6 +97,7 @@ public static class DatabaseInitializer
                 room_id     INT           NOT NULL,
                 show_date   VARCHAR(20)   NOT NULL,
                 start_time  VARCHAR(20)   NOT NULL,
+                format      VARCHAR(50)   DEFAULT '2D Phụ đề',
                 price       DECIMAL(18,2) NOT NULL,
                 created_at  DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 UNIQUE KEY uk_room_date_time (room_id, show_date, start_time),
@@ -111,6 +113,7 @@ public static class DatabaseInitializer
                 user_id          INT           NOT NULL,
                 seat_code        VARCHAR(10)   NOT NULL,
                 status           VARCHAR(20)   NOT NULL DEFAULT 'holding',
+                concession_status VARCHAR(20)  DEFAULT 'pending',
                 hold_expiry_time VARCHAR(50),
                 total_price      DECIMAL(18,2) NOT NULL DEFAULT 0,
                 promotion_code   VARCHAR(50),
@@ -171,15 +174,17 @@ public static class DatabaseInitializer
                 FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE,
                 FOREIGN KEY (food_beverage_id) REFERENCES food_beverages(id)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        """);
 
         db.Execute("""
             CREATE TABLE IF NOT EXISTS reviews (
-                id         INT AUTO_INCREMENT PRIMARY KEY,
-                movie_id   INT           NOT NULL,
-                user_id    INT           NOT NULL,
-                rating     INT           NOT NULL,
-                comment    TEXT          NOT NULL,
-                created_at DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                id          INT AUTO_INCREMENT PRIMARY KEY,
+                movie_id    INT           NOT NULL,
+                user_id     INT           NOT NULL,
+                rating      INT           NOT NULL,
+                comment     TEXT          NOT NULL,
+                is_approved TINYINT(1)    NOT NULL DEFAULT 1,
+                created_at  DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE CASCADE,
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -265,6 +270,7 @@ public static class DatabaseInitializer
                 created_at   DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        """);
 
         // ── Seed if empty ───────────────────────────────────────────────────
         var userCount = db.ExecuteScalar<int>("SELECT COUNT(*) FROM users");
@@ -435,9 +441,9 @@ public static class DatabaseInitializer
         // Seed Notifications for user_id = 2 (user1)
         db.Execute("""
             INSERT INTO notifications (title, message, type, is_read, user_id, created_at) VALUES
-            ('Giao dịch thành công', 'Bạn đã mua thành công 2 vé phim Dune: Part Two.', 'ticket', 0, 2, datetime('now', '-10 minutes')),
-            ('Khuyến mãi mới', 'Giảm 50% bắp nước cho khách hàng thành viên thứ 3 hàng tuần.', 'promo', 1, 2, datetime('now', '-2 hours')),
-            ('Lịch chiếu thay đổi', 'Suất chiếu Avengers: Endgame đã được dời sang phòng chiếu IMAX.', 'system', 1, 2, datetime('now', '-1 days'));
+            ('Giao dịch thành công', 'Bạn đã mua thành công 2 vé phim Dune: Part Two.', 'ticket', 0, 2, DATE_SUB(NOW(), INTERVAL 10 MINUTE)),
+            ('Khuyến mãi mới', 'Giảm 50% bắp nước cho khách hàng thành viên thứ 3 hàng tuần.', 'promo', 1, 2, DATE_SUB(NOW(), INTERVAL 2 HOUR)),
+            ('Lịch chiếu thay đổi', 'Suất chiếu Avengers: Endgame đã được dời sang phòng chiếu IMAX.', 'system', 1, 2, DATE_SUB(NOW(), INTERVAL 1 DAY));
         """);
     }
 }

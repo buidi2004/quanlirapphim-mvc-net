@@ -1,7 +1,7 @@
 @{
     ViewData["Title"] = "Hồ sơ";
     var user          = ViewBag.User  as CinemaXNet.Domain.Entities.User;
-    var stats         = ViewBag.Stats;
+    var stats         = ((int TotalTickets, int TotalMovies))ViewBag.Stats;
     var recentTickets = ViewBag.RecentTickets as IEnumerable<dynamic> ?? [];
     var levelProgress = (double)(ViewBag.LevelProgress ?? 0);
     var nextLevel     = ViewBag.NextLevel as string ?? "";
@@ -20,11 +20,11 @@
                         <h6 class="text-warning fw-medium mb-0" style="letter-spacing: 2px;">CINEMAX REWARDS</h6>
                         <span class="small text-light">Thành viên @user?.GetMemberLevelLabel()</span>
                     </div>
-                    <i class="bi bi-award-fill text-purple fs-2 shadow-sm"></i>
+                    <i class="bi bi-award-fill text-primary fs-2 shadow-sm"></i>
                 </div>
                 
                 <div class="d-flex align-items-center mb-4">
-                    <img src="@user?.GetAvatarUrl()" class="rounded-circle me-3 border border-2 border-purple" style="width:60px; height:60px; object-fit:cover;" alt="Avatar">
+                    <img src="@user?.GetAvatarUrl()" class="rounded-circle me-3 border border-2 border-primary" style="width:60px; height:60px; object-fit:cover;" alt="Avatar">
                     <div>
                         <h5 class="mb-0 fw-medium text-white">@user?.GetDisplayName()</h5>
                         <p class="mb-0 small text-secondary font-monospace">ID: @(user?.Id.ToString("D8"))</p>
@@ -47,7 +47,7 @@
                     <span>@nextLevel</span>
                 </div>
                 <div class="progress" style="height:6px; background:#333;">
-                    <div class="progress-bar bg-purple" style="width:@levelProgress.ToString("0")%"></div>
+                    <div class="progress-bar bg-primary" style="width:@levelProgress.ToString("0")%"></div>
                 </div>
                 @if (pointsToNext > 0)
                 {
@@ -58,13 +58,13 @@
             <div class="row g-2 text-center">
                 <div class="col-6">
                     <div class="bg-light rounded p-2">
-                        <div class="text-warning fw-medium">@stats?.TotalTickets</div>
+                        <div class="text-warning fw-medium">@stats.TotalTickets</div>
                         <small class="text-secondary">Vé đã mua</small>
                     </div>
                 </div>
                 <div class="col-6">
                     <div class="bg-light rounded p-2">
-                        <div class="text-warning fw-medium">@stats?.TotalMovies</div>
+                        <div class="text-warning fw-medium">@stats.TotalMovies</div>
                         <small class="text-secondary">Phim đã xem</small>
                     </div>
                 </div>
@@ -75,19 +75,19 @@
         <div class="card bg-white border-light">
             <div class="list-group list-group-flush bg-transparent">
                 <a href="/profile" class="list-group-item list-group-item-action bg-transparent text-dark border-light">
-                    <i class="bi bi-person me-2 text-purple"></i>Hồ sơ của tôi
+                    <i class="bi bi-person me-2 text-primary"></i>Hồ sơ của tôi
                 </a>
                 <a href="/profile/edit" class="list-group-item list-group-item-action bg-transparent text-dark border-light">
-                    <i class="bi bi-pencil me-2 text-purple"></i>Chỉnh sửa hồ sơ
+                    <i class="bi bi-pencil me-2 text-primary"></i>Chỉnh sửa hồ sơ
                 </a>
                 <a href="/my-tickets" class="list-group-item list-group-item-action bg-transparent text-dark border-light">
-                    <i class="bi bi-ticket me-2 text-purple"></i>Vé của tôi
+                    <i class="bi bi-ticket me-2 text-primary"></i>Vé của tôi
                 </a>
                 <a href="/profile/transactions" class="list-group-item list-group-item-action bg-transparent text-dark border-light">
-                    <i class="bi bi-clock-history me-2 text-purple"></i>Lịch sử giao dịch
+                    <i class="bi bi-clock-history me-2 text-primary"></i>Lịch sử giao dịch
                 </a>
                 <a href="/profile/change-password" class="list-group-item list-group-item-action bg-transparent text-dark border-light">
-                    <i class="bi bi-shield-lock me-2 text-purple"></i>Đổi mật khẩu
+                    <i class="bi bi-shield-lock me-2 text-primary"></i>Đổi mật khẩu
                 </a>
                 <form method="post" action="/logout">
                     @Html.AntiForgeryToken()
@@ -129,7 +129,7 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between mb-3">
                     <h5 class="text-warning mb-0">Vé gần đây</h5>
-                    <a href="/my-tickets" class="btn btn-outline-warning btn-sm">Xem tất cả</a>
+                    <a href="/my-tickets" class="btn btn-outline-primary btn-sm">Xem tất cả</a>
                 </div>
                 @if (!recentTickets.Any())
                 {

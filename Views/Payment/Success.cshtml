@@ -36,7 +36,7 @@
                         <p class="mb-1 text-truncate" title="@Model.MovieTitle"><span class="text-secondary small d-inline-block" style="width: 80px;">Phim:</span> <strong class="fs-5 text-dark">@Model.MovieTitle</strong></p>
                         <p class="mb-1"><span class="text-secondary small d-inline-block" style="width: 80px;">Phòng:</span> <strong>@Model.RoomName</strong></p>
                         <p class="mb-1"><span class="text-secondary small d-inline-block" style="width: 80px;">Suất:</span> <strong class="text-dark">@Model.ShowDate.ToString("dd/MM/yyyy") - @Model.StartTime.ToString("HH:mm")</strong></p>
-                        <p class="mb-1"><span class="text-secondary small d-inline-block" style="width: 80px;">Ghế:</span> <strong class="text-purple fs-5">@(string.Join(", ", Model.SelectedSeats))</strong></p>
+                        <p class="mb-1"><span class="text-secondary small d-inline-block" style="width: 80px;">Ghế:</span> <strong class="text-primary fs-5">@(string.Join(", ", Model.SelectedSeats))</strong></p>
                         <p class="mb-1 mt-2 border-top border-secondary pt-2"><span class="text-secondary small d-inline-block" style="width: 80px;">Mã GD:</span> <strong class="text-info font-monospace">@transactionId</strong></p>
                         <p class="mb-0 mt-3 text-center text-secondary small animate-pulse">
                             <i class="bi bi-hand-index-thumb me-1"></i> Chạm để quét mã QR
@@ -58,7 +58,7 @@
         </div>
 
         <div class="d-flex gap-3 justify-content-center mt-5">
-            <a href="/my-tickets" class="btn btn-warning fw-medium px-4 btn-lg shadow">
+            <a href="/my-tickets" class="btn btn-primary fw-medium px-4 btn-lg shadow">
                 Vé của tôi
             </a>
             <a href="/" class="btn btn-outline-secondary fw-semibold px-4 btn-lg text-dark">

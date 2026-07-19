@@ -17,7 +17,7 @@
 }
 else
 {
-    <h4 class="text-purple border-start border-purple ps-3 mb-4" data-aos="fade-right"><i class="bi bi-ticket-detailed me-2"></i>Mã giảm giá đang hoạt động</h4>
+    <h4 class="text-primary border-start border-primary ps-3 mb-4" data-aos="fade-right"><i class="bi bi-ticket-detailed me-2"></i>Mã giảm giá đang hoạt động</h4>
     <div class="row g-4">
         @{ int index = 0; }
         @foreach (var promo in promotions)
@@ -46,7 +46,7 @@ else
                         </p>
                         <div class="promo-code-box d-flex align-items-center gap-2 mb-3">
                             <code class="text-warning fs-5 fw-medium">@promo.Code</code>
-                            <button class="btn btn-sm btn-outline-warning rounded-3" onclick="copyPromoCode('@promo.Code')">
+                            <button class="btn btn-sm btn-outline-primary rounded-3" onclick="copyPromoCode('@promo.Code')">
                                 <i class="bi bi-clipboard"></i>
                             </button>
                         </div>
@@ -102,7 +102,7 @@ function copyPromoCode(code) {
         <p class="lead text-white mx-auto mb-4" style="max-width: 600px; text-shadow: 1px 1px 5px rgba(0,0,0,0.8);">
             Đăng ký thành viên CinemaX ngay hôm nay để nhận thẻ cứng độc quyền, tích điểm mỗi lần xem phim và tận hưởng vô vàn ưu đãi đặc quyền!
         </p>
-        <button class="btn btn-warning btn-lg rounded-3 px-5 fw-medium shadow-lg">ĐĂNG KÝ NGAY</button>
+        <button class="btn btn-primary btn-lg rounded-3 px-5 fw-medium shadow-lg">ĐĂNG KÝ NGAY</button>
     </div>
 </div>
 
@@ -219,7 +219,7 @@ function copyPromoCode(code) {
                                 Không chỉ là bắp và nước ngọt, menu VVIP mang đến cho bạn trải nghiệm ẩm thực tinh tế chuẩn nhà hàng 5 sao. 
                                 Bạn có thể thưởng thức ngay trong khi xem phim với hệ thống bàn ăn riêng biệt.
                             </p>
-                            <button class="btn btn-warning btn-lg px-5 rounded-3 fw-medium shadow-sm">Xem Thực Đơn</button>
+                            <button class="btn btn-primary btn-lg px-5 rounded-3 fw-medium shadow-sm">Xem Thực Đơn</button>
                         </div>
                     </div>
                 </div>
@@ -263,7 +263,7 @@ function copyPromoCode(code) {
                             <label class="form-label text-dark fw-medium">Số điện thoại</label>
                             <input type="tel" class="form-control form-control-lg bg-light border-light" placeholder="Nhập số điện thoại">
                         </div>
-                        <button type="button" class="btn btn-warning btn-lg w-100 fw-medium py-3 rounded-3 shadow">GỬI YÊU CẦU NÂNG HẠNG</button>
+                        <button type="button" class="btn btn-primary btn-lg w-100 fw-medium py-3 rounded-3 shadow">GỬI YÊU CẦU NÂNG HẠNG</button>
                     </form>
                 </div>
             </div>
@@ -284,7 +284,7 @@ function copyPromoCode(code) {
         <img src="https://images.unsplash.com/photo-1585647347384-2593bc35786b?q=80&w=800&auto=format&fit=crop" class="img-fluid rounded-2 shadow-sm mb-4" alt="Food">
         <h3 class="fw-medium text-dark mb-3">Ẩm Thực Đỉnh Cao</h3>
         <p class="text-secondary mb-4">Trải nghiệm ẩm thực tinh tế chuẩn nhà hàng 5 sao ngay tại ghế ngồi bọc da cao cấp.</p>
-        <button class="btn btn-warning w-100 rounded-3 fw-medium py-2">Xem Thực Đơn</button>
+        <button class="btn btn-primary w-100 rounded-3 fw-medium py-2">Xem Thực Đơn</button>
     </div>
 
     <div class="py-5 bg-white px-3">
@@ -307,7 +307,7 @@ function copyPromoCode(code) {
             <div class="mb-4">
                 <input type="tel" class="form-control bg-light border-0" placeholder="Số điện thoại">
             </div>
-            <button type="button" class="btn btn-warning w-100 fw-medium py-2 rounded-3">GỬI YÊU CẦU</button>
+            <button type="button" class="btn btn-primary w-100 fw-medium py-2 rounded-3">GỬI YÊU CẦU</button>
         </form>
     </div>
 </div>

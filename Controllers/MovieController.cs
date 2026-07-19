@@ -35,6 +35,19 @@ public class MovieController(IMovieService movieService, ITicketService ticketSe
         return View(viewModel);
     }
 
+    // GET /movies/{id}/booking-modal
+    [HttpGet("{id:int}/booking-modal")]
+    public async Task<IActionResult> BookingModal(int id, string? date = null)
+    {
+        var movie     = await movieService.GetDetailAsync(id);
+        var showDate  = DateOnly.TryParse(date, out var d) ? d : DateOnly.FromDateTime(DateTime.Today);
+        var showtimes = await movieService.GetShowtimesByDateAsync(id, showDate);
+        var viewModel = MovieDetailViewModel.FromMovie(movie, showtimes, new List<CinemaXNet.Domain.Entities.Review>());
+
+        ViewBag.SelectedDate = showDate;
+        return PartialView("_BookingModal", viewModel);
+    }
+
     // GET /my-tickets
     [Authorize]
     [HttpGet("/my-tickets")]

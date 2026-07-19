@@ -12,17 +12,13 @@ WORKDIR /src
 COPY ["CinemaXNet.csproj", "."]
 RUN dotnet restore "./CinemaXNet.csproj"
 
-# Copy everything else and build
+# Copy everything else and publish directly
 COPY . .
-RUN dotnet build "./CinemaXNet.csproj" -c $BUILD_CONFIGURATION -o /app/build --no-restore
-
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./CinemaXNet.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false --no-restore
 
 FROM base AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=build /app/publish .
 
 # Health check for container orchestration
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \

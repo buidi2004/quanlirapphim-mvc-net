@@ -43,14 +43,14 @@
                         <div class="row g-3">
                             <div class="col-6">
                                 <div class="ticket-info-block">
-                                    <i class="bi bi-calendar3 text-purple"></i>
+                                    <i class="bi bi-calendar3 text-primary"></i>
                                     <small class="text-secondary d-block">Ngày chiếu</small>
                                     <strong class="text-dark">@Model.ShowDate</strong>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="ticket-info-block">
-                                    <i class="bi bi-clock text-purple"></i>
+                                    <i class="bi bi-clock text-primary"></i>
                                     <small class="text-secondary d-block">Giờ chiếu</small>
                                     <strong class="text-dark fs-5">@Model.StartTime</strong>
                                 </div>
@@ -73,14 +73,14 @@
                                 <div class="ticket-info-block">
                                     <i class="bi bi-grid-3x3-gap text-success"></i>
                                     <small class="text-secondary d-block">Ghế</small>
-                                    <strong class="text-purple fs-4">@Model.Ticket.SeatCode</strong>
+                                    <strong class="text-primary fs-4">@Model.Ticket.SeatCode</strong>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="ticket-info-block">
-                                    <i class="bi bi-cash-coin text-purple"></i>
+                                    <i class="bi bi-cash-coin text-primary"></i>
                                     <small class="text-secondary d-block">Giá vé</small>
-                                    <strong class="text-purple fs-5">@Model.Ticket.TotalPrice.ToString("N0")₫</strong>
+                                    <strong class="text-primary fs-5">@Model.Ticket.TotalPrice.ToString("N0")₫</strong>
                                 </div>
                             </div>
                         </div>
@@ -108,7 +108,7 @@
                         <p class="text-secondary small">Mã vé có hiệu lực đến @Model.ShowDate</p>
 
                         <div class="d-flex gap-2 justify-content-center mt-3">
-                            <button class="btn btn-outline-warning rounded-3 btn-sm" onclick="shareTicket()">
+                            <button class="btn btn-outline-primary rounded-3 btn-sm" onclick="shareTicket()">
                                 <i class="bi bi-share me-1"></i>Chia sẻ
                             </button>
                         </div>

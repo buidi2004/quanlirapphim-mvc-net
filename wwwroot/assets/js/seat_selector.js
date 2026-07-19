@@ -1,9 +1,52 @@
 // public/assets/js/seat_selector.js
 
-document.addEventListener('DOMContentLoaded', () => {
+function initSeatSelector() {
+    let showtimeId = null;
+    const bookingForm = document.getElementById('booking-form');
+    if (bookingForm) {
+        const input = bookingForm.querySelector('input[name="showtimeId"]');
+        if(input) showtimeId = input.value;
+    }
+
+    // ── SignalR Seat Locking ────────────────────────────────────────
+    let connection = null;
+    const selectedSeats = new Set();
+
+    if (showtimeId && typeof signalR !== 'undefined') {
+        connection = new signalR.HubConnectionBuilder()
+            .withUrl("/seathub")
+            .withAutomaticReconnect()
+            .build();
+
+        connection.on("InitializeLocks", (lockedSeats) => {
+            lockedSeats.forEach(seatCode => {
+                const btn = document.querySelector(`.seat-btn[data-seat="${seatCode}"]`);
+                if (btn && !selectedSeats.has(seatCode) && !btn.disabled) {
+                    btn.classList.add('seat-status-holding');
+                }
+            });
+        });
+
+        connection.on("SeatLocked", (seatCode) => {
+            const btn = document.querySelector(`.seat-btn[data-seat="${seatCode}"]`);
+            if (btn && !selectedSeats.has(seatCode) && !btn.disabled) {
+                btn.classList.add('seat-status-holding');
+            }
+        });
+
+        connection.on("SeatUnlocked", (seatCode) => {
+            const btn = document.querySelector(`.seat-btn[data-seat="${seatCode}"]`);
+            if (btn && !selectedSeats.has(seatCode) && !btn.disabled) {
+                btn.classList.remove('seat-status-holding');
+            }
+        });
+
+        connection.start().then(() => {
+            connection.invoke("JoinShowtimeGroup", parseInt(showtimeId));
+        }).catch(err => console.error('SignalR Connection Error: ', err));
+    }
 
     // ── Seat Selection ────────────────────────────────────────
-    const selectedSeats  = new Set();
     const MAX_SEATS      = 5;
     const pricePerSeatElement = document.querySelector('[data-price-per-seat]');
     const pricePerSeat   = pricePerSeatElement ? parseFloat(pricePerSeatElement.dataset.pricePerSeat) : 0;
@@ -14,24 +57,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (selectedSeats.has(seat)) {
                 // Bỏ chọn
-                btn.classList.remove('selected');
-                // Khôi phục class gốc nếu cần (ở đây CSS lo hết trạng thái selected)
-                if(btn.classList.contains('btn-success')) {
-                     btn.classList.replace('btn-success', 'btn-outline-success');
-                }
+                btn.classList.remove('seat-selected');
                 selectedSeats.delete(seat);
+                
+                if (connection && showtimeId && connection.state === 'Connected') {
+                    try {
+                        connection.invoke("UnlockSeat", parseInt(showtimeId), seat).catch(console.error);
+                    } catch (err) { console.error(err); }
+                }
             } else {
                 // Kiểm tra giới hạn
                 if (selectedSeats.size >= MAX_SEATS) {
                     alert(`Chỉ được chọn tối đa ${MAX_SEATS} ghế.`);
                     return;
                 }
+                
                 // Chọn
-                btn.classList.add('selected');
-                if(btn.classList.contains('btn-outline-success')) {
-                     btn.classList.replace('btn-outline-success', 'btn-success');
-                }
+                btn.classList.add('seat-selected');
                 selectedSeats.add(seat);
+
+                // SignalR Lock
+                if (connection && showtimeId && connection.state === 'Connected') {
+                    try {
+                        connection.invoke("LockSeat", parseInt(showtimeId), seat).then(success => {
+                            if (!success) {
+                                alert("Ghế này vừa có người khác chọn!");
+                                selectedSeats.delete(seat);
+                                btn.classList.remove('seat-selected');
+                                btn.classList.add('seat-status-holding');
+                                updateSummary();
+                            }
+                        }).catch(console.error);
+                    } catch (err) { console.error(err); }
+                }
             }
 
             updateSummary();
@@ -88,7 +146,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Inject seat_codes vào form trước khi submit
-    const bookingForm = document.getElementById('booking-form');
     if (bookingForm) {
         bookingForm.addEventListener('submit', (e) => {
             if (selectedSeats.size === 0) {
@@ -112,14 +169,13 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
 
             // Submit form via AJAX to handle redirects nicely
-            const csrf = bookingForm.querySelector('input[name="_csrf_token"]').value;
-            const showtimeId = bookingForm.querySelector('input[name="showtime_id"]').value;
+            const csrf = bookingForm.querySelector('input[name="__RequestVerificationToken"]')?.value;
             
             const params = new URLSearchParams();
-            params.append('showtime_id', showtimeId);
-            params.append('_csrf_token', csrf);
+            params.append('showtimeId', showtimeId);
+            if (csrf) params.append('__RequestVerificationToken', csrf);
             selectedSeats.forEach(seat => {
-                params.append('seat_codes[]', seat);
+                params.append('seatCodes', seat);
             });
 
             fetch(bookingForm.action, {
@@ -193,13 +249,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             btnPromo.disabled = true;
             btnPromo.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
-            const csrf = document.querySelector('input[name="_csrf_token"]').value;
+            const csrfInput = document.querySelector('input[name="__RequestVerificationToken"]');
+            const csrf = csrfInput ? csrfInput.value : '';
 
             try {
                 const res = await fetch('/booking/apply-promo', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `code=${encodeURIComponent(code)}&subtotal=${subtotal}&_csrf_token=${csrf}`
+                    body: `code=${encodeURIComponent(code)}&subtotal=${subtotal}&__RequestVerificationToken=${csrf}`
                 });
                 const data = await res.json();
 
@@ -223,4 +280,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSeatSelector);
+} else {
+    initSeatSelector();
+}

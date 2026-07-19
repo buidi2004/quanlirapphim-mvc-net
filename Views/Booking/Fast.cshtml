@@ -111,7 +111,7 @@
 
         async function loadCinemas(movieId) {
             const list = document.getElementById('cinema-list');
-            list.innerHTML = '<div class="text-center p-4 text-purple"><div class="spinner-border spinner-border-sm"></div> Đang tải...</div>';
+            list.innerHTML = '<div class="text-center p-4 text-primary"><div class="spinner-border spinner-border-sm"></div> Đang tải...</div>';
             
             try {
                 const res = await fetch(`/api/quickbooking/cinemas?movieId=${movieId}`);
@@ -126,7 +126,7 @@
                 data.forEach(c => {
                     const btn = document.createElement('button');
                     btn.className = 'list-group-item list-group-item-action bg-white text-dark border-0 py-3 cinema-item';
-                    btn.innerHTML = `<i class="bi bi-building me-2 text-purple"></i>${c.name}`;
+                    btn.innerHTML = `<i class="bi bi-building me-2 text-primary"></i>${c.name}`;
                     btn.onclick = () => {
                         document.querySelectorAll('.cinema-item').forEach(i => i.classList.remove('active'));
                         btn.classList.add('active');
@@ -144,7 +144,7 @@
 
         async function loadDates(movieId, cinemaId) {
             const list = document.getElementById('date-list');
-            list.innerHTML = '<div class="text-center p-4 text-purple"><div class="spinner-border spinner-border-sm"></div> Đang tải...</div>';
+            list.innerHTML = '<div class="text-center p-4 text-primary"><div class="spinner-border spinner-border-sm"></div> Đang tải...</div>';
             
             try {
                 const res = await fetch(`/api/quickbooking/dates?movieId=${movieId}&cinemaId=${cinemaId}`);
@@ -170,7 +170,7 @@
 
         async function loadShowtimes(movieId, cinemaId, date) {
             const list = document.getElementById('time-list');
-            list.innerHTML = '<div class="text-center p-4 text-purple"><div class="spinner-border spinner-border-sm"></div> Đang tải...</div>';
+            list.innerHTML = '<div class="text-center p-4 text-primary"><div class="spinner-border spinner-border-sm"></div> Đang tải...</div>';
             
             try {
                 const res = await fetch(`/api/quickbooking/showtimes?movieId=${movieId}&cinemaId=${cinemaId}&date=${date}`);
@@ -187,7 +187,7 @@
                 data.forEach(st => {
                     const a = document.createElement('a');
                     a.href = `/booking/seats?showtimeId=${st.id}`;
-                    a.className = 'btn btn-outline-warning time-btn fw-medium';
+                    a.className = 'btn btn-outline-primary time-btn fw-medium';
                     a.style.width = 'calc(50% - 0.25rem)';
                     a.innerHTML = st.time;
                     container.appendChild(a);

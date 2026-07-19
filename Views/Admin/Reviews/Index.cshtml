@@ -39,7 +39,7 @@
                         <tr>
                             <td><strong class="text-dark">@r.full_name</strong></td>
                             <td><strong class="text-info">@r.movie_title</strong></td>
-                            <td class="text-purple">
+                            <td class="text-primary">
                                 @for (int i = 0; i < Convert.ToInt32(r.rating); i++)
                                 {
                                     <i class="bi bi-star-fill"></i>
@@ -63,7 +63,7 @@
                                 <form method="post" action="/admin/reviews/toggle" class="d-inline">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="id" value="@r.id" />
-                                    <button type="submit" class="btn btn-sm btn-outline-purple" title="Duyệt / Ẩn">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary" title="Duyệt / Ẩn">
                                         <i class="bi bi-eye"></i>
                                     </button>
                                 </form>

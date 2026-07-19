@@ -6,7 +6,7 @@
 
 <nav aria-label="breadcrumb" class="mb-4">
     <ol class="breadcrumb bg-transparent p-0">
-        <li class="breadcrumb-item"><a href="/" class="text-purple text-decoration-none">Trang chủ</a></li>
+        <li class="breadcrumb-item"><a href="/" class="text-primary text-decoration-none">Trang chủ</a></li>
         <li class="breadcrumb-item active text-secondary">Quà tặng &amp; Bắp nước</li>
         <li class="breadcrumb-item active text-secondary">@Model.Name</li>
     </ol>
@@ -33,7 +33,7 @@
                             @Html.Raw(Model.Description)
                         </div>
                         <div class="mt-5 text-center text-md-start">
-                            <a href="/movies" class="btn btn-warning btn-lg px-5 rounded-3 fw-medium">
+                            <a href="/movies" class="btn btn-primary btn-lg px-5 rounded-3 fw-medium">
                                 <i class="bi bi-cart-plus me-2"></i>MUA KÈM VÉ NGAY
                             </a>
                         </div>
@@ -41,7 +41,7 @@
                     <div class="col-md-5">
                         @if (!string.IsNullOrEmpty(Model.Video))
                         {
-                            <h5 class="text-purple mb-3 border-bottom border-light pb-2"><i class="bi bi-youtube me-2 text-danger"></i>Video Review</h5>
+                            <h5 class="text-primary mb-3 border-bottom border-light pb-2"><i class="bi bi-youtube me-2 text-danger"></i>Video Review</h5>
                             <div class="ratio ratio-16x9 rounded-3 overflow-hidden shadow-sm">
                                 <iframe src="@Model.Video" allowfullscreen></iframe>
                             </div>

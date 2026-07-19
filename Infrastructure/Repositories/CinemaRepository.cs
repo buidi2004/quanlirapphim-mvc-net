@@ -37,7 +37,7 @@ public class CinemaRepository(IDbConnection db) : ICinemaRepository
 
     public async Task<IEnumerable<Cinema>> FindNearestAsync(double lat, double lng, int limit = 3)
     {
-        // SQLite doesn't have native spatial functions, calculate distance in memory
+        // Tính khoảng cách Haversine trong memory (không dùng spatial index)
         var all = await GetAllAsync();
         return all
             .Where(c => c.Latitude.HasValue && c.Longitude.HasValue)

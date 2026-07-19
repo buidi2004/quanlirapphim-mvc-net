@@ -1,0 +1,16 @@
+@model CinemaXNet.Application.ViewModels.MovieDetailViewModel
+<div class="modal fade" id="movieBookingModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" style="max-width: 95%;">
+        <div class="modal-content bg-white" style="border-radius: 8px; overflow: hidden;">
+            <div class="modal-header border-bottom border-light align-items-center" style="background-color: var(--color-bg-light);">
+                <h5 class="modal-title fw-bold text-dark d-flex align-items-center text-uppercase fs-4">
+                    @Model.Title
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0" style="background-color: var(--color-bg-white);">
+                @Html.Partial("_ShowtimesBMS", Model)
+            </div>
+        </div>
+    </div>
+</div>

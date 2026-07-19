@@ -66,6 +66,8 @@ public class MovieService(
                 Id             = showtime.Id,
                 CinemaId       = showtime.Room?.CinemaId ?? 0,
                 CinemaName     = showtime.Room?.Cinema?.Name ?? "",
+                CinemaAddress  = showtime.Room?.Cinema?.Address ?? "",
+                Province       = showtime.Room?.Cinema?.Province ?? "Khác",
                 ShowDate       = showtime.ShowDate,
                 StartTime      = showtime.StartTime,
                 EndTime        = showtime.EndTime,

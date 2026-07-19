@@ -36,7 +36,7 @@ public class TicketService(
             throw new SeatUnavailableException(takenSeats);
 
         // Transaction
-        if (db is System.Data.Common.DbConnection dbConn)
+        if (db is System.Data.Common.DbConnection dbConn && dbConn.State == System.Data.ConnectionState.Closed)
             await dbConn.OpenAsync();
 
         using var transaction = db.BeginTransaction();
@@ -59,7 +59,7 @@ public class TicketService(
                     TotalPrice    = 0,
                     Version       = 0
                 };
-                ticketIds.Add(await ticketRepo.CreateAsync(ticket));
+                ticketIds.Add(await ticketRepo.CreateAsync(ticket, transaction));
             }
 
             transaction.Commit();
@@ -93,7 +93,7 @@ public class TicketService(
 
             foreach (var ticketId in ids)
             {
-                var ticket = await ticketRepo.FindByIdAsync(ticketId)
+                var ticket = await ticketRepo.FindByIdAsync(ticketId, transaction)
                     ?? throw new BusinessException("Không tìm thấy thông tin vé.");
 
                 if (ticket.UserId != userId && userId != null)
@@ -103,7 +103,7 @@ public class TicketService(
                     throw new BusinessException("Phiên giữ chỗ đã hết hạn. Vui lòng chọn ghế lại.");
 
                 var rowsAffected = await ticketRepo.UpdateStatusWithVersionAsync(
-                    ticketId, TicketStatus.Paid, ticket.Version, individualPrice, promotionCode);
+                    ticketId, TicketStatus.Paid, ticket.Version, individualPrice, promotionCode, transaction);
 
                 if (rowsAffected == 0)
                     throw new ConcurrencyException(
@@ -124,13 +124,13 @@ public class TicketService(
                         FoodBeverageId = conc.FoodBeverageId,
                         Quantity = conc.Quantity,
                         Price = conc.Price
-                    });
+                    }, transaction);
                 }
             }
 
             if (!string.IsNullOrEmpty(promotionCode))
             {
-                await db.ExecuteAsync("UPDATE promotions SET used_count = used_count + 1 WHERE code = @Code", new { Code = promotionCode });
+                await db.ExecuteAsync("UPDATE promotions SET used_count = used_count + 1 WHERE code = @Code", new { Code = promotionCode }, transaction);
             }
 
             // Update loyalty points and membership tier via Domain Event
@@ -139,7 +139,8 @@ public class TicketService(
                 await mediator.Publish(new TicketPaidEvent 
                 { 
                     UserId = userId.Value, 
-                    TotalPrice = totalPrice.Value 
+                    TotalPrice = totalPrice.Value,
+                    Transaction = transaction
                 });
             }
 

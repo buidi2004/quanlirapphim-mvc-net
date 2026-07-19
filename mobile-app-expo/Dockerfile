@@ -3,15 +3,9 @@ FROM node:20-alpine
 # Set working directory
 WORKDIR /app
 
-# Install dependencies first for better caching
-COPY package*.json ./
-RUN npm install
-
-# Copy the rest of the application code
-COPY . .
-
 # Expose Metro bundler port
 EXPOSE 8081
 
-# Start Expo with LAN enabled so you can scan the QR code within the same network
-CMD ["npx", "expo", "start", "--lan"]
+# Run npm install on startup to keep node_modules in sync, then start Expo.
+# We avoid running npm ci during build to prevent the 30s+ volume copying delay during container creation.
+CMD ["sh", "-c", "npm install && npx expo start --lan"]

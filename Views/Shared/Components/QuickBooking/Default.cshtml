@@ -4,7 +4,7 @@
     <div class="card-body p-4">
         <form action="/booking/quick" method="GET" class="row g-3 align-items-end" id="quickBookingForm">
             <div class="col-md-3">
-                <label class="form-label text-warning fw-medium small"><i class="bi bi-film me-1"></i>Chọn Phim</label>
+                <label for="qb-movie" class="form-label text-warning fw-medium small"><i class="bi bi-film me-1"></i>Chọn Phim</label>
                 <select name="movieId" id="qb-movie" class="form-select bg-light border-0 text-dark rounded-3" required>
                     <option value="">-- Chọn phim --</option>
                     @foreach (var m in Model) {
@@ -13,25 +13,25 @@
                 </select>
             </div>
             <div class="col-md-3">
-                <label class="form-label text-warning fw-medium small"><i class="bi bi-geo-alt me-1"></i>Chọn Rạp</label>
+                <label for="qb-cinema" class="form-label text-warning fw-medium small"><i class="bi bi-geo-alt me-1"></i>Chọn Rạp</label>
                 <select name="cinemaId" id="qb-cinema" class="form-select bg-light border-0 text-dark rounded-3" disabled required>
                     <option value="">-- Chọn rạp --</option>
                 </select>
             </div>
             <div class="col-md-2">
-                <label class="form-label text-warning fw-medium small"><i class="bi bi-calendar3 me-1"></i>Ngày chiếu</label>
+                <label for="qb-date" class="form-label text-warning fw-medium small"><i class="bi bi-calendar3 me-1"></i>Ngày chiếu</label>
                 <select name="date" id="qb-date" class="form-select bg-light border-0 text-dark rounded-3" disabled required>
                     <option value="">-- Chọn ngày --</option>
                 </select>
             </div>
             <div class="col-md-2">
-                <label class="form-label text-warning fw-medium small"><i class="bi bi-clock me-1"></i>Suất chiếu</label>
+                <label for="qb-showtime" class="form-label text-warning fw-medium small"><i class="bi bi-clock me-1"></i>Suất chiếu</label>
                 <select name="showtimeId" id="qb-showtime" class="form-select bg-light border-0 text-dark rounded-3" disabled required>
                     <option value="">-- Chọn suất --</option>
                 </select>
             </div>
             <div class="col-md-2">
-                <button type="submit" id="qb-submit" class="btn btn-warning w-100 rounded-3 fw-medium" disabled>ĐẶT VÉ</button>
+                <button type="submit" id="qb-submit" class="btn btn-primary w-100 rounded-3 fw-medium" disabled aria-label="Xác nhận đặt vé">ĐẶT VÉ</button>
             </div>
         </form>
     </div>

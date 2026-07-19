@@ -1,0 +1,227 @@
+@model CinemaXNet.Application.ViewModels.MovieDetailViewModel
+@{
+    var selectedDate = ViewBag.SelectedDate as DateOnly? ?? DateOnly.FromDateTime(DateTime.Today);
+    var daysOfWeek = new string[] { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+    
+    var allProvinces = new[] {
+        "Hồ Chí Minh", "Hà Nội", "Đà Nẵng", "Cần Thơ", "Đồng Nai", "Hải Phòng", 
+        "Quảng Ninh", "Bà Rịa-Vũng Tàu", "Bình Định", "Bình Dương", "Đắk Lắk", 
+        "Trà Vinh", "Yên Bái", "Vĩnh Long", "Kiên Giang", "Hà Tĩnh", "Phú Yên", 
+        "Đồng Tháp", "Bạc Liêu", "Hưng Yên", "Khánh Hòa", "Kon Tum", "Lạng Sơn", 
+        "Nghệ An", "Phú Thọ", "Quảng Ngãi", "Sóc Trăng", "Sơn La", "Tây Ninh", 
+        "Thái Nguyên", "Tiền Giang", "Gia Lai", "Ninh Thuận", "Bình Thuận"
+    };
+    
+    var activeProvince = Model.GroupedShowtimes.FirstOrDefault()?.Province;
+}
+
+<style>
+    .cgv-container {
+        background-color: #fdfcf0;
+        color: #333;
+        font-family: Arial, sans-serif;
+    }
+    .cgv-date-list {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 1.5rem;
+        padding: 1rem 0;
+        border-bottom: 2px solid #333;
+    }
+    .cgv-date-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        cursor: pointer;
+        color: #777;
+        min-width: 40px;
+    }
+    .cgv-date-item.active {
+        color: #333;
+        font-weight: bold;
+    }
+    .cgv-date-month { font-size: 0.7rem; }
+    .cgv-date-day { font-size: 1.8rem; line-height: 1; margin: 2px 0; }
+    .cgv-date-dow { font-size: 0.75rem; }
+    
+    .cgv-prov-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        padding: 1rem 0;
+        border-bottom: 2px solid #333;
+        font-size: 0.85rem;
+    }
+    .cgv-prov-item {
+        cursor: pointer;
+        color: #333;
+    }
+    .cgv-prov-item.active {
+        background-color: #000;
+        color: #fff;
+        font-weight: bold;
+        padding: 2px 8px;
+    }
+    .cgv-prov-item.disabled {
+        color: #999;
+        cursor: default;
+    }
+    
+    .cgv-format-list {
+        display: flex;
+        gap: 10px;
+        padding: 1rem 0;
+        border-bottom: 2px solid #333;
+    }
+    .cgv-format-item {
+        border: 1px solid #333;
+        padding: 4px 12px;
+        font-size: 0.8rem;
+        border-radius: 4px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .cgv-format-item.active {
+        background-color: #333;
+        color: #fff;
+    }
+    
+    .cgv-cinema-item {
+        padding: 1.5rem 0;
+        border-bottom: 1px solid #ccc;
+    }
+    .cgv-cinema-name {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 5px;
+    }
+    .cgv-format-name {
+        font-size: 0.85rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
+    }
+    .cgv-time-box {
+        display: inline-block;
+        border: 1px solid #ccc;
+        padding: 5px 12px;
+        font-size: 1rem;
+        color: #333;
+        text-decoration: none;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        background-color: #fff;
+    }
+    .cgv-time-box:hover {
+        background-color: #f0f0f0;
+        color: #d32f2f;
+        border-color: #d32f2f;
+    }
+    .cgv-time-box.disabled {
+        background-color: #f5f5f5;
+        color: #ccc;
+        border-color: #eee;
+        pointer-events: none;
+    }
+</style>
+
+<div class="cgv-container p-4" id="showtimes-section">
+    <!-- Date Picker -->
+    <div class="cgv-date-list">
+        @for (int i = 0; i < 20; i++)
+        {
+            var currentDate = DateOnly.FromDateTime(DateTime.Today.AddDays(i));
+            var dateVal = currentDate.ToString("yyyy-MM-dd");
+            var monthStr = currentDate.Month.ToString("D2");
+            var dayStr = currentDate.Day.ToString("D2");
+            var dow = daysOfWeek[(int)currentDate.DayOfWeek];
+            var isActive = currentDate == selectedDate;
+            
+            <div class="cgv-date-item @(isActive ? "active" : "")" onclick="loadCgvShowtimes(@Model.Id, '@dateVal')">
+                <div class="cgv-date-month">@monthStr</div>
+                <div class="cgv-date-day">@dayStr</div>
+                <div class="cgv-date-dow">@dow</div>
+            </div>
+        }
+    </div>
+
+    <!-- Provinces -->
+    <div class="cgv-prov-list">
+        @foreach (var p in allProvinces)
+        {
+            var hasShowtimes = Model.GroupedShowtimes.Any(x => x.Province == p);
+            var isActive = hasShowtimes && p == activeProvince;
+            var classes = isActive ? "cgv-prov-item active" : (hasShowtimes ? "cgv-prov-item" : "cgv-prov-item disabled");
+            
+            <div class="@classes" @(hasShowtimes ? $"onclick=\"selectCgvProvince('{p}')\"" : "") data-prov="@p">
+                @p
+            </div>
+        }
+    </div>
+
+    @if (Model.Status != "now_showing")
+    {
+        <div class="text-center py-5">
+            <h5 class="fw-normal">Phim hiện không ở trạng thái "Đang chiếu" nên không có suất chiếu.</h5>
+        </div>
+    }
+    else if (!Model.Showtimes.Any())
+    {
+        <div class="text-center py-5">
+            <h5 class="fw-normal">Không có suất chiếu nào vào ngày @selectedDate.ToString("dd/MM/yyyy").</h5>
+        </div>
+    }
+    else
+    {
+        <!-- Formats Filter -->
+        <div class="cgv-format-list">
+            <div class="cgv-format-item active" onclick="filterCgvFormat('All', this)">Tất cả</div>
+            <div class="cgv-format-item" onclick="filterCgvFormat('2D', this)">2D</div>
+            <div class="cgv-format-item" onclick="filterCgvFormat('3D', this)">3D</div>
+            <div class="cgv-format-item" onclick="filterCgvFormat('IMAX', this)">IMAX</div>
+            <div class="cgv-format-item" onclick="filterCgvFormat('4DX', this)">4DX</div>
+        </div>
+
+        <!-- Cinemas Content -->
+        <div class="cgv-content">
+            @foreach (var prov in Model.GroupedShowtimes)
+            {
+                <div class="cgv-prov-pane @(prov.Province == activeProvince ? "" : "d-none")" id="pane-@prov.Province.Replace(" ", "-")">
+                    @foreach (var cinema in prov.Cinemas)
+                    {
+                        <div class="cgv-cinema-item">
+                            <div class="cgv-cinema-name">@cinema.CinemaName</div>
+                            
+                            @{
+                                // Group by format
+                                var formatGroups = cinema.Showtimes.GroupBy(s => s.Format).ToList();
+                            }
+                            
+                            @foreach (var fg in formatGroups)
+                            {
+                                <div class="format-group" data-format="@fg.Key">
+                                    <div class="cgv-format-name mt-2">Rạp @fg.Key</div>
+                                    <div class="d-flex flex-wrap">
+                                        @foreach (var st in fg)
+                                        {
+                                            var isFull = st.AvailableSeats == 0;
+                                            var disabledClass = isFull ? "disabled" : "";
+                                            var link = isFull ? "javascript:void(0)" : $"/booking/{st.Id}";
+                                            
+                                            <a href="@link" class="cgv-time-box @disabledClass">
+                                                @st.StartTime.ToString("HH:mm")
+                                            </a>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>
+

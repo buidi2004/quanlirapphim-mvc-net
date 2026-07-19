@@ -17,15 +17,15 @@
                 <div class="col-md-6">
                     <div class="btn-group shadow-sm" role="group">
                         <a href="/movies?status=now_showing@(genre != null ? "&genre=" + Uri.EscapeDataString(genre) : "")"
-                           class="btn btn-sm @(status == "now_showing" ? "btn-warning fw-medium" : "btn-outline-secondary")">
+                           class="btn btn-sm @(status == "now_showing" ? "btn-primary fw-medium" : "btn-outline-secondary")">
                             <i class="bi bi-play-fill"></i> Đang chiếu
                         </a>
                         <a href="/movies?status=coming_soon@(genre != null ? "&genre=" + Uri.EscapeDataString(genre) : "")"
-                           class="btn btn-sm @(status == "coming_soon" ? "btn-warning fw-medium" : "btn-outline-secondary")">
+                           class="btn btn-sm @(status == "coming_soon" ? "btn-primary fw-medium" : "btn-outline-secondary")">
                             <i class="bi bi-calendar-event"></i> Sắp chiếu
                         </a>
                         <a href="/movies?status=ended@(genre != null ? "&genre=" + Uri.EscapeDataString(genre) : "")"
-                           class="btn btn-sm @(status == "ended" ? "btn-warning fw-medium" : "btn-outline-secondary")">
+                           class="btn btn-sm @(status == "ended" ? "btn-primary fw-medium" : "btn-outline-secondary")">
                             <i class="bi bi-stop-fill"></i> Đã dừng chiếu
                         </a>
                     </div>
@@ -35,7 +35,7 @@
                 <div class="col-md-6 text-md-end">
                     <label class="text-secondary small me-2">Thể loại:</label>
                     <div class="dropdown d-inline-block">
-                        <button class="btn btn-sm btn-outline-purple dropdown-toggle fw-semibold" type="button" data-bs-toggle="dropdown">
+                        <button class="btn btn-sm btn-outline-primary dropdown-toggle fw-semibold" type="button" data-bs-toggle="dropdown">
                             @(genre ?? "Tất cả")
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end border-light bg-white shadow">

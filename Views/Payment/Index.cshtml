@@ -89,7 +89,7 @@
                            class="form-control bg-light text-dark border-light py-2"
                            placeholder="Nhập mã giảm giá (ví dụ: GIAM20)..."
                            value="@(Model.PromotionCode ?? "")">
-                    <button class="btn btn-warning fw-medium px-4" id="btn-apply-promo" type="button">
+                    <button class="btn btn-primary fw-medium px-4" id="btn-apply-promo" type="button">
                         Áp dụng
                     </button>
                 </div>
@@ -112,7 +112,7 @@
                 <hr class="border-light">
                 <div class="d-flex justify-content-between align-items-center">
                     <strong class="text-dark fs-5">TỔNG THANH TOÁN:</strong>
-                    <strong class="text-purple fs-3" id="total-display">@Model.TotalPrice.ToString("N0")₫</strong>
+                    <strong class="text-primary fs-3" id="total-display">@Model.TotalPrice.ToString("N0")₫</strong>
                 </div>
             </div>
         </div>
@@ -152,7 +152,7 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-warning w-100 btn-lg fw-medium py-3 shadow mb-4" id="btn-pay-submit">
+            <button type="submit" class="btn btn-primary w-100 btn-lg fw-medium py-3 shadow mb-4" id="btn-pay-submit">
                 <i class="bi bi-check-circle me-2"></i>XÁC NHẬN THANH TOÁN
             </button>
         </form>

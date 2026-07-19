@@ -55,7 +55,7 @@
         </div>
 
         <div class="mb-4">
-            <button class="btn btn-outline-warning rounded-3 px-4" data-bs-toggle="modal" data-bs-target="#trailerModal">
+            <button class="btn btn-outline-primary rounded-3 px-4" data-bs-toggle="modal" data-bs-target="#trailerModal">
                 Xem Trailer
             </button>
         </div>
@@ -73,78 +73,11 @@
         <i class="bi bi-calendar3 me-2"></i>LỊCH CHIẾU & SUẤT CHIẾU
     </h3>
 
-            <!-- Date slider — Trượt ngang, scrollbar ẩn -->
-            <div class="date-slider mb-4 pb-3 border-bottom border-secondary">
-                @for (int i = 0; i < 7; i++)
-                {
-                    var currentDate = DateOnly.FromDateTime(DateTime.Today.AddDays(i));
-                    var dateVal = currentDate.ToString("yyyy-MM-dd");
-                    var dayLabel = (i == 0) ? "Hôm nay" : daysOfWeek[(int)DateTime.Today.AddDays(i).DayOfWeek];
-                    var dayNumber = currentDate.Day;
-                    var monthLabel = "Th" + currentDate.Month;
-                    var activeClass = (currentDate == selectedDate) ? "active" : "";
-                    
-                    <a href="/movies/@Model.Id?date=@dateVal"
-                       class="date-item @activeClass text-secondary">
-                        <span class="day-name opacity-75">@dayLabel</span>
-                        <span class="day-number text-dark">@dayNumber</span>
-                        <span class="day-name opacity-75">@monthLabel</span>
-                    </a>
-                }
-            </div>
-
-            <!-- Showtime cards -->
-            <div class="showtimes-container mt-4">
-                @if (Model.Status != "now_showing")
-                {
-                    <div class="text-center py-5 text-dark opacity-75 bg-light bg-opacity-50 rounded-4 border border-secondary">
-                        <i class="bi bi-calendar-x display-4 mb-3 d-block text-purple opacity-75"></i>
-                        <h5 class="fw-normal">Phim hiện không ở trạng thái "Đang chiếu" nên không có suất chiếu.</h5>
-                    </div>
-                }
-                else if (!Model.Showtimes.Any())
-                {
-                    <div class="text-center py-5 text-dark opacity-75 bg-light bg-opacity-50 rounded-4 border border-secondary">
-                        <i class="bi bi-clock-history display-4 mb-3 d-block text-purple opacity-75"></i>
-                        <h5 class="fw-normal">Không có suất chiếu nào vào ngày @selectedDate.ToString("dd/MM/yyyy").<br>Vui lòng chọn ngày khác.</h5>
-                    </div>
-                }
-                else
-                {
-                    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-                        @foreach (var showtime in Model.Showtimes)
-                        {
-                            <div class="col">
-                                <div class="showtime-card bg-white bg-opacity-10 border border-light rounded-4 p-4 h-100 d-flex flex-column justify-content-between transition-all hover-shadow" style="backdrop-filter: blur(10px);">
-                                    <div class="mb-3">
-                                        <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <span class="badge bg-purple text-white fw-bold px-3 py-2 rounded-pill shadow-sm">
-                                                <i class="bi bi-camera-reels-fill me-1"></i> @showtime.RoomName
-                                            </span>
-                                        </div>
-                                        <div class="text-center">
-                                            <div class="time display-5 fw-bolder text-dark mb-1" style="letter-spacing: -1px;">@showtime.StartTime.ToString("HH:mm")</div>
-                                            <div class="price fs-5 text-info fw-bold mb-2">@showtime.FormattedPrice</div>
-                                            <div class="small text-secondary opacity-75 @(showtime.AvailableSeats <= 20 ? "text-danger fw-bold opacity-100" : "")">
-                                                <i class="bi bi-people-fill me-1"></i> Còn @showtime.AvailableSeats ghế trống
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <a href="/booking/@showtime.Id"
-                                       class="btn btn-purple w-100 fw-bold rounded-pill shadow hover-shadow @(showtime.AvailableSeats == 0 ? "disabled btn-secondary text-muted" : "")">
-                                        @(showtime.AvailableSeats == 0 ? "HẾT VÉ" : "CHỌN GHẾ")
-                                    </a>
-                                </div>
-                            </div>
-                            <a href="/booking/@showtime.Id"
-                               class="btn btn-warning w-100 fw-medium btn-select-showtime @(showtime.AvailableSeats == 0 ? "disabled btn-secondary text-muted" : "")">
-                                @(showtime.AvailableSeats == 0 ? "Hết vé" : "Chọn ghế")
-                            </a>
-                        </div>
-                    </div>
-                }
-            </div>
-        </div>
+    <!-- Showtime cards (BookMyShow Style) -->
+    <div class="showtimes-container mt-4 mb-5 border border-light rounded-4 overflow-hidden shadow-sm">
+        @Html.Partial("_ShowtimesCGV", Model)
+    </div>
+</div>
 
 <!-- Reviews Section -->
 <div class="card bg-white border border-light rounded p-4 shadow-lg mt-4">
@@ -170,7 +103,7 @@
             <div class="mb-3">
                 <textarea name="Comment" class="form-control bg-white text-dark border-light" rows="3" placeholder="Chia sẻ cảm nghĩ của bạn về bộ phim này..." required></textarea>
             </div>
-            <button type="submit" class="btn btn-warning"><i class="bi bi-send me-1"></i> Gửi đánh giá</button>
+            <button type="submit" class="btn btn-primary"><i class="bi bi-send me-1"></i> Gửi đánh giá</button>
         </form>
     }
     else
@@ -189,57 +122,58 @@
         {
             foreach (var review in Model.Reviews)
             {
-                <form method="POST" asp-controller="Reviews" asp-action="Submit" class="mb-4 bg-white bg-opacity-50 shadow-sm p-4 rounded-4 border border-light">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="MovieId" value="@Model.Id">
-                    <div class="mb-3">
-                        <label class="form-label text-dark fw-bold">Đánh giá của bạn</label>
-                        <select name="Rating" class="form-select bg-white text-dark border-light" style="width: auto;">
-                            <option value="5">★★★★★ (5 sao) - Tuyệt vời</option>
-                            <option value="4">★★★★☆ (4 sao) - Rất tốt</option>
-                            <option value="3">★★★☆☆ (3 sao) - Khá</option>
-                            <option value="2">★★☆☆☆ (2 sao) - Trung bình</option>
-                            <option value="1">★☆☆☆☆ (1 sao) - Tệ</option>
-                        </select>
+                <div class="review-item border-bottom border-light pb-3 mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong class="text-dark"><i class="bi bi-person-circle me-2 text-primary"></i>@review.User?.Username</strong>
+                        <small class="text-secondary opacity-75">@review.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
                     </div>
-                    <div class="mb-3">
-                        <textarea name="Comment" class="form-control bg-white text-dark border-light" rows="3" placeholder="Chia sẻ cảm nghĩ của bạn về bộ phim này..." required></textarea>
+                    <div class="text-primary mb-2 fs-5">
+                        @for(int i = 1; i <= 5; i++)
+                        {
+                            <i class="bi bi-star@(i <= review.Rating ? "-fill" : "")"></i>
+                        }
                     </div>
-                    <button type="submit" class="btn btn-purple rounded-pill fw-bold"><i class="bi bi-send me-1"></i> Gửi đánh giá</button>
-                </form>
-            }
-            else
-            {
-                <div class="alert bg-white bg-opacity-75 shadow-sm text-dark border border-light rounded-4">
-                    Vui lòng <a href="/login" class="text-purple text-decoration-none fw-bold">đăng nhập</a> để viết đánh giá cho bộ phim này.
+                    <p class="text-secondary mb-0 opacity-75">@Html.Raw(review.Comment.Replace("\n", "<br/>"))</p>
                 </div>
             }
-
-            <div class="reviews-list mt-4">
-                @if (!Model.Reviews.Any())
-                {
-                    <p class="text-secondary opacity-75 text-center py-3"><i class="bi bi-chat-square-text me-2"></i>Chưa có đánh giá nào cho phim này.</p>
-                }
-                else
-                {
-                    foreach (var review in Model.Reviews)
-                    {
-                        <div class="review-item border-bottom border-light pb-3 mb-3">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <strong class="text-dark"><i class="bi bi-person-circle me-2 text-purple"></i>@review.User?.Username</strong>
-                                <small class="text-secondary opacity-75">@review.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
-                            </div>
-                            <div class="text-purple mb-2 fs-5">
-                                @for(int i = 1; i <= 5; i++)
-                                {
-                                    <i class="bi bi-star@(i <= review.Rating ? "-fill" : "")"></i>
-                                }
-                            </div>
-                            <p class="text-secondary mb-0 opacity-75">@Html.Raw(review.Comment.Replace("\n", "<br/>"))</p>
-                        </div>
-                    }
-                }
-            </div>
-        </div>
-    </div> <!-- End inner container -->
+        }
+    </div>
+</div>
+    </div> <!-- End position-relative z-1 -->
 </div> <!-- End wrapper container -->
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if user has already selected a tab manually to not override it on back navigation
+            if (sessionStorage.getItem('province_auto_selected') === 'true') return;
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    fetch(`/api/cinemas/nearest?lat=${lat}&lng=${lng}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success && data.data.length > 0) {
+                                const nearestProvince = data.data[0].province;
+                                // Find the tab with this province
+                                const tabs = document.querySelectorAll('#province-tabs .nav-link');
+                                for (let tab of tabs) {
+                                    if (tab.innerText.trim().includes(nearestProvince)) {
+                                        tab.click();
+                                        sessionStorage.setItem('province_auto_selected', 'true');
+                                        break;
+                                    }
+                                }
+                            }
+                        })
+                        .catch(err => console.error('Error fetching nearest province:', err));
+                }, () => {
+                    // Geolocation denied or failed, ignore
+                });
+            }
+        });
+    </script>
+}
