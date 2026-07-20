@@ -34,7 +34,7 @@ public class AdminReviewsController(IReviewService reviewService) : Controller
                 TempData["Error"] = result.Message;
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
@@ -50,7 +50,7 @@ public class AdminReviewsController(IReviewService reviewService) : Controller
             await reviewService.DeleteReviewAsync(id);
             TempData["Success"] = "Đã xóa đánh giá!";
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }

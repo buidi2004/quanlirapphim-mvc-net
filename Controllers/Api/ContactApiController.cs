@@ -29,7 +29,7 @@ public class ContactApiController(IContactService contactService) : ControllerBa
             });
             return Ok(ApiResponse<object>.Ok(new { }, "Yêu cầu hỗ trợ của bạn đã được gửi. Chúng tôi sẽ phản hồi sớm nhất có thể."));
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return StatusCode(500, ApiResponse<object>.Fail("Đã xảy ra lỗi khi gửi yêu cầu. Vui lòng thử lại sau."));
         }

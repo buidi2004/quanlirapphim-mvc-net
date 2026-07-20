@@ -27,7 +27,7 @@ public class AdminPromotionsController(IPromotionService promotionService) : Con
             await promotionService.CreateAsync(new { Code = code, Title = title, Description = description, DiscountPercent = discountPercent, ValidFrom = validFrom, ValidTo = validTo, IsActive = isActive });
             TempData["Success"] = "Thêm khuyến mãi thành công!";
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
@@ -43,7 +43,7 @@ public class AdminPromotionsController(IPromotionService promotionService) : Con
             await promotionService.UpdateAsync(new { Id = id, Code = code, Title = title, Description = description, DiscountPercent = discountPercent, ValidFrom = validFrom, ValidTo = validTo, IsActive = isActive });
             TempData["Success"] = "Cập nhật khuyến mãi thành công!";
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
@@ -59,7 +59,7 @@ public class AdminPromotionsController(IPromotionService promotionService) : Con
             await promotionService.DeleteAsync(id);
             TempData["Success"] = "Xóa khuyến mãi thành công!";
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }

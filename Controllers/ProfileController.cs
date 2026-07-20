@@ -92,7 +92,14 @@ public class ProfileController(IUserService userService, ITicketService ticketSe
 
         if (avatar != null && avatar.Length > 0)
         {
-            var ext       = Path.GetExtension(avatar.FileName);
+            var ext       = Path.GetExtension(avatar.FileName).ToLowerInvariant();
+            var allowedExts = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+            if (!allowedExts.Contains(ext))
+            {
+                ModelState.AddModelError("avatar", "Chỉ chấp nhận file ảnh (jpg, png, gif, webp).");
+                ViewBag.User = await userService.GetByIdAsync(GetUserId());
+                return View(vm);
+            }
             var filename  = $"avatar_{userId}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}{ext}";
             var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "avatars");
             Directory.CreateDirectory(uploadDir);

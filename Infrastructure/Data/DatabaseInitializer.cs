@@ -110,11 +110,13 @@ public static class DatabaseInitializer
             CREATE TABLE IF NOT EXISTS tickets (
                 id               INT AUTO_INCREMENT PRIMARY KEY,
                 showtime_id      INT           NOT NULL,
-                user_id          INT           NOT NULL,
+                user_id          INT,
+                guest_email      VARCHAR(255),
+                guest_phone      VARCHAR(20),
                 seat_code        VARCHAR(10)   NOT NULL,
                 status           VARCHAR(20)   NOT NULL DEFAULT 'holding',
                 concession_status VARCHAR(20)  DEFAULT 'pending',
-                hold_expiry_time VARCHAR(50),
+                hold_expiry_time DATETIME,
                 total_price      DECIMAL(18,2) NOT NULL DEFAULT 0,
                 promotion_code   VARCHAR(50),
                 version          INT           NOT NULL DEFAULT 0,
@@ -123,6 +125,11 @@ public static class DatabaseInitializer
                 FOREIGN KEY (user_id) REFERENCES users(id)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         """);
+
+        // Ensure user_id is nullable for guest bookings (fix for existing databases)
+        try { db.Execute("ALTER TABLE tickets MODIFY COLUMN user_id INT NULL"); } catch { }
+        try { db.Execute("ALTER TABLE tickets ADD COLUMN guest_email VARCHAR(255) AFTER user_id"); } catch { }
+        try { db.Execute("ALTER TABLE tickets ADD COLUMN guest_phone VARCHAR(20) AFTER guest_email"); } catch { }
 
         db.Execute("""
             CREATE TABLE IF NOT EXISTS promotions (

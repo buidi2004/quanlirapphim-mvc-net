@@ -5,7 +5,6 @@ using CinemaXNet.Domain.ValueObjects;
 using CinemaXNet.Domain.Entities;
 using CinemaXNet.Domain.Constants;
 using CinemaXNet.Application.Interfaces;
-using CinemaXNet.Application.Interfaces;
 using CinemaXNet.Application.ViewModels;
 using CinemaXNet.Application.Commands;
 using MediatR;

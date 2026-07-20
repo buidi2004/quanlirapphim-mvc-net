@@ -29,7 +29,10 @@ public class SettingService(ISettingRepository settingRepository) : ISettingServ
 
         if (site_logo != null && site_logo.Length > 0)
         {
-            var ext = Path.GetExtension(site_logo.FileName);
+            var ext = Path.GetExtension(site_logo.FileName).ToLowerInvariant();
+            var allowedExts = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+            if (!allowedExts.Contains(ext))
+                throw new InvalidOperationException("Chỉ chấp nhận file ảnh (jpg, png, gif, webp).");
             var newName = $"logo_{Guid.NewGuid():N}{ext}";
             var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "settings");
             Directory.CreateDirectory(uploadDir);

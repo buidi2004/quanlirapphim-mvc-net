@@ -49,14 +49,22 @@ public class AdminController(IMovieService movieService, IAuditLogService auditL
         string? posterUrl = null;
         if (poster != null && poster.Length > 0)
         {
-            var ext      = Path.GetExtension(poster.FileName);
-            var newName  = $"{Guid.NewGuid():N}{ext}";
-            var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-            Directory.CreateDirectory(uploadDir);
-            var filePath = Path.Combine(uploadDir, newName);
-            await using var stream = System.IO.File.Create(filePath);
-            await poster.CopyToAsync(stream);
-            posterUrl = "/uploads/" + newName;
+            var ext      = Path.GetExtension(poster.FileName).ToLowerInvariant();
+            var allowedExts = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+            if (!allowedExts.Contains(ext))
+            {
+                errors["poster"] = "Chỉ chấp nhận file ảnh (jpg, png, gif, webp).";
+            }
+            else
+            {
+                var newName  = $"{Guid.NewGuid():N}{ext}";
+                var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                Directory.CreateDirectory(uploadDir);
+                var filePath = Path.Combine(uploadDir, newName);
+                await using var stream = System.IO.File.Create(filePath);
+                await poster.CopyToAsync(stream);
+                posterUrl = "/uploads/" + newName;
+            }
         }
 
         if (errors.Count > 0)
@@ -114,14 +122,20 @@ public class AdminController(IMovieService movieService, IAuditLogService auditL
         string? posterUrl = null;
         if (poster != null && poster.Length > 0)
         {
-            var ext      = Path.GetExtension(poster.FileName);
-            var newName  = $"{Guid.NewGuid():N}{ext}";
-            var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-            Directory.CreateDirectory(uploadDir);
-            var filePath = Path.Combine(uploadDir, newName);
-            await using var stream = System.IO.File.Create(filePath);
-            await poster.CopyToAsync(stream);
-            posterUrl = "/uploads/" + newName;
+            var ext      = Path.GetExtension(poster.FileName).ToLowerInvariant();
+            var allowedExts = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+            if (!allowedExts.Contains(ext))
+                errors["poster"] = "Chỉ chấp nhận file ảnh (jpg, png, gif, webp).";
+            else
+            {
+                var newName  = $"{Guid.NewGuid():N}{ext}";
+                var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                Directory.CreateDirectory(uploadDir);
+                var filePath = Path.Combine(uploadDir, newName);
+                await using var stream = System.IO.File.Create(filePath);
+                await poster.CopyToAsync(stream);
+                posterUrl = "/uploads/" + newName;
+            }
         }
 
         if (errors.Count > 0)
@@ -150,7 +164,7 @@ public class AdminController(IMovieService movieService, IAuditLogService auditL
             
             TempData["Success"] = "Cập nhật phim thành công!";
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
@@ -172,7 +186,7 @@ public class AdminController(IMovieService movieService, IAuditLogService auditL
             
             TempData["Success"] = "Xóa phim thành công!";
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }

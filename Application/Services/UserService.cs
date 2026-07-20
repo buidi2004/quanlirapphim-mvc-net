@@ -1,7 +1,6 @@
 using CinemaXNet.Domain.Exceptions;
 using CinemaXNet.Domain.Entities;
 using CinemaXNet.Application.Interfaces;
-using CinemaXNet.Application.Interfaces;
 
 namespace CinemaXNet.Application.Services;
 
@@ -116,4 +115,6 @@ public class UserService(IUserRepository userRepo) : IUserService
     public Task UpdateRoleAsync(int userId, string role) => userRepo.UpdateRoleAsync(userId, role);
 
     public Task DeleteAccountAsync(int userId) => userRepo.DeleteAsync(userId);
+
+    public Task<User?> FindByEmailAsync(string email) => userRepo.FindByEmailAsync(email);
 }

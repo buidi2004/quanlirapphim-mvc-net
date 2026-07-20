@@ -30,7 +30,9 @@ public class AuthController(IUserService userService) : Controller
         {
             var user = await userService.AuthenticateAsync(vm.Email, vm.Password);
             await SignInUser(user);
-            return Redirect(returnUrl ?? "/");
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                return Redirect(returnUrl);
+            return Redirect("/");
         }
         catch (BusinessException ex)
         {
@@ -163,17 +165,27 @@ public class AuthController(IUserService userService) : Controller
             {
                 try 
                 {
-                    // Mock auto register/login
-                    var user = await userService.RegisterAsync(name, email, "Social123!@#");
+                    // Thử đăng ký user mới
+                    var randomPassword = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(16)) + "A1!";
+                    var user = await userService.RegisterAsync(name, email, randomPassword);
                     await SignInUser(user);
                 }
                 catch
                 {
-                    // Nếu user đã tồn tại, mock đăng nhập (cần bypass password check, nhưng ở đây tạm redirect)
+                    // User đã tồn tại → đăng nhập trực tiếp bằng email
+                    try
+                    {
+                        var existingUser = await userService.FindByEmailAsync(email);
+                        if (existingUser != null)
+                            await SignInUser(existingUser);
+                    }
+                    catch { /* Nếu vẫn lỗi, redirect về trang chủ */ }
                 }
             }
         }
-        return Redirect(returnUrl ?? "/");
+        if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            return Redirect(returnUrl);
+        return Redirect("/");
     }
 
     // ── Helpers ────────────────────────────────────────────────────────────

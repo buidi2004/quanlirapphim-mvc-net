@@ -41,6 +41,17 @@ function initSeatSelector() {
             }
         });
 
+        connection.on("SeatReleased", (data) => {
+            if (!data || !data.seatCodes) return;
+            data.seatCodes.forEach(seatCode => {
+                const btn = document.querySelector(`.seat-btn[data-seat="${seatCode}"]`);
+                if (btn && !selectedSeats.has(seatCode) && !btn.disabled) {
+                    btn.classList.remove('seat-status-holding');
+                    btn.classList.remove('seat-status-taken'); // In case it was mistakenly marked taken
+                }
+            });
+        });
+
         connection.start().then(() => {
             connection.invoke("JoinShowtimeGroup", parseInt(showtimeId));
         }).catch(err => console.error('SignalR Connection Error: ', err));
@@ -181,19 +192,33 @@ function initSeatSelector() {
             fetch(bookingForm.action, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: params.toString()
+                body: params.toString(),
+                redirect: 'follow'
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
+            .then(res => {
+                // Handle auth redirects (302 → login page returns HTML)
+                if (res.redirected || res.url.includes('/login')) {
+                    throw new Error('AUTH_REQUIRED');
+                }
+                // Try to parse JSON for both success and error responses
+                return res.json().then(data => ({ ok: res.ok, data }));
+            })
+            .then(({ ok, data }) => {
+                if (ok && data.success) {
                     window.location.href = data.redirectUrl;
                 } else {
                     alert(data.error || 'Lỗi không xác định.');
                     resetHoldButtons();
                 }
             })
-            .catch(() => {
-                alert('Lỗi kết nối. Vui lòng thử lại.');
+            .catch(err => {
+                if (err.message === 'AUTH_REQUIRED') {
+                    if (confirm('Bạn cần đăng nhập để giữ ghế. Chuyển đến trang đăng nhập?')) {
+                        window.location.href = '/login?returnUrl=' + encodeURIComponent(window.location.pathname);
+                    }
+                } else {
+                    alert('Lỗi kết nối. Vui lòng thử lại.');
+                }
                 resetHoldButtons();
             });
 
@@ -213,7 +238,7 @@ function initSeatSelector() {
     // ── #5 Countdown Timer ───────────────────────────────────────
     const timerEl = document.getElementById('countdown-timer');
     if (timerEl) {
-        const remainingSeconds = parseInt(timerEl.dataset.remainingSeconds ?? '600');
+        const remainingSeconds = parseInt(timerEl.dataset.remainingSeconds ?? '900');
         let timeLeft = remainingSeconds;
 
         const interval = setInterval(() => {

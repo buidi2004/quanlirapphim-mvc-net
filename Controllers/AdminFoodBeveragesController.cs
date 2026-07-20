@@ -28,7 +28,13 @@ public class AdminFoodBeveragesController(IFoodBeverageService foodBeverageServi
             string? imageUrl = null;
             if (image != null && image.Length > 0)
             {
-                var ext = Path.GetExtension(image.FileName);
+                var ext = Path.GetExtension(image.FileName).ToLowerInvariant();
+                var allowedExts = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+                if (!allowedExts.Contains(ext))
+                {
+                    TempData["Error"] = "Chỉ chấp nhận file ảnh (jpg, png, gif, webp).";
+                    return RedirectToAction(nameof(Index));
+                }
                 var newName = $"{Guid.NewGuid():N}{ext}";
                 var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "food");
                 Directory.CreateDirectory(uploadDir);
@@ -65,7 +71,13 @@ public class AdminFoodBeveragesController(IFoodBeverageService foodBeverageServi
             string? imageUrl = null;
             if (image != null && image.Length > 0)
             {
-                var ext = Path.GetExtension(image.FileName);
+                var ext = Path.GetExtension(image.FileName).ToLowerInvariant();
+                var allowedExts = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+                if (!allowedExts.Contains(ext))
+                {
+                    TempData["Error"] = "Chỉ chấp nhận file ảnh (jpg, png, gif, webp).";
+                    return RedirectToAction(nameof(Index));
+                }
                 var newName = $"{Guid.NewGuid():N}{ext}";
                 var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "food");
                 Directory.CreateDirectory(uploadDir);

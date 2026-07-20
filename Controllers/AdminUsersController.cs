@@ -27,7 +27,7 @@ public class AdminUsersController(IUserService userService) : Controller
             await userService.UpdateRoleAsync(id, role);
             TempData["Success"] = "Cập nhật quyền thành công!";
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }

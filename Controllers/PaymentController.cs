@@ -18,7 +18,7 @@ public class ConcessionCartItem
 
 [Authorize]
 [Route("payment")]
-public class PaymentController(ITicketService ticketService, IPaymentService paymentService) : Controller
+public class PaymentController(ITicketService ticketService, IPaymentService paymentService, IFoodBeverageRepository foodBeverageRepository) : Controller
 {
     // GET /payment
     [AllowAnonymous]
@@ -38,16 +38,26 @@ public class PaymentController(ITicketService ticketService, IPaymentService pay
             if (!string.IsNullOrEmpty(concessionsJson))
             {
                 var concessions = JsonSerializer.Deserialize<List<ConcessionCartItem>>(concessionsJson);
-                ViewBag.Concessions = concessions;
                 
                 decimal concessionTotal = 0;
                 if (concessions != null)
                 {
                     foreach(var c in concessions)
                     {
-                        concessionTotal += c.qty * c.price;
+                        if (int.TryParse(c.id, out int fbId))
+                        {
+                            var fb = await foodBeverageRepository.GetByIdAsync(fbId);
+                            if (fb != null)
+                            {
+                                c.price = (int)fb.Price;
+                                c.name = fb.Name;
+                                concessionTotal += c.qty * c.price;
+                            }
+                        }
                     }
                 }
+                
+                ViewBag.Concessions = concessions;
                 
                 // Add to subtotal and total
                 confirmVm.Subtotal += concessionTotal;
@@ -87,12 +97,24 @@ public class PaymentController(ITicketService ticketService, IPaymentService pay
             
             var concessionsJson = HttpContext.Session.GetString("selected_concessions");
             decimal concessionTotal = 0;
+            List<(int, int, decimal)> parsedConcessions = new();
             if (!string.IsNullOrEmpty(concessionsJson))
             {
                 var concessions = JsonSerializer.Deserialize<List<ConcessionCartItem>>(concessionsJson);
                 if (concessions != null)
                 {
-                    foreach(var c in concessions) concessionTotal += c.qty * c.price;
+                    foreach(var c in concessions)
+                    {
+                        if (int.TryParse(c.id, out int fbId))
+                        {
+                            var fb = await foodBeverageRepository.GetByIdAsync(fbId);
+                            if (fb != null)
+                            {
+                                concessionTotal += c.qty * fb.Price;
+                                parsedConcessions.Add((fbId, c.qty, fb.Price));
+                            }
+                        }
+                    }
                 }
             }
             
@@ -111,7 +133,7 @@ public class PaymentController(ITicketService ticketService, IPaymentService pay
                 throw new BusinessException("Thanh toán không thành công. Vui lòng thử lại.");
 
             // Bước 2: Xác nhận + Optimistic Locking (Truyền giá trị thực để cộng điểm)
-            await ticketService.ConfirmPaymentAsync(ticketIds, userId, paymentMethod, finalTotalPrice, promotionCode);
+            await ticketService.ConfirmPaymentAsync(ticketIds, userId, paymentMethod, finalTotalPrice, promotionCode, parsedConcessions.Count > 0 ? parsedConcessions : null);
 
             // Pass data to success page
             TempData["SuccessTicketIds"] = string.Join(",", ticketIds);

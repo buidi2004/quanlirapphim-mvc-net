@@ -9,7 +9,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-0" style="background-color: var(--color-bg-white);">
-                @Html.Partial("_ShowtimesBMS", Model)
+                @await Html.PartialAsync("_ShowtimesBMS", Model)
             </div>
         </div>
     </div>

@@ -39,7 +39,7 @@ public class AdminContactsController(IContactService contactService) : Controlle
             
             TempData["Success"] = "Đã lưu phản hồi thành công!";
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
@@ -55,7 +55,7 @@ public class AdminContactsController(IContactService contactService) : Controlle
             await contactService.DeleteContactAsync(id);
             TempData["Success"] = "Đã xóa liên hệ!";
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }

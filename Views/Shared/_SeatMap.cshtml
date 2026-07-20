@@ -103,7 +103,7 @@
     {
         List<List<SeatLayoutItem>> layout = new();
         try {
-            layout = JsonSerializer.Deserialize<List<List<SeatLayoutItem>>>(Model.LayoutJson) ?? new();
+            layout = JsonSerializer.Deserialize<List<List<SeatLayoutItem>>>(Model.LayoutJson!) ?? new();
         } catch {}
 
         <div class="seat-grid-container" style="grid-template-columns: repeat(@Model.SeatsPerRow, auto);">

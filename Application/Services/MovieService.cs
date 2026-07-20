@@ -2,7 +2,6 @@ using System.Data;
 using CinemaXNet.Domain.Exceptions;
 using CinemaXNet.Domain.Entities;
 using CinemaXNet.Application.Interfaces;
-using CinemaXNet.Application.Interfaces;
 using CinemaXNet.Application.ViewModels;
 using CinemaXNet.Domain.Constants;
 using Dapper;
@@ -73,7 +72,7 @@ public class MovieService(
                 EndTime        = showtime.EndTime,
                 Price          = dynamicPrice,
                 FormattedPrice = showtime.GetFormattedPrice(),
-                RoomName       = showtime.Room.Name,
+                RoomName       = showtime.Room?.Name ?? "",
                 Format         = showtime.Format,
                 AvailableSeats = Math.Max(0, totalSeats - activeCount)
             });

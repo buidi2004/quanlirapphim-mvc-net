@@ -28,7 +28,7 @@ public class AdminCinemasController(ICinemaService cinemaService) : Controller
             await cinemaService.CreateAsync(cinema);
             TempData["Success"] = "Thêm rạp thành công!";
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
@@ -45,7 +45,7 @@ public class AdminCinemasController(ICinemaService cinemaService) : Controller
             await cinemaService.UpdateAsync(id, cinema);
             TempData["Success"] = "Cập nhật rạp thành công!";
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
@@ -61,7 +61,7 @@ public class AdminCinemasController(ICinemaService cinemaService) : Controller
             await cinemaService.DeleteAsync(id);
             TempData["Success"] = "Xóa rạp thành công!";
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }

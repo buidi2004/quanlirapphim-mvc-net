@@ -33,7 +33,7 @@ public class AdminShowtimesController(IShowtimeService showtimeService) : Contro
             await showtimeService.AddAsync(movieId, roomId, showDate, startTime, format, price);
             TempData["Success"] = "Thêm suất chiếu thành công!";
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
@@ -49,7 +49,7 @@ public class AdminShowtimesController(IShowtimeService showtimeService) : Contro
             await showtimeService.UpdateAsync(id, movieId, roomId, showDate, startTime, format, price);
             TempData["Success"] = "Cập nhật suất chiếu thành công!";
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
@@ -65,7 +65,7 @@ public class AdminShowtimesController(IShowtimeService showtimeService) : Contro
             await showtimeService.DeleteAsync(id);
             TempData["Success"] = "Xóa suất chiếu thành công!";
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }

@@ -35,7 +35,7 @@ public class AdminRoomsController(IRoomService roomService) : Controller
             await roomService.AddAsync(room);
             TempData["Success"] = "Thêm phòng thành công!";
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
@@ -52,7 +52,7 @@ public class AdminRoomsController(IRoomService roomService) : Controller
             await roomService.UpdateAsync(room);
             TempData["Success"] = "Cập nhật phòng thành công!";
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
@@ -68,7 +68,7 @@ public class AdminRoomsController(IRoomService roomService) : Controller
             await roomService.DeleteAsync(id);
             TempData["Success"] = "Xóa phòng thành công!";
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }
@@ -97,7 +97,7 @@ public class AdminRoomsController(IRoomService roomService) : Controller
         }
         catch (Exception ex)
         {
-            return BadRequest(new { error = ex.Message });
+            return BadRequest(new { success = false, error = ex.Message });
         }
     }
 }

@@ -31,7 +31,7 @@ public class BookingController(
     public async Task<IActionResult> HoldSeats([FromForm] int showtimeId, [FromForm] List<string> seatCodes, [FromForm] string? guestEmail, [FromForm] string? guestPhone)
     {
         if (seatCodes.Count == 0)
-            return Json(new { error = "Vui lòng chọn ít nhất 1 ghế." });
+            return Json(new { success = false, error = "Vui lòng chọn ít nhất 1 ghế." });
 
         int? userId = null;
         if (User.Identity?.IsAuthenticated == true)
@@ -40,7 +40,7 @@ public class BookingController(
         }
         else if (string.IsNullOrWhiteSpace(guestEmail) || string.IsNullOrWhiteSpace(guestPhone))
         {
-            return Json(new { error = "Vui lòng đăng nhập hoặc nhập thông tin khách." });
+            return Json(new { success = false, error = "Vui lòng đăng nhập hoặc nhập thông tin khách." });
         }
 
         try
@@ -59,11 +59,11 @@ public class BookingController(
         }
         catch (SeatUnavailableException ex)
         {
-            return StatusCode(409, new { error = ex.Message });
+            return StatusCode(409, new { success = false, error = ex.Message });
         }
         catch (BusinessException ex)
         {
-            return StatusCode(422, new { error = ex.Message });
+            return StatusCode(422, new { success = false, error = ex.Message });
         }
     }
 
@@ -113,7 +113,7 @@ public class BookingController(
         }
         catch (BusinessException ex)
         {
-            return StatusCode(422, new { error = ex.Message });
+            return StatusCode(422, new { success = false, error = ex.Message });
         }
     }
 

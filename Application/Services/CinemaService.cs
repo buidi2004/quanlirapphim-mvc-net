@@ -1,7 +1,6 @@
 using CinemaXNet.Domain.Exceptions;
 using CinemaXNet.Domain.Entities;
 using CinemaXNet.Application.Interfaces;
-using CinemaXNet.Application.Interfaces;
 
 namespace CinemaXNet.Application.Services;
 

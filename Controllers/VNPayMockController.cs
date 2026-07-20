@@ -1,4 +1,3 @@
-using CinemaXNet.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,7 +5,7 @@ namespace CinemaXNet.Controllers;
 
 [AllowAnonymous]
 [Route("vnpay-sandbox")]
-public class VNPayMockController(ITicketService ticketService) : Controller
+public class VNPayMockController() : Controller
 {
     [HttpGet("pay")]
     public IActionResult Pay(string txnRef, decimal amount, string ticketIds, string returnUrl)
@@ -20,8 +19,11 @@ public class VNPayMockController(ITicketService ticketService) : Controller
 
     [HttpPost("process-pay")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> ProcessPay(string txnRef, decimal amount, string ticketIds, string returnUrl)
+    public IActionResult ProcessPay(string txnRef, decimal amount, string ticketIds, string returnUrl)
     {
+        // Bảo mật: Chặn Open Redirect — chỉ cho phép redirect nội bộ
+        if (!Url.IsLocalUrl(returnUrl))
+            returnUrl = "/payment/success";
         var redirectUrl = $"{returnUrl}?vnp_TxnRef={txnRef}&vnp_ResponseCode=00&vnp_Amount={amount*100}&ticketIds={ticketIds}";
         return Redirect(redirectUrl);
     }

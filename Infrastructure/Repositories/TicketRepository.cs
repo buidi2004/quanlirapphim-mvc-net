@@ -53,8 +53,8 @@ public class TicketRepository(IDbConnection db) : ITicketRepository
     public async Task<int> CreateAsync(Ticket ticket, System.Data.IDbTransaction? transaction = null)
     {
         const string sql = @"
-            INSERT INTO tickets (showtime_id, user_id, seat_code, status, hold_expiry_time, total_price, version)
-            VALUES (@ShowtimeId, @UserId, @SeatCode, @Status, @HoldExpiryTime, @TotalPrice, @Version);
+            INSERT INTO tickets (showtime_id, user_id, guest_email, guest_phone, seat_code, status, hold_expiry_time, total_price, version)
+            VALUES (@ShowtimeId, @UserId, @GuestEmail, @GuestPhone, @SeatCode, @Status, @HoldExpiryTime, @TotalPrice, @Version);
             SELECT LAST_INSERT_ID();";
         return await db.ExecuteScalarAsync<int>(sql, ticket, transaction);
     }
@@ -105,20 +105,20 @@ public class TicketRepository(IDbConnection db) : ITicketRepository
 
     public async Task<IEnumerable<(int ShowtimeId, string SeatCode)>> CancelExpiredHoldsAsync()
     {
-        // Lấy danh sách ghế sắp bị hủy trước khi UPDATE
+        var nowStr = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
         const string selectSql = @"
             SELECT showtime_id AS ShowtimeId, seat_code AS SeatCode
             FROM tickets
-            WHERE status = 'holding' AND hold_expiry_time < NOW()";
-        var expired = (await db.QueryAsync<(int ShowtimeId, string SeatCode)>(selectSql)).ToList();
+            WHERE status = 'holding' AND hold_expiry_time < @Now";
+        var expired = (await db.QueryAsync<(int ShowtimeId, string SeatCode)>(selectSql, new { Now = nowStr })).ToList();
 
         if (expired.Count > 0)
         {
             const string updateSql = @"
                 UPDATE tickets
                 SET status = 'cancelled', hold_expiry_time = NULL
-                WHERE status = 'holding' AND hold_expiry_time < NOW()";
-            await db.ExecuteAsync(updateSql);
+                WHERE status = 'holding' AND hold_expiry_time < @Now";
+            await db.ExecuteAsync(updateSql, new { Now = nowStr });
         }
 
         return expired;

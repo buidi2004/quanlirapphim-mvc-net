@@ -14,11 +14,15 @@ public class NewsService(INewsRepository newsRepository) : INewsService
         return slug;
     }
 
+    private static readonly string[] AllowedImageExts = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+
     private async Task<string?> UploadImageAsync(IFormFile? image)
     {
         if (image != null && image.Length > 0)
         {
-            var ext = Path.GetExtension(image.FileName);
+            var ext = Path.GetExtension(image.FileName).ToLowerInvariant();
+            if (!AllowedImageExts.Contains(ext))
+                throw new InvalidOperationException("Chỉ chấp nhận file ảnh (jpg, png, gif, webp).");
             var newName = $"{Guid.NewGuid():N}{ext}";
             var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "news");
             Directory.CreateDirectory(uploadDir);

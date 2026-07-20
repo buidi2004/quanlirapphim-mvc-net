@@ -24,7 +24,7 @@ public class AdminSettingsController(ISettingService settingService) : Controlle
             await settingService.SaveSettingsAsync(form, site_logo);
             TempData["Success"] = "Lưu cấu hình thành công!";
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
         }

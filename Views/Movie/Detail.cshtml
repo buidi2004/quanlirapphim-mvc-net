@@ -75,7 +75,7 @@
 
     <!-- Showtime cards (BookMyShow Style) -->
     <div class="showtimes-container mt-4 mb-5 border border-light rounded-4 overflow-hidden shadow-sm">
-        @Html.Partial("_ShowtimesCGV", Model)
+        @await Html.PartialAsync("_ShowtimesCGV", Model)
     </div>
 </div>
 
