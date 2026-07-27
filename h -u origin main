@@ -1,0 +1,176 @@
+[33mcommit 8b70590eabe4bf25553651fa76b4a8e3d1dfa98e[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: Bot <bot@example.com>
+Date:   Fri Jul 17 07:26:04 2026 +0700
+
+    UI Optimization: Sync yellow colors to purple and fix text visibility on bg-warning
+
+[33mcommit faa3c93013ac6fe9ca22608572e4ab052c5c39bf[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: admin <admin@admins-MacBook-Pro.local>
+Date:   Wed Jul 8 22:05:25 2026 -0700
+
+    Update project codebase
+
+[33mcommit 537a4f0c743f2802f6a7845f53378f1d6d7af1a5[m
+Author: admin <admin@admins-MacBook-Pro.local>
+Date:   Sat Jul 4 12:29:11 2026 -0700
+
+    style: apply iOS-Native glassmorphism & update UI standards for mobile app
+
+[33mcommit a88115f9c87e106db146d132913e6bd740668c8a[m[33m ([m[1;31morigin/feature/add-jwt-service[m[33m)[m
+Author: admin <admin@admins-MacBook-Pro.local>
+Date:   Fri Jul 3 15:27:25 2026 -0700
+
+    Cập nhật ứng dụng Mobile và cấu trúc thư mục MVC
+
+[33mcommit 5a410dabf71522861f8ac80858caeed50b47bef9[m[33m ([m[1;31morigin/Stale[m[33m)[m
+Author: buidi2004 <buidi2004@gmail.com>
+Date:   Thu Jul 2 02:30:56 2026 +0700
+
+    fix: restore missing JwtService files from nested folder
+
+[33mcommit 004d5b80324f141b80b8bb7ae36cd5c4c15f28a4[m
+Author: buidi2004 <buidi2004@gmail.com>
+Date:   Thu Jul 2 02:28:30 2026 +0700
+
+    fix: add missing JwtBearer package and fix dockerignore for duplicate folders
+
+[33mcommit 6b59ca013afb75857819660308841823f25e8841[m
+Author: buidi2004 <buidi2004@gmail.com>
+Date:   Thu Jul 2 02:26:22 2026 +0700
+
+    chore: update API URL to point to WSL IP directly
+
+[33mcommit 1b7cf50d9df19cd5b3a681493048cd3a3bb6a42a[m
+Author: buidi2004 <buidi2004@gmail.com>
+Date:   Thu Jul 2 02:25:11 2026 +0700
+
+    fix: add missing JWT config to prevent crash
+
+[33mcommit ea930c994007de2499b74a9a435150da65473736[m
+Merge: 717a40f 9da3955
+Author: buidi2004 <buidi2004@gmail.com>
+Date:   Thu Jul 2 02:17:28 2026 +0700
+
+    Merge master into main
+
+[33mcommit 9da39554d66fa6dac3f98895aaa2f888a9293cf5[m[33m ([m[1;31morigin/master[m[33m)[m
+Author: buidi2004 <buidi2004@gmail.com>
+Date:   Thu Jul 2 02:09:20 2026 +0700
+
+    Update mobile app UI and navigation
+
+[33mcommit 38846f1daf858c7f5fa51a52cacd391791cf0423[m
+Author: buidi2004 <buidi2004@gmail.com>
+Date:   Sun Jun 28 22:37:43 2026 +0700
+
+    feat: add vector icons to bottom tab navigator
+
+[33mcommit 3777f01e01c7216496dc0ca0364afa40a4545099[m
+Author: buidi2004 <buidi2004@gmail.com>
+Date:   Sun Jun 28 22:25:20 2026 +0700
+
+    refactor: use useSafeAreaInsets for pixel-perfect header alignment
+
+[33mcommit 4efa8707567c1acdc3235923de5524f1ea7c0064[m
+Author: buidi2004 <buidi2004@gmail.com>
+Date:   Sun Jun 28 22:18:59 2026 +0700
+
+    fix: wrap app in SafeAreaProvider to prevent silent crash on startup
+
+[33mcommit 82503ffa0198441da8ef1852164ec842f98aaecb[m
+Author: buidi2004 <buidi2004@gmail.com>
+Date:   Sun Jun 28 22:15:34 2026 +0700
+
+    fix: install missing @expo/vector-icons package
+
+[33mcommit f82cd277b7c87402b6c67b1cc9593edc10b3f481[m
+Author: buidi2004 <buidi2004@gmail.com>
+Date:   Sun Jun 28 22:14:05 2026 +0700
+
+    feat: add premium icons to home screen header per ux guidelines
+
+[33mcommit 3cdfbf53f6e3c501b204fae3fd63e2983fb784f8[m
+Author: buidi2004 <buidi2004@gmail.com>
+Date:   Sun Jun 28 21:48:21 2026 +0700
+
+    fix: use expo-image for more robust image rendering from wikipedia
+
+[33mcommit cd144ff81135c68c4578c6b08f94470b0bc63634[m
+Author: buidi2004 <buidi2004@gmail.com>
+Date:   Sun Jun 28 21:42:35 2026 +0700
+
+    chore: use localtunnel to bypass dev tunnel issues
+
+[33mcommit 713cc6fe168ebace2ea86e0a3d93ffdb7b661e37[m
+Author: buidi2004 <buidi2004@gmail.com>
+Date:   Sun Jun 28 21:39:46 2026 +0700
+
+    chore: update async-storage version for expo compatibility
+
+[33mcommit 915f98bc1290a68c8b4a475b53a2f3e197b9b354[m
+Author: buidi2004 <buidi2004@gmail.com>
+Date:   Sun Jun 28 21:31:56 2026 +0700
+
+    Update API base URL to WSL IP 172.18.226.230
+
+[33mcommit 55001b34900ace07f408b6cb23a57c2b5423834b[m
+Author: buidi2004 <buidi2004@gmail.com>
+Date:   Sun Jun 28 21:30:09 2026 +0700
+
+    Update API base URL to 192.168.1.5 for Expo Go on physical device
+
+[33mcommit bc03a62633c22888d1ccf8ddcb43d60926ffbcd0[m
+Author: buidi2004 <buidi2004@gmail.com>
+Date:   Sun Jun 28 21:23:55 2026 +0700
+
+    Fix API compilation errors and update mobile API port to local docker 8080
+
+[33mcommit 29c5a0762311898a516cbef5aa66b965aef8d87e[m
+Author: buidi2004 <buidi2004@gmail.com>
+Date:   Sun Jun 28 21:15:34 2026 +0700
+
+    feat: add project reset script and initial app structure
+    
+    - Introduced a new script `reset-project.js` to reset the project to a blank state, allowing users to move or delete existing directories.
+    - Created initial files for the app structure including `index.tsx`, `_layout.tsx`, and `explore.tsx` in the `src/app` directory.
+    - Added components for animated icons, themed text, and themed views to enhance UI consistency.
+    - Implemented a collapsible UI component for better organization of content.
+    - Established a color scheme and theme management system to support light and dark modes.
+    - Included a web badge component to display the Expo version.
+    - Configured TypeScript with paths for easier imports.
+
+[33mcommit 635b52a2206395731f117934424123ce1b95705b[m
+Author: buidi2004 <buidi2004@gmail.com>
+Date:   Sun Jun 28 21:15:27 2026 +0700
+
+    cc
+
+[33mcommit 717a40f6800ca31761999c921dfc3a709ffbf960[m
+Author: buidi2004 <buidi2004@gmail.com>
+Date:   Sun Jun 28 21:07:59 2026 +0700
+
+    Fix CORS configuration for API
+
+[33mcommit d92fec9669591b1da4fafe0d657785f18b69eea7[m
+Author: buidi2004 <buidi2004@gmail.com>
+Date:   Sun Jun 28 21:07:05 2026 +0700
+
+    Sync FE and BE configurations: Fix CORS, ports, and API paths
+
+[33mcommit 55b745b0db1cd6cd70eca44c43cef583a3d93ed8[m
+Author: buidi2004 <buidi2004@gmail.com>
+Date:   Thu Jun 25 02:56:16 2026 +0700
+
+    Thêm trang chi tiết hỗ trợ khách hàng và quản trị viên, cập nhật cơ sở dữ liệu và số điện thoại liên hệ
+
+[33mcommit 6c5f66964d963668a358f9d5ad32c9b5e63ac50b[m
+Author: buidi <buidi@buidis-MacBook-Pro.local>
+Date:   Tue Jun 23 02:23:49 2026 -0700
+
+    Update project
+
+[33mcommit 5a750297267891257934c5490d1ae166f04c3cce[m
+Author: buidi <buidi@buidis-MacBook-Pro.local>
+Date:   Sat Jun 20 09:12:42 2026 -0700
+
+    Initial commit

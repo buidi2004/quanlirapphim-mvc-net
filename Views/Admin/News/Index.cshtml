@@ -1,0 +1,175 @@
+@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "Quản Lý Tin Tức";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var news = Model?.ToList() ?? new List<dynamic>();
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-secondary-subtle">
+    <h1 class="h2 text-warning fw-medium">Quản Lý Tin Tức</h1>
+    <button type="button" class="btn btn-primary fw-medium btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#addNewsModal">
+        <i class="bi bi-plus-lg"></i> Thêm bài viết
+    </button>
+</div>
+
+<div class="card bg-body border border-secondary-subtle rounded shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-striped table-hover mb-0 align-middle">
+            <thead class="text-uppercase" class="table-light">
+                <tr>
+                    <th scope="col" style="width: 80px;">Ảnh</th>
+                    <th scope="col">Tiêu đề</th>
+                    <th scope="col">Slug</th>
+                    <th scope="col">Ngày đăng</th>
+                    <th scope="col" class="text-end">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!news.Any())
+                {
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-secondary fst-italic">
+                            Chưa có bài viết nào.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var n in news)
+                    {
+                        <tr>
+                            <td>
+                                <img src="@(n.image_url ?? "https://placehold.co/100x60/111/fff?text=No+Image")"
+                                     alt="Image" class="img-thumbnail bg-light border-secondary-subtle rounded shadow-sm"
+                                     style="width: 80px; height: 50px; object-fit: cover;">
+                            </td>
+                            <td><strong class="text-body-emphasis">@n.title</strong></td>
+                            <td><span class="badge bg-secondary">@n.slug</span></td>
+                            <td>@Convert.ToDateTime(n.created_at).ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="text-end">
+                                <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#editNewsModal-@n.id">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteNewsModal-@n.id">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Edit Modal -->
+                        <div class="modal fade" id="editNewsModal-@n.id" tabindex="-1">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content bg-light text-body-emphasis border border-secondary-subtle shadow-lg">
+                                    <div class="modal-header bg-body border-bottom border-secondary-subtle">
+                                        <h5 class="modal-title text-warning fw-medium">Sửa Bài Viết</h5>
+                                        <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form method="post" action="/admin/news/update" enctype="multipart/form-data">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@n.id" />
+                                        <div class="modal-body p-4 text-start">
+                                            <div class="mb-3">
+                                                <label class="form-label text-body-emphasis fw-medium">Tiêu đề bài viết</label>
+                                                <input type="text" name="title" value="@n.title" class="form-control bg-body text-body-emphasis border-secondary-subtle" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-body-emphasis fw-medium">Tóm tắt (Excerpt)</label>
+                                                <textarea name="excerpt" rows="2" class="form-control bg-body text-body-emphasis border-secondary-subtle" required>@n.excerpt</textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-body-emphasis fw-medium">Nội dung chi tiết</label>
+                                                <textarea name="content" rows="6" class="form-control bg-body text-body-emphasis border-secondary-subtle" required>@n.content</textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-body-emphasis fw-medium">Ảnh đại diện mới (để trống nếu giữ nguyên)</label>
+                                                <input type="file" name="image" class="form-control bg-body text-body-emphasis border-secondary-subtle" accept="image/*">
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer bg-body border-top border-secondary-subtle">
+                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                                            <button type="submit" class="btn btn-info fw-medium">Cập nhật</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Delete Modal -->
+                        <div class="modal fade" id="deleteNewsModal-@n.id" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content bg-light text-body-emphasis border border-secondary-subtle shadow-lg">
+                                    <div class="modal-header bg-body border-bottom border-secondary-subtle">
+                                        <h5 class="modal-title text-danger fw-medium">Xác Nhận Xóa</h5>
+                                        <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body p-4 text-start">
+                                        Bạn có chắc chắn muốn xóa bài viết <strong>@n.title</strong>?
+                                    </div>
+                                    <div class="modal-footer bg-body border-top border-secondary-subtle">
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                                        <form method="post" action="/admin/news/delete">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@n.id" />
+                                            <button type="submit" class="btn btn-danger fw-medium">Xóa</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@if (ViewBag.TotalPages > 1)
+{
+    <div class="d-flex justify-content-center mt-4">
+        <ul class="pagination pagination-sm">
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="/admin/news?page=@i">@i</a>
+                </li>
+            }
+        </ul>
+    </div>
+}
+
+<!-- Add Modal -->
+<div class="modal fade" id="addNewsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content bg-light text-body-emphasis border border-secondary-subtle shadow-lg">
+            <div class="modal-header bg-body border-bottom border-secondary-subtle">
+                <h5 class="modal-title text-warning fw-medium">Đăng Bài Viết Mới</h5>
+                <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="/admin/news" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <div class="modal-body p-4 text-start">
+                    <div class="mb-3">
+                        <label class="form-label text-body-emphasis fw-medium">Tiêu đề bài viết</label>
+                        <input type="text" name="title" class="form-control bg-body text-body-emphasis border-secondary-subtle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-body-emphasis fw-medium">Tóm tắt (Excerpt)</label>
+                        <textarea name="excerpt" rows="2" class="form-control bg-body text-body-emphasis border-secondary-subtle" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-body-emphasis fw-medium">Nội dung chi tiết</label>
+                        <textarea name="content" rows="6" class="form-control bg-body text-body-emphasis border-secondary-subtle" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-body-emphasis fw-medium">Ảnh đại diện</label>
+                        <input type="file" name="image" class="form-control bg-body text-body-emphasis border-secondary-subtle" accept="image/*">
+                    </div>
+                </div>
+                <div class="modal-footer bg-body border-top border-secondary-subtle">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary fw-medium">Đăng bài</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

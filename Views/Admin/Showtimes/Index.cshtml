@@ -1,0 +1,222 @@
+@model IEnumerable<CinemaXNet.Domain.Entities.Showtime>
+@{
+    ViewData["Title"] = "Quản Lý Suất Chiếu";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var showtimes = Model?.ToList() ?? new List<CinemaXNet.Domain.Entities.Showtime>();
+    var movies = ViewBag.Movies as IEnumerable<CinemaXNet.Domain.Entities.Movie> ?? new List<CinemaXNet.Domain.Entities.Movie>();
+    var rooms = ViewBag.Rooms as IEnumerable<CinemaXNet.Domain.Entities.Room> ?? new List<CinemaXNet.Domain.Entities.Room>();
+}
+
+<!-- Custom CSS for Deep Dark Theme and Showtimes -->
+<style>
+    .table-borderless-dark > :not(caption) > * > * {
+        border-bottom-color: #27272a; /* border-secondary-subtle equivalent */
+    }
+    
+    .showtime-card {
+        background-color: #18181b;
+        border: 1px solid #3f3f46;
+        border-radius: 8px;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .showtime-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+        border-color: #3b82f6; /* Blue highlight */
+    }
+    
+    .badge-format-2d { background-color: #3b82f6; color: white; }
+    .badge-format-3d { background-color: #8b5cf6; color: white; }
+    .badge-format-imax { background-color: #eab308; color: black; font-weight: bold; }
+</style>
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom border-secondary-subtle">
+    <div>
+        <h1 class="h2 text-body-emphasis fw-bold mb-0">Quản Lý Suất Chiếu</h1>
+        <p class="text-secondary small mb-0">Theo dõi, sắp xếp lịch chiếu và định giá vé</p>
+    </div>
+    <button type="button" class="btn btn-primary fw-medium px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#addShowtimeModal">
+        <i class="bi bi-calendar-plus me-2"></i> Thêm suất chiếu mới
+    </button>
+</div>
+
+<!-- Filters -->
+<div class="card border border-secondary-subtle bg-transparent mb-4">
+    <div class="card-body p-3">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label text-body-emphasis small fw-medium">Chọn ngày</label>
+                <input type="date" class="form-control bg-body text-body-emphasis border-secondary-subtle" name="date" value="@DateTime.Now.ToString("yyyy-MM-dd")">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-body-emphasis small fw-medium">Phim</label>
+                <select class="form-select bg-body text-body-emphasis border-secondary-subtle">
+                    <option value="">-- Tất cả phim --</option>
+                    @foreach (var m in movies) {
+                        <option value="@m.Id">@m.Title</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-body-emphasis small fw-medium">Cụm rạp / Phòng</label>
+                <select class="form-select bg-body text-body-emphasis border-secondary-subtle">
+                    <option value="">-- Tất cả rạp --</option>
+                    @foreach (var r in rooms) {
+                        <option value="@r.Id">@r.Name (Rạp ID: @r.CinemaId)</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-outline-info w-100 fw-medium">Lọc danh sách</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    @if (!showtimes.Any())
+    {
+        <div class="col-12">
+            <div class="card border-0 bg-transparent text-center py-5">
+                <div class="card-body">
+                    <i class="bi bi-calendar-x fs-1 d-block mb-2 text-muted"></i>
+                    <p class="text-secondary">Không có suất chiếu nào được tìm thấy.</p>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        var groupedShowtimes = showtimes.OrderBy(s => s.StartTime).GroupBy(s => s.RoomId);
+        
+        foreach (var group in groupedShowtimes)
+        {
+            var room = rooms.FirstOrDefault(r => r.Id == group.Key);
+            <div class="col-12">
+                <div class="card bg-body border border-secondary-subtle shadow-sm rounded-3">
+                    <div class="card-header bg-body-tertiary border-bottom border-secondary-subtle py-3">
+                        <h5 class="card-title text-body-emphasis fw-bold mb-0">
+                            <i class="bi bi-door-open-fill me-2 text-warning"></i>Phòng @(room?.Name ?? "Không xác định")
+                            <span class="fs-6 fw-normal text-secondary ms-2">(Rạp ID: @(room?.CinemaId ?? 0))</span>
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="d-flex flex-wrap gap-3">
+                            @foreach (var showtime in group)
+                            {
+                                var movie = movies.FirstOrDefault(m => m.Id == showtime.MovieId);
+                                <div class="showtime-card p-3" style="min-width: 250px;">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div class="fw-bold text-body-emphasis fs-4 lh-1">@showtime.StartTime.ToString("HH:mm")</div>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-link text-secondary p-0" type="button" data-bs-toggle="dropdown">
+                                                <i class="bi bi-three-dots-vertical"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-dark shadow">
+                                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editShowtimeModal-@showtime.Id"><i class="bi bi-pencil me-2"></i>Sửa</a></li>
+                                                <li><hr class="dropdown-divider border-secondary-subtle"></li>
+                                                <li>
+                                                    <form asp-action="Delete" asp-route-id="@showtime.Id" method="post" onsubmit="return confirm('Xác nhận xóa suất chiếu này?');">
+                                                        <button type="submit" class="dropdown-item text-danger"><i class="bi bi-trash me-2"></i>Xóa</button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="text-body-emphasis fw-semibold text-truncate mb-1" title="@(movie?.Title)">
+                                        @(movie?.Title ?? "Phim không xác định")
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        @if(showtime.Format == "3D") {
+                                            <span class="badge badge-format-3d">3D</span>
+                                        } else if(showtime.Format == "IMAX") {
+                                            <span class="badge badge-format-imax">IMAX</span>
+                                        } else {
+                                            <span class="badge badge-format-2d">2D</span>
+                                        }
+                                        <span class="text-secondary small">@showtime.Price.ToString("N0") ₫</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Placeholder for Edit Modal to prevent syntax errors, keeping it simple as it's structurally similar -->
+                                <div class="modal fade" id="editShowtimeModal-@showtime.Id" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content bg-body border border-secondary-subtle shadow-lg">
+                                            <div class="modal-header border-bottom border-secondary-subtle">
+                                                <h5 class="modal-title text-body-emphasis fw-bold">Thêm suất chiếu mới</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p class="text-body">Form chỉnh sửa dành cho suất chiếu @showtime.Id...</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addShowtimeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-body border border-secondary-subtle shadow-lg">
+            <div class="modal-header border-bottom border-secondary-subtle">
+                <h5 class="modal-title text-body-emphasis fw-bold">Thêm suất chiếu mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="Create" method="post">
+                <div class="modal-body p-4">
+                    <div class="alert alert-warning border-0 mb-4 bg-warning bg-opacity-10 text-warning rounded-3">
+                        <i class="bi bi-info-circle-fill me-2"></i> <strong>Lưu ý:</strong> Vui lòng đảm bảo khoảng cách tối thiểu 15 phút giữa các suất chiếu trong cùng một phòng để nhân viên dọn dẹp vệ sinh.
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label text-body-emphasis fw-medium">Phim *</label>
+                            <select name="movieId" class="form-select bg-body text-body-emphasis border-secondary-subtle" required>
+                                <option value="">-- Chọn phim --</option>
+                                @foreach (var m in movies) {
+                                    <option value="@m.Id">@m.Title (@m.DurationMinutes phút)</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label text-body-emphasis fw-medium">Phòng chiếu *</label>
+                            <select name="roomId" class="form-select bg-body text-body-emphasis border-secondary-subtle" required>
+                                <option value="">-- Chọn phòng --</option>
+                                @foreach (var r in rooms) {
+                                    <option value="@r.Id">@r.Name (Thuộc rạp ID: @r.CinemaId)</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-body-emphasis fw-medium">Thời gian bắt đầu *</label>
+                            <input type="datetime-local" name="startTime" class="form-control bg-body text-body-emphasis border-secondary-subtle" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-body-emphasis fw-medium">Định dạng *</label>
+                            <select name="format" class="form-select bg-body text-body-emphasis border-secondary-subtle">
+                                <option value="2D">2D Tiêu chuẩn</option>
+                                <option value="3D">3D</option>
+                                <option value="IMAX">IMAX</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label text-body-emphasis fw-medium">Giá vé cơ bản (VNĐ) *</label>
+                            <input type="number" name="basePrice" class="form-control bg-body text-body-emphasis border-secondary-subtle" required min="0" step="1000" value="90000">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top border-secondary-subtle p-3">
+                    <button type="button" class="btn btn-outline-secondary px-4 fw-medium" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary px-4 fw-medium">Thêm suất chiếu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

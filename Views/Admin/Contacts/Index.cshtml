@@ -1,0 +1,145 @@
+@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "Quản Lý Liên Hệ";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var contacts = Model?.ToList() ?? new List<dynamic>();
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-secondary-subtle">
+    <h1 class="h2 text-warning fw-medium">Quản Lý Liên Hệ</h1>
+</div>
+
+<div class="card bg-body border border-secondary-subtle rounded shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-striped table-hover mb-0 align-middle">
+            <thead class="text-uppercase" class="table-light">
+                <tr>
+                    <th scope="col">Khách hàng</th>
+                    <th scope="col">Tiêu đề</th>
+                    <th scope="col">Nội dung</th>
+                    <th scope="col">Trạng thái</th>
+                    <th scope="col">Ngày gửi</th>
+                    <th scope="col" class="text-end">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!contacts.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-secondary fst-italic">
+                            Chưa có liên hệ nào.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var c in contacts)
+                    {
+                        <tr>
+                            <td>
+                                <div><strong class="text-body-emphasis">@c.name</strong></div>
+                                <div><small class="text-secondary">@c.email</small></div>
+                                <div><small class="text-secondary">@c.phone</small></div>
+                            </td>
+                            <td><strong class="text-info">@c.subject</strong></td>
+                            <td style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                @c.message
+                            </td>
+                            <td>
+                                @if (c.status == "replied")
+                                {
+                                    <span class="badge bg-success">Đã trả lời</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-white">Chờ xử lý</span>
+                                }
+                            </td>
+                            <td>@Convert.ToDateTime(c.created_at).ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="text-end">
+                                <a href="/admin/contacts/details/@c.id" class="btn btn-sm btn-outline-primary" title="Xem chi tiết">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-info ms-1" data-bs-toggle="modal" data-bs-target="#replyContactModal-@c.id" title="Trả lời nhanh">
+                                    <i class="bi bi-reply"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger ms-1" data-bs-toggle="modal" data-bs-target="#deleteContactModal-@c.id" title="Xóa">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Reply Modal -->
+                        <div class="modal fade" id="replyContactModal-@c.id" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content bg-light text-body-emphasis border border-secondary-subtle shadow-lg">
+                                    <div class="modal-header bg-body border-bottom border-secondary-subtle">
+                                        <h5 class="modal-title text-warning fw-medium">Trả Lời Liên Hệ</h5>
+                                        <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form method="post" action="/admin/contacts/reply">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@c.id" />
+                                        <div class="modal-body p-4 text-start">
+                                            <div class="mb-3">
+                                                <label class="form-label text-secondary fw-medium">Nội dung của khách:</label>
+                                                <div class="p-3 bg-body border border-secondary-subtle rounded text-body-emphasis" style="font-size: 0.9rem;">
+                                                    @c.message
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-body-emphasis fw-medium">Nội dung trả lời</label>
+                                                <textarea name="replyMessage" rows="5" class="form-control bg-body text-body-emphasis border-secondary-subtle" required>@c.reply_message</textarea>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer bg-body border-top border-secondary-subtle">
+                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>
+                                            <button type="submit" class="btn btn-info fw-medium">Gửi trả lời</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Delete Modal -->
+                        <div class="modal fade" id="deleteContactModal-@c.id" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content bg-light text-body-emphasis border border-secondary-subtle shadow-lg">
+                                    <div class="modal-header bg-body border-bottom border-secondary-subtle">
+                                        <h5 class="modal-title text-danger fw-medium">Xác Nhận Xóa</h5>
+                                        <button type="button" class="btn-close btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body p-4 text-start">
+                                        Bạn có chắc chắn muốn xóa liên hệ từ <strong>@c.name</strong>?
+                                    </div>
+                                    <div class="modal-footer bg-body border-top border-secondary-subtle">
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                                        <form method="post" action="/admin/contacts/delete">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@c.id" />
+                                            <button type="submit" class="btn btn-danger fw-medium">Xóa</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@if (ViewBag.TotalPages > 1)
+{
+    <div class="d-flex justify-content-center mt-4">
+        <ul class="pagination pagination-sm">
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="/admin/contacts?page=@i">@i</a>
+                </li>
+            }
+        </ul>
+    </div>
+}

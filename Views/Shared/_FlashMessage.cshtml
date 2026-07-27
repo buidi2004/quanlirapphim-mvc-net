@@ -1,0 +1,25 @@
+@{
+    var error   = TempData["Error"]?.ToString();
+    var success = TempData["Success"]?.ToString();
+}
+<div class="container mt-3">
+    @if (!string.IsNullOrEmpty(error))
+    {
+        <div class="alert alert-danger alert-dismissible fade show border-0 shadow" role="alert"
+             style="background-color: #3b171c; color: #f8d7da;">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            @error
+            <button type="button" class="btn-close btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(success))
+    {
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow" role="alert"
+             style="background-color: #173b22; color: #d1e7dd;">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            @success
+            <button type="button" class="btn-close btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+</div>

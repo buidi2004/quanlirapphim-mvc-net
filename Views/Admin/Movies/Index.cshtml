@@ -1,0 +1,344 @@
+@model CinemaXNet.Application.ViewModels.PaginatedList<CinemaXNet.Domain.Entities.Movie>
+@{
+    ViewData["Title"] = "Quản Lý Phim";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var errors = ViewBag.Errors as Dictionary<string, string>;
+    var movies = Model?.Items ?? new List<CinemaXNet.Domain.Entities.Movie>();
+}
+
+<!-- Custom CSS for Deep Dark Theme and Split Modal -->
+<style>
+    .table-borderless-dark > :not(caption) > * > * {
+        border-bottom-color: #27272a; /* border-secondary-subtle equivalent */
+    }
+    .badge-status-now { background-color: #10b981; color: white; }
+    .badge-status-soon { background-color: #eab308; color: black; }
+    .badge-status-ended { background-color: #52525b; color: white; }
+    
+    .poster-preview-box {
+        width: 100%;
+        height: 350px;
+        background-color: #18181b;
+        border: 2px dashed #3f3f46;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        position: relative;
+    }
+    .poster-preview-box img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: cover;
+    }
+    .poster-placeholder {
+        color: #a1a1aa;
+        text-align: center;
+    }
+</style>
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom border-secondary-subtle">
+    <div>
+        <h1 class="h2 text-body-emphasis fw-bold mb-0">Quản Lý Phim</h1>
+        <p class="text-secondary small mb-0">Danh sách phim, quản lý lịch chiếu và thông tin chi tiết</p>
+    </div>
+    <button type="button" class="btn btn-primary fw-medium px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#addMovieModal">
+        <i class="bi bi-plus-circle me-2"></i> Thêm phim mới
+    </button>
+</div>
+
+@if (errors != null && errors.ContainsKey("general"))
+{
+    <div class="alert alert-danger border-0 mb-4 bg-danger bg-opacity-10 text-danger rounded-3">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> @errors["general"]
+    </div>
+}
+
+<div class="card border-0 bg-transparent mb-5">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-borderless-dark align-middle mb-0">
+                <thead class="bg-body-tertiary">
+                    <tr>
+                        <th scope="col" class="py-3 px-3 rounded-start text-secondary fw-semibold">Poster</th>
+                        <th scope="col" class="py-3 text-secondary fw-semibold">Tiêu đề</th>
+                        <th scope="col" class="py-3 text-secondary fw-semibold">Thể loại</th>
+                        <th scope="col" class="py-3 text-secondary fw-semibold">Trạng thái</th>
+                        <th scope="col" class="py-3 text-secondary fw-semibold">Thời lượng</th>
+                        <th scope="col" class="py-3 text-secondary fw-semibold">Độ tuổi</th>
+                        <th scope="col" class="py-3 px-3 rounded-end text-end text-secondary fw-semibold">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!movies.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-secondary">
+                                <i class="bi bi-film fs-1 d-block mb-2 text-muted"></i>
+                                Chưa có bộ phim nào trong danh sách.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var movie in movies)
+                        {
+                            <tr>
+                                <td class="px-3">
+                                    <img src="@(movie.PosterUrl ?? "https://placehold.co/100x150/18181b/fff?text=No+Poster")"
+                                         alt="Poster" class="rounded"
+                                         style="width: 50px; height: 75px; object-fit: cover; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.5);">
+                                </td>
+                                <td>
+                                    <strong class="text-body-emphasis d-block fs-6">@movie.Title</strong>
+                                    <small class="text-secondary" style="font-size: 0.8rem;">ID: @movie.Id</small>
+                                </td>
+                                <td><span class="text-body">@movie.Genre</span></td>
+                                <td>
+                                    @if (movie.Status == "now_showing") {
+                                        <span class="badge rounded-pill px-3 py-2 badge-status-now"><i class="bi bi-play-circle-fill me-1"></i> Đang chiếu</span>
+                                    } else if (movie.Status == "coming_soon") {
+                                        <span class="badge rounded-pill px-3 py-2 badge-status-soon"><i class="bi bi-clock-fill me-1"></i> Sắp chiếu</span>
+                                    } else {
+                                        <span class="badge rounded-pill px-3 py-2 badge-status-ended"><i class="bi bi-stop-circle-fill me-1"></i> Ngừng chiếu</span>
+                                    }
+                                </td>
+                                <td><span class="text-body">@movie.DurationMinutes phút</span></td>
+                                <td><span class="text-body fw-medium">@movie.AgeRating</span></td>
+                                <td class="px-3 text-end">
+                                    <div class="btn-group shadow-sm">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editMovieModal-@movie.Id" title="Chỉnh sửa">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                        <form asp-action="Delete" asp-route-id="@movie.Id" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa bộ phim này không? Mọi suất chiếu liên quan cũng có thể bị ảnh hưởng.');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Edit Modal (2 Columns Layout) -->
+                            <div class="modal fade" id="editMovieModal-@movie.Id" tabindex="-1" aria-labelledby="editMovieModalLabel-@movie.Id" aria-hidden="true">
+                                <div class="modal-dialog modal-xl modal-dialog-centered">
+                                    <div class="modal-content bg-body border border-secondary-subtle shadow-lg">
+                                        <div class="modal-header border-bottom border-secondary-subtle">
+                                            <h5 class="modal-title text-body-emphasis fw-bold" id="editMovieModalLabel-@movie.Id">Chỉnh sửa phim: @movie.Title</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <form asp-action="Edit" asp-route-id="@movie.Id" method="post" enctype="multipart/form-data">
+                                            <div class="modal-body p-4">
+                                                <div class="row g-4">
+                                                    <!-- Left Column: Text Info -->
+                                                    <div class="col-md-8">
+                                                        <div class="row g-3">
+                                                            <div class="col-12">
+                                                                <label class="form-label text-body-emphasis fw-medium">Tiêu đề phim *</label>
+                                                                <input type="text" name="title" value="@movie.Title" class="form-control bg-body text-body-emphasis border-secondary-subtle" required>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <label class="form-label text-body-emphasis fw-medium">Thể loại *</label>
+                                                                <input type="text" name="genre" value="@movie.Genre" class="form-control bg-body text-body-emphasis border-secondary-subtle" required>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <label class="form-label text-body-emphasis fw-medium">Đạo diễn *</label>
+                                                                <input type="text" name="director" value="@movie.Director" class="form-control bg-body text-body-emphasis border-secondary-subtle" required>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <label class="form-label text-body-emphasis fw-medium">Diễn viên</label>
+                                                                <input type="text" name="cast" value="@movie.Cast" class="form-control bg-body text-body-emphasis border-secondary-subtle" placeholder="Ví dụ: Tom Cruise, Henry Cavill...">
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <label class="form-label text-body-emphasis fw-medium">Trạng thái</label>
+                                                                <select name="status" class="form-select bg-body text-body-emphasis border-secondary-subtle">
+                                                                    <!option value="coming_soon" @(movie.Status == "coming_soon" ? "selected" : null)>Sắp chiếu</!option>
+                                                                    <!option value="now_showing" @(movie.Status == "now_showing" ? "selected" : null)>Đang chiếu</!option>
+                                                                    <!option value="ended" @(movie.Status == "ended" ? "selected" : null)>Dừng chiếu</!option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <label class="form-label text-body-emphasis fw-medium">Thời lượng (phút)</label>
+                                                                <input type="number" name="durationMinutes" value="@movie.DurationMinutes" class="form-control bg-body text-body-emphasis border-secondary-subtle" required min="1">
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <label class="form-label text-body-emphasis fw-medium">Độ tuổi</label>
+                                                                <select name="ageRating" class="form-select bg-body text-body-emphasis border-secondary-subtle">
+                                                                    <!option value="P" @(movie.AgeRating == "P" ? "selected" : null)>P - Mọi lứa tuổi</!option>
+                                                                    <!option value="C13" @(movie.AgeRating == "C13" ? "selected" : null)>C13 - Trên 13 tuổi</!option>
+                                                                    <!option value="C16" @(movie.AgeRating == "C16" ? "selected" : null)>C16 - Trên 16 tuổi</!option>
+                                                                    <!option value="C18" @(movie.AgeRating == "C18" ? "selected" : null)>C18 - Trên 18 tuổi</!option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <label class="form-label text-body-emphasis fw-medium">Mô tả chi tiết</label>
+                                                                <textarea name="description" rows="4" class="form-control bg-body text-body-emphasis border-secondary-subtle">@movie.Description</textarea>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <!-- Right Column: Media -->
+                                                    <div class="col-md-4">
+                                                        <label class="form-label text-body-emphasis fw-medium">Poster phim (tải lên file mới)</label>
+                                                        <div class="poster-preview-box mb-3">
+                                                            <img id="preview-edit-@movie.Id" src="@(movie.PosterUrl ?? "")" alt="Poster Preview" style="@(string.IsNullOrEmpty(movie.PosterUrl) ? "display: none;" : "")" />
+                                                            @if(string.IsNullOrEmpty(movie.PosterUrl)) {
+                                                                <div class="poster-placeholder" id="placeholder-edit-@movie.Id">
+                                                                    <i class="bi bi-image fs-1 d-block mb-2"></i>
+                                                                    <span>Chưa có ảnh</span>
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                        <input type="file" name="poster" id="file-edit-@movie.Id" class="form-control bg-body text-body-emphasis border-secondary-subtle mb-3" accept="image/*" onchange="previewImage(this, 'preview-edit-@movie.Id', 'placeholder-edit-@movie.Id')">
+                                                        
+                                                        <label class="form-label text-body-emphasis fw-medium mt-2">Trailer URL (YouTube)</label>
+                                                        <input type="url" name="trailerUrl" value="@movie.TrailerUrl" class="form-control bg-body text-body-emphasis border-secondary-subtle" placeholder="https://youtube.com/...">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer border-top border-secondary-subtle p-3">
+                                                <button type="button" class="btn btn-outline-secondary px-4 fw-medium" data-bs-dismiss="modal">Hủy</button>
+                                                <button type="submit" class="btn btn-primary px-4 fw-medium">Lưu thay đổi</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        @if (Model != null && Model.TotalPages > 1)
+        {
+            <div class="card-footer bg-transparent border-top border-secondary-subtle py-3">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center mb-0">
+                        <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                            <a class="page-link bg-body text-body-emphasis border-secondary-subtle" href="@Url.Action("Movies", new { page = Model.PageIndex - 1 })">
+                                <i class="bi bi-chevron-left"></i> Trước
+                            </a>
+                        </li>
+                        
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                                <a class="page-link @(i == Model.PageIndex ? "bg-primary border-primary text-white fw-bold" : "bg-body text-body-emphasis border-secondary-subtle")" href="@Url.Action("Movies", new { page = i })">@i</a>
+                            </li>
+                        }
+                        
+                        <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                            <a class="page-link bg-body text-body-emphasis border-secondary-subtle" href="@Url.Action("Movies", new { page = Model.PageIndex + 1 })">
+                                Sau <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addMovieModal" tabindex="-1" aria-labelledby="addMovieModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content bg-body border border-secondary-subtle shadow-lg">
+            <div class="modal-header border-bottom border-secondary-subtle">
+                <h5 class="modal-title text-body-emphasis fw-bold" id="addMovieModalLabel">Thêm phim mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="Create" method="post" enctype="multipart/form-data">
+                <div class="modal-body p-4">
+                    <div class="row g-4">
+                        <!-- Left Column -->
+                        <div class="col-md-8">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label text-body-emphasis fw-medium">Tiêu đề phim *</label>
+                                    <input type="text" name="title" class="form-control bg-body text-body-emphasis border-secondary-subtle" required placeholder="Nhập tên phim">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-body-emphasis fw-medium">Thể loại *</label>
+                                    <input type="text" name="genre" class="form-control bg-body text-body-emphasis border-secondary-subtle" required placeholder="Hành động, Viễn tưởng...">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-body-emphasis fw-medium">Đạo diễn *</label>
+                                    <input type="text" name="director" class="form-control bg-body text-body-emphasis border-secondary-subtle" required>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label text-body-emphasis fw-medium">Diễn viên</label>
+                                    <input type="text" name="cast" class="form-control bg-body text-body-emphasis border-secondary-subtle">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label text-body-emphasis fw-medium">Trạng thái</label>
+                                    <select name="status" class="form-select bg-body text-body-emphasis border-secondary-subtle">
+                                        <option value="coming_soon">Sắp chiếu</option>
+                                        <option value="now_showing">Đang chiếu</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label text-body-emphasis fw-medium">Thời lượng (phút)</label>
+                                    <input type="number" name="durationMinutes" class="form-control bg-body text-body-emphasis border-secondary-subtle" required min="1" value="120">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label text-body-emphasis fw-medium">Độ tuổi</label>
+                                    <select name="ageRating" class="form-select bg-body text-body-emphasis border-secondary-subtle">
+                                        <option value="P">P - Mọi lứa tuổi</option>
+                                        <option value="C13">C13 - Trên 13 tuổi</option>
+                                        <option value="C16">C16 - Trên 16 tuổi</option>
+                                        <option value="C18">C18 - Trên 18 tuổi</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label text-body-emphasis fw-medium">Mô tả chi tiết</label>
+                                    <textarea name="description" rows="4" class="form-control bg-body text-body-emphasis border-secondary-subtle"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Column -->
+                        <div class="col-md-4">
+                            <label class="form-label text-body-emphasis fw-medium">Poster phim *</label>
+                            <div class="poster-preview-box mb-3">
+                                <img id="preview-add" src="" alt="Poster Preview" style="display: none;" />
+                                <div class="poster-placeholder" id="placeholder-add">
+                                    <i class="bi bi-image fs-1 d-block mb-2"></i>
+                                    <span>Tải ảnh lên</span>
+                                </div>
+                            </div>
+                            <input type="file" name="poster" id="file-add" class="form-control bg-body text-body-emphasis border-secondary-subtle mb-3" accept="image/*" required onchange="previewImage(this, 'preview-add', 'placeholder-add')">
+                            
+                            <label class="form-label text-body-emphasis fw-medium mt-2">Trailer URL (YouTube)</label>
+                            <input type="url" name="trailerUrl" class="form-control bg-body text-body-emphasis border-secondary-subtle" placeholder="https://youtube.com/...">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top border-secondary-subtle p-3">
+                    <button type="button" class="btn btn-outline-secondary px-4 fw-medium" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary px-4 fw-medium">Thêm phim</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function previewImage(input, imgId, placeholderId) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var img = document.getElementById(imgId);
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                    var placeholder = document.getElementById(placeholderId);
+                    if (placeholder) placeholder.style.display = 'none';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+}

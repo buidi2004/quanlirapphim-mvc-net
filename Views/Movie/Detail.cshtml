@@ -1,0 +1,275 @@
+@model CinemaXNet.Application.ViewModels.MovieDetailViewModel
+@{
+    ViewData["Title"] = Model.Title;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var selectedDate = (DateOnly)(ViewBag.SelectedDate ?? DateOnly.FromDateTime(DateTime.Today));
+    var daysOfWeek = new[] { "Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy" };
+}
+
+<div class="movie-hero-section position-relative pb-5 pt-5 px-3 px-md-5 overflow-hidden mb-5" style="background: url('@(!string.IsNullOrEmpty(Model.PosterUrl) ? Model.PosterUrl : "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba")') center 20%/cover; margin-top: -30px;">
+    <!-- Cinematic Dark Overlay -->
+    <div class="position-absolute w-100 h-100 top-0 start-0" style="background: linear-gradient(to right, rgba(15, 23, 42, 1) 0%, rgba(15, 23, 42, 0.85) 50%, rgba(15, 23, 42, 0.6) 100%);"></div>
+    <div class="position-absolute w-100 bottom-0 start-0" style="height: 150px; background: linear-gradient(to top, #f8f9fa 0%, transparent 100%);"></div>
+    
+    <div class="position-relative z-1 container mt-4">
+        <div class="row g-5 align-items-center mb-4">
+            <!-- Cột trái: Poster với 3D tilt -->
+            <div class="col-md-4 col-lg-3 text-center text-md-start">
+                <div class="movie-card-3d position-relative d-inline-block">
+                    <img src="@(!string.IsNullOrEmpty(Model.PosterUrl) ? Model.PosterUrl : "https://placehold.co/400x600/111/fff?text=No+Poster")"
+                         class="img-fluid rounded-4 shadow-lg border border-secondary movie-card"
+                         alt="@Model.Title"
+                         data-tilt
+                         style="max-height: 450px; object-fit: cover; width: 100%; box-shadow: 0 15px 35px rgba(0,0,0,0.5) !important;">
+                         
+                    <div class="position-absolute top-50 start-50 translate-middle" style="z-index: 5;">
+                        <button class="btn btn-warning rounded-circle shadow-lg play-trailer-btn" data-bs-toggle="modal" data-bs-target="#trailerModal" style="width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+                            <i class="bi bi-play-fill fs-1 ms-1 text-dark"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cột phải: Thông tin chi tiết -->
+            <div class="col-md-8 col-lg-9 text-white">
+                <h1 class="display-4 fw-bold text-white mb-2 text-shadow">@Model.Title</h1>
+                
+                <div class="d-flex flex-wrap gap-2 mb-4 align-items-center">
+                    @if (!string.IsNullOrEmpty(Model.AgeRating))
+                    {
+                        <span class="badge badge-@Model.AgeRating.ToLower() fs-6 p-2 rounded shadow-sm">
+                            @Model.AgeRating
+                        </span>
+                    }
+                    <span class="badge bg-dark border border-secondary fs-6 p-2 rounded shadow-sm">
+                        <i class="bi bi-clock me-1 text-warning"></i> @Model.FormattedDuration
+                    </span>
+                    @if (!string.IsNullOrEmpty(Model.Genre))
+                    {
+                        <span class="badge bg-dark border border-secondary fs-6 p-2 rounded shadow-sm">
+                            <i class="bi bi-tag-fill me-1 text-warning"></i> @Model.Genre
+                        </span>
+                    }
+                    @if (Model.ReviewCount > 0)
+                    {
+                        <span class="badge bg-warning text-dark fs-6 p-2 rounded shadow-sm fw-bold">
+                            <i class="bi bi-star-fill me-1"></i> @Model.AverageRating.ToString("0.0") / 5 (@Model.ReviewCount đánh giá)
+                        </span>
+                    }
+                    <span class="badge bg-light text-dark fs-6 p-2 rounded shadow-sm fw-bold">
+                        @(Model.Status == "now_showing" ? "Đang chiếu" : (Model.Status == "coming_soon" ? "Sắp chiếu" : "Đã kết thúc"))
+                    </span>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-8">
+                        <div class="mb-2">
+                            <span class="text-secondary fw-medium me-2">Đạo diễn:</span>
+                            <span class="text-light fw-medium">@(Model.Director ?? "Đang cập nhật")</span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="text-secondary fw-medium me-2">Diễn viên:</span>
+                            <span class="text-light fw-medium">@(Model.Cast ?? "Đang cập nhật")</span>
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="text-warning border-start border-warning border-3 ps-2 mb-3 fw-bold text-shadow">NỘI DUNG PHIM</h5>
+                <p class="text-light lh-lg mb-4 opacity-75" style="text-align: justify; font-size: 1.05rem; max-width: 900px;">
+                    @Html.Raw((!string.IsNullOrEmpty(Model.Description) ? Model.Description.Replace("\n", "<br/>") : "Chưa có thông tin mô tả chi tiết cho bộ phim này."))
+                </p>
+                
+                <div>
+                    <button class="btn btn-warning btn-lg rounded-pill px-5 fw-bold shadow-lg" onclick="document.getElementById('showtimes-section').scrollIntoView({ behavior: 'smooth' });">
+                        <i class="bi bi-ticket-perforated-fill me-2"></i> MUA VÉ NGAY
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lịch chiếu trượt ngang + Thẻ suất chiếu đẹp -->
+<div class="card bg-white border border-light rounded p-4 shadow-lg">
+    <h3 class="h4 text-warning border-start border-warning border-4 ps-3 fw-medium mb-4">
+        <i class="bi bi-calendar3 me-2"></i>LỊCH CHIẾU & SUẤT CHIẾU
+    </h3>
+
+    <!-- Showtime cards (BookMyShow Style) -->
+    <div class="showtimes-container mt-4 mb-5 border border-light rounded-4 overflow-hidden shadow-sm">
+        @await Html.PartialAsync("_ShowtimesCGV", Model)
+    </div>
+</div>
+
+<!-- Reviews Section -->
+<div class="card bg-white border-0 rounded-4 p-4 shadow-lg mt-4 mb-5">
+    <h3 class="h4 text-warning border-start border-warning border-4 ps-3 fw-bold mb-4">
+        <i class="bi bi-star-fill me-2"></i>ĐÁNH GIÁ TỪ NGƯỜI XEM
+    </h3>
+
+    <div class="row g-4">
+        <!-- Cột trái: Điểm số tổng quan -->
+        <div class="col-md-4 col-lg-3 text-center">
+            <div class="p-4 bg-light rounded-4 h-100 d-flex flex-column justify-content-center align-items-center shadow-sm">
+                <h6 class="text-secondary fw-bold mb-2 text-uppercase">ĐIỂM TRUNG BÌNH</h6>
+                <div class="display-3 fw-bold text-dark mb-2" style="font-family: 'Arial Black', sans-serif;">@Model.AverageRating.ToString("0.0")</div>
+                <div class="text-warning fs-4 mb-2">
+                    @for(int i = 1; i <= 5; i++)
+                    {
+                        <i class="bi bi-star@(i <= Math.Round(Model.AverageRating) ? "-fill" : "")"></i>
+                    }
+                </div>
+                <div class="text-secondary small fw-medium">Dựa trên @Model.ReviewCount đánh giá</div>
+            </div>
+        </div>
+
+        <!-- Cột phải: Form & Danh sách đánh giá -->
+        <div class="col-md-8 col-lg-9">
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <form method="POST" asp-controller="Reviews" asp-action="Submit" class="mb-5 bg-white shadow-sm p-4 rounded-4 border border-light">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="MovieId" value="@Model.Id">
+                    <h6 class="fw-bold text-dark mb-3">Viết đánh giá của bạn</h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <select name="Rating" class="form-select bg-light text-dark border-0 shadow-none fw-medium" required>
+                                <option value="" disabled selected>-- Chọn điểm --</option>
+                                <option value="5">★★★★★ (Tuyệt vời)</option>
+                                <option value="4">★★★★☆ (Rất tốt)</option>
+                                <option value="3">★★★☆☆ (Khá)</option>
+                                <option value="2">★★☆☆☆ (Trung bình)</option>
+                                <option value="1">★☆☆☆☆ (Tệ)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-8">
+                            <textarea name="Comment" class="form-control bg-light text-dark border-0 shadow-none" rows="2" placeholder="Chia sẻ cảm nghĩ..." required></textarea>
+                        </div>
+                        <div class="col-12 text-end mt-3">
+                            <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold shadow-sm">
+                                <i class="bi bi-send-fill me-1"></i> GỬI ĐÁNH GIÁ
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            }
+            else
+            {
+                <div class="alert bg-light border-0 shadow-sm text-dark rounded-4 mb-5 p-4 text-center">
+                    <i class="bi bi-person-lock fs-3 d-block mb-2 text-secondary"></i>
+                    Vui lòng <a href="/login" class="text-warning fw-bold text-decoration-none">đăng nhập</a> để viết đánh giá cho bộ phim này.
+                </div>
+            }
+
+            <h5 class="fw-bold text-dark mb-4 border-bottom pb-2">Đánh giá gần đây</h5>
+            <div class="reviews-list">
+                @if (!Model.Reviews.Any())
+                {
+                    <div class="text-center py-5 bg-light rounded-4">
+                        <i class="bi bi-chat-square-quote fs-1 text-secondary opacity-50 mb-3 d-block"></i>
+                        <p class="text-secondary fw-medium">Chưa có đánh giá nào. Hãy là người đầu tiên!</p>
+                    </div>
+                }
+                else
+                {
+                    foreach (var review in Model.Reviews)
+                    {
+                        <div class="review-item bg-white border border-light rounded-4 p-4 mb-3 shadow-sm transition-hover">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px;">
+                                        @(review.User?.Username?.Substring(0,1).ToUpper() ?? "U")
+                                    </div>
+                                    <div>
+                                        <strong class="text-dark d-block">@review.User?.Username</strong>
+                                        <small class="text-secondary opacity-75">@review.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                                    </div>
+                                </div>
+                                <div class="text-warning fs-5">
+                                    @for(int i = 1; i <= 5; i++)
+                                    {
+                                        <i class="bi bi-star@(i <= review.Rating ? "-fill" : "")"></i>
+                                    }
+                                </div>
+                            </div>
+                            <p class="text-dark opacity-75 mb-0" style="font-size: 0.95rem; line-height: 1.6;">
+                                @Html.Raw(review.Comment.Replace("\n", "<br/>"))
+                            </p>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+    </div> <!-- End position-relative z-1 -->
+</div> <!-- End wrapper container -->
+
+<!-- Sticky Booking Bar -->
+<div id="stickyBookingBar" class="sticky-booking-bar shadow-lg">
+    <div class="container d-flex justify-content-between align-items-center h-100">
+        <div class="d-flex align-items-center gap-3">
+            <img src="@(!string.IsNullOrEmpty(Model.PosterUrl) ? Model.PosterUrl : "https://placehold.co/100x150")" alt="@Model.Title" class="rounded shadow-sm" style="height: 50px; width: 35px; object-fit: cover;">
+            <div>
+                <h6 class="mb-0 text-white fw-bold text-truncate" style="max-width: 200px;">@Model.Title</h6>
+                <div class="text-warning small" style="font-size: 0.8rem;">
+                    <i class="bi bi-star-fill"></i> @Model.AverageRating.ToString("0.0") / 5
+                </div>
+            </div>
+        </div>
+        <button class="btn btn-warning rounded-pill px-4 fw-bold shadow" onclick="document.getElementById('showtimes-section').scrollIntoView({ behavior: 'smooth' });">
+            MUA VÉ
+        </button>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if user has already selected a tab manually to not override it on back navigation
+            const qbTarget = sessionStorage.getItem('qb_target_province');
+            if (qbTarget) {
+                const items = document.querySelectorAll('.cgv-prov-item');
+                for (let item of items) {
+                    if (item.getAttribute('data-prov') === qbTarget && !item.classList.contains('disabled')) {
+                        item.click();
+                        break;
+                    }
+                }
+                sessionStorage.removeItem('qb_target_province');
+                sessionStorage.setItem('province_auto_selected', 'true');
+                // Scroll to showtimes section
+                document.getElementById('showtimes-section').scrollIntoView({ behavior: 'smooth' });
+                return;
+            }
+
+            if (sessionStorage.getItem('province_auto_selected') === 'true') return;
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    fetch(`/api/cinemas/nearest?lat=${lat}&lng=${lng}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success && data.data.length > 0) {
+                                const nearestProvince = data.data[0].province;
+                                const items = document.querySelectorAll('.cgv-prov-item');
+                                for (let item of items) {
+                                    if (item.getAttribute('data-prov') === nearestProvince && !item.classList.contains('disabled')) {
+                                        item.click();
+                                        sessionStorage.setItem('province_auto_selected', 'true');
+                                        break;
+                                    }
+                                }
+                            }
+                        })
+                        .catch(err => console.error('Error fetching nearest province:', err));
+                }, () => {
+                    // Geolocation denied or failed, ignore
+                });
+            }
+        });
+    </script>
+}

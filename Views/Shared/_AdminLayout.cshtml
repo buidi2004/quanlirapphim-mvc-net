@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="vi" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@(ViewBag.PageTitle ?? "CinemaX Admin Dashboard")</title>
+
+    <!-- Bootstrap 5.3 Dark Mode -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/assets/css/app.css">
+    <style>
+        .sidebar {
+            box-shadow: 2px 0 10px rgba(0,0,0,0.03);
+        }
+        .sidebar .nav-link {
+            color: #212529 !important;
+            font-weight: 500;
+            padding: 0.55rem 0.85rem;
+            border-radius: 8px;
+            transition: all 0.2s ease-in-out;
+        }
+        .sidebar .nav-link:hover {
+            background-color: rgba(255, 193, 7, 0.15) !important;
+            color: #000 !important;
+            transform: translateX(3px);
+        }
+        .sidebar .nav-link.active {
+            background-color: #ffc107 !important;
+            color: #000 !important;
+            font-weight: 700 !important;
+            box-shadow: 0 3px 8px rgba(255, 193, 7, 0.35);
+        }
+        .sidebar .sidebar-heading {
+            font-size: 0.72rem;
+            letter-spacing: 1px;
+            font-weight: 700;
+            color: #6c757d !important;
+        }
+    </style>
+</head>
+<body class="bg-body-tertiary min-vh-100 d-flex flex-column">
+
+    <!-- Navbar -->
+    @await Html.PartialAsync("_Navbar")
+
+    <div class="container-fluid flex-grow-1 d-flex">
+        <div class="row w-100 flex-grow-1">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 border-end border-secondary-subtle py-4 sidebar bg-body">
+                <div class="position-sticky">
+                    <ul class="nav flex-column gap-1">
+                        <li class="nav-item mb-2">
+                            <a class="nav-link @(Context.Request.Path.StartsWithSegments("/admin/pos") ? "active" : "") fw-bold text-white bg-danger rounded shadow-sm" href="/admin/pos">
+                                <i class="bi bi-cart-plus-fill me-2 text-white"></i> BÁN VÉ TẠI QUẦY
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(Context.Request.Path.StartsWithSegments("/admin/dashboard") ? "active" : "")" href="/admin/dashboard">
+                                <i class="bi bi-speedometer2 me-2 text-warning"></i> Thống kê chung
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(Context.Request.Path.StartsWithSegments("/admin/movies") ? "active" : "")" href="/admin/movies">
+                                <i class="bi bi-film me-2 text-primary"></i> Quản lý phim
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(Context.Request.Path.StartsWithSegments("/admin/showtimes") ? "active" : "")" href="/admin/showtimes">
+                                <i class="bi bi-clock me-2 text-info"></i> Suất Chiếu
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(Context.Request.Path.StartsWithSegments("/admin/rooms") ? "active" : "")" href="/admin/rooms">
+                                <i class="bi bi-door-open me-2 text-primary"></i> Phòng & Ghế
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(Context.Request.Path.StartsWithSegments("/admin/tickets") ? "active" : "")" href="/admin/tickets">
+                                <i class="bi bi-ticket-perforated me-2 text-success"></i> Đơn Vé
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(Context.Request.Path.StartsWithSegments("/admin/food-beverages") ? "active" : "")" href="/admin/food-beverages">
+                                <i class="bi bi-cup-straw me-2 text-danger"></i> Bắp Nước
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(Context.Request.Path.StartsWithSegments("/admin/promotions") ? "active" : "")" href="/admin/promotions">
+                                <i class="bi bi-tags me-2 text-warning"></i> Khuyến Mãi
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(Context.Request.Path.StartsWithSegments("/admin/news") ? "active" : "")" href="/admin/news">
+                                <i class="bi bi-newspaper me-2 text-secondary"></i> Tin Tức
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(Context.Request.Path.StartsWithSegments("/admin/banners") ? "active" : "")" href="/admin/banners">
+                                <i class="bi bi-images me-2 text-info"></i> Quản Lý Banner
+                            </a>
+                        </li>
+                        <li class="nav-item mt-2">
+                            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-3 mb-1 text-uppercase">
+                                <span>Hoạt Động Trực Tiếp</span>
+                            </h6>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(Context.Request.Path.StartsWithSegments("/admin/pos") ? "active" : "")" href="/admin/pos">
+                                <i class="bi bi-display me-2 text-primary"></i> POS Bán Vé
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(Context.Request.Path.StartsWithSegments("/admin/scanner") ? "active" : "")" href="/admin/scanner">
+                                <i class="bi bi-qr-code-scan me-2 text-success"></i> Quét Vé Check-in
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(Context.Request.Path.StartsWithSegments("/admin/refunds") ? "active" : "")" href="/admin/refunds">
+                                <i class="bi bi-arrow-counterclockwise me-2 text-warning"></i> Hoàn & Hủy Vé
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(Context.Request.Path.StartsWithSegments("/admin/payments") ? "active" : "")" href="/admin/payments">
+                                <i class="bi bi-credit-card me-2 text-primary"></i> Quản Lý Thanh Toán
+                            </a>
+                        </li>
+                        <li class="nav-item mt-2">
+                            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-3 mb-1 text-uppercase">
+                                <span>Khách Hàng</span>
+                            </h6>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(Context.Request.Path.StartsWithSegments("/admin/users") ? "active" : "")" href="/admin/users">
+                                <i class="bi bi-people me-2 text-info"></i> Người Dùng
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(Context.Request.Path.StartsWithSegments("/admin/reviews") ? "active" : "")" href="/admin/reviews">
+                                <i class="bi bi-star-half me-2 text-warning"></i> Đánh Giá
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(Context.Request.Path.StartsWithSegments("/admin/contacts") ? "active" : "")" href="/admin/contacts">
+                                <i class="bi bi-envelope-paper me-2 text-danger"></i> Liên Hệ
+                            </a>
+                        </li>
+                        <li class="nav-item mt-2">
+                            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-3 mb-1 text-uppercase">
+                                <span>Hệ Thống</span>
+                            </h6>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(Context.Request.Path.StartsWithSegments("/admin/reports") ? "active" : "")" href="/admin/reports">
+                                <i class="bi bi-graph-up me-2 text-success"></i> Báo Cáo
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(Context.Request.Path.StartsWithSegments("/admin/settings") ? "active" : "")" href="/admin/settings">
+                                <i class="bi bi-gear me-2 text-secondary"></i> Cấu Hình
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(Context.Request.Path.StartsWithSegments("/admin/seat-lock-config") ? "active" : "")" href="/admin/seat-lock-config">
+                                <i class="bi bi-lock me-2 text-danger"></i> Cấu Hình Giữ Ghế (TTL)
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(Context.Request.Path.StartsWithSegments("/admin/roles-permissions") ? "active" : "")" href="/admin/roles-permissions">
+                                <i class="bi bi-shield-lock me-2 text-success"></i> Phân Quyền (RBAC)
+                            </a>
+                        </li>
+                        <li class="nav-item mt-2">
+                            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-3 mb-1 text-uppercase">
+                                <span>Mở Rộng & CRM</span>
+                            </h6>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(Context.Request.Path.StartsWithSegments("/admin/audit-logs") ? "active" : "")" href="/admin/audit-logs">
+                                <i class="bi bi-journal-text me-2 text-muted"></i> Nhật Ký (Audit)
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(Context.Request.Path.StartsWithSegments("/admin/membership") ? "active" : "")" href="/admin/membership">
+                                <i class="bi bi-star me-2 text-warning"></i> Hạng Thành Viên
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(Context.Request.Path.StartsWithSegments("/admin/pricing-rules") ? "active" : "")" href="/admin/pricing-rules">
+                                <i class="bi bi-currency-dollar me-2 text-success"></i> Luật Giá Vé
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(Context.Request.Path.StartsWithSegments("/admin/campaigns") ? "active" : "")" href="/admin/campaigns">
+                                <i class="bi bi-megaphone me-2 text-danger"></i> Chiến Dịch Marketing
+                            </a>
+                        </li>
+                        <li class="nav-item mt-4">
+                            <a class="nav-link text-secondary p-2 d-flex align-items-center gap-2 rounded" href="/">
+                                <i class="bi bi-arrow-left"></i>
+                                Về Trang chủ
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main Panel Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4 bg-light">
+                <!-- Flash Messages -->
+                @await Html.PartialAsync("_FlashMessage")
+
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-body border-top border-secondary-subtle text-secondary text-center py-3">
+        <small>&copy; @DateTime.Now.Year CinemaX. Admin Panel.</small>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,357 @@
+@model CinemaXNet.Application.ViewModels.DashboardStats
+@{
+    ViewData["Title"] = "Dashboard Tổng Quan";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<!-- Custom CSS to perfectly match the uploaded image (Dark Mode UI) -->
+<style>
+    :root {
+        --dash-bg: #18181b; /* Deep dark background */
+        --dash-text: #ffffff;
+        --dash-text-muted: #a1a1aa;
+        --dash-green: #10b981;
+        --dash-red: #ef4444;
+        --dash-blue: #3b82f6;
+        --dash-yellow: #eab308;
+        --dash-orange: #f97316;
+    }
+    
+    /* Override bootstrap body if we are in this specific view */
+    body[data-bs-theme="dark"] .dashboard-container {
+        background-color: var(--dash-bg);
+        color: var(--dash-text);
+        font-family: 'Inter', sans-serif;
+    }
+
+    .dashboard-container {
+        padding: 2rem 0;
+    }
+
+    /* Header styling */
+    .dash-header-title {
+        font-size: 2rem;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        margin-bottom: 0.25rem;
+    }
+    .dash-header-subtitle {
+        color: var(--dash-text-muted);
+        font-size: 0.95rem;
+        font-weight: 500;
+    }
+    .dash-btn-outline {
+        background: transparent;
+        border: 1px solid #3f3f46;
+        color: var(--dash-text);
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+    }
+    .dash-btn-outline:hover {
+        background: #27272a;
+        color: #fff;
+    }
+
+    /* Metrics */
+    .metric-title {
+        color: var(--dash-text-muted);
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+    }
+    .metric-value {
+        font-size: 2.25rem;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        line-height: 1.1;
+        margin-bottom: 0.5rem;
+    }
+    .metric-value span.unit {
+        text-decoration: underline;
+        text-decoration-thickness: 2px;
+        text-underline-offset: 4px;
+    }
+    .metric-trend {
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    .trend-up { color: var(--dash-green); }
+    .trend-down { color: var(--dash-red); }
+    .trend-neutral { color: var(--dash-text-muted); }
+
+    /* Chart Containers */
+    .chart-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+    }
+    
+    /* ApexCharts overrides for exact match */
+    .apexcharts-tooltip {
+        background: #27272a !important;
+        border: 1px solid #3f3f46 !important;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+        color: #fff !important;
+    }
+    .apexcharts-tooltip-title {
+        background: #18181b !important;
+        border-bottom: 1px solid #3f3f46 !important;
+        font-weight: 700 !important;
+    }
+    
+    /* Custom Legend at bottom */
+    .custom-legend {
+        display: flex;
+        gap: 1.5rem;
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--dash-text-muted);
+    }
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .legend-box {
+        width: 12px;
+        height: 12px;
+        border-radius: 2px;
+    }
+    .legend-blue { background-color: var(--dash-blue); }
+    .legend-green { background-color: var(--dash-green); }
+</style>
+
+<div class="dashboard-container">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-start mb-5">
+        <div>
+            <h1 class="dash-header-title">Dashboard tổng quan</h1>
+            <p class="dash-header-subtitle">Cụm rạp CineMax — hôm nay, @DateTime.Now.ToString("dd/MM/yyyy")</p>
+        </div>
+        <button class="dash-btn-outline d-flex align-items-center gap-2">
+            Xem báo cáo chi tiết <i class="bi bi-arrow-up-right"></i>
+        </button>
+    </div>
+
+    <!-- 4 Metrics -->
+    <div class="row mb-5 pb-3">
+        <div class="col-md-3">
+            <div class="metric-title">Doanh thu hôm nay</div>
+            <div class="metric-value">@(Model.TodayRevenue >= 1000000 ? (Model.TodayRevenue / 1000000).ToString("0.#") + " triệu" : Model.TodayRevenue.ToString("N0")) <span class="unit">đ</span></div>
+            <div class="metric-trend @(Model.RevenueGrowth >= 0 ? "trend-up" : "trend-down")">
+                <i class="bi @(Model.RevenueGrowth >= 0 ? "bi-arrow-up-right" : "bi-arrow-down-right")"></i> @Math.Abs(Model.RevenueGrowth)% so hôm qua
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="metric-title">Vé bán ra</div>
+            <div class="metric-value">@Model.TodayTickets.ToString("N0")</div>
+            <div class="metric-trend @(Model.TicketGrowth >= 0 ? "trend-up" : "trend-down")">
+                <i class="bi @(Model.TicketGrowth >= 0 ? "bi-arrow-up-right" : "bi-arrow-down-right")"></i> @Math.Abs(Model.TicketGrowth)% so hôm qua
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="metric-title">Tỷ lệ lấp đầy</div>
+            <div class="metric-value">@Model.TodayOccupancy.ToString("0.#")%</div>
+            <div class="metric-trend @(Model.OccupancyGrowth >= 0 ? "trend-up" : "trend-down")">
+                <i class="bi @(Model.OccupancyGrowth >= 0 ? "bi-arrow-up-right" : "bi-arrow-down-right")"></i> @Math.Abs(Model.OccupancyGrowth)% so hôm qua
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="metric-title">Vé hủy/hoàn</div>
+            <div class="metric-value">@Model.CanceledTickets</div>
+            <div class="metric-trend trend-neutral">
+                @Model.CancelRate% tổng vé
+            </div>
+        </div>
+    </div>
+
+    <!-- 4 Charts Grid -->
+    <div class="row g-5 mb-3">
+        <!-- Chart 1: Doanh thu 7 ngày qua -->
+        <div class="col-md-6">
+            <h3 class="chart-title">Doanh thu 7 ngày qua</h3>
+            <div id="revenueLineChart" style="min-height: 250px;"></div>
+        </div>
+
+        <!-- Chart 2: Vé theo thể loại phim -->
+        <div class="col-md-6">
+            <h3 class="chart-title">Vé theo thể loại phim</h3>
+            <div id="genreDonutChart" class="d-flex justify-content-center" style="min-height: 250px;"></div>
+        </div>
+
+        <!-- Chart 3: Top 5 phim bán chạy tuần này -->
+        <div class="col-md-6 pt-4">
+            <h3 class="chart-title">Top 5 phim bán chạy tuần này</h3>
+            <div id="topMoviesBarChart" style="min-height: 250px;"></div>
+        </div>
+
+        <!-- Chart 4: Lấp đầy theo khung giờ -->
+        <div class="col-md-6 pt-4">
+            <h3 class="chart-title">Lấp đầy theo khung giờ</h3>
+            <div id="occupancyBarChart" style="min-height: 250px;"></div>
+        </div>
+    </div>
+
+    <!-- Bottom Legend -->
+    <div class="custom-legend mt-2">
+        <div class="legend-item">
+            <div class="legend-box legend-blue"></div>
+            <span>Doanh thu / Top phim</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-box legend-green"></div>
+            <span>Lấp đầy</span>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Common Chart Settings
+            const commonOptions = {
+                chart: {
+                    background: 'transparent',
+                    fontFamily: 'Inter, sans-serif',
+                    toolbar: { show: false }
+                },
+                theme: { mode: 'dark' },
+                grid: {
+                    borderColor: '#3f3f46',
+                    strokeDashArray: 0,
+                    xaxis: { lines: { show: false } },
+                    yaxis: { lines: { show: true } },
+                    padding: { top: 0, right: 0, bottom: 0, left: 10 }
+                },
+                dataLabels: { enabled: false }
+            };
+
+            // 1. Line Chart (Doanh thu 7 ngày qua)
+            var lineOptions = {
+                ...commonOptions,
+                series: [{ name: 'Doanh thu', data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Revenue7Days.Select(r => r.Revenue / 1000000))) }],
+                chart: { ...commonOptions.chart, type: 'line', height: 280 },
+                stroke: { curve: 'smooth', width: 3, colors: ['#3b82f6'] },
+                markers: {
+                    size: 5,
+                    colors: ['#3b82f6'],
+                    strokeColors: '#3b82f6',
+                    strokeWidth: 2,
+                    hover: { size: 7 }
+                },
+                xaxis: {
+                    categories: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Revenue7Days.Select(r => r.DateLabel))),
+                    axisBorder: { show: false },
+                    axisTicks: { show: false },
+                    labels: { style: { colors: '#a1a1aa', fontWeight: 500 } }
+                },
+                yaxis: {
+                    labels: {
+                        style: { colors: '#a1a1aa', fontWeight: 500 },
+                        formatter: function (value) { return value + "tr"; }
+                    },
+                    min: 25,
+                    max: 55,
+                    tickAmount: 6
+                },
+                tooltip: { y: { formatter: function(val) { return val + " triệu đ" } } }
+            };
+            new ApexCharts(document.querySelector("#revenueLineChart"), lineOptions).render();
+
+            // 2. Donut Chart (Vé theo thể loại phim)
+            var donutOptions = {
+                chart: { ...commonOptions.chart, type: 'donut', height: 280 },
+                series: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.GenreStats.Select(g => g.TicketCount))),
+                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.GenreStats.Select(g => g.Genre))),
+                colors: ['#eab308', '#f97316', '#3b82f6', '#10b981'],
+                stroke: { show: false }, // No borders between slices exactly like the image
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            size: '55%',
+                            labels: { show: false }
+                        }
+                    }
+                },
+                legend: { show: false },
+                dataLabels: { enabled: false }
+            };
+            new ApexCharts(document.querySelector("#genreDonutChart"), donutOptions).render();
+
+            // 3. Horizontal Bar Chart (Top 5 phim)
+            var hBarOptions = {
+                ...commonOptions,
+                series: [{ name: 'Doanh thu', data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TopMovies.Select(m => m.Revenue / 100000))) }],
+                chart: { ...commonOptions.chart, type: 'bar', height: 280 },
+                plotOptions: {
+                    bar: {
+                        horizontal: true,
+                        barHeight: '50%',
+                        borderRadius: 4
+                    }
+                },
+                colors: ['#3b82f6'],
+                grid: {
+                    ...commonOptions.grid,
+                    xaxis: { lines: { show: true } },
+                    yaxis: { lines: { show: false } }
+                },
+                xaxis: {
+                    categories: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TopMovies.Select(m => m.MovieName))),
+                    axisBorder: { show: false },
+                    axisTicks: { show: false },
+                    labels: { style: { colors: '#a1a1aa', fontWeight: 500 } },
+                    min: 0,
+                    max: 1000,
+                    tickAmount: 5
+                },
+                yaxis: {
+                    labels: { style: { colors: '#ffffff', fontWeight: 700 } }
+                },
+                tooltip: { y: { formatter: function(val) { return val + " triệu đ" } } }
+            };
+            new ApexCharts(document.querySelector("#topMoviesBarChart"), hBarOptions).render();
+
+            // 4. Vertical Bar Chart (Lấp đầy theo khung giờ)
+            var vBarOptions = {
+                ...commonOptions,
+                series: [{ name: 'Tỷ lệ lấp đầy', data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TimeSlotStats.Select(t => t.OccupancyRate))) }],
+                chart: { ...commonOptions.chart, type: 'bar', height: 280 },
+                plotOptions: {
+                    bar: {
+                        columnWidth: '40%',
+                        borderRadius: 2
+                    }
+                },
+                colors: ['#10b981'],
+                xaxis: {
+                    categories: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TimeSlotStats.Select(t => t.HourLabel))),
+                    axisBorder: { show: false },
+                    axisTicks: { show: false },
+                    labels: { style: { colors: '#a1a1aa', fontWeight: 500 } }
+                },
+                yaxis: {
+                    labels: {
+                        style: { colors: '#a1a1aa', fontWeight: 500 },
+                        formatter: function(val) { return val + "%" }
+                    },
+                    min: 0,
+                    max: 90,
+                    tickAmount: 9
+                },
+                tooltip: { y: { formatter: function(val) { return val + "%" } } }
+            };
+            new ApexCharts(document.querySelector("#occupancyBarChart"), vBarOptions).render();
+            
+            // Force Dark Mode on the parent layout if it isn't already
+            if (document.documentElement.getAttribute('data-bs-theme') !== 'dark') {
+                const themeToggleBtn = document.getElementById('themeToggleBtn');
+                if (themeToggleBtn) themeToggleBtn.click();
+            }
+        });
+    </script>
+}

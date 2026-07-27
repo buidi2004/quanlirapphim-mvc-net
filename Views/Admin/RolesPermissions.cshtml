@@ -1,0 +1,191 @@
+@{
+    ViewData["Title"] = "Phân Quyền Chi Tiết (RBAC)";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    /* Custom Switch for Matrix */
+    .matrix-switch .form-check-input {
+        width: 2.5em;
+        height: 1.25em;
+        cursor: pointer;
+    }
+    .matrix-switch .form-check-input:checked {
+        background-color: #198754;
+        border-color: #198754;
+    }
+    .table-hover tbody tr:hover td {
+        background-color: var(--bs-secondary-bg-subtle) !important;
+    }
+    .sticky-col {
+        position: sticky;
+        left: 0;
+        background-color: var(--bs-body-bg);
+        z-index: 2;
+        border-right: 1px solid var(--bs-border-color);
+    }
+</style>
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom border-secondary-subtle">
+    <h1 class="h3 text-body-emphasis fw-bold mb-0">Ma Trận Phân Quyền (RBAC)</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <button type="button" class="btn btn-sm btn-outline-secondary me-2">
+            <i class="bi bi-arrow-counterclockwise"></i> Khôi phục mặc định
+        </button>
+        <button type="button" class="btn btn-sm btn-primary d-flex align-items-center gap-2">
+            <i class="bi bi-save"></i> Lưu Thay Đổi
+        </button>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4 bg-body mb-4">
+    <div class="card-header bg-transparent border-0 pt-4 pb-3 px-4 d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="fw-bold mb-1 text-body-emphasis"><i class="bi bi-shield-check text-success me-2"></i> Role-Based Access Control (RBAC)</h5>
+            <small class="text-secondary">Thiết lập quyền hạn truy cập cho từng nhóm tài khoản quản trị.</small>
+        </div>
+        <button class="btn btn-sm btn-outline-primary"><i class="bi bi-plus-circle"></i> Thêm Vai Trò Mới</button>
+    </div>
+    <div class="card-body px-0 pb-0 pt-2">
+        <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+            <table class="table table-hover align-middle mb-0 border-top">
+                <thead class="text-body-emphasis bg-body-tertiary" style="position: sticky; top: 0; z-index: 3;">
+                    <tr>
+                        <th class="border-0 pb-3 pt-3 px-4 sticky-col" style="min-width: 250px;">Danh sách Quyền (Permissions)</th>
+                        <th class="border-0 pb-3 pt-3 text-center" style="min-width: 150px;">
+                            <span class="badge bg-danger rounded-pill px-3 py-2 mb-1"><i class="bi bi-star-fill me-1"></i> Super Admin</span>
+                            <br><small class="text-secondary fw-normal">Toàn quyền hệ thống</small>
+                        </th>
+                        <th class="border-0 pb-3 pt-3 text-center" style="min-width: 150px;">
+                            <span class="badge bg-primary rounded-pill px-3 py-2 mb-1">Cinema Manager</span>
+                            <br><small class="text-secondary fw-normal">Quản lý cụm rạp</small>
+                        </th>
+                        <th class="border-0 pb-3 pt-3 text-center" style="min-width: 150px;">
+                            <span class="badge bg-info text-body-emphasis rounded-pill px-3 py-2 mb-1">Ticket Staff</span>
+                            <br><small class="text-secondary fw-normal">Nhân viên quầy vé</small>
+                        </th>
+                        <th class="border-0 pb-3 pt-3 text-center" style="min-width: 150px;">
+                            <span class="badge bg-secondary rounded-pill px-3 py-2 mb-1">Scanner Staff</span>
+                            <br><small class="text-secondary fw-normal">Nhân viên soát vé</small>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="border-top-0">
+                    
+                    <!-- Nhóm Quyền: Đặt vé & Giao dịch -->
+                    <tr class="bg-body-tertiary">
+                        <td colspan="5" class="fw-bold text-primary px-4 py-3 border-bottom"><i class="bi bi-ticket-perforated me-2"></i> Bán Vé & Giao Dịch (POS)</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 sticky-col">
+                            <span class="fw-medium text-body-emphasis d-block">Bán vé tại quầy (POS)</span>
+                            <small class="text-secondary">Sử dụng giao diện POS để bán vé trực tiếp</small>
+                        </td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox" checked disabled></div></td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox" checked></div></td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox" checked></div></td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 sticky-col">
+                            <span class="fw-medium text-body-emphasis d-block">Duyệt hoàn tiền (Refund)</span>
+                            <small class="text-secondary">Xử lý yêu cầu hủy vé và hoàn tiền qua cổng</small>
+                        </td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox" checked disabled></div></td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox" checked></div></td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox"></div></td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 sticky-col">
+                            <span class="fw-medium text-body-emphasis d-block">In lại vé (Reprint)</span>
+                            <small class="text-secondary">In lại vé giấy trong trường hợp kẹt máy in</small>
+                        </td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox" checked disabled></div></td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox" checked></div></td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox" checked></div></td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox"></div></td>
+                    </tr>
+
+                    <!-- Nhóm Quyền: Soát Vé -->
+                    <tr class="bg-body-tertiary">
+                        <td colspan="5" class="fw-bold text-success px-4 py-3 border-bottom"><i class="bi bi-qr-code-scan me-2"></i> Soát Vé (Check-in)</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 sticky-col">
+                            <span class="fw-medium text-body-emphasis d-block">Quét mã QR vé</span>
+                            <small class="text-secondary">Sử dụng camera hoặc máy quét mã vạch</small>
+                        </td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox" checked disabled></div></td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox" checked></div></td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox" checked></div></td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox" checked></div></td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 sticky-col">
+                            <span class="fw-medium text-body-emphasis d-block">Ghi đè cảnh báo trùng lặp</span>
+                            <small class="text-secondary">Cho qua khi vé báo "Đã Check-in" (nếu khách đi ra ngoài)</small>
+                        </td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox" checked disabled></div></td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox" checked></div></td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox"></div></td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox"></div></td>
+                    </tr>
+
+                    <!-- Nhóm Quyền: Phim & Suất Chiếu -->
+                    <tr class="bg-body-tertiary">
+                        <td colspan="5" class="fw-bold text-warning px-4 py-3 border-bottom"><i class="bi bi-film me-2"></i> Quản Lý Phim & Suất Chiếu</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 sticky-col">
+                            <span class="fw-medium text-body-emphasis d-block">Thêm/Sửa thông tin Phim</span>
+                            <small class="text-secondary">Cập nhật nội dung, poster, trailer phim</small>
+                        </td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox" checked disabled></div></td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox" checked></div></td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox"></div></td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 sticky-col">
+                            <span class="fw-medium text-body-emphasis d-block">Tạo/Xóa suất chiếu</span>
+                            <small class="text-secondary">Sắp xếp lịch chiếu, chọn phòng chiếu</small>
+                        </td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox" checked disabled></div></td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox" checked></div></td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox"></div></td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 sticky-col">
+                            <span class="fw-medium text-body-emphasis d-block">Chỉnh sửa giá vé</span>
+                            <small class="text-secondary">Thay đổi phụ thu, giá VIP/Cuối tuần</small>
+                        </td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox" checked disabled></div></td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox"></div></td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox"></div></td>
+                        <td class="text-center"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox"></div></td>
+                    </tr>
+                    
+                    <!-- Nhóm Quyền: Hệ thống -->
+                    <tr class="bg-body-tertiary">
+                        <td colspan="5" class="fw-bold text-danger px-4 py-3 border-bottom"><i class="bi bi-gear-fill me-2"></i> Hệ Thống & Cấu Hình</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 sticky-col pb-4">
+                            <span class="fw-medium text-body-emphasis d-block">Thay đổi Cấu hình cốt lõi</span>
+                            <small class="text-secondary">RBAC, Seat-Lock TTL, Audit Logs</small>
+                        </td>
+                        <td class="text-center pb-4"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox" checked disabled></div></td>
+                        <td class="text-center pb-4"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox"></div></td>
+                        <td class="text-center pb-4"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox"></div></td>
+                        <td class="text-center pb-4"><div class="form-check form-switch matrix-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox"></div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer bg-transparent border-top-0 px-4 py-3 text-end">
+        <small class="text-muted me-3"><i class="bi bi-info-circle me-1"></i> Quyền Super Admin không thể bị vô hiệu hóa.</small>
+    </div>
+</div>

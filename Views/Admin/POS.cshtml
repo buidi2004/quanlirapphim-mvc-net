@@ -1,0 +1,500 @@
+@using CinemaXNet.Domain.Entities
+@{
+    ViewData["Title"] = "POS - Bán Vé Tại Quầy";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var movies = ViewBag.Movies as IEnumerable<Movie> ?? new List<Movie>();
+    var showtimes = ViewBag.Showtimes as IEnumerable<Showtime> ?? new List<Showtime>();
+}
+
+<!-- Custom CSS for POS Interface -->
+<style>
+    /* POS Container */
+    .pos-container {
+        height: calc(100vh - 80px); /* Fill screen minus navbar */
+        display: flex;
+        gap: 1.5rem;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+    
+    /* Left Panel: Movie & Seat Selection */
+    .pos-left {
+        flex: 7;
+        display: flex;
+        flex-direction: column;
+        background-color: #18181b; /* Deep Dark */
+        border: 1px solid #27272a;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    /* Right Panel: Receipt & Payment */
+    .pos-right {
+        flex: 3;
+        display: flex;
+        flex-direction: column;
+        background-color: #18181b;
+        border: 1px solid #27272a;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    .pos-header {
+        background-color: #27272a;
+        padding: 1rem 1.5rem;
+        font-weight: 700;
+        font-size: 1.1rem;
+        border-bottom: 1px solid #3f3f46;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .pos-body {
+        padding: 1.5rem;
+        overflow-y: auto;
+        flex: 1;
+    }
+    
+    /* Movie Cards */
+    .movie-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 1rem;
+    }
+    .pos-movie-card {
+        background-color: #27272a;
+        border-radius: 8px;
+        overflow: hidden;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: all 0.2s;
+    }
+    .pos-movie-card:hover { border-color: #3f3f46; }
+    .pos-movie-card.active { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.3); }
+    .pos-movie-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+    .pos-movie-title {
+        padding: 0.5rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    /* Showtime Pills */
+    .showtime-pill {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background-color: #27272a;
+        border: 1px solid #3f3f46;
+        border-radius: 8px;
+        margin: 0.25rem;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+    .showtime-pill:hover { background-color: #3f3f46; }
+    .showtime-pill.active { background-color: #3b82f6; color: white; border-color: #3b82f6; }
+    
+    /* Seat Map */
+    .screen-curve {
+        height: 40px;
+        border-top: 4px solid #3f3f46;
+        border-radius: 50% / 100% 100% 0 0;
+        margin-bottom: 2rem;
+        text-align: center;
+        color: #a1a1aa;
+        font-size: 0.8rem;
+        letter-spacing: 2px;
+        padding-top: 0.5rem;
+    }
+    .seat {
+        width: 35px;
+        height: 35px;
+        border-radius: 8px 8px 4px 4px;
+        margin: 4px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.1s;
+    }
+    .seat-standard { background-color: #3f3f46; color: #fff; }
+    .seat-vip { background-color: #eab308; color: #000; }
+    .seat-couple { background-color: #ec4899; color: #fff; width: 78px; }
+    .seat-sold { background-color: #ef4444; color: #fff; cursor: not-allowed; opacity: 0.5; }
+    .seat-selected { background-color: #10b981; color: #fff; box-shadow: 0 0 8px #10b981; }
+    
+    /* Receipt Styles */
+    .receipt-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.75rem;
+        font-size: 0.95rem;
+    }
+    .receipt-total {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #10b981; /* Green */
+        border-top: 2px dashed #3f3f46;
+        padding-top: 1rem;
+        margin-top: 1rem;
+    }
+    
+    /* Action Buttons */
+    .pos-btn-huge {
+        padding: 1.25rem;
+        font-size: 1.25rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        border-radius: 0;
+    }
+    
+    /* Custom Scrollbar for POS */
+    .pos-body::-webkit-scrollbar { width: 6px; }
+    .pos-body::-webkit-scrollbar-track { background: transparent; }
+    .pos-body::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
+</style>
+
+<div class="pos-container">
+    
+    <!-- LEFT PANEL: Selection -->
+    <div class="pos-left">
+        <!-- POS Nav Tabs -->
+        <ul class="nav nav-tabs border-secondary-subtle px-3 pt-3" id="posTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link text-body-emphasis active fw-bold border-secondary-subtle" id="movie-tab" data-bs-toggle="tab" data-bs-target="#movie-step" type="button" role="tab">1. Chọn Phim & Suất</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link text-secondary fw-bold border-secondary-subtle" id="seat-tab" data-bs-toggle="tab" data-bs-target="#seat-step" type="button" role="tab" disabled>2. Chọn Ghế</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link text-secondary fw-bold border-secondary-subtle" id="food-tab" data-bs-toggle="tab" data-bs-target="#food-step" type="button" role="tab" disabled>3. Bắp nước</button>
+            </li>
+        </ul>
+        
+        <div class="tab-content pos-body" id="posTabContent">
+            
+            <!-- STEP 1: Movie & Showtime -->
+            <div class="tab-pane fade show active" id="movie-step" role="tabpanel">
+                <h5 class="text-body-emphasis fw-bold mb-3">Phim đang chiếu hôm nay</h5>
+                <div class="movie-grid mb-4">
+                    @foreach (var m in movies)
+                    {
+                        <div class="pos-movie-card" onclick="selectMovie(this, @m.Id, '@m.Title')">
+                            <img src="@(m.PosterUrl ?? "https://placehold.co/200x300/111/fff?text=No+Poster")" alt="Movie">
+                            <div class="pos-movie-title text-body-emphasis">@m.Title</div>
+                        </div>
+                    }
+                    @if (!movies.Any())
+                    {
+                        <div class="text-secondary">Không có phim nào đang chiếu hôm nay.</div>
+                    }
+                </div>
+                
+                <hr class="border-secondary-subtle my-4">
+                
+                <h5 class="text-body-emphasis fw-bold mb-3" id="showtimes-title">Vui lòng chọn phim để xem suất chiếu</h5>
+                <div id="showtimes-container">
+                    <!-- Showtimes will be injected here via JS -->
+                </div>
+                
+                <div class="text-end mt-4">
+                    <button id="btn-next-seat" class="btn btn-primary px-5 fw-bold" onclick="nextStep('seat-tab')" disabled>Tiếp tục: Chọn ghế <i class="bi bi-arrow-right"></i></button>
+                </div>
+            </div>
+            
+            <!-- STEP 2: Seat Selection -->
+            <div class="tab-pane fade" id="seat-step" role="tabpanel">
+                <div class="d-flex justify-content-between mb-4">
+                    <button class="btn btn-outline-secondary btn-sm fw-medium" onclick="nextStep('movie-tab')"><i class="bi bi-arrow-left"></i> Quay lại</button>
+                    <h5 id="seat-map-title" class="text-body-emphasis fw-bold mb-0">Sơ đồ ghế: Vui lòng chọn phim</h5>
+                    <div>
+                        <span class="badge bg-secondary me-2">Thường</span>
+                        <span class="badge text-dark" style="background-color: #eab308;">VIP</span>
+                        <span class="badge text-white" style="background-color: #ec4899;">Couple</span>
+                        <span class="badge bg-danger">Đã bán</span>
+                    </div>
+                </div>
+                
+                <div class="screen-curve">MÀN HÌNH</div>
+                
+                <div class="text-center mb-5 overflow-auto pb-3">
+                    <!-- Static Map Mockup -->
+                    @for (char r = 'A'; r <= 'F'; r++)
+                    {
+                        <div class="d-flex justify-content-center align-items-center mb-1">
+                            <span class="text-secondary fw-bold me-3" style="width: 20px;">@r</span>
+                            @for (int c = 1; c <= 12; c++)
+                            {
+                                string seatClass = "seat-standard";
+                                if (r >= 'D') seatClass = "seat-vip";
+                                if (r == 'A' && (c == 3 || c == 4 || c == 8)) seatClass = "seat-sold";
+                                if (r == 'F' && c > 10) continue; // Empty space for layout
+                                
+                                <div class="seat @seatClass" onclick="toggleSeat(this, '@r@c', @(seatClass == "seat-vip" ? 110000 : 90000))">@c</div>
+                            }
+                            <span class="text-secondary fw-bold ms-3" style="width: 20px;">@r</span>
+                        </div>
+                    }
+                    <div class="d-flex justify-content-center align-items-center mt-3">
+                        <span class="text-secondary fw-bold me-3" style="width: 20px;">G</span>
+                        <div class="seat seat-couple" onclick="toggleSeat(this, 'G1', 200000)">1</div>
+                        <div class="seat seat-couple seat-sold" onclick="toggleSeat(this, 'G2', 200000)">2</div>
+                        <div class="seat seat-couple" onclick="toggleSeat(this, 'G3', 200000)">3</div>
+                        <div class="seat seat-couple" onclick="toggleSeat(this, 'G4', 200000)">4</div>
+                        <div class="seat seat-couple" onclick="toggleSeat(this, 'G5', 200000)">5</div>
+                        <span class="text-secondary fw-bold ms-3" style="width: 20px;">G</span>
+                    </div>
+                </div>
+                
+                <div class="text-end">
+                    <button class="btn btn-primary px-5 fw-bold" onclick="nextStep('food-tab')">Tiếp tục: Bắp nước <i class="bi bi-arrow-right"></i></button>
+                </div>
+            </div>
+            
+            <!-- STEP 3: F&B -->
+            <div class="tab-pane fade" id="food-step" role="tabpanel">
+                <div class="d-flex justify-content-between mb-4">
+                    <button class="btn btn-outline-secondary btn-sm fw-medium" onclick="nextStep('seat-tab')"><i class="bi bi-arrow-left"></i> Quay lại ghế</button>
+                    <h5 class="text-body-emphasis fw-bold mb-0">Chọn Bắp Nước</h5>
+                </div>
+                
+                <!-- Mockup combos -->
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="d-flex justify-content-between align-items-center p-3 border border-secondary-subtle rounded bg-body-tertiary">
+                            <div>
+                                <h6 class="fw-bold text-body-emphasis mb-1">Combo 1 Big</h6>
+                                <span class="text-secondary small">1 Bắp lớn + 1 Nước lớn</span>
+                                <div class="text-info fw-bold mt-1">79.000 ₫</div>
+                            </div>
+                            <div class="input-group" style="width: 120px;">
+                                <button class="btn btn-outline-secondary" type="button">-</button>
+                                <input type="text" class="form-control text-center bg-body text-body-emphasis border-secondary-subtle" value="0" readonly>
+                                <button class="btn btn-outline-secondary" type="button">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex justify-content-between align-items-center p-3 border border-secondary-subtle rounded bg-body-tertiary">
+                            <div>
+                                <h6 class="fw-bold text-body-emphasis mb-1">Combo Couple</h6>
+                                <span class="text-secondary small">1 Bắp lớn + 2 Nước lớn</span>
+                                <div class="text-info fw-bold mt-1">109.000 ₫</div>
+                            </div>
+                            <div class="input-group" style="width: 120px;">
+                                <button class="btn btn-outline-secondary" type="button">-</button>
+                                <input type="text" class="form-control text-center bg-body text-body-emphasis border-secondary-subtle" value="1" readonly>
+                                <button class="btn btn-outline-secondary" type="button">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    
+    <!-- RIGHT PANEL: Receipt -->
+    <div class="pos-right">
+        <div class="pos-header text-body-emphasis">
+            <span>MÁY TÍNH TIỀN (POS)</span>
+            <span class="badge bg-danger rounded-pill px-3">Máy số 1</span>
+        </div>
+        
+        <div class="pos-body bg-body d-flex flex-column" style="flex: 1;">
+            
+            <div class="flex-grow-1">
+                <!-- Movie Info -->
+                <div class="mb-4">
+                    <h5 id="receipt-movie-title" class="fw-bold text-body-emphasis text-uppercase mb-1">Vui lòng chọn phim</h5>
+                    <div id="receipt-movie-time" class="text-secondary small mb-1"><i class="bi bi-calendar-event me-1"></i> --:--</div>
+                    <div id="receipt-movie-room" class="text-secondary small"><i class="bi bi-geo-alt me-1"></i> --</div>
+                </div>
+                
+                <hr class="border-secondary-subtle border-dashed">
+                
+                <!-- Ticket Line Items -->
+                <div class="fw-bold text-body-emphasis mb-2 mt-3">Vé xem phim:</div>
+                <div id="receipt-seats">
+                    <div class="text-secondary fst-italic small">Chưa chọn ghế...</div>
+                </div>
+                
+                <hr class="border-secondary-subtle border-dashed mt-3">
+                
+                <!-- F&B Line Items -->
+                <div class="fw-bold text-body-emphasis mb-2 mt-3">Bắp nước:</div>
+                <div class="receipt-item text-body">
+                    <span>1x Combo Couple</span>
+                    <span>109.000</span>
+                </div>
+            </div>
+            
+            <!-- Totals -->
+            <div>
+                <div class="receipt-item text-secondary mb-1 mt-4">
+                    <span>Tạm tính</span>
+                    <span id="subtotal">109.000</span>
+                </div>
+                <div class="receipt-item text-secondary mb-1">
+                    <span>Khuyến mãi</span>
+                    <span>0</span>
+                </div>
+                
+                <div class="receipt-item receipt-total d-flex justify-content-between align-items-center">
+                    <span>TỔNG TIỀN</span>
+                    <span id="total-price">109.000 ₫</span>
+                </div>
+                
+                <!-- Fast Cash Tender -->
+                <div class="mt-4">
+                    <label class="form-label text-body-emphasis small fw-bold">Khách đưa (Tiền mặt)</label>
+                    <div class="input-group mb-2">
+                        <span class="input-group-text bg-body-tertiary border-secondary-subtle text-secondary fw-bold">VNĐ</span>
+                        <input type="number" class="form-control form-control-lg fw-bold bg-body text-body-emphasis border-secondary-subtle text-end" value="500000">
+                    </div>
+                    <div class="d-flex gap-2 mb-3">
+                        <button class="btn btn-sm btn-outline-secondary flex-fill">200.000</button>
+                        <button class="btn btn-sm btn-outline-secondary flex-fill">500.000</button>
+                        <button class="btn btn-sm btn-outline-secondary flex-fill">Vừa đủ</button>
+                    </div>
+                    
+                    <div class="receipt-item text-body-emphasis fw-bold">
+                        <span>Tiền thối lại</span>
+                        <span class="text-danger fs-5" id="change-amount">391.000 ₫</span>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        
+        <button class="btn btn-success pos-btn-huge d-flex justify-content-center align-items-center gap-2">
+            <i class="bi bi-printer-fill"></i> THANH TOÁN & IN VÉ
+        </button>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Inject data from ViewBag
+        const allShowtimes = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(showtimes.Select(s => new {
+            s.Id,
+            s.MovieId,
+            s.RoomId,
+            StartTime = s.StartTime.ToString("HH:mm"),
+            s.Format,
+            s.Price
+        })));
+        
+        let selectedSeats = [];
+        let subtotal = 109000; // default for combo couple
+        
+        function selectMovie(el, movieId, movieTitle) {
+            document.querySelectorAll('.pos-movie-card').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            
+            // Render showtimes for this movie
+            const titleEl = document.getElementById('showtimes-title');
+            titleEl.innerText = `Suất chiếu: ${movieTitle}`;
+            
+            const container = document.getElementById('showtimes-container');
+            container.innerHTML = '';
+            
+            const movieShowtimes = allShowtimes.filter(s => s.MovieId === movieId);
+            if (movieShowtimes.length === 0) {
+                container.innerHTML = '<div class="text-secondary fst-italic">Không có suất chiếu nào hôm nay.</div>';
+                document.getElementById('btn-next-seat').disabled = true;
+                return;
+            }
+            
+            // Group by Format and Room (Simplified grouping for POS UI)
+            const grouped = {};
+            movieShowtimes.forEach(s => {
+                const key = `Định dạng ${s.Format} (Phòng ${s.RoomId})`;
+                if(!grouped[key]) grouped[key] = [];
+                grouped[key].push(s);
+            });
+            
+            for (const [key, list] of Object.entries(grouped)) {
+                let html = `<div class="mt-3"><span class="text-secondary small d-block mb-2">${key}</span>`;
+                list.forEach(s => {
+                    html += `<div class="showtime-pill" onclick="selectShowtime(this, ${s.Id}, '${movieTitle}', '${s.StartTime}', ${s.RoomId})">${s.StartTime}</div>`;
+                });
+                html += `</div>`;
+                container.innerHTML += html;
+            }
+        }
+        
+        function selectShowtime(el, showtimeId, title, time, room) {
+            document.querySelectorAll('.showtime-pill').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            
+            // Enable next step
+            document.getElementById('btn-next-seat').disabled = false;
+            
+            // Update Receipt UI
+            document.getElementById('receipt-movie-title').innerText = title;
+            document.getElementById('receipt-movie-time').innerHTML = `<i class="bi bi-calendar-event me-1"></i> Hôm nay, ${time}`;
+            document.getElementById('receipt-movie-room').innerHTML = `<i class="bi bi-geo-alt me-1"></i> Rạp CineMax (Phòng ${room})`;
+            document.getElementById('seat-map-title').innerText = `Sơ đồ ghế: Phòng ${room} (${time})`;
+        }
+        
+        function nextStep(tabId) {
+            document.getElementById(tabId).removeAttribute('disabled');
+            let tab = new bootstrap.Tab(document.getElementById(tabId));
+            tab.show();
+            document.getElementById(tabId).classList.remove('text-secondary');
+            document.getElementById(tabId).classList.add('text-body-emphasis');
+        }
+        
+        function toggleSeat(el, seatId, price) {
+            if(el.classList.contains('seat-sold')) return;
+            
+            if(el.classList.contains('seat-selected')) {
+                el.classList.remove('seat-selected');
+                selectedSeats = selectedSeats.filter(s => s.id !== seatId);
+                subtotal -= price;
+            } else {
+                el.classList.add('seat-selected');
+                selectedSeats.push({id: seatId, price: price});
+                subtotal += price;
+            }
+            updateReceipt();
+        }
+        
+        function updateReceipt() {
+            let container = document.getElementById('receipt-seats');
+            container.innerHTML = '';
+            
+            if(selectedSeats.length === 0) {
+                container.innerHTML = '<div class="text-secondary fst-italic small">Chưa chọn ghế...</div>';
+            } else {
+                selectedSeats.forEach(s => {
+                    let typeLabel = s.price > 100000 ? (s.price > 150000 ? "Couple" : "VIP") : "Thường";
+                    container.innerHTML += `
+                        <div class="receipt-item text-body">
+                            <span>Ghế ${s.id} <small class="text-secondary">(${typeLabel})</small></span>
+                            <span>${s.price.toLocaleString('vi-VN')}</span>
+                        </div>
+                    `;
+                });
+            }
+            
+            document.getElementById('subtotal').innerText = subtotal.toLocaleString('vi-VN');
+            document.getElementById('total-price').innerText = subtotal.toLocaleString('vi-VN') + ' ₫';
+            
+            let cashGiven = 500000;
+            let change = cashGiven - subtotal;
+            document.getElementById('change-amount').innerText = change.toLocaleString('vi-VN') + ' ₫';
+        }
+    </script>
+}

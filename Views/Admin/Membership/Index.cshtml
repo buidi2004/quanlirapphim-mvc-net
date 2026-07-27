@@ -1,0 +1,32 @@
+@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "Hạng thành viên";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-secondary-subtle">
+    <h1 class="h2 text-warning fw-medium">Quản Lý Hạng Thành Viên</h1>
+</div>
+
+<div class="row">
+    @foreach(var tier in Model)
+    {
+        <div class="col-md-3 mb-4">
+            <div class="card bg-body border border-secondary-subtle rounded shadow-sm text-center h-100">
+                <div class="card-header bg-dark text-warning border-bottom border-secondary-subtle py-3">
+                    <h5 class="mb-0 fw-medium">@tier.name</h5>
+                </div>
+                <div class="card-body">
+                    <h3 class="text-success mb-3">@tier.discount_percent% <small class="text-muted fs-6">Giảm giá</small></h3>
+                    <p class="text-secondary mb-1">Mức chi tiêu tối thiểu:</p>
+                    <h5 class="text-body-emphasis">@string.Format("{0:N0}₫", tier.min_spent)</h5>
+                    <hr class="border-secondary-subtle">
+                    <p class="text-muted small">@tier.benefits</p>
+                </div>
+                <div class="card-footer bg-light border-top border-secondary-subtle">
+                    <button class="btn btn-outline-info btn-sm w-100" disabled>Chỉnh sửa (Sắp ra mắt)</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>

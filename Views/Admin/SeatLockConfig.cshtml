@@ -1,0 +1,156 @@
+@{
+    ViewData["Title"] = "Cấu Hình Giữ Ghế (TTL) & Concurrency";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom border-secondary-subtle">
+    <h1 class="h3 text-body-emphasis fw-bold mb-0">Cấu Hình Giữ Ghế & Đồng Bộ</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <button type="button" class="btn btn-sm btn-primary d-flex align-items-center gap-2">
+            <i class="bi bi-save"></i> Lưu Cấu Hình
+        </button>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Cấu hình TTL Giữ Ghế -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 h-100 bg-body">
+            <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4">
+                <h5 class="fw-bold mb-0 text-body-emphasis"><i class="bi bi-stopwatch text-danger me-2"></i> Thời Gian Giữ Ghế (TTL)</h5>
+            </div>
+            <div class="card-body px-4 pb-4">
+                <p class="text-secondary small mb-4">
+                    Xác định thời gian tối đa một ghế được giữ tạm thời trong Redis trước khi người dùng thanh toán. Hết thời gian này, ghế sẽ được giải phóng cho người khác.
+                </p>
+                
+                <div class="d-flex justify-content-between align-items-end mb-2">
+                    <label for="ttlRange" class="form-label fw-medium text-body-emphasis mb-0">Thời lượng (Phút)</label>
+                    <span class="badge bg-danger fs-5 rounded-pill px-3" id="ttlValue">10 Phút</span>
+                </div>
+                <input type="range" class="form-range" min="5" max="20" step="1" value="10" id="ttlRange">
+                <div class="d-flex justify-content-between text-muted small mt-1">
+                    <span>5 Phút (Nhanh)</span>
+                    <span>20 Phút (Thư thả)</span>
+                </div>
+
+                <hr class="border-secondary-subtle my-4">
+
+                <h6 class="fw-bold text-body-emphasis mb-3">Thông điệp cảnh báo khách hàng</h6>
+                <textarea class="form-control" rows="2">Vui lòng hoàn tất thanh toán trong {TTL} phút. Sau thời gian này, ghế của bạn sẽ bị hủy để nhường cho người khác.</textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cấu hình Cơ chế khóa (Concurrency Control) -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 h-100 bg-body">
+            <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4">
+                <h5 class="fw-bold mb-0 text-body-emphasis"><i class="bi bi-shield-lock text-success me-2"></i> Chiến Lược Khóa Ghế (Concurrency)</h5>
+            </div>
+            <div class="card-body px-4 pb-4">
+                <p class="text-secondary small mb-4">
+                    Chọn chiến lược giải quyết xung đột khi có nhiều khách hàng cùng chọn một ghế tại cùng một thời điểm.
+                </p>
+
+                <!-- Pessimistic Locking -->
+                <div class="form-check border border-secondary-subtle rounded-3 p-3 mb-3 d-flex align-items-center">
+                    <div class="flex-grow-1 ms-2">
+                        <input class="form-check-input ms-0 mt-2 fs-5" type="radio" name="concurrencyStrategy" id="pessimisticLock" checked>
+                        <div class="ms-4">
+                            <label class="form-check-label fw-bold text-body-emphasis d-block" for="pessimisticLock">
+                                Khóa Ngay Khi Click (Pessimistic Locking)
+                            </label>
+                            <small class="text-secondary d-block mt-1">Ghế sẽ bị khóa ngay lập tức trong Redis khi người dùng click chọn. Người khác sẽ thấy ghế màu xám ngay lập tức. <span class="badge bg-success bg-opacity-10 text-success ms-1">Khuyên dùng</span></small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Optimistic Locking -->
+                <div class="form-check border border-secondary-subtle rounded-3 p-3 d-flex align-items-center">
+                    <div class="flex-grow-1 ms-2">
+                        <input class="form-check-input ms-0 mt-2 fs-5" type="radio" name="concurrencyStrategy" id="optimisticLock">
+                        <div class="ms-4">
+                            <label class="form-check-label fw-bold text-body-emphasis d-block" for="optimisticLock">
+                                Khóa Lúc Thanh Toán (Optimistic Locking)
+                            </label>
+                            <small class="text-secondary d-block mt-1">Ai cũng có thể chọn ghế. Chỉ khi bấm "Thanh toán", hệ thống mới kiểm tra Database Transaction. Ai nhanh hơn sẽ mua được.</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning mt-4 mb-0 border-0 bg-warning bg-opacity-10 text-warning d-flex align-items-start">
+                    <i class="bi bi-exclamation-triangle-fill fs-5 me-3 mt-1"></i>
+                    <small>
+                        <strong>Lưu ý:</strong> Chuyển đổi chiến lược khóa sẽ yêu cầu khởi động lại các worker service để áp dụng đồng bộ.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quản lý trạng thái ghế thủ công -->
+<div class="card border-0 shadow-sm rounded-4 bg-body mb-4">
+    <div class="card-header bg-transparent border-0 pt-4 pb-3 px-4 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0 text-body-emphasis">Khóa Ghế Bảo Trì (Thủ công)</h5>
+        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-plus-circle"></i> Thêm Ghế Bảo Trì</button>
+    </div>
+    <div class="card-body px-4 pb-4 pt-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="text-secondary small">
+                    <tr>
+                        <th class="border-0 pb-3">Phòng chiếu</th>
+                        <th class="border-0 pb-3">Số ghế</th>
+                        <th class="border-0 pb-3">Lý do</th>
+                        <th class="border-0 pb-3 text-end">Thời gian khóa</th>
+                        <th class="border-0 pb-3 text-end">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody class="border-top-0">
+                    <tr>
+                        <td class="fw-bold text-body-emphasis">CinemaX Mega Mall - Phòng 1</td>
+                        <td><span class="badge bg-dark rounded-pill px-3 py-2">F12</span></td>
+                        <td class="text-secondary small">Rách nệm ghế, đang chờ thay</td>
+                        <td class="text-end text-secondary small">24/07/2026 - 31/07/2026</td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-success">Mở khóa</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold text-body-emphasis">CinemaX Quận 1 - Phòng VIP 2</td>
+                        <td><span class="badge bg-dark rounded-pill px-3 py-2">C01</span> <span class="badge bg-dark rounded-pill px-3 py-2">C02</span></td>
+                        <td class="text-secondary small">Hỏng hệ thống massage</td>
+                        <td class="text-end text-secondary small">25/07/2026 - Vô thời hạn</td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-success">Mở khóa</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const ttlRange = document.getElementById('ttlRange');
+            const ttlValue = document.getElementById('ttlValue');
+            
+            ttlRange.addEventListener('input', function() {
+                ttlValue.textContent = this.value + ' Phút';
+                
+                // Color coding based on value
+                if (this.value < 8) {
+                    ttlValue.className = 'badge bg-danger fs-5 rounded-pill px-3';
+                } else if (this.value <= 15) {
+                    ttlValue.className = 'badge bg-success fs-5 rounded-pill px-3';
+                } else {
+                    ttlValue.className = 'badge bg-warning text-body-emphasis fs-5 rounded-pill px-3';
+                }
+            });
+        });
+    </script>
+}

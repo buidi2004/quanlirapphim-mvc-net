@@ -1,0 +1,185 @@
+@model IEnumerable<CinemaXNet.Domain.Entities.Room>
+@{
+    ViewData["Title"] = "Quản Lý Phòng Chiếu";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var rooms = Model?.ToList() ?? new List<CinemaXNet.Domain.Entities.Room>();
+    var cinemas = ViewBag.Cinemas as IEnumerable<CinemaXNet.Domain.Entities.Cinema> ?? new List<CinemaXNet.Domain.Entities.Cinema>();
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-secondary-subtle">
+    <h1 class="h2 text-warning fw-medium">Quản Lý Phòng Chiếu</h1>
+    <button type="button" class="btn btn-primary fw-medium btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#addRoomModal">
+        <i class="bi bi-plus-lg"></i> Thêm phòng mới
+    </button>
+</div>
+
+<div class="card bg-body border border-secondary-subtle rounded shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-striped table-hover mb-0 align-middle">
+            <thead class="text-uppercase" class="table-light">
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Tên Rạp</th>
+                    <th scope="col">Tên Phòng</th>
+                    <th scope="col">Số Hàng</th>
+                    <th scope="col">Ghế/Hàng</th>
+                    <th scope="col" class="text-end">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!rooms.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-secondary fst-italic">
+                            Chưa có phòng nào.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var r in rooms)
+                    {
+                        <tr>
+                            <td>@r.Id</td>
+                            <td><strong class="text-body-emphasis">@r.Cinema?.Name</strong></td>
+                            <td>@r.Name</td>
+                            <td>@r.TotalRows</td>
+                            <td>@r.SeatsPerRow</td>
+                            <td class="text-end">
+                                <a href="/admin/rooms/builder/@r.Id" class="btn btn-sm btn-outline-success" title="Thiết kế sơ đồ ghế">
+                                    <i class="bi bi-grid-3x3"></i> Thiết kế
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-info ms-1" data-bs-toggle="modal" data-bs-target="#editRoomModal-@r.Id">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger ms-1" data-bs-toggle="modal" data-bs-target="#deleteRoomModal-@r.Id">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Edit Modal -->
+                        <div class="modal fade" id="editRoomModal-@r.Id" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content bg-light text-body-emphasis border border-secondary-subtle shadow-lg">
+                                    <div class="modal-header bg-body border-bottom border-secondary-subtle">
+                                        <h5 class="modal-title text-warning fw-medium">Sửa Phòng: @r.Name</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form method="post" action="/admin/rooms/update">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@r.Id" />
+                                        <div class="modal-body p-4 text-start">
+                                            <div class="mb-3">
+                                                <label class="form-label text-body-emphasis fw-medium">Rạp chiếu</label>
+                                                <select name="cinemaId" class="form-select bg-body text-body-emphasis border-secondary-subtle" required>
+                                                    @foreach(var c in cinemas) {
+                                                        <option value="@c.Id" selected="@(c.Id == r.CinemaId)">@c.Name</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-body-emphasis fw-medium">Tên Phòng</label>
+                                                <input type="text" name="name" value="@r.Name" class="form-control bg-body text-body-emphasis border-secondary-subtle" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-body-emphasis fw-medium">Tổng số Hàng ghế</label>
+                                                <input type="number" name="totalRows" value="@r.TotalRows" class="form-control bg-body text-body-emphasis border-secondary-subtle" required min="1">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-body-emphasis fw-medium">Số ghế mỗi Hàng</label>
+                                                <input type="number" name="seatsPerRow" value="@r.SeatsPerRow" class="form-control bg-body text-body-emphasis border-secondary-subtle" required min="1">
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer bg-body border-top border-secondary-subtle">
+                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                                            <button type="submit" class="btn btn-info fw-medium">Cập nhật</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Delete Modal -->
+                        <div class="modal fade" id="deleteRoomModal-@r.Id" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content bg-light text-body-emphasis border border-secondary-subtle shadow-lg">
+                                    <div class="modal-header bg-body border-bottom border-secondary-subtle">
+                                        <h5 class="modal-title text-danger fw-medium">Xác Nhận Xóa</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body p-4 text-start">
+                                        Bạn có chắc chắn muốn xóa phòng <strong>@r.Name</strong>?
+                                    </div>
+                                    <div class="modal-footer bg-body border-top border-secondary-subtle">
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                                        <form method="post" action="/admin/rooms/delete">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@r.Id" />
+                                            <button type="submit" class="btn btn-danger fw-medium">Xóa</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    
+    @if (ViewBag.TotalPages > 1)
+    {
+        <div class="card-footer bg-body border-top border-secondary-subtle d-flex justify-content-center">
+            <ul class="pagination pagination-sm mb-0">
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                        <a class="page-link" href="/admin/rooms?page=@i">@i</a>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addRoomModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-light text-body-emphasis border border-secondary-subtle shadow-lg">
+            <div class="modal-header bg-body border-bottom border-secondary-subtle">
+                <h5 class="modal-title text-warning fw-medium">Thêm Phòng Mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="/admin/rooms">
+                @Html.AntiForgeryToken()
+                <div class="modal-body p-4 text-start">
+                    <div class="mb-3">
+                        <label class="form-label text-body-emphasis fw-medium">Rạp chiếu</label>
+                        <select name="cinemaId" class="form-select bg-body text-body-emphasis border-secondary-subtle" required>
+                            @foreach(var c in cinemas) {
+                                <option value="@c.Id">@c.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-body-emphasis fw-medium">Tên Phòng</label>
+                        <input type="text" name="name" class="form-control bg-body text-body-emphasis border-secondary-subtle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-body-emphasis fw-medium">Tổng số Hàng ghế</label>
+                        <input type="number" name="totalRows" class="form-control bg-body text-body-emphasis border-secondary-subtle" required min="1">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-body-emphasis fw-medium">Số ghế mỗi Hàng</label>
+                        <input type="number" name="seatsPerRow" class="form-control bg-body text-body-emphasis border-secondary-subtle" required min="1">
+                    </div>
+                </div>
+                <div class="modal-footer bg-body border-top border-secondary-subtle">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary fw-medium">Thêm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

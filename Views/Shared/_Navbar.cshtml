@@ -1,0 +1,186 @@
+<nav id="mainNavbar" class="navbar navbar-expand-lg sticky-top smart-navbar" style="z-index: 1050;">
+    <div class="container">
+        <a class="navbar-brand fw-medium text-warning fs-3" href="/">
+            <i class="bi bi-film"></i> CinemaX
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navMenu">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <!-- Standard Dropdown: Phim -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMovies" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Phim
+                    </a>
+                    <ul class="dropdown-menu shadow border-0" aria-labelledby="navbarDropdownMovies" style="min-width: 200px;">
+                        <li><h6 class="dropdown-header text-warning fw-medium">Danh mục</h6></li>
+                        <li><a class="dropdown-item py-2" href="/movies">Phim Đang Chiếu</a></li>
+                        <li><a class="dropdown-item py-2" href="/movies?status=coming_soon">Phim Sắp Chiếu</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header text-warning fw-medium">Thể loại</h6></li>
+                        <li><a class="dropdown-item py-2" href="/movies?genre=Hành động">Hành Động</a></li>
+                        <li><a class="dropdown-item py-2" href="/movies?genre=Khoa học viễn tưởng">Viễn Tưởng</a></li>
+                        <li><a class="dropdown-item py-2" href="/movies?genre=Kinh dị">Kinh Dị</a></li>
+                    </ul>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link text-warning fw-medium" href="/booking/fast">
+                        <i class="bi bi-lightning-charge-fill me-1"></i>Đặt Vé Nhanh
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/cinemas">
+                        <i class="bi bi-geo-alt me-1"></i>Hệ thống rạp
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/promotions">
+                        <i class="bi bi-tag me-1"></i>Ưu đãi
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/news">
+                        <i class="bi bi-newspaper me-1"></i>Tin tức
+                    </a>
+                </li>
+            </ul>
+
+            <div class="d-flex me-3 d-none d-lg-flex position-relative search-container">
+                <form class="search-form-premium w-100" action="/search" method="GET">
+                    <div class="input-group input-group-sm">
+                        <input type="text" name="q" id="mainSearchInput" class="form-control border-end-0" placeholder="Tìm phim, rạp..." style="width: 250px; border-radius: 20px 0 0 20px;" autocomplete="off">
+                        <button type="submit" class="btn bg-white border border-start-0 text-muted" aria-label="Tìm kiếm" style="border-radius: 0 20px 20px 0;"><i class="bi bi-search"></i></button>
+                    </div>
+                </form>
+                <!-- Trending Searches Dropdown -->
+                <div id="trendingSearchDropdown" class="dropdown-menu shadow-lg border-0 w-100 mt-2 rounded-4 p-0" style="display: none; position: absolute; top: 100%; left: 0; z-index: 1060; overflow: hidden; animation: dropdownFade 0.3s ease forwards; opacity: 0; transform: translateY(-10px);">
+                    <style>
+                        @@keyframes dropdownFade {
+                            to {
+                                opacity: 1;
+                                transform: translateY(0);
+                            }
+                        }
+                    </style>
+                    <div class="bg-light px-3 py-2 border-bottom border-light">
+                        <span class="text-secondary small fw-medium"><i class="bi bi-graph-up-arrow me-1 text-danger"></i> TÌM KIẾM THỊNH HÀNH</span>
+                    </div>
+                    <ul class="list-unstyled mb-0">
+                        <li><a href="/search?q=Lật Mặt 7" class="dropdown-item py-2 d-flex justify-content-between align-items-center transition-all hover-bg-light">Lật Mặt 7 <span class="badge bg-danger rounded-pill">HOT</span></a></li>
+                        <li><a href="/search?q=Mai" class="dropdown-item py-2 d-flex justify-content-between align-items-center transition-all hover-bg-light">Phim Mai <span class="badge bg-secondary rounded-pill">1</span></a></li>
+                        <li><a href="/search?q=Dune" class="dropdown-item py-2 d-flex justify-content-between align-items-center transition-all hover-bg-light">Dune: Part Two <span class="badge bg-secondary rounded-pill">2</span></a></li>
+                        <li><a href="/search?q=Đào, Phở và Piano" class="dropdown-item py-2 d-flex justify-content-between align-items-center transition-all hover-bg-light">Đào, Phở và Piano <span class="badge bg-secondary rounded-pill">3</span></a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+                <!-- Theme Toggle -->
+                <li class="nav-item me-2">
+                    <button id="themeToggleBtn" class="btn btn-sm btn-outline-secondary" title="Đổi giao diện" aria-label="Đổi giao diện">
+                        <i class="bi bi-moon-stars"></i>
+                    </button>
+                </li>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <!-- Notifications -->
+                    <li class="nav-item dropdown me-2 d-flex align-items-center">
+                        <a class="nav-link position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Thông báo" aria-label="Thông báo">
+                            <i class="bi bi-bell fs-5"></i>
+                            <span class="position-absolute top-25 start-75 translate-middle p-1 bg-danger border border-light rounded-circle" style="margin-top: 5px;">
+                                <span class="visually-hidden">New alerts</span>
+                            </span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow" style="width: 320px;">
+                            <li><h6 class="dropdown-header fw-medium">Thông báo mới</h6></li>
+                            <li>
+                                <a class="dropdown-item py-2 text-wrap" href="#">
+                                    <div class="d-flex align-items-start">
+                                        <div class="bg-warning text-white rounded-circle p-2 me-3 mt-1"><i class="bi bi-ticket-perforated"></i></div>
+                                        <div>
+                                            <p class="mb-0 fw-medium small">Nhắc lịch xem phim</p>
+                                            <p class="mb-0 small text-secondary" style="font-size: 0.8rem;">Dune: Part Two sẽ chiếu trong 2 giờ nữa tại Landmark 81.</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item py-2 text-wrap" href="#">
+                                    <div class="d-flex align-items-start">
+                                        <div class="bg-info text-white rounded-circle p-2 me-3 mt-1"><i class="bi bi-star"></i></div>
+                                        <div>
+                                            <p class="mb-0 fw-medium small">Điểm thưởng cập nhật</p>
+                                            <p class="mb-0 small text-secondary" style="font-size: 0.8rem;">Bạn vừa được cộng 5,000 điểm từ giao dịch gần nhất.</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-center small text-primary fw-medium" href="#">Xem tất cả thông báo</a></li>
+                        </ul>
+                    </li>
+
+                    @if (User.IsInRole("admin"))
+                    {
+                        <li class="nav-item d-flex align-items-center">
+                            <a class="nav-link text-primary fw-semibold me-2" href="/admin/dashboard">
+                                <i class="bi bi-speedometer2"></i> Admin Panel
+                            </a>
+                        </li>
+                    }
+
+                    <!-- User Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="https://api.dicebear.com/7.x/initials/svg?seed=@User.Identity.Name"
+                                 class="rounded-circle" width="28" height="28" style="object-fit: cover;"
+                                 alt="avatar">
+                            <span class="d-none d-lg-inline">@User.Identity.Name</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="/profile">
+                                    <i class="bi bi-person me-2"></i>Hồ sơ
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/my-tickets">
+                                    Vé của tôi
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/profile/transactions">
+                                    <i class="bi bi-receipt me-2"></i>Lịch sử giao dịch
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form method="POST" action="/logout">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a class="nav-link me-3" href="/login">Đăng nhập</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-sm btn-primary fw-semibold" href="/register">Đăng ký</a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</nav>
