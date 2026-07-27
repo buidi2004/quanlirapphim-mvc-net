@@ -1,7 +1,8 @@
-using CinemaXNet.Domain.Exceptions;
+﻿using CinemaXNet.Domain.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Net;
+using System.Runtime.ExceptionServices;
 using System.Text.Json;
 using CinemaXNet.Application.Responses;
 
@@ -26,8 +27,9 @@ public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExcep
     {
         if (!context.Request.Path.StartsWithSegments("/api"))
         {
-            // Rethrow to let the default ASP.NET Core exception handler or Developer Exception Page handle it for web views
-            throw exception;
+            // Giữ nguyên stack trace gốc thay vì "throw exception;"
+            // để Developer Exception Page hiển thị đúng nơi lỗi thật sự phát sinh
+            ExceptionDispatchInfo.Capture(exception).Throw();
         }
 
         context.Response.ContentType = "application/json";
@@ -44,7 +46,10 @@ public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExcep
         context.Response.StatusCode = statusCode;
 
         var response = ApiResponse<object>.Fail(exception.Message);
-        var result = JsonSerializer.Serialize(response, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+        var result = JsonSerializer.Serialize(
+            response,
+            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+
         return context.Response.WriteAsync(result);
     }
 }

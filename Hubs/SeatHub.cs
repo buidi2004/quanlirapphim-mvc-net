@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 using System.Collections.Concurrent;
 
 namespace CinemaXNet.Hubs;

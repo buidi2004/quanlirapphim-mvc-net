@@ -1,4 +1,4 @@
-namespace CinemaXNet.Domain.Constants;
+﻿namespace CinemaXNet.Domain.Constants;
 
 public static class MovieStatus
 {

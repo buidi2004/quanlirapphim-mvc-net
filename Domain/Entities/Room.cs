@@ -1,4 +1,4 @@
-namespace CinemaXNet.Domain.Entities;
+﻿namespace CinemaXNet.Domain.Entities;
 
 public class Room
 {

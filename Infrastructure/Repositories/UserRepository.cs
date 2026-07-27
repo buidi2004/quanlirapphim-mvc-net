@@ -114,4 +114,28 @@ public class UserRepository(IDbConnection db) : IUserRepository
         await db.ExecuteAsync("DELETE FROM notifications WHERE user_id = @Id", new { Id = userId });
         await db.ExecuteAsync("DELETE FROM users WHERE id = @Id", new { Id = userId });
     }
+
+    public async Task RecalculateMemberTierAsync(int userId, System.Data.IDbTransaction? transaction = null)
+    {
+        var currentSpent = await db.ExecuteScalarAsync<double>(
+            "SELECT total_spent FROM users WHERE id = @UserId", 
+            new { UserId = userId }, transaction);
+
+        var totalTickets = await db.ExecuteScalarAsync<int>(
+            "SELECT COUNT(*) FROM tickets WHERE user_id = @UserId AND status = 'paid'", 
+            new { UserId = userId }, transaction);
+
+        var newTier = await db.QueryFirstOrDefaultAsync<string>(@"
+            SELECT name FROM membership_tiers 
+            WHERE min_spent <= @Spent AND min_tickets <= @Tickets
+            ORDER BY min_spent DESC, min_tickets DESC LIMIT 1", 
+            new { Spent = currentSpent, Tickets = totalTickets }, transaction);
+
+        if (!string.IsNullOrEmpty(newTier))
+        {
+            await db.ExecuteAsync(
+                "UPDATE users SET member_level = @Tier WHERE id = @UserId", 
+                new { Tier = newTier, UserId = userId }, transaction);
+        }
+    }
 }

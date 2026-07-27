@@ -1,4 +1,4 @@
-using CinemaXNet.Application.Interfaces;
+﻿using CinemaXNet.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -8,13 +8,18 @@ namespace CinemaXNet.Controllers;
 
 [Authorize(Roles = "admin,cinema_manager,staff")]
 [Route("admin/pos")]
-public class AdminPosController(IMovieService movieService, ITicketService ticketService) : Controller
+public class AdminPosController(IMovieService movieService, ITicketService ticketService, IShowtimeService showtimeService) : Controller
 {
     [HttpGet("")]
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
         ViewBag.PageTitle = "POS Bán vé tại quầy";
-        return View();
+        ViewBag.Movies = await movieService.GetNowShowingAsync();
+
+        var today = DateOnly.FromDateTime(DateTime.Now);
+        ViewBag.Showtimes = await showtimeService.GetAllByDateAsync(today);
+
+        return View("~/Views/Admin/POS.cshtml");
     }
 
     [HttpGet("api/movies")]

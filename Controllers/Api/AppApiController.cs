@@ -1,4 +1,4 @@
-using CinemaXNet.Application.Interfaces;
+﻿using CinemaXNet.Application.Interfaces;
 using CinemaXNet.Application.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

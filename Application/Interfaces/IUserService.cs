@@ -16,6 +16,8 @@ public interface IUserService
     Task       SaveRefreshTokenAsync(int userId, string? token, string? expiry);
     Task<User> ValidateRefreshTokenAsync(string token);
     
+    Task       RecalculateMemberTierAsync(int userId, System.Data.IDbTransaction? transaction = null);
+
     Task<CinemaXNet.Application.ViewModels.PaginatedList<dynamic>> GetPaginatedUsersAsync(int page, int pageSize);
     Task UpdateRoleAsync(int userId, string role);
     Task DeleteAccountAsync(int userId);

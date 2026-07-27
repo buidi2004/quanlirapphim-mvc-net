@@ -1,4 +1,4 @@
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using CinemaXNet.Domain.Entities;
 using CinemaXNet.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;

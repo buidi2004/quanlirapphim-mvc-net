@@ -1,4 +1,4 @@
-@using CinemaXNet.Domain.Entities
+﻿@using CinemaXNet.Domain.Entities
 @{
     ViewData["Title"] = "POS - Bán Vé Tại Quầy";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
@@ -22,7 +22,7 @@
         flex: 7;
         display: flex;
         flex-direction: column;
-        background-color: #18181b; /* Deep Dark */
+        background-color: #efeff3ff; /* Deep Dark */
         border: 1px solid #27272a;
         border-radius: 12px;
         overflow: hidden;
@@ -33,14 +33,14 @@
         flex: 3;
         display: flex;
         flex-direction: column;
-        background-color: #18181b;
+        background-color: #f1f1f5ff;
         border: 1px solid #27272a;
         border-radius: 12px;
         overflow: hidden;
     }
     
     .pos-header {
-        background-color: #27272a;
+        background-color: #ececf8ff;
         padding: 1rem 1.5rem;
         font-weight: 700;
         font-size: 1.1rem;
@@ -377,7 +377,7 @@
             
         </div>
         
-        <button class="btn btn-success pos-btn-huge d-flex justify-content-center align-items-center gap-2">
+        <button id="btn-checkout" class="btn btn-success pos-btn-huge d-flex justify-content-center align-items-center gap-2" onclick="handleCheckout()">
             <i class="bi bi-printer-fill"></i> THANH TOÁN & IN VÉ
         </button>
     </div>
@@ -396,6 +396,7 @@
         })));
         
         let selectedSeats = [];
+        let selectedShowtimeId = null;
         let subtotal = 109000; // default for combo couple
         
         function selectMovie(el, movieId, movieTitle) {
@@ -437,6 +438,9 @@
         function selectShowtime(el, showtimeId, title, time, room) {
             document.querySelectorAll('.showtime-pill').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
+            
+            // Save selected showtime ID
+            selectedShowtimeId = showtimeId;
             
             // Enable next step
             document.getElementById('btn-next-seat').disabled = false;
@@ -495,6 +499,71 @@
             let cashGiven = 500000;
             let change = cashGiven - subtotal;
             document.getElementById('change-amount').innerText = change.toLocaleString('vi-VN') + ' ₫';
+        }
+        
+        // Handle Checkout
+        async function handleCheckout() {
+            // Validation
+            if (!selectedShowtimeId) {
+                alert('Vui lòng chọn suất chiếu!');
+                return;
+            }
+            
+            if (selectedSeats.length === 0) {
+                alert('Vui lòng chọn ít nhất 1 ghế!');
+                return;
+            }
+            
+            // Prepare data
+            const seatCodes = selectedSeats.map(s => s.id);
+            const requestData = {
+                ShowtimeId: selectedShowtimeId,
+                SeatCodes: seatCodes
+            };
+            
+            // Disable button during request
+            const btn = document.getElementById('btn-checkout');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Đang xử lý...';
+            
+            try {
+                const response = await fetch('/admin/pos/api/checkout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    alert('✅ ' + result.message + '\n\nMã vé: ' + result.ticketIds.join(', '));
+                    
+                    // Reset UI
+                    selectedSeats = [];
+                    selectedShowtimeId = null;
+                    subtotal = 109000;
+                    updateReceipt();
+                    
+                    // Go back to step 1
+                    nextStep('movie-tab');
+                    document.querySelectorAll('.pos-movie-card').forEach(c => c.classList.remove('active'));
+                    document.querySelectorAll('.showtime-pill').forEach(c => c.classList.remove('active'));
+                    document.querySelectorAll('.seat-selected').forEach(s => s.classList.remove('seat-selected'));
+                    document.getElementById('btn-next-seat').disabled = true;
+                } else {
+                    alert('❌ Lỗi: ' + (result.error || 'Không thể thanh toán'));
+                }
+            } catch (error) {
+                console.error('Checkout error:', error);
+                alert('❌ Lỗi kết nối đến server. Vui lòng thử lại.');
+            } finally {
+                // Re-enable button
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
         }
     </script>
 }

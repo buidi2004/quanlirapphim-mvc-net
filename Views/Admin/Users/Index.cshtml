@@ -1,4 +1,4 @@
-@model CinemaXNet.Application.ViewModels.PaginatedList<dynamic>
+﻿@model CinemaXNet.Application.ViewModels.PaginatedList<dynamic>
 @{
     ViewData["Title"] = "Quản Lý Người Dùng";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
@@ -43,14 +43,15 @@
                             <td>@u.phone</td>
                             <td>@u.created_at</td>
                             <td>
-                                @if (u.role == "admin")
-                                {
-                                    <span class="badge bg-danger">Quản trị viên</span>
+                                @{
+                                    var (badgeClass, roleLabel) = ((string)u.role) switch {
+                                        "admin"           => ("bg-danger",  "Quản trị viên"),
+                                        "cinema_manager"  => ("bg-primary", "Quản lý rạp"),
+                                        "staff"           => ("bg-info text-dark", "Nhân viên"),
+                                        _                 => ("bg-secondary", "Khách hàng"),
+                                    };
                                 }
-                                else
-                                {
-                                    <span class="badge bg-secondary">Khách hàng</span>
-                                }
+                                <span class="badge @badgeClass">@roleLabel</span>
                             </td>
                             <td class="text-end">
                                 <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#editUserRoleModal-@u.id">
@@ -74,8 +75,10 @@
                                             <div class="mb-3">
                                                 <label class="form-label text-body-emphasis fw-medium">Phân quyền cho: @u.full_name</label>
                                                 <select name="role" class="form-select bg-body text-body-emphasis border-secondary-subtle">
-                                                    <option value="customer" selected="@(u.role == "customer")">Khách hàng</option>
-                                                    <option value="admin" selected="@(u.role == "admin")">Quản trị viên (Admin)</option>
+                                                    <option value="user"            selected="@(u.role == "user")">Khách hàng</option>
+                                                    <option value="staff"           selected="@(u.role == "staff")">Nhân viên (Staff)</option>
+                                                    <option value="cinema_manager"  selected="@(u.role == "cinema_manager")">Quản lý rạp (Cinema Manager)</option>
+                                                    <option value="admin"           selected="@(u.role == "admin")">Quản trị viên (Admin)</option>
                                                 </select>
                                             </div>
                                         </div>

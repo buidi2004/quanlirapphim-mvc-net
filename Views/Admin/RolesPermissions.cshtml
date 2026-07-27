@@ -1,4 +1,4 @@
-@{
+﻿@{
     ViewData["Title"] = "Phân Quyền Chi Tiết (RBAC)";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
@@ -26,15 +26,31 @@
     }
 </style>
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom border-secondary-subtle">
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-secondary-subtle">
     <h1 class="h3 text-body-emphasis fw-bold mb-0">Ma Trận Phân Quyền (RBAC)</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
-        <button type="button" class="btn btn-sm btn-outline-secondary me-2">
+        <button type="button" class="btn btn-sm btn-outline-secondary me-2" disabled title="Chức năng chưa được triển khai">
             <i class="bi bi-arrow-counterclockwise"></i> Khôi phục mặc định
         </button>
-        <button type="button" class="btn btn-sm btn-primary d-flex align-items-center gap-2">
+        <button type="button" class="btn btn-sm btn-primary d-flex align-items-center gap-2" disabled title="Chức năng chưa được triển khai">
             <i class="bi bi-save"></i> Lưu Thay Đổi
         </button>
+    </div>
+</div>
+
+<div class="alert alert-warning d-flex align-items-start gap-3 mb-4 border border-warning-subtle rounded-3" role="alert">
+    <i class="bi bi-exclamation-triangle-fill fs-4 mt-1 flex-shrink-0"></i>
+    <div>
+        <strong class="d-block mb-1">Tính năng đang trong giai đoạn phát triển</strong>
+        Bảng phân quyền dưới đây là <strong>giao diện xem trước</strong>, các toggle chưa được kết nối với hệ thống.
+        Quyền truy cập thực tế hiện được quản lý cố định theo từng nhóm role:
+        <ul class="mb-0 mt-2">
+            <li><strong class="text-danger">Admin</strong> — toàn quyền hệ thống</li>
+            <li><strong class="text-primary">Cinema Manager</strong> — quản lý rạp, phim, suất chiếu, báo cáo</li>
+            <li><strong class="text-info">Staff</strong> — bán vé POS và quét vé check-in</li>
+            <li><strong class="text-secondary">Khách hàng (User)</strong> — chỉ truy cập giao diện người dùng</li>
+        </ul>
+        Để thay đổi quyền của một tài khoản, vào <a href="/admin/users" class="alert-link">Quản lý Người dùng</a>.
     </div>
 </div>
 
@@ -187,5 +203,6 @@
     </div>
     <div class="card-footer bg-transparent border-top-0 px-4 py-3 text-end">
         <small class="text-muted me-3"><i class="bi bi-info-circle me-1"></i> Quyền Super Admin không thể bị vô hiệu hóa.</small>
+        <small class="text-warning"><i class="bi bi-tools me-1"></i> Bảng này chỉ mang tính minh họa — chưa có tác dụng thực.</small>
     </div>
 </div>

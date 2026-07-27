@@ -1,4 +1,4 @@
-using CinemaXNet.Domain.Entities;
+﻿using CinemaXNet.Domain.Entities;
 
 namespace CinemaXNet.Application.Interfaces;
 
@@ -11,6 +11,8 @@ public interface ITicketRepository
     Task<int> CreateAsync(Ticket ticket, System.Data.IDbTransaction? transaction = null);
     Task<int> UpdateStatusWithVersionAsync(int id, string newStatus, int expectedVersion,
         decimal? totalPrice = null, string? promotionCode = null, System.Data.IDbTransaction? transaction = null);
+    Task<int> UpdateMultipleStatusesWithVersionAsync(IEnumerable<int> ids, string newStatus, 
+        decimal? individualPrice = null, string? promotionCode = null, System.Data.IDbTransaction? transaction = null);
     Task<IEnumerable<(int ShowtimeId, string SeatCode)>> CancelExpiredHoldsAsync();
     Task<IEnumerable<dynamic>> FindByUserIdAsync(int userId);
     Task<(int TotalTickets, int TotalMovies)> GetUserTicketStatsAsync(int userId);

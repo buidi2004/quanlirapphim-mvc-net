@@ -1,4 +1,4 @@
-namespace CinemaXNet.Application.Responses;
+﻿namespace CinemaXNet.Application.Responses;
 
 public class ApiResponse<T>
 {

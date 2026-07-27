@@ -12,57 +12,113 @@ public class DashboardRepository(IDbConnection db) : IDashboardRepository
     {
         var stats = new DashboardStats();
 
-        // 1. Chỉ số tổng quan (Giả lập số liệu do DB SQLite/MySQL chưa có đủ data thật 100%)
-        stats.TodayRevenue = 42500000;
-        stats.RevenueGrowth = 12.0m;
-        stats.TodayTickets = 1284;
-        stats.TicketGrowth = 8.0m;
-        stats.TodayOccupancy = 67.0m;
-        stats.OccupancyGrowth = -3.0m;
-        stats.CanceledTickets = 23;
-        stats.CancelRate = 1.8m;
+        var sql = @"
+            -- 1. Overview Stats
+            SELECT 
+                IFNULL(SUM(CASE WHEN DATE(booked_at) = CURDATE() THEN total_price ELSE 0 END), 0) AS TodayRevenue,
+                IFNULL(SUM(CASE WHEN DATE(booked_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY) THEN total_price ELSE 0 END), 0) AS YesterdayRevenue,
+                SUM(CASE WHEN DATE(booked_at) = CURDATE() THEN 1 ELSE 0 END) AS TodayTickets,
+                SUM(CASE WHEN DATE(booked_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY) THEN 1 ELSE 0 END) AS YesterdayTickets
+            FROM tickets
+            WHERE status = 'paid' AND booked_at >= DATE_SUB(CURDATE(), INTERVAL 1 DAY);
 
-        // 2. Doanh thu 7 ngày qua
-        stats.Revenue7Days = new List<RevenueByDay>
+            SELECT 
+                SUM(CASE WHEN DATE(booked_at) = CURDATE() THEN 1 ELSE 0 END) AS TodayCanceled,
+                SUM(CASE WHEN DATE(booked_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY) THEN 1 ELSE 0 END) AS YesterdayCanceled
+            FROM tickets
+            WHERE status = 'cancelled' AND booked_at >= DATE_SUB(CURDATE(), INTERVAL 1 DAY);
+
+            -- 2. Revenue 7 Days
+            SELECT 
+                DATE_FORMAT(d, '%d/%m') AS DateLabel,
+                IFNULL(SUM(total_price), 0) AS Revenue
+            FROM (
+                SELECT DATE(booked_at) AS d, total_price
+                FROM tickets
+                WHERE status = 'paid' AND booked_at >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+            ) sub
+            GROUP BY d
+            ORDER BY d;
+
+            -- 3. Genre Stats
+            SELECT 
+                IFNULL(m.genre, 'Khác') AS Genre,
+                COUNT(t.id) AS TicketCount
+            FROM tickets t
+            JOIN showtimes s ON t.showtime_id = s.id
+            JOIN movies m ON s.movie_id = m.id
+            WHERE t.status = 'paid'
+            GROUP BY m.genre
+            ORDER BY TicketCount DESC
+            LIMIT 5;
+
+            -- 4. Top 5 Movies
+            SELECT 
+                m.title AS MovieName,
+                IFNULL(SUM(t.total_price), 0) AS Revenue
+            FROM tickets t
+            JOIN showtimes s ON t.showtime_id = s.id
+            JOIN movies m ON s.movie_id = m.id
+            WHERE t.status = 'paid'
+            GROUP BY m.id, m.title
+            ORDER BY Revenue DESC
+            LIMIT 5;
+
+            -- 5. TimeSlot Stats
+            SELECT 
+                CONCAT(h, 'h') AS HourLabel,
+                COUNT(*) AS OccupancyRate
+            FROM (
+                SELECT HOUR(s.start_time) AS h
+                FROM tickets t
+                JOIN showtimes s ON t.showtime_id = s.id
+                WHERE t.status = 'paid'
+            ) sub
+            GROUP BY h
+            ORDER BY h;
+        ";
+
+        using var multi = await db.QueryMultipleAsync(sql);
+
+        // 1. Overview
+        var overview = await multi.ReadFirstOrDefaultAsync();
+        var canceled = await multi.ReadFirstOrDefaultAsync();
+
+        if (overview != null)
         {
-            new RevenueByDay { DateLabel = "T2", Revenue = 32000000 },
-            new RevenueByDay { DateLabel = "T3", Revenue = 28000000 },
-            new RevenueByDay { DateLabel = "T4", Revenue = 35000000 },
-            new RevenueByDay { DateLabel = "T5", Revenue = 30000000 },
-            new RevenueByDay { DateLabel = "T6", Revenue = 45000000 },
-            new RevenueByDay { DateLabel = "T7", Revenue = 52000000 },
-            new RevenueByDay { DateLabel = "CN", Revenue = 42500000 }
-        };
+            stats.TodayRevenue = overview.TodayRevenue ?? 0;
+            decimal yesterdayRev = overview.YesterdayRevenue ?? 0;
+            stats.RevenueGrowth = yesterdayRev > 0 ? ((stats.TodayRevenue - yesterdayRev) / yesterdayRev) * 100m : 100m;
 
-        // 3. Tỷ trọng thể loại
-        stats.GenreStats = new List<TicketsByGenre>
+            // SUM(CASE WHEN...THEN 1 ELSE 0 END) trong MySQL có thể trả về decimal,
+            // nên phải Convert.ToInt32 thay vì gán thẳng (dynamic decimal -> int gây RuntimeBinderException)
+            stats.TodayTickets = Convert.ToInt32(overview.TodayTickets ?? 0);
+            decimal yesterdayTix = Convert.ToDecimal(overview.YesterdayTickets ?? 0);
+            stats.TicketGrowth = yesterdayTix > 0 ? ((stats.TodayTickets - yesterdayTix) / yesterdayTix) * 100m : 100m;
+        }
+
+        if (canceled != null)
         {
-            new TicketsByGenre { Genre = "Hành động", TicketCount = 450 },
-            new TicketsByGenre { Genre = "Tình cảm", TicketCount = 300 },
-            new TicketsByGenre { Genre = "Kinh dị", TicketCount = 200 },
-            new TicketsByGenre { Genre = "Hoạt hình", TicketCount = 150 }
-        };
+            stats.CanceledTickets = Convert.ToInt32(canceled.TodayCanceled ?? 0);
+            decimal yesterdayCanceled = Convert.ToDecimal(canceled.YesterdayCanceled ?? 0);
+            stats.CancelRate = yesterdayCanceled > 0 ? ((stats.CanceledTickets - yesterdayCanceled) / yesterdayCanceled) * 100m : 100m;
+        }
 
-        // 4. Top 5 Phim
-        stats.TopMovies = new List<TopMovie>
-        {
-            new TopMovie { MovieName = "Phim A", Revenue = 98000000 },
-            new TopMovie { MovieName = "Phim B", Revenue = 82000000 },
-            new TopMovie { MovieName = "Phim C", Revenue = 65000000 },
-            new TopMovie { MovieName = "Phim D", Revenue = 54000000 },
-            new TopMovie { MovieName = "Phim E", Revenue = 41000000 }
-        };
+        stats.TodayOccupancy = 0; // Requires room capacity calculation, set to 0 for now
+        stats.OccupancyGrowth = 0;
 
-        // 5. Lấp đầy theo khung giờ
-        stats.TimeSlotStats = new List<OccupancyByHour>
-        {
-            new OccupancyByHour { HourLabel = "10h", OccupancyRate = 22 },
-            new OccupancyByHour { HourLabel = "13h", OccupancyRate = 40 },
-            new OccupancyByHour { HourLabel = "16h", OccupancyRate = 55 },
-            new OccupancyByHour { HourLabel = "19h", OccupancyRate = 82 },
-            new OccupancyByHour { HourLabel = "21h", OccupancyRate = 75 }
-        };
+        // 2. Revenue 7 Days
+        stats.Revenue7Days = (await multi.ReadAsync<RevenueByDay>()).ToList();
 
-        return await Task.FromResult(stats);
+        // 3. Genre Stats
+        stats.GenreStats = (await multi.ReadAsync<TicketsByGenre>()).ToList();
+
+        // 4. Top 5 Movies
+        stats.TopMovies = (await multi.ReadAsync<TopMovie>()).ToList();
+
+        // 5. TimeSlot Stats
+        stats.TimeSlotStats = (await multi.ReadAsync<OccupancyByHour>()).ToList();
+
+        return stats;
     }
 }

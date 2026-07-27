@@ -1,4 +1,4 @@
-using CinemaXNet.Domain.ValueObjects;
+﻿using CinemaXNet.Domain.ValueObjects;
 
 namespace CinemaXNet.Application.Interfaces;
 

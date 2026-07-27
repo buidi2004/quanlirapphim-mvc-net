@@ -1,4 +1,4 @@
-namespace CinemaXNet.Application.Interfaces;
+﻿namespace CinemaXNet.Application.Interfaces;
 
 public interface IReportRepository
 {

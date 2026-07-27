@@ -4,7 +4,7 @@ using CinemaXNet.Application.Interfaces;
 
 namespace CinemaXNet.Application.Services;
 
-public class UserService(IUserRepository userRepo) : IUserService
+public class UserService(IUserRepository userRepo, IEmailSender emailSender) : IUserService
 {
     public async Task<User> AuthenticateAsync(string email, string password)
     {
@@ -40,9 +40,9 @@ public class UserService(IUserRepository userRepo) : IUserService
         return user ?? throw new NotFoundException("Không tìm thấy người dùng.");
     }
 
-    public Task UpdateProfileAsync(int userId, string? fullName, string? phone,
+    public async Task UpdateProfileAsync(int userId, string? fullName, string? phone,
                                    string? dateOfBirth, string gender, string? city, string? avatarUrl) =>
-        userRepo.UpdateProfileAsync(userId, fullName, phone, dateOfBirth, gender, city, avatarUrl);
+        await userRepo.UpdateProfileAsync(userId, fullName, phone, dateOfBirth, gender, city, avatarUrl);
 
     public async Task ChangePasswordAsync(int userId, string currentPassword, string newPassword)
     {
@@ -68,13 +68,11 @@ public class UserService(IUserRepository userRepo) : IUserService
         var expiry = DateTime.UtcNow.AddHours(1).ToString("yyyy-MM-dd HH:mm:ss");
         await userRepo.SetResetTokenAsync(user.Id, token, expiry);
 
-        // Log reset link thay vì gửi email thật
-        var logDir  = Path.Combine(Directory.GetCurrentDirectory(), "logs");
-        Directory.CreateDirectory(logDir);
-        var logFile = Path.Combine(logDir, "emails.log");
         var link    = $"http://localhost:5000/reset-password?token={token}";
-        await File.AppendAllTextAsync(logFile,
-            $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Password Reset for {email}: {link}\n");
+        await emailSender.SendEmailAsync(
+            email, 
+            "Đặt lại mật khẩu - CinemaX", 
+            $"Bạn đã yêu cầu đặt lại mật khẩu. Vui lòng click vào link sau: <a href='{link}'>{link}</a>");
     }
 
     public async Task ResetPasswordAsync(string token, string newPassword)
@@ -82,17 +80,17 @@ public class UserService(IUserRepository userRepo) : IUserService
         var user = await userRepo.FindByResetTokenAsync(token)
             ?? throw new BusinessException("Token không hợp lệ hoặc đã hết hạn.");
 
-        if (newPassword.Length < 6)
-            throw new BusinessException("Mật khẩu phải từ 6 ký tự.");
+        if (newPassword.Length < 8)
+            throw new BusinessException("Mật khẩu phải từ 8 ký tự.");
 
         var newHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
         await userRepo.UpdatePasswordAsync(user.Id, newHash);
         await userRepo.ClearResetTokenAsync(user.Id);
     }
 
-    public Task SaveRefreshTokenAsync(int userId, string? token, string? expiry)
+    public async Task SaveRefreshTokenAsync(int userId, string? token, string? expiry)
     {
-        return userRepo.UpdateRefreshTokenAsync(userId, token, expiry);
+        await userRepo.UpdateRefreshTokenAsync(userId, token, expiry);
     }
 
     public async Task<User> ValidateRefreshTokenAsync(string token)
@@ -112,9 +110,12 @@ public class UserService(IUserRepository userRepo) : IUserService
         return new CinemaXNet.Application.ViewModels.PaginatedList<dynamic>(users.ToList(), count, page, pageSize);
     }
 
-    public Task UpdateRoleAsync(int userId, string role) => userRepo.UpdateRoleAsync(userId, role);
+    public async Task UpdateRoleAsync(int userId, string role) => await userRepo.UpdateRoleAsync(userId, role);
 
-    public Task DeleteAccountAsync(int userId) => userRepo.DeleteAsync(userId);
+    public async Task DeleteAccountAsync(int userId) => await userRepo.DeleteAsync(userId);
 
     public Task<User?> FindByEmailAsync(string email) => userRepo.FindByEmailAsync(email);
+
+    public Task RecalculateMemberTierAsync(int userId, System.Data.IDbTransaction? transaction = null) => 
+        userRepo.RecalculateMemberTierAsync(userId, transaction);
 }

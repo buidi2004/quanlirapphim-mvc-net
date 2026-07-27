@@ -1,4 +1,4 @@
-using CinemaXNet.Domain.Entities;
+﻿using CinemaXNet.Domain.Entities;
 
 namespace CinemaXNet.Application.Interfaces;
 

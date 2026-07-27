@@ -1,4 +1,4 @@
-using CinemaXNet.Application.Interfaces;
+﻿using CinemaXNet.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
@@ -20,19 +20,6 @@ public class AdminController(IMovieService movieService, IAuditLogService auditL
     {
         var stats = await dashboardService.GetDashboardStatsAsync();
         return View(stats);
-    }
-
-    [HttpGet("pos")]
-    public async Task<IActionResult> POS()
-    {
-        var movies = await movieService.GetNowShowingAsync();
-        var today = DateOnly.FromDateTime(DateTime.Now);
-        var showtimes = await showtimeService.GetAllByDateAsync(today);
-        
-        ViewBag.Movies = movies;
-        ViewBag.Showtimes = showtimes;
-        
-        return View("POS");
     }
 
     [HttpGet("payments")]

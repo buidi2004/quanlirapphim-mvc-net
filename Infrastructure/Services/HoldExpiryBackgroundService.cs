@@ -16,6 +16,9 @@ public class HoldExpiryBackgroundService(
     {
         logger.LogInformation("HoldExpiryBackgroundService started.");
 
+        int errorCount = 0;
+        int baseDelaySeconds = 60;
+
         while (!stoppingToken.IsCancellationRequested)
         {
             try
@@ -40,10 +43,20 @@ public class HoldExpiryBackgroundService(
                         });
                     }
                 }
+                
+                // Reset error count on success
+                errorCount = 0;
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error in HoldExpiryBackgroundService.");
+                errorCount++;
+                logger.LogError(ex, "Error in HoldExpiryBackgroundService. Attempt: {Attempt}", errorCount);
+                
+                // Exponential backoff: Max delay 5 minutes
+                var backoffDelay = Math.Min(baseDelaySeconds * (int)Math.Pow(2, errorCount - 1), 300);
+                logger.LogWarning("HoldExpiryBackgroundService will back off for {Delay} seconds.", backoffDelay);
+                await Task.Delay(TimeSpan.FromSeconds(backoffDelay), stoppingToken);
+                continue;
             }
 
             await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);

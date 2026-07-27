@@ -1,4 +1,4 @@
-namespace CinemaXNet.Domain.Exceptions;
+﻿namespace CinemaXNet.Domain.Exceptions;
 
 public class SeatUnavailableException : Exception
 {

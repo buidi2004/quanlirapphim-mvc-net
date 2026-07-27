@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using ModelContextProtocol.Server;
 using CinemaXNet.Application.Interfaces;
 using CinemaXNet.Domain.Entities;

@@ -1,4 +1,4 @@
-using System.Data;
+﻿using System.Data;
 using System.Text;
 using CinemaXNet.Domain.Entities;
 using CinemaXNet.Application.Interfaces;
@@ -100,6 +100,43 @@ public class TicketRepository(IDbConnection db) : ITicketRepository
 
         sql.Append(" WHERE id = @id AND version = @expectedVersion");
 
+        return await db.ExecuteAsync(sql.ToString(), param, transaction);
+    }
+
+    public async Task<int> UpdateMultipleStatusesWithVersionAsync(
+        IEnumerable<int> ids, string newStatus, 
+        decimal? individualPrice = null, string? promotionCode = null, System.Data.IDbTransaction? transaction = null)
+    {
+        var idList = ids.ToList();
+        if (idList.Count == 0) return 0;
+
+        var sql = new StringBuilder(@"
+            UPDATE tickets
+            SET status  = @newStatus,
+                version = version + 1");
+
+        var param = new DynamicParameters();
+        param.Add("newStatus", newStatus);
+        param.Add("ids", idList);
+
+        if (individualPrice.HasValue)
+        {
+            sql.Append(", total_price = @individualPrice");
+            param.Add("individualPrice", individualPrice.Value);
+        }
+        if (promotionCode != null)
+        {
+            sql.Append(", promotion_code = @promotionCode");
+            param.Add("promotionCode", promotionCode);
+        }
+        if (newStatus is "paid" or "cancelled")
+        {
+            sql.Append(", hold_expiry_time = NULL");
+        }
+
+        sql.Append(" WHERE id IN @ids");
+
+        // The caller will check if the affected rows matches the count of ids.
         return await db.ExecuteAsync(sql.ToString(), param, transaction);
     }
 

@@ -1,4 +1,4 @@
-using System.Data;
+﻿using System.Data;
 using CinemaXNet.Domain.Entities;
 using CinemaXNet.Application.Interfaces;
 using CinemaXNet.Application.ViewModels;

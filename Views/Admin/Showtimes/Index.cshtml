@@ -1,4 +1,4 @@
-@model IEnumerable<CinemaXNet.Domain.Entities.Showtime>
+﻿@model IEnumerable<CinemaXNet.Domain.Entities.Showtime>
 @{
     ViewData["Title"] = "Quản Lý Suất Chiếu";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
@@ -116,7 +116,7 @@
                                                 <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editShowtimeModal-@showtime.Id"><i class="bi bi-pencil me-2"></i>Sửa</a></li>
                                                 <li><hr class="dropdown-divider border-secondary-subtle"></li>
                                                 <li>
-                                                    <form asp-action="Delete" asp-route-id="@showtime.Id" method="post" onsubmit="return confirm('Xác nhận xóa suất chiếu này?');">
+                                                    <form asp-controller="AdminShowtimes" asp-action="Delete" asp-route-id="@showtime.Id" method="post" onsubmit="return confirm('Xác nhận xóa suất chiếu này?');">
                                                         <button type="submit" class="dropdown-item text-danger"><i class="bi bi-trash me-2"></i>Xóa</button>
                                                     </form>
                                                 </li>
@@ -138,17 +138,60 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Placeholder for Edit Modal to prevent syntax errors, keeping it simple as it's structurally similar -->
+                                <!-- Edit Modal for Showtime -->
                                 <div class="modal fade" id="editShowtimeModal-@showtime.Id" tabindex="-1" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered">
                                         <div class="modal-content bg-body border border-secondary-subtle shadow-lg">
                                             <div class="modal-header border-bottom border-secondary-subtle">
-                                                <h5 class="modal-title text-body-emphasis fw-bold">Thêm suất chiếu mới</h5>
+                                                <h5 class="modal-title text-body-emphasis fw-bold">Chỉnh sửa suất chiếu #@showtime.Id</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
-                                            <div class="modal-body">
-                                                <p class="text-body">Form chỉnh sửa dành cho suất chiếu @showtime.Id...</p>
-                                            </div>
+                                            <form asp-controller="AdminShowtimes" asp-action="Update" asp-route-id="@showtime.Id" method="post">
+                                                <div class="modal-body p-4">
+                                                    <div class="row g-3">
+                                                        <div class="col-12">
+                                                            <label class="form-label text-body-emphasis fw-medium">Phim *</label>
+                                                            <select name="movieId" class="form-select bg-body text-body-emphasis border-secondary-subtle" required>
+                                                                @foreach (var m in movies) {
+                                                                    <option value="@m.Id" selected="@(m.Id == showtime.MovieId ? "selected" : null)">@m.Title (@m.DurationMinutes phút)</option>
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-12">
+                                                            <label class="form-label text-body-emphasis fw-medium">Phòng chiếu *</label>
+                                                            <select name="roomId" class="form-select bg-body text-body-emphasis border-secondary-subtle" required>
+                                                                @foreach (var r in rooms) {
+                                                                    <option value="@r.Id" selected="@(r.Id == showtime.RoomId ? "selected" : null)">@r.Name (Rạp ID: @r.CinemaId)</option>
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="form-label text-body-emphasis fw-medium">Ngày chiếu *</label>
+                                                            <input type="date" name="showDate" value="@showtime.ShowDate.ToString("yyyy-MM-dd")" class="form-control bg-body text-body-emphasis border-secondary-subtle" required>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="form-label text-body-emphasis fw-medium">Giờ chiếu *</label>
+                                                            <input type="time" name="startTime" value="@showtime.StartTime.ToString("HH:mm", System.Globalization.CultureInfo.InvariantCulture)" class="form-control bg-body text-body-emphasis border-secondary-subtle" required>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="form-label text-body-emphasis fw-medium">Định dạng *</label>
+                                                            <select name="format" class="form-select bg-body text-body-emphasis border-secondary-subtle">
+                                                                <option value="2D" selected="@(showtime.Format == "2D" ? "selected" : null)">2D Tiêu chuẩn</option>
+                                                                <option value="3D" selected="@(showtime.Format == "3D" ? "selected" : null)">3D</option>
+                                                                <option value="IMAX" selected="@(showtime.Format == "IMAX" ? "selected" : null)">IMAX</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="form-label text-body-emphasis fw-medium">Giá vé (VNĐ) *</label>
+                                                            <input type="number" name="price" value="@showtime.Price" class="form-control bg-body text-body-emphasis border-secondary-subtle" required min="0" step="1000">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer border-top border-secondary-subtle p-3">
+                                                    <button type="button" class="btn btn-outline-secondary px-4 fw-medium" data-bs-dismiss="modal">Hủy</button>
+                                                    <button type="submit" class="btn btn-primary px-4 fw-medium">Lưu thay đổi</button>
+                                                </div>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
@@ -169,7 +212,7 @@
                 <h5 class="modal-title text-body-emphasis fw-bold">Thêm suất chiếu mới</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form asp-action="Create" method="post">
+            <form asp-controller="AdminShowtimes" asp-action="Store" method="post">
                 <div class="modal-body p-4">
                     <div class="alert alert-warning border-0 mb-4 bg-warning bg-opacity-10 text-warning rounded-3">
                         <i class="bi bi-info-circle-fill me-2"></i> <strong>Lưu ý:</strong> Vui lòng đảm bảo khoảng cách tối thiểu 15 phút giữa các suất chiếu trong cùng một phòng để nhân viên dọn dẹp vệ sinh.
@@ -195,8 +238,12 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label text-body-emphasis fw-medium">Thời gian bắt đầu *</label>
-                            <input type="datetime-local" name="startTime" class="form-control bg-body text-body-emphasis border-secondary-subtle" required>
+                            <label class="form-label text-body-emphasis fw-medium">Ngày chiếu *</label>
+                            <input type="date" name="showDate" class="form-control bg-body text-body-emphasis border-secondary-subtle" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-body-emphasis fw-medium">Giờ chiếu *</label>
+                            <input type="time" name="startTime" class="form-control bg-body text-body-emphasis border-secondary-subtle" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label text-body-emphasis fw-medium">Định dạng *</label>
@@ -208,7 +255,7 @@
                         </div>
                         <div class="col-12">
                             <label class="form-label text-body-emphasis fw-medium">Giá vé cơ bản (VNĐ) *</label>
-                            <input type="number" name="basePrice" class="form-control bg-body text-body-emphasis border-secondary-subtle" required min="0" step="1000" value="90000">
+                            <input type="number" name="price" class="form-control bg-body text-body-emphasis border-secondary-subtle" required min="0" step="1000" value="90000">
                         </div>
                     </div>
                 </div>

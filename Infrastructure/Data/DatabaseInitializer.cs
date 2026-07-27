@@ -215,6 +215,7 @@ public static class DatabaseInitializer
                 id               INT AUTO_INCREMENT PRIMARY KEY,
                 name             VARCHAR(50)   NOT NULL UNIQUE,
                 min_spent        DECIMAL(18,2) NOT NULL DEFAULT 0,
+                min_tickets      INT           NOT NULL DEFAULT 0,
                 discount_percent DECIMAL(5,2)  NOT NULL DEFAULT 0,
                 benefits         TEXT
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -291,6 +292,9 @@ public static class DatabaseInitializer
                 created_at   DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         """);
+
+        // Ensure min_tickets exists for existing databases
+        try { db.Execute("ALTER TABLE membership_tiers ADD COLUMN min_tickets INT NOT NULL DEFAULT 0 AFTER min_spent"); } catch { }
 
         // ── Seed if empty ───────────────────────────────────────────────────
         var userCount = db.ExecuteScalar<int>("SELECT COUNT(*) FROM users");
@@ -436,11 +440,11 @@ public static class DatabaseInitializer
 
         // Seed Membership Tiers
         db.Execute("""
-            INSERT INTO membership_tiers (name, min_spent, discount_percent, benefits) VALUES
-            ('Bronze', 0, 0, 'Thành viên cơ bản, tích lũy điểm khi mua vé.'),
-            ('Silver', 1000000, 5, 'Giảm 5% khi mua vé, ưu tiên hỗ trợ.'),
-            ('Gold', 3000000, 10, 'Giảm 10% khi mua vé, tặng 1 vé sinh nhật.'),
-            ('Diamond', 10000000, 15, 'Giảm 15% khi mua vé, phòng VIP lounge miễn phí.');
+            INSERT INTO membership_tiers (name, min_spent, min_tickets, discount_percent, benefits) VALUES
+            ('Bronze', 0, 0, 0, 'Thành viên cơ bản, tích lũy điểm khi mua vé.'),
+            ('Silver', 1000000, 10, 5, 'Giảm 5% khi mua vé, ưu tiên hỗ trợ.'),
+            ('Gold', 3000000, 30, 10, 'Giảm 10% khi mua vé, tặng 1 vé sinh nhật.'),
+            ('Diamond', 10000000, 100, 15, 'Giảm 15% khi mua vé, phòng VIP lounge miễn phí.');
         """);
 
         // Seed Pricing Rules

@@ -1,4 +1,4 @@
-using System.Data;
+﻿using System.Data;
 using CinemaXNet.Infrastructure.Data;
 using CinemaXNet.Infrastructure.Repositories;
 using CinemaXNet.Application.Interfaces;
@@ -151,6 +151,7 @@ builder.Services.AddScoped<IRefundService, RefundService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IBannerService, BannerService>();
+builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 
 // ── AutoMapper & MediatR ──────────────────────────────────────────────────
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());

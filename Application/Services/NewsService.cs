@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Http;
 using CinemaXNet.Application.Interfaces;
 

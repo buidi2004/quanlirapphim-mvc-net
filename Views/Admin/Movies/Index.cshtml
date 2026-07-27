@@ -1,4 +1,4 @@
-@model CinemaXNet.Application.ViewModels.PaginatedList<CinemaXNet.Domain.Entities.Movie>
+﻿@model CinemaXNet.Application.ViewModels.PaginatedList<CinemaXNet.Domain.Entities.Movie>
 @{
     ViewData["Title"] = "Quản Lý Phim";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
@@ -111,7 +111,7 @@
                                         <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editMovieModal-@movie.Id" title="Chỉnh sửa">
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
-                                        <form asp-action="Delete" asp-route-id="@movie.Id" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa bộ phim này không? Mọi suất chiếu liên quan cũng có thể bị ảnh hưởng.');">
+                                        <form asp-action="DeleteMovie" asp-route-id="@movie.Id" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa bộ phim này không? Mọi suất chiếu liên quan cũng có thể bị ảnh hưởng.');">
                                             <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa">
                                                 <i class="bi bi-trash"></i>
                                             </button>
@@ -128,7 +128,7 @@
                                             <h5 class="modal-title text-body-emphasis fw-bold" id="editMovieModalLabel-@movie.Id">Chỉnh sửa phim: @movie.Title</h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
-                                        <form asp-action="Edit" asp-route-id="@movie.Id" method="post" enctype="multipart/form-data">
+                                        <form asp-action="UpdateMovie" asp-route-id="@movie.Id" method="post" enctype="multipart/form-data">
                                             <div class="modal-body p-4">
                                                 <div class="row g-4">
                                                     <!-- Left Column: Text Info -->
@@ -250,7 +250,7 @@
                 <h5 class="modal-title text-body-emphasis fw-bold" id="addMovieModalLabel">Thêm phim mới</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form asp-action="Create" method="post" enctype="multipart/form-data">
+            <form asp-action="StoreMovie" method="post" enctype="multipart/form-data">
                 <div class="modal-body p-4">
                     <div class="row g-4">
                         <!-- Left Column -->

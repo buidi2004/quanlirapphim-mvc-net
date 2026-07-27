@@ -1,4 +1,4 @@
-using CinemaXNet.Domain.Exceptions;
+﻿using CinemaXNet.Domain.Exceptions;
 using CinemaXNet.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 

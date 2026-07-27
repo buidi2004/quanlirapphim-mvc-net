@@ -1,4 +1,4 @@
-using CinemaXNet.Domain.Exceptions;
+﻿using CinemaXNet.Domain.Exceptions;
 using CinemaXNet.Application.Interfaces;
 using CinemaXNet.Application.Responses;
 using CinemaXNet.Domain.ValueObjects;

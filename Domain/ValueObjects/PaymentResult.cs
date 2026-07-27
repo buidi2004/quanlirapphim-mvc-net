@@ -1,4 +1,4 @@
-namespace CinemaXNet.Domain.ValueObjects;
+﻿namespace CinemaXNet.Domain.ValueObjects;
 
 public class PaymentResult
 {

@@ -1,4 +1,4 @@
-namespace CinemaXNet.Application.DTOs;
+﻿namespace CinemaXNet.Application.DTOs;
 
 public class MovieSummaryDto
 {

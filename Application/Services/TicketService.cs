@@ -1,4 +1,4 @@
-using System.Data;
+﻿using System.Data;
 using CinemaXNet.Domain.Exceptions;
 using Dapper;
 using CinemaXNet.Domain.ValueObjects;
@@ -90,6 +90,8 @@ public class TicketService(
         {
             var individualPrice = totalPrice.HasValue ? totalPrice.Value / ids.Count : (decimal?)null;
 
+            // 1. Pre-check all tickets
+            var seatCodes = new List<string>();
             foreach (var ticketId in ids)
             {
                 var ticket = await ticketRepo.FindByIdAsync(ticketId, transaction)
@@ -101,12 +103,17 @@ public class TicketService(
                 if (ticket.IsExpired)
                     throw new BusinessException("Phiên giữ chỗ đã hết hạn. Vui lòng chọn ghế lại.");
 
-                var rowsAffected = await ticketRepo.UpdateStatusWithVersionAsync(
-                    ticketId, TicketStatus.Paid, ticket.Version, individualPrice, promotionCode, transaction);
+                seatCodes.Add(ticket.SeatCode);
+            }
 
-                if (rowsAffected == 0)
-                    throw new ConcurrencyException(
-                        $"Ghế {ticket.SeatCode} vừa được người khác đặt. Vui lòng chọn ghế khác.");
+            // 2. Atomic bulk update
+            var rowsAffected = await ticketRepo.UpdateMultipleStatusesWithVersionAsync(
+                ids, TicketStatus.Paid, individualPrice, promotionCode, transaction);
+
+            if (rowsAffected != ids.Count)
+            {
+                // Concurrency issue: At least one ticket was modified by another transaction or expired/changed status.
+                throw new ConcurrencyException("Một hoặc nhiều ghế bạn chọn vừa được người khác đặt hoặc đã hết hạn. Vui lòng chọn lại.");
             }
 
             if (concessions != null && concessions.Any() && ids.Count > 0)

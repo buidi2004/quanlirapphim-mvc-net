@@ -1,4 +1,4 @@
-using CinemaXNet.Application.ViewModels;
+﻿using CinemaXNet.Application.ViewModels;
 
 namespace CinemaXNet.Application.Interfaces;
 

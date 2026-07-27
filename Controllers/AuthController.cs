@@ -1,4 +1,4 @@
-using CinemaXNet.Domain.Exceptions;
+﻿using CinemaXNet.Domain.Exceptions;
 using CinemaXNet.Application.Interfaces;
 using CinemaXNet.Application.ViewModels;
 using Microsoft.AspNetCore.Authentication;
@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace CinemaXNet.Controllers;
 
-public class AuthController(IUserService userService) : Controller
+public class AuthController(IUserService userService, IEmailSender emailSender) : Controller
 {
     // GET /login
     [HttpGet("login")]
@@ -168,6 +168,8 @@ public class AuthController(IUserService userService) : Controller
                     // Thử đăng ký user mới
                     var randomPassword = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(16)) + "A1!";
                     var user = await userService.RegisterAsync(name, email, randomPassword);
+                    await emailSender.SendEmailAsync(email, "Mật khẩu tài khoản CinemaX của bạn",
+                        $"Chào {name},<br>Tài khoản của bạn đã được tạo thành công qua đăng nhập liên kết.<br>Mật khẩu tạm thời của bạn là: <b>{randomPassword}</b><br>Vui lòng đổi mật khẩu sau khi đăng nhập.");
                     await SignInUser(user);
                 }
                 catch

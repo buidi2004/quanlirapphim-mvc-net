@@ -1,4 +1,4 @@
-namespace CinemaXNet.Application.ViewModels;
+﻿namespace CinemaXNet.Application.ViewModels;
 
 public class ErrorViewModel
 {

@@ -23,4 +23,6 @@ public interface IUserRepository
     Task<int> GetCountAsync();
     Task UpdateRoleAsync(int userId, string role);
     Task DeleteAsync(int userId);
+
+    Task RecalculateMemberTierAsync(int userId, System.Data.IDbTransaction? transaction = null);
 }

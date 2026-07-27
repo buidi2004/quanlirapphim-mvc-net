@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using CinemaXNet.Application.Interfaces;
 
 namespace CinemaXNet.Application.Services;
