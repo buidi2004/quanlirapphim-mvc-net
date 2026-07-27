@@ -112,21 +112,23 @@
 
     <style>
         .custom-nav-pills .nav-link {
-            color: #495057;
-            background-color: #f8f9fa;
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
+            color: var(--color-text-secondary, #6B7280);
+            background-color: #fff;
+            border: 2px solid #e5e7eb;
+            transition: all 0.25s ease;
+            font-size: 0.85rem;
+            letter-spacing: 0.04em;
         }
         .custom-nav-pills .nav-link:hover {
-            color: #6f42c1;
-            background-color: #fff;
-            border-color: #6f42c1;
+            color: var(--color-primary, #F84464);
+            background-color: #fff5f7;
+            border-color: var(--color-primary, #F84464);
         }
         .custom-nav-pills .nav-link.active {
             color: #fff;
-            background-color: #6f42c1;
-            box-shadow: 0 0 15px rgba(111, 66, 193, 0.4) !important;
-            border-color: #6f42c1;
+            background-color: var(--color-primary, #F84464);
+            border-color: var(--color-primary, #F84464);
+            box-shadow: 0 4px 14px rgba(248, 68, 100, 0.35) !important;
         }
     </style>
 
