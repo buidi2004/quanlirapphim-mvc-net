@@ -5,82 +5,316 @@
     var cinemas = ViewBag.Cinemas as IEnumerable<CinemaXNet.Domain.Entities.Cinema> ?? [];
 }
 
-<div class="container py-4">
-    <h2 class="text-warning fw-medium mb-4"><i class="bi bi-lightning-charge-fill me-2"></i>ĐẶT VÉ NHANH</h2>
+<style>
+    .fast-booking-wrapper {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    .fb-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 20px 24px;
+        background: rgba(255,255,255,0.04);
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .fb-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        color: var(--color-primary, #F84464);
+        margin: 0;
+        text-transform: uppercase;
+    }
+    .fb-title i { color: var(--color-primary, #F84464); }
 
-    <div class="row g-0 rounded-2 overflow-hidden border border-secondary border-opacity-25 shadow-lg bg-dark">
-        <!-- Bước 1: Chọn Phim -->
-        <div class="col-md-3 border-end border-secondary border-opacity-25 matrix-col">
-            <div class="bg-dark p-3 border-bottom border-secondary border-opacity-25 text-center">
-                <h5 class="text-white mb-0 fw-medium">1. CHỌN PHIM</h5>
-            </div>
-            <div class="list-group list-group-flush custom-scroll" style="height: 500px; overflow-y: auto;">
-                @foreach (var m in movies)
-                {
-                    <button class="list-group-item list-group-item-action bg-white text-dark border-0 py-3 movie-item" data-id="@m.Id">
-                        <div class="d-flex align-items-center">
-                            <img src="@m.PosterUrl" class="rounded me-3" style="width: 40px; height: 60px; object-fit: cover;">
+    /* Step columns */
+    .fb-cols { display: flex; height: 480px; }
+    .fb-col {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        border-right: 1px solid rgba(255,255,255,0.07);
+    }
+    .fb-col:last-child { border-right: none; }
+
+    /* Step header */
+    .fb-step-head {
+        padding: 14px 16px;
+        background: rgba(255,255,255,0.05);
+        border-bottom: 1px solid rgba(255,255,255,0.07);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .fb-step-num {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: rgba(248,68,100,0.2);
+        border: 1.5px solid var(--color-primary, #F84464);
+        color: var(--color-primary, #F84464);
+        font-size: 0.72rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .fb-step-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.75);
+    }
+    .fb-step-head.done .fb-step-num {
+        background: var(--color-primary, #F84464);
+        color: #fff;
+    }
+
+    /* Scroll body */
+    .fb-body {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+    .fb-body::-webkit-scrollbar { width: 4px; }
+    .fb-body::-webkit-scrollbar-track { background: transparent; }
+    .fb-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+
+    /* Movie item */
+    .fb-movie-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        cursor: pointer;
+        border: none;
+        background: transparent;
+        width: 100%;
+        text-align: left;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        transition: background 0.15s;
+        color: rgba(255,255,255,0.85);
+    }
+    .fb-movie-item:hover { background: rgba(255,255,255,0.06); }
+    .fb-movie-item.active {
+        background: rgba(248,68,100,0.15);
+        border-left: 3px solid var(--color-primary, #F84464);
+    }
+    .fb-movie-poster {
+        width: 38px;
+        height: 56px;
+        object-fit: cover;
+        border-radius: 6px;
+        flex-shrink: 0;
+    }
+    .fb-movie-title { font-size: 0.82rem; font-weight: 600; line-height: 1.3; margin-bottom: 3px; }
+    .fb-movie-meta { font-size: 0.72rem; color: rgba(255,255,255,0.45); display: flex; align-items: center; gap: 6px; }
+
+    /* Cinema item */
+    .fb-cinema-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 16px;
+        cursor: pointer;
+        border: none;
+        background: transparent;
+        width: 100%;
+        text-align: left;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        transition: background 0.15s;
+        color: rgba(255,255,255,0.8);
+        font-size: 0.83rem;
+    }
+    .fb-cinema-item:hover { background: rgba(255,255,255,0.06); }
+    .fb-cinema-item.active {
+        background: rgba(248,68,100,0.15);
+        border-left: 3px solid var(--color-primary, #F84464);
+        color: #fff;
+        font-weight: 600;
+    }
+    .fb-cinema-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        background: rgba(248,68,100,0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        color: var(--color-primary, #F84464);
+        font-size: 0.8rem;
+    }
+
+    /* Date item */
+    .fb-date-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        padding: 13px 16px;
+        cursor: pointer;
+        border: none;
+        background: transparent;
+        width: 100%;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        transition: background 0.15s;
+        color: rgba(255,255,255,0.7);
+        font-size: 0.83rem;
+        font-weight: 500;
+        gap: 2px;
+    }
+    .fb-date-item:hover { background: rgba(255,255,255,0.06); }
+    .fb-date-item.active {
+        background: rgba(248,68,100,0.15);
+        border-left: 3px solid var(--color-primary, #F84464);
+        color: var(--color-primary, #F84464);
+        font-weight: 700;
+    }
+
+    /* Showtime buttons */
+    .fb-time-grid { padding: 14px; display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; }
+    .fb-time-btn {
+        flex: 0 0 calc(50% - 4px);
+        padding: 10px 8px;
+        border-radius: 10px;
+        border: 1.5px solid rgba(248,68,100,0.4);
+        background: rgba(248,68,100,0.08);
+        color: var(--color-primary, #F84464);
+        font-size: 0.82rem;
+        font-weight: 700;
+        text-align: center;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+    .fb-time-btn:hover {
+        background: var(--color-primary, #F84464);
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(248,68,100,0.35);
+    }
+
+    /* Empty state */
+    .fb-empty {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        gap: 10px;
+        color: rgba(255,255,255,0.3);
+        font-size: 0.8rem;
+        font-style: italic;
+        padding: 20px;
+        text-align: center;
+    }
+    .fb-empty i { font-size: 2rem; opacity: 0.4; }
+
+    /* Spinner */
+    .fb-spinner {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        height: 100%;
+        color: var(--color-primary, #F84464);
+        font-size: 0.82rem;
+    }
+
+    @media (max-width: 767px) {
+        .fb-cols { flex-direction: column; height: auto; }
+        .fb-col { height: 220px; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.07); }
+        .fb-col:last-child { border-bottom: none; }
+    }
+</style>
+
+<div class="py-4">
+    <div class="fast-booking-wrapper">
+        <!-- Header -->
+        <div class="fb-header">
+            <i class="bi bi-lightning-charge-fill" style="color: var(--color-primary); font-size: 1.1rem;"></i>
+            <h2 class="fb-title">Đặt Vé Nhanh</h2>
+        </div>
+
+        <!-- 4 columns -->
+        <div class="fb-cols">
+
+            <!-- Col 1: Phim -->
+            <div class="fb-col">
+                <div class="fb-step-head" id="head-1">
+                    <div class="fb-step-num">1</div>
+                    <span class="fb-step-label">Chọn Phim</span>
+                </div>
+                <div class="fb-body">
+                    @foreach (var m in movies)
+                    {
+                        <button class="fb-movie-item" data-id="@m.Id">
+                            <img src="@(m.PosterUrl ?? "/images/no-poster.jpg")" class="fb-movie-poster" alt="@m.Title">
                             <div>
-                                <h6 class="mb-1 fw-medium">@m.Title</h6>
-                                <small class="text-secondary"><span class="badge bg-danger me-1">@m.AgeRating</span> @m.DurationMinutes phút</small>
+                                <div class="fb-movie-title">@m.Title</div>
+                                <div class="fb-movie-meta">
+                                    @if (m.AgeRating != null) {
+                                        <span class="badge" style="background: var(--color-primary); font-size: 0.65rem; padding: 2px 6px;">@m.AgeRating</span>
+                                    }
+                                    <span>@m.DurationMinutes phút</span>
+                                </div>
                             </div>
-                        </div>
-                    </button>
-                }
-            </div>
-        </div>
-
-        <!-- Bước 2: Chọn Rạp -->
-        <div class="col-md-3 border-end border-secondary border-opacity-25 matrix-col">
-            <div class="bg-dark p-3 border-bottom border-secondary border-opacity-25 text-center">
-                <h5 class="text-white mb-0 fw-medium">2. CHỌN RẠP</h5>
-            </div>
-            <div class="list-group list-group-flush custom-scroll" id="cinema-list" style="height: 500px; overflow-y: auto;">
-                <div class="p-4 text-center text-secondary fst-italic">
-                    <i class="bi bi-arrow-left-circle fs-3 d-block mb-2"></i>
-                    Vui lòng chọn Phim trước
+                        </button>
+                    }
                 </div>
             </div>
-        </div>
 
-        <!-- Bước 3: Chọn Ngày -->
-        <div class="col-md-3 border-end border-secondary border-opacity-25 matrix-col">
-            <div class="bg-dark p-3 border-bottom border-secondary border-opacity-25 text-center">
-                <h5 class="text-white mb-0 fw-medium">3. CHỌN NGÀY</h5>
-            </div>
-            <div class="list-group list-group-flush custom-scroll" id="date-list" style="height: 500px; overflow-y: auto;">
-                <div class="p-4 text-center text-secondary fst-italic">
-                    <i class="bi bi-arrow-left-circle fs-3 d-block mb-2"></i>
-                    Vui lòng chọn Rạp trước
+            <!-- Col 2: Rạp -->
+            <div class="fb-col">
+                <div class="fb-step-head" id="head-2">
+                    <div class="fb-step-num">2</div>
+                    <span class="fb-step-label">Chọn Rạp</span>
+                </div>
+                <div class="fb-body" id="cinema-list">
+                    <div class="fb-empty">
+                        <i class="bi bi-arrow-left-circle"></i>
+                        Vui lòng chọn phim trước
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Bước 4: Chọn Giờ -->
-        <div class="col-md-3 matrix-col">
-            <div class="bg-dark p-3 border-bottom border-secondary border-opacity-25 text-center">
-                <h5 class="text-white mb-0 fw-medium">4. CHỌN SUẤT</h5>
+            <!-- Col 3: Ngày -->
+            <div class="fb-col">
+                <div class="fb-step-head" id="head-3">
+                    <div class="fb-step-num">3</div>
+                    <span class="fb-step-label">Chọn Ngày</span>
+                </div>
+                <div class="fb-body" id="date-list">
+                    <div class="fb-empty">
+                        <i class="bi bi-arrow-left-circle"></i>
+                        Vui lòng chọn rạp trước
+                    </div>
+                </div>
             </div>
-            <div class="p-3 custom-scroll" id="time-list" style="height: 500px; overflow-y: auto;">
-                <div class="p-4 text-center text-secondary fst-italic">
-                    <i class="bi bi-arrow-left-circle fs-3 d-block mb-2"></i>
-                    Vui lòng chọn Ngày trước
+
+            <!-- Col 4: Suất -->
+            <div class="fb-col">
+                <div class="fb-step-head" id="head-4">
+                    <div class="fb-step-num">4</div>
+                    <span class="fb-step-label">Chọn Suất</span>
+                </div>
+                <div class="fb-body" id="time-list">
+                    <div class="fb-empty">
+                        <i class="bi bi-arrow-left-circle"></i>
+                        Vui lòng chọn ngày trước
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<style>
-    .matrix-col { transition: all 0.3s ease; }
-    .custom-scroll::-webkit-scrollbar { width: 6px; }
-    .custom-scroll::-webkit-scrollbar-track { background: #212529; }
-    .custom-scroll::-webkit-scrollbar-thumb { background: #495057; border-radius: 4px; }
-    .list-group-item.active { background-color: #333 !important; border-left: 4px solid #6f42c1 !important; color: #fff !important; }
-    .list-group-item:hover:not(.active) { background-color: rgba(255,193,7,0.1) !important; cursor: pointer; }
-    .time-btn { transition: all 0.2s; }
-    .time-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(124, 58, 237, 0.2); }
-</style>
 
 @section Scripts {
     <script>
@@ -88,113 +322,102 @@
         let selectedCinema = null;
         let selectedDate = null;
 
-        // Xử lý Chọn Phim
-        document.querySelectorAll('.movie-item').forEach(item => {
-            item.addEventListener('click', function() {
-                document.querySelectorAll('.movie-item').forEach(i => i.classList.remove('active'));
+        function markStepDone(headId) {
+            document.getElementById(headId)?.classList.add('done');
+        }
+
+        function showEmpty(id, msg) {
+            document.getElementById(id).innerHTML =
+                `<div class="fb-empty"><i class="bi bi-arrow-left-circle"></i>${msg}</div>`;
+        }
+
+        function showSpinner(id) {
+            document.getElementById(id).innerHTML =
+                `<div class="fb-spinner"><div class="spinner-border spinner-border-sm"></div> Đang tải...</div>`;
+        }
+
+        // Movie select
+        document.querySelectorAll('.fb-movie-item').forEach(item => {
+            item.addEventListener('click', function () {
+                document.querySelectorAll('.fb-movie-item').forEach(i => i.classList.remove('active'));
                 this.classList.add('active');
                 selectedMovie = this.getAttribute('data-id');
-                
-                // Reset các cột sau
                 selectedCinema = null;
                 selectedDate = null;
-                resetList('date-list', 'Vui lòng chọn Rạp trước');
-                resetList('time-list', 'Vui lòng chọn Ngày trước');
-                
+                markStepDone('head-1');
+                showEmpty('date-list', 'Vui lòng chọn rạp trước');
+                showEmpty('time-list', 'Vui lòng chọn ngày trước');
                 loadCinemas(selectedMovie);
             });
         });
 
-        function resetList(id, msg) {
-            document.getElementById(id).innerHTML = `<div class="p-4 text-center text-secondary fst-italic"><i class="bi bi-arrow-left-circle fs-3 d-block mb-2"></i>${msg}</div>`;
-        }
-
         async function loadCinemas(movieId) {
-            const list = document.getElementById('cinema-list');
-            list.innerHTML = '<div class="text-center p-4 text-primary"><div class="spinner-border spinner-border-sm"></div> Đang tải...</div>';
-            
+            showSpinner('cinema-list');
             try {
                 const res = await fetch(`/api/quickbooking/cinemas?movieId=${movieId}`);
                 const data = await res.json();
-                
-                if(data.length === 0) {
-                    resetList('cinema-list', 'Không có rạp nào chiếu phim này');
-                    return;
-                }
-
+                const list = document.getElementById('cinema-list');
+                if (data.length === 0) { showEmpty('cinema-list', 'Không có rạp nào chiếu phim này'); return; }
                 list.innerHTML = '';
                 data.forEach(c => {
                     const btn = document.createElement('button');
-                    btn.className = 'list-group-item list-group-item-action bg-white text-dark border-0 py-3 cinema-item';
-                    btn.innerHTML = `<i class="bi bi-building me-2 text-primary"></i>${c.name}`;
+                    btn.className = 'fb-cinema-item';
+                    btn.innerHTML = `<div class="fb-cinema-icon"><i class="bi bi-building"></i></div><span>${c.name}</span>`;
                     btn.onclick = () => {
-                        document.querySelectorAll('.cinema-item').forEach(i => i.classList.remove('active'));
+                        document.querySelectorAll('.fb-cinema-item').forEach(i => i.classList.remove('active'));
                         btn.classList.add('active');
                         selectedCinema = c.id;
                         selectedDate = null;
-                        resetList('time-list', 'Vui lòng chọn Ngày trước');
+                        markStepDone('head-2');
+                        showEmpty('time-list', 'Vui lòng chọn ngày trước');
                         loadDates(movieId, c.id);
                     };
                     list.appendChild(btn);
                 });
-            } catch(e) {
-                resetList('cinema-list', 'Lỗi kết nối');
-            }
+            } catch { showEmpty('cinema-list', 'Lỗi kết nối'); }
         }
 
         async function loadDates(movieId, cinemaId) {
-            const list = document.getElementById('date-list');
-            list.innerHTML = '<div class="text-center p-4 text-primary"><div class="spinner-border spinner-border-sm"></div> Đang tải...</div>';
-            
+            showSpinner('date-list');
             try {
                 const res = await fetch(`/api/quickbooking/dates?movieId=${movieId}&cinemaId=${cinemaId}`);
                 const data = await res.json();
-                
+                const list = document.getElementById('date-list');
                 list.innerHTML = '';
+                if (data.length === 0) { showEmpty('date-list', 'Không có ngày chiếu nào'); return; }
                 data.forEach(d => {
                     const btn = document.createElement('button');
-                    btn.className = 'list-group-item list-group-item-action bg-dark text-light border-0 py-3 date-item';
-                    btn.innerHTML = `${d.formatted}`;
+                    btn.className = 'fb-date-item';
+                    btn.textContent = d.formatted;
                     btn.onclick = () => {
-                        document.querySelectorAll('.date-item').forEach(i => i.classList.remove('active'));
+                        document.querySelectorAll('.fb-date-item').forEach(i => i.classList.remove('active'));
                         btn.classList.add('active');
                         selectedDate = d.value;
+                        markStepDone('head-3');
                         loadShowtimes(movieId, cinemaId, d.value);
                     };
                     list.appendChild(btn);
                 });
-            } catch(e) {
-                resetList('date-list', 'Lỗi kết nối');
-            }
+            } catch { showEmpty('date-list', 'Lỗi kết nối'); }
         }
 
         async function loadShowtimes(movieId, cinemaId, date) {
-            const list = document.getElementById('time-list');
-            list.innerHTML = '<div class="text-center p-4 text-primary"><div class="spinner-border spinner-border-sm"></div> Đang tải...</div>';
-            
+            showSpinner('time-list');
             try {
                 const res = await fetch(`/api/quickbooking/showtimes?movieId=${movieId}&cinemaId=${cinemaId}&date=${date}`);
                 const data = await res.json();
-                
-                if(data.length === 0) {
-                    resetList('time-list', 'Không có suất chiếu nào');
-                    return;
-                }
-
-                list.innerHTML = '<div class="d-flex flex-wrap gap-2"></div>';
-                const container = list.querySelector('.d-flex');
-                
+                const list = document.getElementById('time-list');
+                if (data.length === 0) { showEmpty('time-list', 'Không có suất chiếu nào'); return; }
+                list.innerHTML = '<div class="fb-time-grid"></div>';
+                const grid = list.querySelector('.fb-time-grid');
                 data.forEach(st => {
                     const a = document.createElement('a');
                     a.href = `/booking/seats?showtimeId=${st.id}`;
-                    a.className = 'btn btn-outline-primary time-btn fw-medium';
-                    a.style.width = 'calc(50% - 0.25rem)';
-                    a.innerHTML = st.time;
-                    container.appendChild(a);
+                    a.className = 'fb-time-btn';
+                    a.textContent = st.time;
+                    grid.appendChild(a);
                 });
-            } catch(e) {
-                resetList('time-list', 'Lỗi kết nối');
-            }
+            } catch { showEmpty('time-list', 'Lỗi kết nối'); }
         }
     </script>
 }
