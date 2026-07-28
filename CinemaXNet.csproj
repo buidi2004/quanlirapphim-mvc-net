@@ -21,5 +21,10 @@
     <PackageReference Include="ModelContextProtocol.AspNetCore" Version="1.4.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
   </ItemGroup>
-
+  <ItemGroup>
+    <Compile Remove="CinemaXNet.Tests/**" />
+    <Content Remove="CinemaXNet.Tests/**" />
+    <EmbeddedResource Remove="CinemaXNet.Tests/**" />
+    <None Remove="CinemaXNet.Tests/**" />
+  </ItemGroup>
 </Project>
