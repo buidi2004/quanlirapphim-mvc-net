@@ -1,3 +1,4 @@
+// AdminScannerController: Controller xu ly cac yeu cau HTTP va dieu huong cho AdminScanner
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using CinemaXNet.Application.Interfaces;
@@ -9,6 +10,7 @@ namespace CinemaXNet.Controllers;
 public class AdminScannerController(IScannerService scannerService) : Controller
 {
     [HttpGet("")]
+    // Xử lý logic và luồng thực thi cho phương thức Index
     public IActionResult Index()
     {
         ViewBag.PageTitle = "Quét vé Check-in";
@@ -16,6 +18,7 @@ public class AdminScannerController(IScannerService scannerService) : Controller
     }
 
     [HttpPost("api/scan")]
+    // Xử lý logic và luồng thực thi cho phương thức ScanTicket
     public async Task<IActionResult> ScanTicket([FromBody] ScanRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.TicketId))
@@ -24,25 +27,32 @@ public class AdminScannerController(IScannerService scannerService) : Controller
         }
 
         int ticketId = 0;
-        // Kiểm tra xem QR code có phải là chuỗi JSON do Mobile App tạo ra không
-        if (request.TicketId.Trim().StartsWith("{"))
+        string rawInput = request.TicketId.Trim();
+
+        // 1. Giải mã nếu là chuỗi JSON (Từ App Mobile)
+        if (rawInput.StartsWith("{"))
         {
             try
             {
-                var payload = System.Text.Json.JsonSerializer.Deserialize<System.Text.Json.Nodes.JsonObject>(request.TicketId);
-                if (payload != null && payload.ContainsKey("code"))
+                var payload = System.Text.Json.JsonSerializer.Deserialize<System.Text.Json.Nodes.JsonObject>(rawInput);
+                if (payload != null)
                 {
-                    ticketId = payload["code"]?.GetValue<int>() ?? 0;
+                    if (payload.ContainsKey("code")) ticketId = payload["code"]?.GetValue<int>() ?? 0;
+                    else if (payload.ContainsKey("ticketId")) ticketId = payload["ticketId"]?.GetValue<int>() ?? 0;
+                    else if (payload.ContainsKey("id")) ticketId = payload["id"]?.GetValue<int>() ?? 0;
                 }
             }
-            catch
-            {
-                // Fallback nếu JSON lỗi
-            }
+            catch { }
         }
-        else
+
+        // 2. Linh hoạt trích xuất số ID vé cho mọi định dạng (TICKET:105, CINEMAX-TICKET:105, URL, Số thuần)
+        if (ticketId <= 0)
         {
-            int.TryParse(request.TicketId, out ticketId);
+            var match = System.Text.RegularExpressions.Regex.Match(rawInput, @"\d+");
+            if (match.Success)
+            {
+                int.TryParse(match.Value, out ticketId);
+            }
         }
 
         if (ticketId <= 0)
@@ -70,6 +80,7 @@ public class AdminScannerController(IScannerService scannerService) : Controller
             success = true, 
             message = "Check-in thành công!", 
             detail = new {
+                ticketId = ticketId,
                 movie = ticket.MovieTitle,
                 time = ticket.start_time,
                 room = ticket.RoomName,

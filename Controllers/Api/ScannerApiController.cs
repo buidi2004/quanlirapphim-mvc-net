@@ -1,3 +1,4 @@
+// ScannerApiController: Controller xu ly cac yeu cau HTTP va dieu huong cho ScannerApi
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using CinemaXNet.Application.Interfaces;
@@ -10,6 +11,7 @@ namespace CinemaXNet.Controllers.Api;
 public class ScannerApiController(IScannerService scannerService) : ControllerBase
 {
     [HttpPost("scan")]
+    // Xử lý logic và luồng thực thi cho phương thức ScanTicket
     public async Task<IActionResult> ScanTicket([FromBody] ScanRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.TicketId))
@@ -17,23 +19,7 @@ public class ScannerApiController(IScannerService scannerService) : ControllerBa
             return BadRequest(new { success = false, message = "Mã vé không hợp lệ." });
         }
 
-        int ticketId = 0;
-        if (request.TicketId.Trim().StartsWith("{"))
-        {
-            try
-            {
-                var payload = System.Text.Json.JsonSerializer.Deserialize<System.Text.Json.Nodes.JsonObject>(request.TicketId);
-                if (payload != null && payload.ContainsKey("code"))
-                {
-                    ticketId = payload["code"]?.GetValue<int>() ?? 0;
-                }
-            }
-            catch { }
-        }
-        else
-        {
-            int.TryParse(request.TicketId, out ticketId);
-        }
+        int ticketId = ExtractTicketId(request.TicketId);
 
         if (ticketId <= 0)
         {
@@ -69,28 +55,13 @@ public class ScannerApiController(IScannerService scannerService) : ControllerBa
     }
 
     [HttpPost("scan-concession")]
+    // Xử lý logic và luồng thực thi cho phương thức ScanConcession
     public async Task<IActionResult> ScanConcession([FromBody] ScanRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.TicketId))
             return BadRequest(new { success = false, message = "Mã vé không hợp lệ." });
 
-        int ticketId = 0;
-        if (request.TicketId.Trim().StartsWith("{"))
-        {
-            try
-            {
-                var payload = System.Text.Json.JsonSerializer.Deserialize<System.Text.Json.Nodes.JsonObject>(request.TicketId);
-                if (payload != null && payload.ContainsKey("code"))
-                {
-                    ticketId = payload["code"]?.GetValue<int>() ?? 0;
-                }
-            }
-            catch { }
-        }
-        else
-        {
-            int.TryParse(request.TicketId, out ticketId);
-        }
+        int ticketId = ExtractTicketId(request.TicketId);
 
         if (ticketId <= 0)
             return BadRequest(new { success = false, message = "Mã vé không hợp lệ hoặc sai định dạng." });
@@ -119,5 +90,36 @@ public class ScannerApiController(IScannerService scannerService) : ControllerBa
                 seat = ticket.seat_code
             }
         });
+    }
+
+    private static int ExtractTicketId(string? input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return 0;
+        var rawInput = input.Trim();
+
+        // 1. Giải mã nếu là chuỗi JSON (Từ App Mobile)
+        if (rawInput.StartsWith("{"))
+        {
+            try
+            {
+                var payload = System.Text.Json.JsonSerializer.Deserialize<System.Text.Json.Nodes.JsonObject>(rawInput);
+                if (payload != null)
+                {
+                    if (payload.ContainsKey("code")) return payload["code"]?.GetValue<int>() ?? 0;
+                    if (payload.ContainsKey("ticketId")) return payload["ticketId"]?.GetValue<int>() ?? 0;
+                    if (payload.ContainsKey("id")) return payload["id"]?.GetValue<int>() ?? 0;
+                }
+            }
+            catch { }
+        }
+
+        // 2. Trích xuất ID số nguyên từ mọi định dạng (CINEMAX-TICKET:105, TICKET-105, URL...)
+        var match = System.Text.RegularExpressions.Regex.Match(rawInput, @"\d+");
+        if (match.Success && int.TryParse(match.Value, out int ticketId))
+        {
+            return ticketId;
+        }
+
+        return 0;
     }
 }
