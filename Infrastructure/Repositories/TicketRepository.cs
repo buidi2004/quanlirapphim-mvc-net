@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using System.Text;
 using CinemaXNet.Domain.Entities;
 using CinemaXNet.Application.Interfaces;
@@ -6,8 +6,10 @@ using Dapper;
 
 namespace CinemaXNet.Infrastructure.Repositories;
 
+// TicketRepository: Đảm nhận các truy vấn phức tạp nhất về Vé, Sơ đồ ghế và Khóa cơ chế lạc quan (Optimistic Concurrency Control)
 public class TicketRepository(IDbConnection db) : ITicketRepository
 {
+    // Kiểm tra xem trong các mã ghế truyền vào, có ghế nào đang bị chiếm ('holding' hoặc 'paid') hay không
     public async Task<IEnumerable<string>> GetActiveSeatsAsync(int showtimeId, IEnumerable<string> seatCodes)
     {
         var codes = seatCodes.ToList();
@@ -21,6 +23,7 @@ public class TicketRepository(IDbConnection db) : ITicketRepository
         return await db.QueryAsync<string>(sql, new { showtimeId, codes });
     }
 
+    // Lấy toàn bộ sơ đồ ghế đang có người đặt/giữ của một Suất chiếu (Trả về Dictionary { "A1": "paid", "A2": "holding" })
     public async Task<IDictionary<string, string>> GetActiveTicketsAsync(int showtimeId)
     {
         const string sql = @"
@@ -33,6 +36,7 @@ public class TicketRepository(IDbConnection db) : ITicketRepository
         );
     }
 
+    // Đếm số lượng vé đã đặt cho danh sách nhiều suất chiếu cùng lúc
     public async Task<IDictionary<int, int>> GetActiveTicketCountsAsync(IEnumerable<int> showtimeIds)
     {
         var ids = showtimeIds.ToList();
@@ -50,6 +54,7 @@ public class TicketRepository(IDbConnection db) : ITicketRepository
         );
     }
 
+    // Tạo bản ghi giữ chỗ tạm thời cho vé
     public async Task<int> CreateAsync(Ticket ticket, System.Data.IDbTransaction? transaction = null)
     {
         const string sql = @"
@@ -59,6 +64,7 @@ public class TicketRepository(IDbConnection db) : ITicketRepository
         return await db.ExecuteScalarAsync<int>(sql, ticket, transaction);
     }
 
+    // Tìm vé theo ID
     public async Task<Ticket?> FindByIdAsync(int id, System.Data.IDbTransaction? transaction = null)
     {
         const string sql = @"
@@ -69,6 +75,8 @@ public class TicketRepository(IDbConnection db) : ITicketRepository
         return await db.QueryFirstOrDefaultAsync<Ticket>(sql, new { id }, transaction);
     }
 
+    // Cập nhật trạng thái vé có kiểm tra Cột Version (Optimistic Concurrency Control)
+    // Đảm bảo nếu phiên vé bị thay đổi bởi request khác trong lúc đang thanh toán -> UPDATE sẽ trả về 0 dòng -> Báo lỗi xung đột
     public async Task<int> UpdateStatusWithVersionAsync(
         int id, string newStatus, int expectedVersion,
         decimal? totalPrice = null, string? promotionCode = null, System.Data.IDbTransaction? transaction = null)
@@ -103,6 +111,7 @@ public class TicketRepository(IDbConnection db) : ITicketRepository
         return await db.ExecuteAsync(sql.ToString(), param, transaction);
     }
 
+    // Cập nhật trạng thái cho nhiều vé cùng lúc trong 1 Transaction
     public async Task<int> UpdateMultipleStatusesWithVersionAsync(
         IEnumerable<int> ids, string newStatus, 
         decimal? individualPrice = null, string? promotionCode = null, System.Data.IDbTransaction? transaction = null)
@@ -136,10 +145,10 @@ public class TicketRepository(IDbConnection db) : ITicketRepository
 
         sql.Append(" WHERE id IN @ids");
 
-        // The caller will check if the affected rows matches the count of ids.
         return await db.ExecuteAsync(sql.ToString(), param, transaction);
     }
 
+    // Hàm tự động nhả các vé giữ chỗ hết hạn (Dùng bởi Background Worker Service)
     public async Task<IEnumerable<(int ShowtimeId, string SeatCode)>> CancelExpiredHoldsAsync()
     {
         var nowStr = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
@@ -161,6 +170,7 @@ public class TicketRepository(IDbConnection db) : ITicketRepository
         return expired;
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức FindByUserIdAsync
     public async Task<IEnumerable<dynamic>> FindByUserIdAsync(int userId)
     {
         const string sql = @"
@@ -173,6 +183,7 @@ public class TicketRepository(IDbConnection db) : ITicketRepository
         return await db.QueryAsync(sql, new { userId });
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức GetUserTicketStatsAsync
     public async Task<(int TotalTickets, int TotalMovies)> GetUserTicketStatsAsync(int userId)
     {
         var sql = """
@@ -186,6 +197,7 @@ public class TicketRepository(IDbConnection db) : ITicketRepository
                 result?.TotalMovies == null ? 0 : (int)result.TotalMovies);
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức GetUserTransactionsAsync
     public async Task<IEnumerable<dynamic>> GetUserTransactionsAsync(int userId, string? status)
     {
         var sql = """
@@ -215,6 +227,7 @@ public class TicketRepository(IDbConnection db) : ITicketRepository
         return await db.QueryAsync(sql, param);
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức GetShowtimeByTicketIdAsync
     public async Task<Showtime?> GetShowtimeByTicketIdAsync(int ticketId)
     {
         const string sql = @"
@@ -238,6 +251,7 @@ public class TicketRepository(IDbConnection db) : ITicketRepository
         return result.FirstOrDefault();
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức GetTicketDetailAsync
     public async Task<CinemaXNet.Application.ViewModels.TicketDetailViewModel?> GetTicketDetailAsync(int ticketId, int userId)
     {
         var sql = """
@@ -267,6 +281,7 @@ public class TicketRepository(IDbConnection db) : ITicketRepository
         return result.FirstOrDefault();
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức Items
     public async Task<(IEnumerable<dynamic> Items, int TotalCount)> GetAdminPaginatedTicketsAsync(int page, int pageSize)
     {
         var offset = (page - 1) * pageSize;
@@ -288,6 +303,7 @@ public class TicketRepository(IDbConnection db) : ITicketRepository
         return (items, count);
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức HasActiveTicketsForMovieAsync
     public async Task<bool> HasActiveTicketsForMovieAsync(int movieId)
     {
         var sql = @"
@@ -298,6 +314,7 @@ public class TicketRepository(IDbConnection db) : ITicketRepository
         return count > 0;
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức HasActiveTicketsForShowtimeAsync
     public async Task<bool> HasActiveTicketsForShowtimeAsync(int showtimeId)
     {
         var sql = @"
@@ -307,6 +324,7 @@ public class TicketRepository(IDbConnection db) : ITicketRepository
         return count > 0;
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức HasUserWatchedMovieAsync
     public async Task<bool> HasUserWatchedMovieAsync(int userId, int movieId)
     {
         var sql = @"

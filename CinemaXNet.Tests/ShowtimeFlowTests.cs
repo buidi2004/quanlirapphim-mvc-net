@@ -28,10 +28,10 @@ public class ShowtimeFlowTests : IClassFixture<WebApplicationFactory<Program>>
         
         // Tạo phim
         var movie = new Movie { Title = "Showtime E2E Test Movie", Status = "now_showing", DurationMinutes = 120, AgeRating = "P" };
-        var movieId = await movieService.CreateAsync(movie);
+        var movieId = await movieService.CreateMovieAsync(movie);
 
         // Tạo Rạp và Phòng
-        var cinema = new Cinema { Name = "Rạp E2E Test", Location = "Hà Nội", Province = "Hà Nội" };
+        var cinema = new Cinema { Name = "Rạp E2E Test", Address = "Hà Nội", Province = "Hà Nội" };
         var cinemaId = await cinemaService.CreateAsync(cinema);
         
         // Vì AddAsync của showtime lấy roomId, ta cần 1 hàm trong repo để tạo,

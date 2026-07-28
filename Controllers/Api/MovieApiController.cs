@@ -1,3 +1,4 @@
+// MovieApiController: Controller xu ly cac yeu cau HTTP va dieu huong cho MovieApi
 ﻿using CinemaXNet.Application.Interfaces;
 using CinemaXNet.Application.Responses;
 using CinemaXNet.Application.DTOs;
@@ -24,6 +25,7 @@ public class MovieApiController(IMovieService movieService, IReviewRepository re
 
 
     [HttpGet("{id}")]
+    // Xử lý logic và luồng thực thi cho phương thức GetMovieDetail
     public async Task<IActionResult> GetMovieDetail(int id, string? date = null)
     {
         var movie = await movieService.GetDetailAsync(id);
@@ -37,6 +39,7 @@ public class MovieApiController(IMovieService movieService, IReviewRepository re
     }
 
     [HttpGet("{id}/showtimes")]
+    // Xử lý logic và luồng thực thi cho phương thức GetMovieShowtimes
     public async Task<IActionResult> GetMovieShowtimes(int id, string? date = null)
     {
         var showDate = DateOnly.TryParse(date, out var d) ? d : DateOnly.FromDateTime(DateTime.Today);
@@ -52,6 +55,7 @@ public class MovieApiController(IMovieService movieService, IReviewRepository re
 
     [HttpPost("{id}/reviews")]
     [Authorize]
+    // Xử lý logic và luồng thực thi cho phương thức AddReview
     public async Task<IActionResult> AddReview(int id, [FromBody] ReviewRequest req)
     {
         var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

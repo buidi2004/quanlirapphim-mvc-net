@@ -1,3 +1,4 @@
+// ApiResponse: Thanh phan ma nguon xu ly logic trong he thong CinemaX
 ﻿namespace CinemaXNet.Application.Responses;
 
 public class ApiResponse<T>

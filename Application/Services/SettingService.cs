@@ -1,10 +1,12 @@
+// SettingService: Service xu ly cac logic nghiep vu (Business Logic) cho Setting
 ﻿using Microsoft.AspNetCore.Http;
 using CinemaXNet.Application.Interfaces;
 
 namespace CinemaXNet.Application.Services;
 
-public class SettingService(ISettingRepository settingRepository) : ISettingService
+public class SettingService(ISettingRepository settingRepository, IImageUploadService imageUploadService) : ISettingService
 {
+    // Xử lý logic và luồng thực thi cho phương thức GetAllSettingsAsync
     public async Task<Dictionary<string, string>> GetAllSettingsAsync()
     {
         var rows = await settingRepository.GetAllAsync();
@@ -16,6 +18,7 @@ public class SettingService(ISettingRepository settingRepository) : ISettingServ
         return settings;
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức SaveSettingsAsync
     public async Task SaveSettingsAsync(IFormCollection form, IFormFile? site_logo)
     {
         var settings = new Dictionary<string, string>();
@@ -29,17 +32,11 @@ public class SettingService(ISettingRepository settingRepository) : ISettingServ
 
         if (site_logo != null && site_logo.Length > 0)
         {
-            var ext = Path.GetExtension(site_logo.FileName).ToLowerInvariant();
-            var allowedExts = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
-            if (!allowedExts.Contains(ext))
-                throw new InvalidOperationException("Chỉ chấp nhận file ảnh (jpg, png, gif, webp).");
-            var newName = $"logo_{Guid.NewGuid():N}{ext}";
-            var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "settings");
-            Directory.CreateDirectory(uploadDir);
-            var filePath = Path.Combine(uploadDir, newName);
-            await using var stream = System.IO.File.Create(filePath);
-            await site_logo.CopyToAsync(stream);
-            settings["site_logo"] = "/uploads/settings/" + newName;
+            var logoUrl = await imageUploadService.UploadImageAsync(site_logo, "settings");
+            if (logoUrl != null)
+            {
+                settings["site_logo"] = logoUrl;
+            }
         }
 
         foreach (var kvp in settings)

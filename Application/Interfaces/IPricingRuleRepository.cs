@@ -1,3 +1,4 @@
+// IPricingRuleRepository: Interface dinh nghia cac phuong thuc Hop dong cho IPricingRule
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 

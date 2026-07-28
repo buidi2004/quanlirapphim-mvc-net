@@ -1,3 +1,4 @@
+// IUserService: Interface dinh nghia cac phuong thuc Hop dong cho IUser
 using CinemaXNet.Domain.Entities;
 
 namespace CinemaXNet.Application.Interfaces;

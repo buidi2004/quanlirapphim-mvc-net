@@ -1,3 +1,4 @@
+// AdminNewsController: Controller xu ly cac yeu cau HTTP va dieu huong cho AdminNews
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using CinemaXNet.Application.Interfaces;
@@ -9,6 +10,7 @@ namespace CinemaXNet.Controllers;
 public class AdminNewsController(INewsService newsService) : Controller
 {
     [HttpGet]
+    // Xử lý logic và luồng thực thi cho phương thức Index
     public async Task<IActionResult> Index(int page = 1)
     {
         int pageSize = 10;
@@ -20,6 +22,7 @@ public class AdminNewsController(INewsService newsService) : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    // Xử lý logic và luồng thực thi cho phương thức Store
     public async Task<IActionResult> Store(string title, string excerpt, string content, IFormFile? image)
     {
         try
@@ -36,6 +39,7 @@ public class AdminNewsController(INewsService newsService) : Controller
 
     [HttpPost("update")]
     [ValidateAntiForgeryToken]
+    // Xử lý logic và luồng thực thi cho phương thức Update
     public async Task<IActionResult> Update(int id, string title, string excerpt, string content, IFormFile? image)
     {
         try
@@ -52,6 +56,7 @@ public class AdminNewsController(INewsService newsService) : Controller
 
     [HttpPost("delete")]
     [ValidateAntiForgeryToken]
+    // Xử lý logic và luồng thực thi cho phương thức Delete
     public async Task<IActionResult> Delete(int id)
     {
         try

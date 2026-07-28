@@ -1,3 +1,4 @@
+// UserService: Service xu ly cac logic nghiep vu (Business Logic) cho User
 using CinemaXNet.Domain.Exceptions;
 using CinemaXNet.Domain.Entities;
 using CinemaXNet.Application.Interfaces;
@@ -6,6 +7,7 @@ namespace CinemaXNet.Application.Services;
 
 public class UserService(IUserRepository userRepo, IEmailSender emailSender) : IUserService
 {
+    // Xử lý logic và luồng thực thi cho phương thức AuthenticateAsync
     public async Task<User> AuthenticateAsync(string email, string password)
     {
         var user = await userRepo.FindByEmailAsync(email) ?? await userRepo.FindByUsernameAsync(email);
@@ -14,6 +16,7 @@ public class UserService(IUserRepository userRepo, IEmailSender emailSender) : I
         return user;
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức RegisterAsync
     public async Task<User> RegisterAsync(string username, string email, string password, string fullName = "", string phone = "")
     {
         var existing = await userRepo.FindByEmailAsync(email);
@@ -34,16 +37,19 @@ public class UserService(IUserRepository userRepo, IEmailSender emailSender) : I
         return await userRepo.FindByIdAsync(id) ?? throw new BusinessException("Lỗi tạo tài khoản.");
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức GetByIdAsync
     public async Task<User> GetByIdAsync(int userId)
     {
         var user = await userRepo.FindByIdAsync(userId);
         return user ?? throw new NotFoundException("Không tìm thấy người dùng.");
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức UpdateProfileAsync
     public async Task UpdateProfileAsync(int userId, string? fullName, string? phone,
                                    string? dateOfBirth, string gender, string? city, string? avatarUrl) =>
         await userRepo.UpdateProfileAsync(userId, fullName, phone, dateOfBirth, gender, city, avatarUrl);
 
+    // Xử lý logic và luồng thực thi cho phương thức ChangePasswordAsync
     public async Task ChangePasswordAsync(int userId, string currentPassword, string newPassword)
     {
         var user = await userRepo.FindByIdAsync(userId)
@@ -59,6 +65,7 @@ public class UserService(IUserRepository userRepo, IEmailSender emailSender) : I
         await userRepo.UpdatePasswordAsync(userId, newHash);
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức ForgotPasswordAsync
     public async Task ForgotPasswordAsync(string email)
     {
         var user = await userRepo.FindByEmailAsync(email);
@@ -75,6 +82,7 @@ public class UserService(IUserRepository userRepo, IEmailSender emailSender) : I
             $"Bạn đã yêu cầu đặt lại mật khẩu. Vui lòng click vào link sau: <a href='{link}'>{link}</a>");
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức ResetPasswordAsync
     public async Task ResetPasswordAsync(string token, string newPassword)
     {
         var user = await userRepo.FindByResetTokenAsync(token)
@@ -88,11 +96,13 @@ public class UserService(IUserRepository userRepo, IEmailSender emailSender) : I
         await userRepo.ClearResetTokenAsync(user.Id);
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức SaveRefreshTokenAsync
     public async Task SaveRefreshTokenAsync(int userId, string? token, string? expiry)
     {
         await userRepo.UpdateRefreshTokenAsync(userId, token, expiry);
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức ValidateRefreshTokenAsync
     public async Task<User> ValidateRefreshTokenAsync(string token)
     {
         var user = await userRepo.FindByRefreshTokenAsync(token);
@@ -101,6 +111,7 @@ public class UserService(IUserRepository userRepo, IEmailSender emailSender) : I
         return user;
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức GetPaginatedUsersAsync
     public async Task<CinemaXNet.Application.ViewModels.PaginatedList<dynamic>> GetPaginatedUsersAsync(int page, int pageSize)
     {
         int limit = pageSize;
@@ -110,10 +121,12 @@ public class UserService(IUserRepository userRepo, IEmailSender emailSender) : I
         return new CinemaXNet.Application.ViewModels.PaginatedList<dynamic>(users.ToList(), count, page, pageSize);
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức UpdateRoleAsync
     public async Task UpdateRoleAsync(int userId, string role) => await userRepo.UpdateRoleAsync(userId, role);
 
     public async Task DeleteAccountAsync(int userId) => await userRepo.DeleteAsync(userId);
 
+    // Xử lý logic và luồng thực thi cho phương thức FindByEmailAsync
     public Task<User?> FindByEmailAsync(string email) => userRepo.FindByEmailAsync(email);
 
     public Task RecalculateMemberTierAsync(int userId, System.Data.IDbTransaction? transaction = null) => 

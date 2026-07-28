@@ -1,3 +1,4 @@
+// AdminRefundsController: Controller xu ly cac yeu cau HTTP va dieu huong cho AdminRefunds
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using CinemaXNet.Application.Interfaces;
@@ -9,6 +10,7 @@ namespace CinemaXNet.Controllers;
 public class AdminRefundsController(IRefundService refundService) : Controller
 {
     [HttpGet("")]
+    // Xử lý logic và luồng thực thi cho phương thức Index
     public IActionResult Index()
     {
         ViewBag.PageTitle = "Quản lý Hoàn / Hủy vé";
@@ -16,6 +18,7 @@ public class AdminRefundsController(IRefundService refundService) : Controller
     }
 
     [HttpGet("api/search")]
+    // Xử lý logic và luồng thực thi cho phương thức SearchTickets
     public async Task<IActionResult> SearchTickets([FromQuery] string query)
     {
         if (string.IsNullOrWhiteSpace(query))
@@ -28,6 +31,7 @@ public class AdminRefundsController(IRefundService refundService) : Controller
     }
 
     [HttpPost("api/cancel")]
+    // Xử lý logic và luồng thực thi cho phương thức CancelTicket
     public async Task<IActionResult> CancelTicket([FromBody] CancelRequest request)
     {
         if (request.TicketId <= 0)

@@ -1,3 +1,4 @@
+// IBannerRepository: Interface dinh nghia cac phuong thuc Hop dong cho IBanner
 ﻿namespace CinemaXNet.Application.Interfaces;
 
 public interface IBannerRepository

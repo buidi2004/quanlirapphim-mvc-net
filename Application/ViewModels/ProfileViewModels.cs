@@ -1,3 +1,4 @@
+// ProfileViewModels: Model dong goi du lieu truyen tai giua Controller va View/API
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace CinemaXNet.Application.ViewModels;

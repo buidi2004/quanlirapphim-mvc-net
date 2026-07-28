@@ -1,3 +1,4 @@
+// IFoodBeverageRepository: Interface dinh nghia cac phuong thuc Hop dong cho IFoodBeverage
 ﻿using CinemaXNet.Domain.Entities;
 
 namespace CinemaXNet.Application.Interfaces;

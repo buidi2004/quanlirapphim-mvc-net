@@ -1,3 +1,4 @@
+// IRefundService: Interface dinh nghia cac phuong thuc Hop dong cho IRefund
 ﻿namespace CinemaXNet.Application.Interfaces;
 
 public interface IRefundService

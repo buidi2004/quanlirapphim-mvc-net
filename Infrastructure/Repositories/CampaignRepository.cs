@@ -1,3 +1,4 @@
+// CampaignRepository: Repository dam nhan cac thao tac truy van Database cho Campaign
 ﻿using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
@@ -8,12 +9,14 @@ namespace CinemaXNet.Infrastructure.Repositories;
 
 public class CampaignRepository(IDbConnection db) : ICampaignRepository
 {
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức GetAllAsync
     public async Task<IEnumerable<dynamic>> GetAllAsync(int limit, int offset)
     {
         var sql = "SELECT * FROM marketing_campaigns ORDER BY id DESC LIMIT @limit OFFSET @offset";
         return await db.QueryAsync<dynamic>(sql, new { limit, offset });
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức GetCountAsync
     public Task<int> GetCountAsync() => db.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM marketing_campaigns");
 
     public Task CreateAsync(dynamic campaign)

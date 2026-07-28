@@ -1,10 +1,11 @@
+// NewsService: Service xu ly cac logic nghiep vu (Business Logic) cho News
 ﻿using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Http;
 using CinemaXNet.Application.Interfaces;
 
 namespace CinemaXNet.Application.Services;
 
-public class NewsService(INewsRepository newsRepository) : INewsService
+public class NewsService(INewsRepository newsRepository, IImageUploadService imageUploadService) : INewsService
 {
     private string CreateSlug(string title)
     {
@@ -14,26 +15,12 @@ public class NewsService(INewsRepository newsRepository) : INewsService
         return slug;
     }
 
-    private static readonly string[] AllowedImageExts = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
-
     private async Task<string?> UploadImageAsync(IFormFile? image)
     {
-        if (image != null && image.Length > 0)
-        {
-            var ext = Path.GetExtension(image.FileName).ToLowerInvariant();
-            if (!AllowedImageExts.Contains(ext))
-                throw new InvalidOperationException("Chỉ chấp nhận file ảnh (jpg, png, gif, webp).");
-            var newName = $"{Guid.NewGuid():N}{ext}";
-            var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "news");
-            Directory.CreateDirectory(uploadDir);
-            var filePath = Path.Combine(uploadDir, newName);
-            await using var stream = System.IO.File.Create(filePath);
-            await image.CopyToAsync(stream);
-            return "/uploads/news/" + newName;
-        }
-        return null;
+        return await imageUploadService.UploadImageAsync(image, "news");
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức NewsList
     public async Task<(IEnumerable<dynamic> NewsList, int TotalPages)> GetAllNewsAsync(int page = 1, int pageSize = 10)
     {
         int totalCount = await newsRepository.GetTotalCountAsync();
@@ -45,6 +32,7 @@ public class NewsService(INewsRepository newsRepository) : INewsService
         return (newsList, totalPages);
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức AddNewsAsync
     public async Task AddNewsAsync(string title, string excerpt, string content, IFormFile? image)
     {
         string slug = CreateSlug(title);
@@ -52,6 +40,7 @@ public class NewsService(INewsRepository newsRepository) : INewsService
         await newsRepository.AddAsync(title, slug, excerpt, content, imageUrl);
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức UpdateNewsAsync
     public async Task UpdateNewsAsync(int id, string title, string excerpt, string content, IFormFile? image)
     {
         string slug = CreateSlug(title);
@@ -59,6 +48,7 @@ public class NewsService(INewsRepository newsRepository) : INewsService
         await newsRepository.UpdateAsync(id, title, slug, excerpt, content, imageUrl);
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức DeleteNewsAsync
     public async Task DeleteNewsAsync(int id)
     {
         await newsRepository.DeleteAsync(id);

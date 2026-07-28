@@ -1,3 +1,4 @@
+// IMovieRepository: Interface dinh nghia cac phuong thuc Hop dong cho IMovie
 ﻿using CinemaXNet.Domain.Entities;
 using CinemaXNet.Application.ViewModels;
 

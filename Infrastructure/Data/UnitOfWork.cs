@@ -1,3 +1,4 @@
+// UnitOfWork: Thanh phan ma nguon xu ly logic trong he thong CinemaX
 ﻿using System.Data;
 using CinemaXNet.Application.Interfaces;
 

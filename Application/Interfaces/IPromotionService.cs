@@ -1,3 +1,4 @@
+// IPromotionService: Interface dinh nghia cac phuong thuc Hop dong cho IPromotion
 ﻿using CinemaXNet.Domain.ValueObjects;
 using CinemaXNet.Application.ViewModels;
 using System.Threading.Tasks;

@@ -168,10 +168,10 @@
         }
     </div>
 
-    @if (Model.Status != "now_showing")
+    @if (Model.Status == "ended")
     {
         <div class="text-center py-5">
-            <h5 class="fw-normal">Phim hiện không ở trạng thái "Đang chiếu" nên không có suất chiếu.</h5>
+            <h5 class="fw-normal">Phim đã kết thúc chiếu nên không còn suất chiếu.</h5>
         </div>
     }
     else if (!Model.Showtimes.Any())

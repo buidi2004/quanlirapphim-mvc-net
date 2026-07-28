@@ -1,3 +1,4 @@
+// AdminRoomsController: Controller xu ly cac yeu cau HTTP va dieu huong cho AdminRooms
 using CinemaXNet.Application.Interfaces;
 using CinemaXNet.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
@@ -13,6 +14,7 @@ namespace CinemaXNet.Controllers;
 public class AdminRoomsController(IRoomService roomService, ILogger<AdminRoomsController> logger) : Controller
 {
     [HttpGet]
+    // Xử lý logic và luồng thực thi cho phương thức Index
     public async Task<IActionResult> Index(int page = 1)
     {
         int pageSize = 10;
@@ -30,6 +32,7 @@ public class AdminRoomsController(IRoomService roomService, ILogger<AdminRoomsCo
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    // Xử lý logic và luồng thực thi cho phương thức Store
     public async Task<IActionResult> Store(int cinemaId, string name, int totalRows, int seatsPerRow)
     {
         try
@@ -59,6 +62,7 @@ public class AdminRoomsController(IRoomService roomService, ILogger<AdminRoomsCo
 
     [HttpPost("update")]
     [ValidateAntiForgeryToken]
+    // Xử lý logic và luồng thực thi cho phương thức Update
     public async Task<IActionResult> Update(int id, int cinemaId, string name, int totalRows, int seatsPerRow)
     {
         try
@@ -88,6 +92,7 @@ public class AdminRoomsController(IRoomService roomService, ILogger<AdminRoomsCo
 
     [HttpPost("delete")]
     [ValidateAntiForgeryToken]
+    // Xử lý logic và luồng thực thi cho phương thức Delete
     public async Task<IActionResult> Delete(int id)
     {
         try
@@ -116,6 +121,7 @@ public class AdminRoomsController(IRoomService roomService, ILogger<AdminRoomsCo
     }
 
     [HttpPost("api/builder/{id}")]
+    // Xử lý logic và luồng thực thi cho phương thức SaveLayout
     public async Task<IActionResult> SaveLayout(int id, [FromBody] LayoutSaveRequest request)
     {
         try

@@ -1,3 +1,4 @@
+// TicketController: Controller xu ly cac yeu cau HTTP va dieu huong cho Ticket
 ﻿using System.Data;
 using System.Security.Claims;
 using CinemaXNet.Domain.Entities;
@@ -13,6 +14,7 @@ namespace CinemaXNet.Controllers;
 public class TicketController(ITicketService ticketService) : Controller
 {
     [HttpGet("{id:int}")]
+    // Xử lý logic và luồng thực thi cho phương thức TicketDetail
     public async Task<IActionResult> TicketDetail(int id)
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);

@@ -1,3 +1,4 @@
+// PromotionRepository: Repository dam nhan cac thao tac truy van Database cho Promotion
 ﻿using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ namespace CinemaXNet.Infrastructure.Repositories;
 
 public class PromotionRepository(IDbConnection db) : IPromotionRepository
 {
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức FindByCodeAsync
     public async Task<Promotion?> FindByCodeAsync(string code)
     {
         const string sql = @"
@@ -18,12 +20,14 @@ public class PromotionRepository(IDbConnection db) : IPromotionRepository
         return await db.QueryFirstOrDefaultAsync<Promotion>(sql, new { code });
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức GetAllAsync
     public async Task<IEnumerable<dynamic>> GetAllAsync(int limit, int offset)
     {
         var sql = "SELECT * FROM promotions ORDER BY id DESC LIMIT @limit OFFSET @offset";
         return await db.QueryAsync<dynamic>(sql, new { limit, offset });
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức GetCountAsync
     public Task<int> GetCountAsync() => db.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM promotions");
 
     public Task CreateAsync(dynamic promo)
@@ -32,12 +36,14 @@ public class PromotionRepository(IDbConnection db) : IPromotionRepository
         return db.ExecuteAsync(sql, (object)promo);
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức UpdateAsync
     public Task UpdateAsync(dynamic promo)
     {
         var sql = "UPDATE promotions SET code = @Code, discount_type = @DiscountType, discount_value = @DiscountValue, max_uses = @MaxUses, expires_at = @ExpiresAt, is_active = @IsActive WHERE id = @Id";
         return db.ExecuteAsync(sql, (object)promo);
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức DeleteAsync
     public Task DeleteAsync(int id)
     {
         return db.ExecuteAsync("DELETE FROM promotions WHERE id = @Id", new { Id = id });

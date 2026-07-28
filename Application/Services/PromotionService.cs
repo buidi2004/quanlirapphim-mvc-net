@@ -1,3 +1,4 @@
+// PromotionService: Service xu ly cac logic nghiep vu (Business Logic) cho Promotion
 ﻿using CinemaXNet.Domain.Exceptions;
 using CinemaXNet.Domain.ValueObjects;
 using CinemaXNet.Application.Interfaces;
@@ -10,6 +11,7 @@ namespace CinemaXNet.Application.Services;
 
 public class PromotionService(IPromotionRepository promoRepo) : IPromotionService
 {
+    // Xử lý logic và luồng thực thi cho phương thức ApplyPromotionAsync
     public async Task<PromotionResult> ApplyPromotionAsync(string code, decimal subtotal)
     {
         var promo = await promoRepo.FindByCodeAsync(code.ToUpper().Trim());
@@ -38,12 +40,14 @@ public class PromotionService(IPromotionRepository promoRepo) : IPromotionServic
         };
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức ValidateCodeAsync
     public async Task<bool> ValidateCodeAsync(string code)
     {
         try { await ApplyPromotionAsync(code, 1); return true; }
         catch (BusinessException) { return false; }
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức GetPaginatedAsync
     public async Task<PaginatedList<dynamic>> GetPaginatedAsync(int page, int pageSize)
     {
         int limit = pageSize;
@@ -53,6 +57,7 @@ public class PromotionService(IPromotionRepository promoRepo) : IPromotionServic
         return new PaginatedList<dynamic>(promos.ToList(), count, page, pageSize);
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức CreateAsync
     public Task CreateAsync(dynamic promotion) => promoRepo.CreateAsync(promotion);
     public Task UpdateAsync(dynamic promotion) => promoRepo.UpdateAsync(promotion);
     public Task DeleteAsync(int id) => promoRepo.DeleteAsync(id);

@@ -1,9 +1,11 @@
+// ReviewService: Service xu ly cac logic nghiep vu (Business Logic) cho Review
 ﻿using CinemaXNet.Application.Interfaces;
 
 namespace CinemaXNet.Application.Services;
 
 public class ReviewService(IReviewRepository reviewRepository) : IReviewService
 {
+    // Xử lý logic và luồng thực thi cho phương thức Reviews
     public async Task<(IEnumerable<dynamic> Reviews, int TotalPages)> GetAllReviewsAsync(int page = 1, int pageSize = 10)
     {
         int totalCount = await reviewRepository.GetTotalReviewsCountAsync();
@@ -15,6 +17,7 @@ public class ReviewService(IReviewRepository reviewRepository) : IReviewService
         return (reviews, totalPages);
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức ToggleReviewStatusAsync
     public async Task<(bool Success, string Message)> ToggleReviewStatusAsync(int id)
     {
         var review = await reviewRepository.GetReviewByIdAsync(id);
@@ -29,6 +32,7 @@ public class ReviewService(IReviewRepository reviewRepository) : IReviewService
         return (false, "Không tìm thấy đánh giá.");
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức DeleteReviewAsync
     public async Task DeleteReviewAsync(int id)
     {
         await reviewRepository.DeleteReviewAsync(id);

@@ -1,3 +1,4 @@
+// ShowtimeService: Service xu ly cac logic nghiep vu (Business Logic) cho Showtime
 ﻿using CinemaXNet.Domain.Entities;
 using CinemaXNet.Application.Interfaces;
 
@@ -5,18 +6,23 @@ namespace CinemaXNet.Application.Services;
 
 public class ShowtimeService(IShowtimeRepository repository, ITicketRepository ticketRepository) : IShowtimeService
 {
+    // Xử lý logic và luồng thực thi cho phương thức FindByIdAsync
     public Task<Showtime?> FindByIdAsync(int id) => repository.FindByIdAsync(id);
     public Task<IEnumerable<Showtime>> GetByMovieAndDateAsync(int movieId, DateOnly date) => repository.GetByMovieAndDateAsync(movieId, date);
     public Task<IEnumerable<Showtime>> GetByCinemaAndDateAsync(int cinemaId, DateOnly date) => repository.GetByCinemaAndDateAsync(cinemaId, date);
+    // Xử lý logic và luồng thực thi cho phương thức GetAllByDateAsync
     public Task<IEnumerable<Showtime>> GetAllByDateAsync(DateOnly date) => repository.GetAllByDateAsync(date);
     
     public Task<(IEnumerable<Showtime> Items, int TotalCount)> GetPagedAsync(int page, int pageSize) => repository.GetPagedAsync(page, pageSize);
+    // Xử lý logic và luồng thực thi cho phương thức GetAllMoviesAsync
     public Task<IEnumerable<Movie>> GetAllMoviesAsync() => repository.GetAllMoviesAsync();
     public Task<IEnumerable<Room>> GetAllRoomsWithCinemaAsync() => repository.GetAllRoomsWithCinemaAsync();
     
+    // Xử lý logic và luồng thực thi cho phương thức AddAsync
     public async Task AddAsync(int movieId, int roomId, string showDate, string startTime, string format, decimal price) => 
         await repository.AddAsync(movieId, roomId, showDate, startTime, format, price);
         
+    // Xử lý logic và luồng thực thi cho phương thức UpdateAsync
     public async Task UpdateAsync(int id, int movieId, int roomId, string showDate, string startTime, string format, decimal price) => 
         await repository.UpdateAsync(id, movieId, roomId, showDate, startTime, format, price);
     public async Task DeleteAsync(int id)

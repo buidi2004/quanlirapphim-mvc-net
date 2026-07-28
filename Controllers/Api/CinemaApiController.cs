@@ -1,3 +1,4 @@
+// CinemaApiController: Controller xu ly cac yeu cau HTTP va dieu huong cho CinemaApi
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ namespace CinemaXNet.Controllers.Api;
 public class CinemaApiController(ICinemaService cinemaService) : ControllerBase
 {
     [HttpGet("")]
+    // Xử lý logic và luồng thực thi cho phương thức GetCinemas
     public async Task<IActionResult> GetCinemas(string? province = null)
     {
         var cinemas = await cinemaService.GetAllAsync(province);
@@ -25,6 +27,7 @@ public class CinemaApiController(ICinemaService cinemaService) : ControllerBase
     }
 
     [HttpGet("provinces")]
+    // Xử lý logic và luồng thực thi cho phương thức GetProvinces
     public async Task<IActionResult> GetProvinces()
     {
         var provinces = await cinemaService.GetAllProvincesAsync();
@@ -32,6 +35,7 @@ public class CinemaApiController(ICinemaService cinemaService) : ControllerBase
     }
 
     [HttpGet("nearest")]
+    // Xử lý logic và luồng thực thi cho phương thức GetNearestCinemas
     public async Task<IActionResult> GetNearestCinemas(double lat, double lng, int limit = 3)
     {
         var cinemas = await cinemaService.FindNearestAsync(lat, lng, limit);
@@ -45,6 +49,7 @@ public class CinemaApiController(ICinemaService cinemaService) : ControllerBase
     }
 
     [HttpGet("{id}/showtimes")]
+    // Xử lý logic và luồng thực thi cho phương thức GetCinemaShowtimes
     public async Task<IActionResult> GetCinemaShowtimes(int id, string? date = null)
     {
         var showDate = DateOnly.TryParse(date, out var d) ? d : DateOnly.FromDateTime(DateTime.Today);
@@ -78,6 +83,7 @@ public class CinemaApiController(ICinemaService cinemaService) : ControllerBase
     }
 
     [HttpGet("global-showtimes")]
+    // Xử lý logic và luồng thực thi cho phương thức GetGlobalShowtimes
     public async Task<IActionResult> GetGlobalShowtimes(string? date = null)
     {
         var showDate = DateOnly.TryParse(date, out var d) ? d : DateOnly.FromDateTime(DateTime.Today);

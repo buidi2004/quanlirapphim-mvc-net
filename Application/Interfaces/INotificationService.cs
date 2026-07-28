@@ -1,3 +1,4 @@
+// INotificationService: Interface dinh nghia cac phuong thuc Hop dong cho INotification
 ﻿namespace CinemaXNet.Application.Interfaces;
 
 public interface INotificationService

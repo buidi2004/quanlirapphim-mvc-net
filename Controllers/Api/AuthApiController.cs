@@ -1,3 +1,4 @@
+// AuthApiController: Controller xu ly cac yeu cau HTTP va dieu huong cho AuthApi
 ﻿using CinemaXNet.Domain.Exceptions;
 using CinemaXNet.Application.Interfaces;
 using CinemaXNet.Application.Responses;
@@ -13,6 +14,7 @@ namespace CinemaXNet.Controllers.Api;
 public class AuthApiController(IUserService userService, IJwtService jwtService) : ControllerBase
 {
     [HttpPost("login")]
+    // Xử lý logic và luồng thực thi cho phương thức Login
     public async Task<IActionResult> Login([FromBody] LoginRequest req)
     {
         var user = await userService.AuthenticateAsync(req.Email, req.Password);
@@ -26,6 +28,7 @@ public class AuthApiController(IUserService userService, IJwtService jwtService)
     }
 
     [HttpPost("register")]
+    // Xử lý logic và luồng thực thi cho phương thức Register
     public async Task<IActionResult> Register([FromBody] RegisterRequest req)
     {
         var user = await userService.RegisterAsync(req.Username, req.Email, req.Password, req.FullName, req.Phone);
@@ -39,6 +42,7 @@ public class AuthApiController(IUserService userService, IJwtService jwtService)
     }
     
     [HttpPost("refresh-token")]
+    // Xử lý logic và luồng thực thi cho phương thức RefreshToken
     public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest req)
     {
         var user = await userService.ValidateRefreshTokenAsync(req.RefreshToken);
@@ -53,6 +57,7 @@ public class AuthApiController(IUserService userService, IJwtService jwtService)
 
     [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpGet("profile")]
+    // Xử lý logic và luồng thực thi cho phương thức GetProfile
     public async Task<IActionResult> GetProfile()
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -63,6 +68,7 @@ public class AuthApiController(IUserService userService, IJwtService jwtService)
 
     [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpPut("profile")]
+    // Xử lý logic và luồng thực thi cho phương thức UpdateProfile
     public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequest req)
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -73,6 +79,7 @@ public class AuthApiController(IUserService userService, IJwtService jwtService)
     
     [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpPost("change-password")]
+    // Xử lý logic và luồng thực thi cho phương thức ChangePassword
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest req)
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -81,6 +88,7 @@ public class AuthApiController(IUserService userService, IJwtService jwtService)
     }
     [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpPost("logout")]
+    // Xử lý logic và luồng thực thi cho phương thức Logout
     public async Task<IActionResult> Logout()
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -89,6 +97,7 @@ public class AuthApiController(IUserService userService, IJwtService jwtService)
     }
 
     [HttpPost("forgot-password")]
+    // Xử lý logic và luồng thực thi cho phương thức ForgotPassword
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest req)
     {
         await userService.ForgotPasswordAsync(req.Email);
@@ -97,6 +106,7 @@ public class AuthApiController(IUserService userService, IJwtService jwtService)
     }
 
     [HttpPost("reset-password")]
+    // Xử lý logic và luồng thực thi cho phương thức ResetPassword
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest req)
     {
         await userService.ResetPasswordAsync(req.Token, req.NewPassword);
@@ -105,6 +115,7 @@ public class AuthApiController(IUserService userService, IJwtService jwtService)
 
     [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpDelete("delete-account")]
+    // Xử lý logic và luồng thực thi cho phương thức DeleteAccount
     public async Task<IActionResult> DeleteAccount()
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -114,6 +125,7 @@ public class AuthApiController(IUserService userService, IJwtService jwtService)
 
     [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpPost("upload-avatar")]
+    // Xử lý logic và luồng thực thi cho phương thức UploadAvatar
     public async Task<IActionResult> UploadAvatar(IFormFile file)
     {
         if (file == null || file.Length == 0) 

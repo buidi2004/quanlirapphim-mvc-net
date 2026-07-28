@@ -1,3 +1,4 @@
+// IReviewRepository: Interface dinh nghia cac phuong thuc Hop dong cho IReview
 ﻿using CinemaXNet.Domain.Entities;
 
 namespace CinemaXNet.Application.Interfaces;

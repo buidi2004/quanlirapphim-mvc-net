@@ -1,3 +1,4 @@
+// MappingProfile: Thanh phan ma nguon xu ly logic trong he thong CinemaX
 ﻿using AutoMapper;
 using CinemaXNet.Domain.Entities;
 using CinemaXNet.Application.DTOs;

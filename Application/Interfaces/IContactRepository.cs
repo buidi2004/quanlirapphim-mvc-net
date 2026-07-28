@@ -1,3 +1,4 @@
+// IContactRepository: Interface dinh nghia cac phuong thuc Hop dong cho IContact
 ﻿namespace CinemaXNet.Application.Interfaces;
 
 public interface IContactRepository

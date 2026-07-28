@@ -1,3 +1,4 @@
+// AdminShowtimesController: Controller xu ly cac yeu cau HTTP va dieu huong cho AdminShowtimes
 ﻿using CinemaXNet.Application.Interfaces;
 using CinemaXNet.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
@@ -10,6 +11,7 @@ namespace CinemaXNet.Controllers;
 public class AdminShowtimesController(IShowtimeService showtimeService) : Controller
 {
     [HttpGet]
+    // Xử lý logic và luồng thực thi cho phương thức Index
     public async Task<IActionResult> Index(int page = 1)
     {
         int pageSize = 10;
@@ -26,6 +28,7 @@ public class AdminShowtimesController(IShowtimeService showtimeService) : Contro
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    // Xử lý logic và luồng thực thi cho phương thức Store
     public async Task<IActionResult> Store(int movieId, int roomId, string showDate, string startTime, string format, decimal price)
     {
         try
@@ -42,6 +45,7 @@ public class AdminShowtimesController(IShowtimeService showtimeService) : Contro
 
     [HttpPost("update")]
     [ValidateAntiForgeryToken]
+    // Xử lý logic và luồng thực thi cho phương thức Update
     public async Task<IActionResult> Update(int id, int movieId, int roomId, string showDate, string startTime, string format, decimal price)
     {
         try
@@ -58,6 +62,7 @@ public class AdminShowtimesController(IShowtimeService showtimeService) : Contro
 
     [HttpPost("delete")]
     [ValidateAntiForgeryToken]
+    // Xử lý logic và luồng thực thi cho phương thức Delete
     public async Task<IActionResult> Delete(int id)
     {
         try

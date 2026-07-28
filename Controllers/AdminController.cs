@@ -1,3 +1,4 @@
+// AdminController: Controller xu ly cac yeu cau HTTP va dieu huong cho Admin
 ﻿using CinemaXNet.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
@@ -23,12 +24,15 @@ public class AdminController(IMovieService movieService, IAuditLogService auditL
     }
 
     [HttpGet("payments")]
+    // Xử lý logic và luồng thực thi cho phương thức Payments
     public IActionResult Payments() => View("Payments");
 
     [HttpGet("seat-lock-config")]
+    // Xử lý logic và luồng thực thi cho phương thức SeatLockConfig
     public IActionResult SeatLockConfig() => View("SeatLockConfig");
 
     [HttpGet("roles-permissions")]
+    // Xử lý logic và luồng thực thi cho phương thức RolesPermissions
     public IActionResult RolesPermissions() => View("RolesPermissions");
     // GET /admin/movies
     [HttpGet("movies")]

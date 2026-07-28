@@ -1,3 +1,4 @@
+// ReviewsController: Controller xu ly cac yeu cau HTTP va dieu huong cho Reviews
 ﻿using System.Security.Claims;
 using CinemaXNet.Domain.Entities;
 using CinemaXNet.Application.Interfaces;
@@ -12,6 +13,7 @@ public class ReviewsController(IReviewRepository reviewRepo) : Controller
 {
     [HttpPost("Submit")]
     [ValidateAntiForgeryToken]
+    // Xử lý logic và luồng thực thi cho phương thức Submit
     public async Task<IActionResult> Submit(int MovieId, int Rating, string Comment)
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);

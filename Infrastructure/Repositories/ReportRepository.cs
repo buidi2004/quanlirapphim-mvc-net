@@ -1,3 +1,4 @@
+// ReportRepository: Repository dam nhan cac thao tac truy van Database cho Report
 ﻿using System.Data;
 using Dapper;
 using CinemaXNet.Application.Interfaces;
@@ -6,6 +7,7 @@ namespace CinemaXNet.Infrastructure.Repositories;
 
 public class ReportRepository(IDbConnection db) : IReportRepository
 {
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức Items
     public async Task<(IEnumerable<dynamic> Items, int TotalCount)> GetMovieRevenueReportPagedAsync(int page, int pageSize)
     {
         var offset = (page - 1) * pageSize;
@@ -34,6 +36,7 @@ public class ReportRepository(IDbConnection db) : IReportRepository
         return (items, totalCount);
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức GetMovieRevenueReportAsync
     public async Task<IEnumerable<dynamic>> GetMovieRevenueReportAsync()
     {
         var sql = """

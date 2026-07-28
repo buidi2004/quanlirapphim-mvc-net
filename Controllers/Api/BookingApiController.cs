@@ -1,3 +1,4 @@
+// BookingApiController: Controller xu ly cac yeu cau HTTP va dieu huong cho BookingApi
 ﻿using CinemaXNet.Domain.Exceptions;
 using CinemaXNet.Application.Interfaces;
 using CinemaXNet.Application.Responses;
@@ -23,6 +24,7 @@ public class BookingApiController(
 {
     [HttpGet("seatmap/{showtimeId}")]
     [AllowAnonymous]
+    // Xử lý logic và luồng thực thi cho phương thức GetSeatMap
     public async Task<IActionResult> GetSeatMap(int showtimeId)
     {
         var vm = await movieService.GetSeatMapViewModelAsync(showtimeId);
@@ -54,6 +56,7 @@ public class BookingApiController(
 
     [HttpGet("concessions")]
     [AllowAnonymous]
+    // Xử lý logic và luồng thực thi cho phương thức GetConcessions
     public async Task<IActionResult> GetConcessions([FromServices] IFoodBeverageService foodBeverageService)
     {
         var result = await foodBeverageService.GetPagedAsync(1, 100);
@@ -61,6 +64,7 @@ public class BookingApiController(
     }
 
     [HttpPost("hold")]
+    // Xử lý logic và luồng thực thi cho phương thức HoldSeats
     public async Task<IActionResult> HoldSeats([FromBody] HoldSeatsRequest req)
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -76,6 +80,7 @@ public class BookingApiController(
     }
 
     [HttpPost("apply-promo")]
+    // Xử lý logic và luồng thực thi cho phương thức ApplyPromo
     public async Task<IActionResult> ApplyPromo([FromBody] ApplyPromoRequest req)
     {
         var promo = await promoService.ApplyPromotionAsync(req.PromoCode, (decimal)req.TotalPrice);
@@ -83,6 +88,7 @@ public class BookingApiController(
     }
 
     [HttpPost("confirm")]
+    // Xử lý logic và luồng thực thi cho phương thức ConfirmBooking
     public async Task<IActionResult> ConfirmBooking([FromBody] ConfirmBookingRequest req)
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -147,6 +153,7 @@ public class BookingApiController(
     }
 
     [HttpPost("create-payment-url")]
+    // Xử lý logic và luồng thực thi cho phương thức CreatePaymentUrl
     public async Task<IActionResult> CreatePaymentUrl([FromBody] ConfirmBookingRequest req)
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -181,6 +188,7 @@ public class BookingApiController(
     }
 
     [HttpPost("status/{txnRef}")]
+    // Xử lý logic và luồng thực thi cho phương thức GetBookingStatus
     public async Task<IActionResult> GetBookingStatus(string txnRef, [FromBody] ConfirmBookingRequest req)
     {
         // Khi VNPay gọi callback hoặc App check status (ở Mock này chúng ta cho App gửi req lên để Confirm luôn)

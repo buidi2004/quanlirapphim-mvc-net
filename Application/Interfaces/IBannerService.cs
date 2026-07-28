@@ -1,3 +1,4 @@
+// IBannerService: Interface dinh nghia cac phuong thuc Hop dong cho IBanner
 ﻿using Microsoft.AspNetCore.Http;
 
 namespace CinemaXNet.Application.Interfaces;

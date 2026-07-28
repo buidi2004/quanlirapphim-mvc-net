@@ -1,3 +1,4 @@
+// IScannerService: Interface dinh nghia cac phuong thuc Hop dong cho IScanner
 ﻿namespace CinemaXNet.Application.Interfaces;
 
 public interface IScannerService

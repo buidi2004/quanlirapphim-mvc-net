@@ -1,3 +1,4 @@
+// INewsService: Interface dinh nghia cac phuong thuc Hop dong cho INews
 ﻿using Microsoft.AspNetCore.Http;
 
 namespace CinemaXNet.Application.Interfaces;

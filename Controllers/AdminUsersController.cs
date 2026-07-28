@@ -1,3 +1,4 @@
+// AdminUsersController: Controller xu ly cac yeu cau HTTP va dieu huong cho AdminUsers
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -11,6 +12,7 @@ namespace CinemaXNet.Controllers;
 public class AdminUsersController(IUserService userService) : Controller
 {
     [HttpGet]
+    // Xử lý logic và luồng thực thi cho phương thức Index
     public async Task<IActionResult> Index(int page = 1)
     {
         int pageSize = 10;
@@ -20,6 +22,7 @@ public class AdminUsersController(IUserService userService) : Controller
 
     [HttpPost("update-role")]
     [ValidateAntiForgeryToken]
+    // Xử lý logic và luồng thực thi cho phương thức UpdateRole
     public async Task<IActionResult> UpdateRole(int id, string role)
     {
         try

@@ -1,3 +1,4 @@
+// IDynamicPricingService: Interface dinh nghia cac phuong thuc Hop dong cho IDynamicPricing
 ﻿using CinemaXNet.Domain.Entities;
 
 namespace CinemaXNet.Application.Interfaces;

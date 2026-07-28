@@ -1,3 +1,4 @@
+// AdminAuditLogsController: Controller xu ly cac yeu cau HTTP va dieu huong cho AdminAuditLogs
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using CinemaXNet.Application.Interfaces;
@@ -9,6 +10,7 @@ namespace CinemaXNet.Controllers;
 public class AdminAuditLogsController(IAuditLogService auditLogService) : Controller
 {
     [HttpGet]
+    // Xử lý logic và luồng thực thi cho phương thức Index
     public async Task<IActionResult> Index(string? entityName, int page = 1)
     {
         ViewBag.PageTitle = "Nhật ký hệ thống (Audit Logs)";

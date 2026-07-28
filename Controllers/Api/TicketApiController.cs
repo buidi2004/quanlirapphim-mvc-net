@@ -1,3 +1,4 @@
+// TicketApiController: Controller xu ly cac yeu cau HTTP va dieu huong cho TicketApi
 ﻿using CinemaXNet.Application.Interfaces;
 using CinemaXNet.Application.Responses;
 using Microsoft.AspNetCore.Authorization;
@@ -12,6 +13,7 @@ namespace CinemaXNet.Controllers.Api;
 public class TicketApiController(ITicketService ticketService) : ControllerBase
 {
     [HttpGet("my-tickets")]
+    // Xử lý logic và luồng thực thi cho phương thức GetMyTickets
     public async Task<IActionResult> GetMyTickets()
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -20,6 +22,7 @@ public class TicketApiController(ITicketService ticketService) : ControllerBase
     }
 
     [HttpGet("{id}")]
+    // Xử lý logic và luồng thực thi cho phương thức GetTicketDetail
     public async Task<IActionResult> GetTicketDetail(int id)
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -49,6 +52,7 @@ public class TicketApiController(ITicketService ticketService) : ControllerBase
     }
 
     [HttpGet("summary")]
+    // Xử lý logic và luồng thực thi cho phương thức GetSummary
     public async Task<IActionResult> GetSummary([FromServices] IUserService userService)
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);

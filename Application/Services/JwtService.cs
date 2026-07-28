@@ -1,3 +1,4 @@
+// JwtService: Service xu ly cac logic nghiep vu (Business Logic) cho Jwt
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;

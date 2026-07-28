@@ -4,9 +4,9 @@ using MySqlConnector;
 
 namespace CinemaXNet.Infrastructure.Data;
 
-/// <summary>
-/// Tạo schema MySQL và seed dữ liệu mẫu khi app khởi động lần đầu.
-/// </summary>
+// DatabaseInitializer: Lớp chịu trách nhiệm tự động Khởi tạo Cấu trúc Bảng MySQL (DDL Schema)
+// và nạp dữ liệu mẫu ban đầu (Seed Data) hoàn toàn tự động khi ứng dụng vừa được bật lên.
+// Giúp lập trình viên chỉ cần tạo Database rỗng là app có thể tự chạy không cần import file SQL thủ công.
 public static class DatabaseInitializer
 {
     public static void Initialize(string connectionString)

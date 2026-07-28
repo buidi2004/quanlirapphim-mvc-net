@@ -1,3 +1,4 @@
+// VNPayMockController: Controller xu ly cac yeu cau HTTP va dieu huong cho VNPayMock
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +9,7 @@ namespace CinemaXNet.Controllers;
 public class VNPayMockController() : Controller
 {
     [HttpGet("pay")]
+    // Xử lý logic và luồng thực thi cho phương thức Pay
     public IActionResult Pay(string txnRef, decimal amount, string ticketIds, string returnUrl)
     {
         ViewBag.TxnRef = txnRef;
@@ -19,6 +21,7 @@ public class VNPayMockController() : Controller
 
     [HttpPost("process-pay")]
     [ValidateAntiForgeryToken]
+    // Xử lý logic và luồng thực thi cho phương thức ProcessPay
     public IActionResult ProcessPay(string txnRef, decimal amount, string ticketIds, string returnUrl)
     {
         // Bảo mật: Chặn Open Redirect — chỉ cho phép redirect nội bộ

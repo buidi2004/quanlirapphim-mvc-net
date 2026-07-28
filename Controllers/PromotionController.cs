@@ -1,3 +1,4 @@
+// PromotionController: Controller xu ly cac yeu cau HTTP va dieu huong cho Promotion
 ﻿using CinemaXNet.Application.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 

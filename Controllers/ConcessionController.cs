@@ -1,3 +1,4 @@
+// ConcessionController: Controller xu ly cac yeu cau HTTP va dieu huong cho Concession
 ﻿using Microsoft.AspNetCore.Mvc;
 
 namespace CinemaXNet.Controllers;
@@ -74,6 +75,7 @@ public class ConcessionController : Controller
     };
 
     [HttpGet("{slug}")]
+    // Xử lý logic và luồng thực thi cho phương thức Detail
     public IActionResult Detail(string slug)
     {
         if (!Concessions.TryGetValue(slug, out var item))

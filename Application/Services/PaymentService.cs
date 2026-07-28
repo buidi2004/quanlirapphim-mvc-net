@@ -12,24 +12,28 @@ public interface IPaymentStrategy
 
 public class VNPayStrategy : IPaymentStrategy
 {
+    // Xử lý logic và luồng thực thi cho phương thức ProcessAsync
     public Task<PaymentResult> ProcessAsync(PaymentRequest request) =>
         Task.FromResult(new PaymentResult { Success = true, TransactionId = "VNP_" + Guid.NewGuid().ToString("N")[..8] });
 }
 
 public class MoMoStrategy : IPaymentStrategy
 {
+    // Xử lý logic và luồng thực thi cho phương thức ProcessAsync
     public Task<PaymentResult> ProcessAsync(PaymentRequest request) =>
         Task.FromResult(new PaymentResult { Success = true, TransactionId = "MOMO_" + Guid.NewGuid().ToString("N")[..8] });
 }
 
 public class CashStrategy : IPaymentStrategy
 {
+    // Xử lý logic và luồng thực thi cho phương thức ProcessAsync
     public Task<PaymentResult> ProcessAsync(PaymentRequest request) =>
         Task.FromResult(new PaymentResult { Success = true, TransactionId = "CASH_" + Guid.NewGuid().ToString("N")[..8] });
 }
 
 public class ZaloPayStrategy : IPaymentStrategy
 {
+    // Xử lý logic và luồng thực thi cho phương thức ProcessAsync
     public Task<PaymentResult> ProcessAsync(PaymentRequest request) =>
         // Giả lập delay mạng thật của ZaloPay (200ms) để test load/tốc độ
         Task.Delay(200).ContinueWith(_ => new PaymentResult { Success = true, TransactionId = "ZALO_" + Guid.NewGuid().ToString("N")[..8] });
@@ -46,6 +50,7 @@ public class PaymentService : IPaymentService
         ["cash"]    = new CashStrategy(),
     };
 
+    // Xử lý logic và luồng thực thi cho phương thức ProcessAsync
     public async Task<PaymentResult> ProcessAsync(string method, PaymentRequest request)
     {
         if (!_strategies.TryGetValue(method, out var strategy))

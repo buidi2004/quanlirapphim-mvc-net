@@ -1,4 +1,5 @@
-﻿using System.Data;
+// TicketService: Service xu ly cac logic nghiep vu (Business Logic) cho Ticket
+using System.Data;
 using CinemaXNet.Domain.Exceptions;
 using Dapper;
 using CinemaXNet.Domain.ValueObjects;
@@ -11,16 +12,19 @@ using MediatR;
 
 namespace CinemaXNet.Application.Services;
 
+// TicketService: Đảm nhận các logic nghiệp vụ quan trọng nhất của toàn bộ hệ thống đặt vé xem phim.
+// Bao gồm: Giữ chỗ tạm thời (HoldSeats), Xác nhận thanh toán (ConfirmPayment), và Tính toán chiết khấu.
 public class TicketService(
     ITicketRepository ticketRepo, 
     IDynamicPricingService pricingService,
     IDbConnection db,
     IMediator mediator) : ITicketService
 {
-    private const int MinTickets  = 1;
-    private const int MaxTickets  = 8;
-    private const int HoldMinutes = 15;
+    private const int MinTickets  = 1;  // Tối thiểu chọn 1 vé
+    private const int MaxTickets  = 8;  // Tối đa chọn 8 vé/lần để tránh tình trạng đầu cơ vé
+    private const int HoldMinutes = 15; // Thời gian giữ ghế tối đa là 15 phút
 
+    // Hàm thực hiện Giữ Ghế Tạm Thời (Hold Seats)
     public async Task<HoldResult> HoldSeatsAsync(int? userId, int showtimeId, IEnumerable<string> seatCodes, string? guestEmail = null, string? guestPhone = null)
     {
         var codes = seatCodes.ToList();
@@ -30,11 +34,12 @@ public class TicketService(
         if (codes.Count > MaxTickets)
             throw new BusinessException($"Chỉ được đặt tối đa {MaxTickets} vé mỗi lần.");
 
+        // 1. Kiểm tra xem các ghế người dùng vừa chọn có bị người khác đặt/giữ từ trước chưa (truy vấn DB)
         var takenSeats = (await ticketRepo.GetActiveSeatsAsync(showtimeId, codes)).ToList();
         if (takenSeats.Count > 0)
-            throw new SeatUnavailableException(takenSeats);
+            throw new SeatUnavailableException(takenSeats); // Báo lỗi nếu có ít nhất 1 ghế bị trùng
 
-        // Transaction
+        // 2. Mở Transaction để đảm bảo tính toàn vẹn (ACID): Thêm tất cả vé cùng lúc hoặc không thêm vé nào.
         if (db is System.Data.Common.DbConnection dbConn && dbConn.State == System.Data.ConnectionState.Closed)
             await dbConn.OpenAsync();
 
@@ -64,18 +69,20 @@ public class TicketService(
             transaction.Commit();
             return new HoldResult(ticketIds, expiryTime);
         }
-        catch (MySqlConnector.MySqlException ex) when (ex.ErrorCode == MySqlConnector.MySqlErrorCode.DuplicateKeyEntry) // Constraint violation
+        catch (MySqlConnector.MySqlException ex) when (ex.ErrorCode == MySqlConnector.MySqlErrorCode.DuplicateKeyEntry)
         {
+            // Bắt lỗi Unique Constraint trong Database (Xử lý concurrency xung đột giữa 2 request giữ ghế cùng millisecond)
             transaction.Rollback();
             throw new BusinessException("Ghế bạn chọn vừa bị người khác nhanh tay đặt trước. Vui lòng thử lại!");
         }
         catch
         {
-            transaction.Rollback();
+            transaction.Rollback(); // Rollback nếu có bất kỳ lỗi không mong muốn nào khác
             throw;
         }
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức ConfirmPaymentAsync
     public async Task<bool> ConfirmPaymentAsync(
         IEnumerable<int> ticketIds, int? userId,
         string paymentMethod, decimal? totalPrice = null, string? promotionCode = null, IEnumerable<(int FoodBeverageId, int Quantity, decimal Price)>? concessions = null)
@@ -106,13 +113,13 @@ public class TicketService(
                 seatCodes.Add(ticket.SeatCode);
             }
 
-            // 2. Atomic bulk update
+            // 2. Cập nhật trạng thái hàng loạt sang ĐÃ THANH TOÁN (Paid) đồng thời kiểm tra Concurrency Version
             var rowsAffected = await ticketRepo.UpdateMultipleStatusesWithVersionAsync(
                 ids, TicketStatus.Paid, individualPrice, promotionCode, transaction);
 
             if (rowsAffected != ids.Count)
             {
-                // Concurrency issue: At least one ticket was modified by another transaction or expired/changed status.
+                // Nếu số dòng bị ảnh hưởng khác số vé cần mua -> Có ghế đã bị sửa bởi transaction khác hoặc hết hạn.
                 throw new ConcurrencyException("Một hoặc nhiều ghế bạn chọn vừa được người khác đặt hoặc đã hết hạn. Vui lòng chọn lại.");
             }
 
@@ -139,7 +146,8 @@ public class TicketService(
                 await db.ExecuteAsync("UPDATE promotions SET used_count = used_count + 1 WHERE code = @Code", new { Code = promotionCode }, transaction);
             }
 
-            // Update loyalty points and membership tier via Domain Event
+            // Kích hoạt sự kiện TicketPaidEvent thông qua MediatR để xử lý bất đồng bộ các tác vụ phụ:
+            // Tự động cộng điểm tích lũy và xét thăng hạng thành viên cho User mà không làm chậm hàm thanh toán chính.
             if (userId != null && totalPrice.HasValue && totalPrice.Value > 0)
             {
                 await mediator.Publish(new TicketPaidEvent 
@@ -150,7 +158,7 @@ public class TicketService(
                 });
             }
 
-            transaction.Commit();
+            transaction.Commit(); // Hoàn tất giao dịch thanh toán
             return true;
         }
         catch
@@ -160,12 +168,15 @@ public class TicketService(
         }
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức ReleaseExpiredHoldsAsync
     public Task<IEnumerable<(int ShowtimeId, string SeatCode)>> ReleaseExpiredHoldsAsync() =>
         ticketRepo.CancelExpiredHoldsAsync();
 
+    // Xử lý logic và luồng thực thi cho phương thức GetUserTicketsAsync
     public Task<IEnumerable<dynamic>> GetUserTicketsAsync(int userId) =>
         ticketRepo.FindByUserIdAsync(userId);
 
+    // Xử lý logic và luồng thực thi cho phương thức BuildConfirmViewModelAsync
     public async Task<BookingConfirmViewModel> BuildConfirmViewModelAsync(IEnumerable<int> ticketIds, int? userId = null)
     {
         var ids = ticketIds.ToList();
@@ -231,21 +242,25 @@ public class TicketService(
         };
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức Items
     public async Task<(IEnumerable<dynamic> Items, int TotalCount)> GetAdminPaginatedTicketsAsync(int page, int pageSize)
     {
         return await ticketRepo.GetAdminPaginatedTicketsAsync(page, pageSize);
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức GetTicketDetailAsync
     public async Task<TicketDetailViewModel?> GetTicketDetailAsync(int ticketId, int userId)
     {
         return await ticketRepo.GetTicketDetailAsync(ticketId, userId);
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức GetUserTicketStatsAsync
     public async Task<(int TotalTickets, int TotalMovies)> GetUserTicketStatsAsync(int userId)
     {
         return await ticketRepo.GetUserTicketStatsAsync(userId);
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức GetUserTransactionsAsync
     public async Task<IEnumerable<dynamic>> GetUserTransactionsAsync(int userId, string? status)
     {
         return await ticketRepo.GetUserTransactionsAsync(userId, status);

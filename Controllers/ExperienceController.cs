@@ -1,3 +1,4 @@
+// ExperienceController: Controller xu ly cac yeu cau HTTP va dieu huong cho Experience
 ﻿using Microsoft.AspNetCore.Mvc;
 
 namespace CinemaXNet.Controllers;

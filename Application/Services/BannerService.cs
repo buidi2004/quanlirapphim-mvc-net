@@ -1,52 +1,43 @@
+// BannerService: Service xu ly cac logic nghiep vu (Business Logic) cho Banner
 ﻿using Microsoft.AspNetCore.Http;
 using CinemaXNet.Application.Interfaces;
 
 namespace CinemaXNet.Application.Services;
 
-public class BannerService(IBannerRepository bannerRepository) : IBannerService
+public class BannerService(IBannerRepository bannerRepository, IImageUploadService imageUploadService) : IBannerService
 {
-    private static readonly string[] AllowedImageExts = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
-
     private async Task<string?> UploadImageAsync(IFormFile? image)
     {
-        if (image != null && image.Length > 0)
-        {
-            var ext = Path.GetExtension(image.FileName).ToLowerInvariant();
-            if (!AllowedImageExts.Contains(ext))
-                throw new InvalidOperationException("Chỉ chấp nhận file ảnh (jpg, png, gif, webp).");
-            var newName = $"{Guid.NewGuid():N}{ext}";
-            var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "banners");
-            Directory.CreateDirectory(uploadDir);
-            var filePath = Path.Combine(uploadDir, newName);
-            await using var stream = System.IO.File.Create(filePath);
-            await image.CopyToAsync(stream);
-            return "/uploads/banners/" + newName;
-        }
-        return null;
+        return await imageUploadService.UploadImageAsync(image, "banners");
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức GetAllBannersAsync
     public async Task<IEnumerable<dynamic>> GetAllBannersAsync()
     {
         return await bannerRepository.GetAllAsync();
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức GetActiveBannersAsync
     public async Task<IEnumerable<dynamic>> GetActiveBannersAsync()
     {
         return await bannerRepository.GetActiveAsync();
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức AddBannerAsync
     public async Task AddBannerAsync(string title, string? description, IFormFile? image, string? linkUrl, int sortOrder, bool isActive)
     {
         string? imageUrl = await UploadImageAsync(image);
         await bannerRepository.AddAsync(title, description, imageUrl, linkUrl, sortOrder, isActive);
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức UpdateBannerAsync
     public async Task UpdateBannerAsync(int id, string title, string? description, IFormFile? image, string? linkUrl, int sortOrder, bool isActive)
     {
         string? imageUrl = await UploadImageAsync(image);
         await bannerRepository.UpdateAsync(id, title, description, imageUrl, linkUrl, sortOrder, isActive);
     }
 
+    // Xử lý logic và luồng thực thi cho phương thức DeleteBannerAsync
     public async Task DeleteBannerAsync(int id)
     {
         await bannerRepository.DeleteAsync(id);

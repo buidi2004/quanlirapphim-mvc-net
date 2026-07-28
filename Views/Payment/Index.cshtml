@@ -1,4 +1,12 @@
-﻿@model CinemaXNet.Application.ViewModels.BookingConfirmViewModel
+@* 
+  Views/Payment/Index.cshtml: Giao diện Xác nhận Đơn hàng & Thanh toán (Bước 3 của quy trình Đặt vé)
+  Nhiệm vụ: 
+  1. Hiển thị Đồng hồ Đếm ngược 15 phút thời gian giữ chỗ (nếu hết 15 phút sẽ tự động ném về trang chủ).
+  2. Tổng hợp lại thông tin Phim, Suất chiếu, Ghế chọn, Bắp nước (Concessions).
+  3. Áp dụng Mã giảm giá (Promotion Code).
+  4. Lựa chọn Phương thức thanh toán (VNPay, MoMo, Thẻ ATM/Visa, Tiền mặt tại quầy).
+*@
+@model CinemaXNet.Application.ViewModels.BookingConfirmViewModel
 @{
     ViewData["Title"] = "Xác nhận thanh toán";
     Layout = "~/Views/Shared/_Layout.cshtml";

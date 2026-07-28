@@ -1,3 +1,4 @@
+// NewsController: Controller xu ly cac yeu cau HTTP va dieu huong cho News
 ﻿using CinemaXNet.Application.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,3 +1,4 @@
+// ScannerRepository: Repository dam nhan cac thao tac truy van Database cho Scanner
 ﻿using System.Data;
 using Dapper;
 using CinemaXNet.Application.Interfaces;
@@ -6,6 +7,7 @@ namespace CinemaXNet.Infrastructure.Repositories;
 
 public class ScannerRepository(IDbConnection db) : IScannerRepository
 {
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức GetTicketDetailsForScanAsync
     public async Task<dynamic?> GetTicketDetailsForScanAsync(int ticketId)
     {
         var sql = """
@@ -20,12 +22,14 @@ public class ScannerRepository(IDbConnection db) : IScannerRepository
         return await db.QueryFirstOrDefaultAsync<dynamic>(sql, new { ticketId });
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức UpdateTicketStatusAsync
     public async Task UpdateTicketStatusAsync(int ticketId, string status)
     {
         var updateSql = "UPDATE tickets SET status = @status WHERE id = @ticketId";
         await db.ExecuteAsync(updateSql, new { ticketId, status });
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức UpdateConcessionStatusAsync
     public async Task UpdateConcessionStatusAsync(int ticketId, string concessionStatus)
     {
         var updateSql = "UPDATE tickets SET concession_status = @concessionStatus WHERE id = @ticketId";

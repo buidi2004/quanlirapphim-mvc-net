@@ -1,3 +1,4 @@
+// IPricingRuleService: Interface dinh nghia cac phuong thuc Hop dong cho IPricingRule
 ﻿using CinemaXNet.Application.ViewModels;
 using System.Threading.Tasks;
 

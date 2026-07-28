@@ -1,3 +1,4 @@
+// IAuditLogService: Interface dinh nghia cac phuong thuc Hop dong cho IAuditLog
 ﻿namespace CinemaXNet.Application.Interfaces;
 
 public interface IAuditLogService

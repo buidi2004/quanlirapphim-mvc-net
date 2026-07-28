@@ -1,3 +1,4 @@
+// IPromotionRepository: Interface dinh nghia cac phuong thuc Hop dong cho IPromotion
 ﻿using CinemaXNet.Domain.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;

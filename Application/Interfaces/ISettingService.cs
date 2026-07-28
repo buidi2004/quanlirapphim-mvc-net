@@ -1,3 +1,4 @@
+// ISettingService: Interface dinh nghia cac phuong thuc Hop dong cho ISetting
 ﻿using Microsoft.AspNetCore.Http;
 
 namespace CinemaXNet.Application.Interfaces;

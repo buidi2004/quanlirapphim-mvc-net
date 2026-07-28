@@ -1,3 +1,4 @@
+// AdminPricingRulesController: Controller xu ly cac yeu cau HTTP va dieu huong cho AdminPricingRules
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +11,7 @@ namespace CinemaXNet.Controllers;
 public class AdminPricingRulesController(IPricingRuleService pricingRuleService) : Controller
 {
     [HttpGet]
+    // Xử lý logic và luồng thực thi cho phương thức Index
     public async Task<IActionResult> Index(int page = 1)
     {
         ViewBag.PageTitle = "Quản lý Luật Giá Vé";

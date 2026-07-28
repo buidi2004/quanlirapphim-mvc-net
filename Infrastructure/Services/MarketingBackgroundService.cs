@@ -1,3 +1,4 @@
+// MarketingBackgroundService: Service xu ly cac logic nghiep vu (Business Logic) cho MarketingBackground
 ﻿using System.Data;
 using Dapper;
 using MySqlConnector;

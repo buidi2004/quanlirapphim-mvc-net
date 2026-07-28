@@ -1,3 +1,4 @@
+// INewsRepository: Interface dinh nghia cac phuong thuc Hop dong cho INews
 ﻿namespace CinemaXNet.Application.Interfaces;
 
 public interface INewsRepository

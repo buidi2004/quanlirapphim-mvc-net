@@ -1,3 +1,4 @@
+// CinemaRepository: Repository dam nhan cac thao tac truy van Database cho Cinema
 ﻿using System.Data;
 using CinemaXNet.Domain.Entities;
 using CinemaXNet.Application.Interfaces;
@@ -13,6 +14,7 @@ public class CinemaRepository(IDbConnection db) : ICinemaRepository
                description, facilities, is_active AS IsActive, created_at AS CreatedAt
         FROM cinemas WHERE is_active = 1";
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức GetAllAsync
     public async Task<IEnumerable<Cinema>> GetAllAsync(string? province = null)
     {
         if (province != null)
@@ -23,18 +25,21 @@ public class CinemaRepository(IDbConnection db) : ICinemaRepository
         return await db.QueryAsync<Cinema>(BaseSelect + " ORDER BY province, name");
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức GetAllProvincesAsync
     public async Task<IEnumerable<string>> GetAllProvincesAsync()
     {
         const string sql = "SELECT DISTINCT province FROM cinemas WHERE is_active = 1 ORDER BY province";
         return await db.QueryAsync<string>(sql);
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức FindBySlugAsync
     public async Task<Cinema?> FindBySlugAsync(string slug)
     {
         var sql = BaseSelect + " AND slug = @slug";
         return await db.QueryFirstOrDefaultAsync<Cinema>(sql, new { slug });
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức FindNearestAsync
     public async Task<IEnumerable<Cinema>> FindNearestAsync(double lat, double lng, int limit = 3)
     {
         // Tính khoảng cách Haversine trong memory (không dùng spatial index)
@@ -64,12 +69,14 @@ public class CinemaRepository(IDbConnection db) : ICinemaRepository
 
     private static double ToRad(double deg) => deg * Math.PI / 180;
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức CreateAsync
     public async Task<int> CreateAsync(Cinema cinema)
     {
         var sql = "INSERT INTO cinemas (name, address, province, phone) VALUES (@Name, @Address, @Province, @Phone); SELECT LAST_INSERT_ID();";
         return await db.ExecuteScalarAsync<int>(sql, cinema);
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức UpdateAsync
     public async Task<int> UpdateAsync(int id, Cinema cinema)
     {
         var sql = "UPDATE cinemas SET name = @Name, address = @Address, province = @Province, phone = @Phone, updated_at = NOW() WHERE id = @Id";
@@ -77,6 +84,7 @@ public class CinemaRepository(IDbConnection db) : ICinemaRepository
         return await db.ExecuteAsync(sql, cinema);
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức DeleteAsync
     public async Task<int> DeleteAsync(int id)
     {
         return await db.ExecuteAsync("DELETE FROM cinemas WHERE id = @Id", new { Id = id });

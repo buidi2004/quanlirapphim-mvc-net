@@ -1,3 +1,4 @@
+// FoodBeverageRepository: Repository dam nhan cac thao tac truy van Database cho FoodBeverage
 ﻿using System.Data;
 using Dapper;
 using CinemaXNet.Application.Interfaces;
@@ -7,6 +8,7 @@ namespace CinemaXNet.Infrastructure.Repositories;
 
 public class FoodBeverageRepository(IDbConnection db) : IFoodBeverageRepository
 {
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức Items
     public async Task<(IEnumerable<FoodBeverage> Items, int TotalCount)> GetPagedAsync(int page, int pageSize)
     {
         var offset = (page - 1) * pageSize;
@@ -19,18 +21,21 @@ public class FoodBeverageRepository(IDbConnection db) : IFoodBeverageRepository
         return (items, totalCount);
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức GetByIdAsync
     public async Task<FoodBeverage?> GetByIdAsync(int id)
     {
         var sql = "SELECT id as Id, name as Name, description as Description, price as Price, image_url as ImageUrl, stock_quantity as StockQuantity FROM food_beverages WHERE id = @Id";
         return await db.QueryFirstOrDefaultAsync<FoodBeverage>(sql, new { Id = id });
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức AddAsync
     public async Task<int> AddAsync(FoodBeverage foodBeverage)
     {
         var sql = "INSERT INTO food_beverages (name, description, price, image_url, stock_quantity) VALUES (@Name, @Description, @Price, @ImageUrl, @StockQuantity)";
         return await db.ExecuteAsync(sql, foodBeverage);
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức UpdateAsync
     public async Task<int> UpdateAsync(FoodBeverage foodBeverage)
     {
         var sql = @"UPDATE food_beverages SET 
@@ -40,6 +45,7 @@ public class FoodBeverageRepository(IDbConnection db) : IFoodBeverageRepository
         return await db.ExecuteAsync(sql, foodBeverage);
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức DeleteAsync
     public async Task<int> DeleteAsync(int id)
     {
         return await db.ExecuteAsync("DELETE FROM food_beverages WHERE id = @Id", new { Id = id });

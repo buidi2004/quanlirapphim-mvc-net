@@ -1,3 +1,4 @@
+// ICampaignRepository: Interface dinh nghia cac phuong thuc Hop dong cho ICampaign
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 

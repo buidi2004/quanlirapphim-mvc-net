@@ -1,3 +1,4 @@
+// ITicketRepository: Interface dinh nghia cac phuong thuc Hop dong cho ITicket
 ﻿using CinemaXNet.Domain.Entities;
 
 namespace CinemaXNet.Application.Interfaces;

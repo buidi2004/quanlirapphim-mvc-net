@@ -1,3 +1,4 @@
+// ContactApiController: Controller xu ly cac yeu cau HTTP va dieu huong cho ContactApi
 ﻿using CinemaXNet.Application.Interfaces;
 using CinemaXNet.Application.Responses;
 using Microsoft.AspNetCore.Authorization;
@@ -11,6 +12,7 @@ namespace CinemaXNet.Controllers.Api;
 public class ContactApiController(IContactService contactService) : ControllerBase
 {
     [HttpPost("")]
+    // Xử lý logic và luồng thực thi cho phương thức SubmitContact
     public async Task<IActionResult> SubmitContact([FromBody] SubmitContactRequest req)
     {
         if (string.IsNullOrWhiteSpace(req.Name) || string.IsNullOrWhiteSpace(req.Email) || string.IsNullOrWhiteSpace(req.Message))

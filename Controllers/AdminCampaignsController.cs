@@ -1,3 +1,4 @@
+// AdminCampaignsController: Controller xu ly cac yeu cau HTTP va dieu huong cho AdminCampaigns
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +11,7 @@ namespace CinemaXNet.Controllers;
 public class AdminCampaignsController(ICampaignService campaignService) : Controller
 {
     [HttpGet]
+    // Xử lý logic và luồng thực thi cho phương thức Index
     public async Task<IActionResult> Index(int page = 1)
     {
         ViewBag.PageTitle = "Chiến dịch Marketing";
@@ -20,6 +22,7 @@ public class AdminCampaignsController(ICampaignService campaignService) : Contro
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    // Xử lý logic và luồng thực thi cho phương thức Create
     public async Task<IActionResult> Create(string name, string type, string targetAudience, string content, string scheduledAt)
     {
         if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(content))

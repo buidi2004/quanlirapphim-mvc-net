@@ -1,3 +1,4 @@
+// AdminContactsController: Controller xu ly cac yeu cau HTTP va dieu huong cho AdminContacts
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using CinemaXNet.Application.Interfaces;
@@ -9,6 +10,7 @@ namespace CinemaXNet.Controllers;
 public class AdminContactsController(IContactService contactService) : Controller
 {
     [HttpGet]
+    // Xử lý logic và luồng thực thi cho phương thức Index
     public async Task<IActionResult> Index(int page = 1)
     {
         int pageSize = 10;
@@ -19,6 +21,7 @@ public class AdminContactsController(IContactService contactService) : Controlle
     }
 
     [HttpGet("details/{id}")]
+    // Xử lý logic và luồng thực thi cho phương thức Details
     public async Task<IActionResult> Details(int id)
     {
         var contact = await contactService.GetContactByIdAsync(id);
@@ -31,6 +34,7 @@ public class AdminContactsController(IContactService contactService) : Controlle
 
     [HttpPost("reply")]
     [ValidateAntiForgeryToken]
+    // Xử lý logic và luồng thực thi cho phương thức Reply
     public async Task<IActionResult> Reply(int id, string replyMessage)
     {
         try
@@ -48,6 +52,7 @@ public class AdminContactsController(IContactService contactService) : Controlle
 
     [HttpPost("delete")]
     [ValidateAntiForgeryToken]
+    // Xử lý logic và luồng thực thi cho phương thức Delete
     public async Task<IActionResult> Delete(int id)
     {
         try

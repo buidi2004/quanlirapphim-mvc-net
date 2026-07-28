@@ -1,3 +1,4 @@
+// PricingRuleService: Service xu ly cac logic nghiep vu (Business Logic) cho PricingRule
 ﻿using CinemaXNet.Application.Interfaces;
 using CinemaXNet.Application.ViewModels;
 using System.Linq;
@@ -7,6 +8,7 @@ namespace CinemaXNet.Application.Services;
 
 public class PricingRuleService(IPricingRuleRepository repo) : IPricingRuleService
 {
+    // Xử lý logic và luồng thực thi cho phương thức GetPaginatedAsync
     public async Task<PaginatedList<dynamic>> GetPaginatedAsync(int page, int pageSize)
     {
         int limit = pageSize;

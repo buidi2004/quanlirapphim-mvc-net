@@ -1,3 +1,4 @@
+// RoomRepository: Repository dam nhan cac thao tac truy van Database cho Room
 ﻿using System.Data;
 using CinemaXNet.Domain.Entities;
 using CinemaXNet.Application.Interfaces;
@@ -7,6 +8,7 @@ namespace CinemaXNet.Infrastructure.Repositories;
 
 public class RoomRepository(IDbConnection db) : IRoomRepository
 {
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức Items
     public async Task<(IEnumerable<Room> Items, int TotalCount)> GetPagedRoomsAsync(int page, int pageSize)
     {
         var offset = (page - 1) * pageSize;
@@ -37,11 +39,13 @@ public class RoomRepository(IDbConnection db) : IRoomRepository
         return (rooms, totalCount);
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức GetAllCinemasAsync
     public async Task<IEnumerable<Cinema>> GetAllCinemasAsync()
     {
         return await db.QueryAsync<Cinema>("SELECT id, name FROM cinemas ORDER BY name");
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức GetByIdAsync
     public async Task<Room?> GetByIdAsync(int id)
     {
         return await db.QueryFirstOrDefaultAsync<Room>(
@@ -49,23 +53,27 @@ public class RoomRepository(IDbConnection db) : IRoomRepository
             new { Id = id });
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức AddAsync
     public async Task AddAsync(Room room)
     {
         var sql = "INSERT INTO rooms (cinema_id, name, total_rows, seats_per_row) VALUES (@CinemaId, @Name, @TotalRows, @SeatsPerRow)";
         await db.ExecuteAsync(sql, room);
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức UpdateAsync
     public async Task UpdateAsync(Room room)
     {
         var sql = "UPDATE rooms SET cinema_id = @CinemaId, name = @Name, total_rows = @TotalRows, seats_per_row = @SeatsPerRow WHERE id = @Id";
         await db.ExecuteAsync(sql, room);
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức DeleteAsync
     public async Task DeleteAsync(int id)
     {
         await db.ExecuteAsync("DELETE FROM rooms WHERE id = @Id", new { Id = id });
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức UpdateLayoutAsync
     public async Task UpdateLayoutAsync(int id, string layoutJson)
     {
         await db.ExecuteAsync("UPDATE rooms SET layout_json = @LayoutJson WHERE id = @Id", new { Id = id, LayoutJson = layoutJson });

@@ -1,3 +1,4 @@
+// PaymentController: Controller xu ly cac yeu cau HTTP va dieu huong cho Payment
 ﻿using CinemaXNet.Domain.Exceptions;
 using CinemaXNet.Domain.ValueObjects;
 using CinemaXNet.Application.Interfaces;
@@ -77,6 +78,7 @@ public class PaymentController(ITicketService ticketService, IPaymentService pay
     [AllowAnonymous]
     [HttpPost("confirm")]
     [ValidateAntiForgeryToken]
+    // Xử lý logic và luồng thực thi cho phương thức Confirm
     public async Task<IActionResult> Confirm(
         string paymentMethod,
         string? promotionCode)

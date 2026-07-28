@@ -1,3 +1,4 @@
+// ICinemaService: Interface dinh nghia cac phuong thuc Hop dong cho ICinema
 ﻿using CinemaXNet.Domain.Entities;
 
 namespace CinemaXNet.Application.Interfaces;

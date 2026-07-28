@@ -1,3 +1,4 @@
+// PaginatedList: Model dong goi du lieu truyen tai giua Controller va View/API
 ﻿namespace CinemaXNet.Application.ViewModels;
 
 public class PaginatedList<T>

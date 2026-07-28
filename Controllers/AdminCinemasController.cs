@@ -1,3 +1,4 @@
+// AdminCinemasController: Controller xu ly cac yeu cau HTTP va dieu huong cho AdminCinemas
 ﻿using System.Data;
 using CinemaXNet.Domain.Entities;
 using CinemaXNet.Application.Interfaces;
@@ -11,6 +12,7 @@ namespace CinemaXNet.Controllers;
 public class AdminCinemasController(ICinemaService cinemaService) : Controller
 {
     [HttpGet]
+    // Xử lý logic và luồng thực thi cho phương thức Index
     public async Task<IActionResult> Index(int page = 1)
     {
         var cinemas = await cinemaService.GetAllAsync();
@@ -20,6 +22,7 @@ public class AdminCinemasController(ICinemaService cinemaService) : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    // Xử lý logic và luồng thực thi cho phương thức Store
     public async Task<IActionResult> Store(string name, string address, string province, string? phone)
     {
         try
@@ -37,6 +40,7 @@ public class AdminCinemasController(ICinemaService cinemaService) : Controller
 
     [HttpPost("update")]
     [ValidateAntiForgeryToken]
+    // Xử lý logic và luồng thực thi cho phương thức Update
     public async Task<IActionResult> Update(int id, string name, string address, string province, string? phone)
     {
         try
@@ -54,6 +58,7 @@ public class AdminCinemasController(ICinemaService cinemaService) : Controller
 
     [HttpPost("delete")]
     [ValidateAntiForgeryToken]
+    // Xử lý logic và luồng thực thi cho phương thức Delete
     public async Task<IActionResult> Delete(int id)
     {
         try

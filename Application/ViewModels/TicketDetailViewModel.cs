@@ -1,3 +1,4 @@
+// TicketDetailViewModel: Model dong goi du lieu truyen tai giua Controller va View/API
 ﻿using CinemaXNet.Domain.Entities;
 
 namespace CinemaXNet.Application.ViewModels;

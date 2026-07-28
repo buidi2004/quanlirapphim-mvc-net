@@ -1,3 +1,4 @@
+// MovieSummaryDto: Model dong goi du lieu truyen tai giua Controller va View/API
 ﻿namespace CinemaXNet.Application.DTOs;
 
 public class MovieSummaryDto

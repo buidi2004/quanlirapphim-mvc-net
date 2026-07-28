@@ -1,3 +1,4 @@
+// ITicketService: Interface dinh nghia cac phuong thuc Hop dong cho ITicket
 ﻿using CinemaXNet.Domain.ValueObjects;
 using CinemaXNet.Application.ViewModels;
 

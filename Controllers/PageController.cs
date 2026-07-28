@@ -1,3 +1,4 @@
+// PageController: Controller xu ly cac yeu cau HTTP va dieu huong cho Page
 ﻿using Microsoft.AspNetCore.Mvc;
 
 namespace CinemaXNet.Controllers;
@@ -6,6 +7,7 @@ namespace CinemaXNet.Controllers;
 public class PageController : Controller
 {
     [HttpGet("{slug}")]
+    // Xử lý logic và luồng thực thi cho phương thức Show
     public IActionResult Show(string slug)
     {
         // Sanitize slug to prevent directory traversal

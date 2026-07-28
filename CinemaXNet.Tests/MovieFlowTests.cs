@@ -33,7 +33,7 @@ public class MovieFlowTests : IClassFixture<WebApplicationFactory<Program>>
             DurationMinutes = 120, 
             AgeRating = "P" 
         };
-        await movieService.CreateAsync(movie);
+        await movieService.CreateMovieAsync(movie);
 
         // Act - Truy cập trang chủ (luồng FE)
         var response = await client.GetAsync("/");

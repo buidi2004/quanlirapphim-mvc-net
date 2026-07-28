@@ -1,7 +1,17 @@
-﻿@using System.Data
+@* 
+  _Footer.cshtml: Partial View Chân Trang Toàn Cục (Global Reusable Footer Component)
+  Nhiệm vụ & Tính năng Tái Sử Dụng:
+  1. Tái sử dụng ở cuối tất cả các trang web của hệ thống.
+  2. Tự động truy vấn Cấu hình Động từ Database bảng `settings` (@inject IDbConnection Db) để hiển thị thông tin công ty: Hotline, Email chăm sóc khách hàng, Giấy phép ĐKKD.
+  3. Hiển thị danh sách các thương hiệu phòng chiếu (IMAX, 4DX, STARIUM, GOLD CLASS, L'AMOUR...).
+  4. Cung cấp các liên kết điều hướng nhanh: Điều khoản sử dụng, Chính sách bảo mật, Câu hỏi thường gặp (FAQ).
+  5. Các biểu tượng mạng xã hội (Facebook, Youtube, Instagram, Zalo) và thông báo Bản quyền Copyright.
+*@
+@using System.Data
 @using Dapper
 @inject IDbConnection Db
 @{
+    // Truy vấn bảng cấu hình settings động từ Database
     var rows = await Db.QueryAsync<dynamic>("SELECT setting_key, setting_value FROM settings");
     var appSettings = new Dictionary<string, string>();
     foreach (var r in rows) {
@@ -10,6 +20,7 @@
     string GetVal(string key, string def = "") => appSettings.ContainsKey(key) && !string.IsNullOrEmpty(appSettings[key]) ? appSettings[key] : def;
 }
 <footer class="custom-footer mt-auto">
+    @* Thanh Thương Hiệu Phòng Chiếu Cao Cấp *@
     <div class="footer-brands-bar border-top border-bottom py-2">
         <div class="container">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 text-dark" style="font-size: 0.85rem; font-weight: 700; font-family: 'Arial', sans-serif;">
@@ -28,6 +39,7 @@
         </div>
     </div>
     
+    @* Khối Chân Trang Chính *@
     <div class="footer-main py-5">
         <div class="container">
             <div class="row g-4">

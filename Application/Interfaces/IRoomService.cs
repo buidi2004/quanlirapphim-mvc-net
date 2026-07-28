@@ -1,3 +1,4 @@
+// IRoomService: Interface dinh nghia cac phuong thuc Hop dong cho IRoom
 ﻿using CinemaXNet.Domain.Entities;
 
 namespace CinemaXNet.Application.Interfaces;

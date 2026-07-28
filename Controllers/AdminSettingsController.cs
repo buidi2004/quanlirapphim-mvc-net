@@ -1,3 +1,4 @@
+// AdminSettingsController: Controller xu ly cac yeu cau HTTP va dieu huong cho AdminSettings
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using CinemaXNet.Application.Interfaces;
@@ -9,6 +10,7 @@ namespace CinemaXNet.Controllers;
 public class AdminSettingsController(ISettingService settingService) : Controller
 {
     [HttpGet]
+    // Xử lý logic và luồng thực thi cho phương thức Index
     public async Task<IActionResult> Index()
     {
         var settings = await settingService.GetAllSettingsAsync();
@@ -17,6 +19,7 @@ public class AdminSettingsController(ISettingService settingService) : Controlle
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    // Xử lý logic và luồng thực thi cho phương thức Save
     public async Task<IActionResult> Save(IFormCollection form, IFormFile? site_logo)
     {
         try

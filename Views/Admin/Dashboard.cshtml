@@ -1,10 +1,14 @@
-﻿@model CinemaXNet.Application.ViewModels.DashboardStats
+@* 
+  Dashboard.cshtml: Giao diện Trung tâm Quản trị Admin Dashboard
+  Nhiệm vụ: Hiển thị các thẻ chỉ số KPI tổng quan (Doanh thu, Vé bán ra, Tỷ lệ lấp đầy ghế rạp), Biểu đồ Doanh thu 7 ngày (ApexCharts/Chart.js), Thống kê thể loại phim và Top phim bán chạy nhất.
+*@
+@model CinemaXNet.Application.ViewModels.DashboardStats
 @{
     ViewData["Title"] = "Dashboard Tổng Quan";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<!-- Custom CSS to perfectly match the uploaded image (Dark Mode UI) -->
+<!-- Custom CSS cho Giao diện Admin Dashboard Chuẩn Dark Mode Premium -->
 <style>
     :root {
         --dash-bg: #18181b; /* Deep dark background */

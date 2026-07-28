@@ -1,3 +1,4 @@
+// IUnitOfWork: Interface dinh nghia cac phuong thuc Hop dong cho IUnitOfWork
 ﻿using System.Data;
 
 namespace CinemaXNet.Application.Interfaces;

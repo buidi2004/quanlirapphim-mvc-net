@@ -1,3 +1,4 @@
+// ProfileController: Controller xu ly cac yeu cau HTTP va dieu huong cho Profile
 ﻿using CinemaXNet.Domain.Exceptions;
 using CinemaXNet.Application.Interfaces;
 using CinemaXNet.Application.ViewModels;

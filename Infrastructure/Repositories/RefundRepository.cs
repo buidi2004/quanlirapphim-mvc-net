@@ -1,3 +1,4 @@
+// RefundRepository: Repository dam nhan cac thao tac truy van Database cho Refund
 ﻿using System.Data;
 using Dapper;
 using CinemaXNet.Application.Interfaces;
@@ -6,6 +7,7 @@ namespace CinemaXNet.Infrastructure.Repositories;
 
 public class RefundRepository(IDbConnection db) : IRefundRepository
 {
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức SearchTicketsAsync
     public async Task<IEnumerable<dynamic>> SearchTicketsAsync(string query)
     {
         var sql = """
@@ -24,11 +26,13 @@ public class RefundRepository(IDbConnection db) : IRefundRepository
         return await db.QueryAsync<dynamic>(sql, new { query = query, queryLike = $"%{query}%" });
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức GetTicketStatusAsync
     public async Task<dynamic?> GetTicketStatusAsync(int ticketId)
     {
         return await db.QueryFirstOrDefaultAsync<dynamic>("SELECT id, status FROM tickets WHERE id = @id", new { id = ticketId });
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức CancelTicketAsync
     public async Task CancelTicketAsync(int ticketId, string reason)
     {
         var updateSql = "UPDATE tickets SET status = 'cancelled' WHERE id = @id";

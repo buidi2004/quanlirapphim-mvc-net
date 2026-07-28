@@ -1,3 +1,4 @@
+// CinemaMcpTools: Thanh phan ma nguon xu ly logic trong he thong CinemaX
 ﻿using System.ComponentModel;
 using ModelContextProtocol.Server;
 using CinemaXNet.Application.Interfaces;

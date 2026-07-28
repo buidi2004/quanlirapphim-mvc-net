@@ -1,16 +1,21 @@
-﻿@model CinemaXNet.Application.ViewModels.SeatMapViewModel
+@* 
+  SeatMap.cshtml: Giao diện Chọn ghế trực quan (Bước 1 của quy trình Đặt vé)
+  Nhiệm vụ: Hiển thị sơ đồ ghế phòng chiếu, kết nối Realtime SignalR (với SeatHub), tính tổng tiền động và cho phép giữ ghế 15 phút.
+*@
+@model CinemaXNet.Application.ViewModels.SeatMapViewModel
 @{
     ViewData["Title"] = "Chọn ghế — " + Model.MovieTitle;
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewBag.HideBottomNav = true;
+    ViewBag.HideBottomNav = true; // Ẩn thanh Bottom Nav trên Mobile để tạo không gian rộng rãi chọn ghế
 }
 
 <div class="container py-4">
+    @* Thanh các bước đặt vé (1. Chọn ghế -> 2. Bắp nước -> 3. Thanh toán) *@
     @await Html.PartialAsync("_BookingStepper", 1)
 </div>
 
 <div class="row g-4">
-    <!-- Cột trái: Sơ đồ ghế -->
+    <!-- Cột trái: Sơ đồ ghế phòng chiếu -->
     <div class="col-lg-8">
         <div class="card border-0 shadow-lg" style="background-color: #ffffff !important; border: 1px solid #e9ecef !important;">
             <div class="card-header bg-white border-bottom border-light p-3">
@@ -25,19 +30,20 @@
                 </small>
             </div>
             <div class="card-body p-4">
+                @* Render Partial View Sơ đồ ghế thực tế *@
                 @await Html.PartialAsync("_SeatMap", Model)
             </div>
         </div>
     </div>
 
-    <!-- Cột phải: Thông tin đặt vé -->
+    <!-- Cột phải: Khung Tổng hợp Thông tin Đặt vé & Nút Giữ Ghế -->
     <div class="col-lg-4">
         <div class="card border-0 shadow-lg sticky-top" style="top: 20px; background-color: #ffffff !important; border: 1px solid #e9ecef !important;">
             <div class="card-header bg-white border-bottom border-light p-3">
                 <h5 class="mb-0 fw-medium"><i class="bi bi-receipt me-2 text-warning"></i>THÔNG TIN ĐẶT VÉ</h5>
             </div>
             <div class="card-body p-4">
-                <!-- Ghế đã chọn -->
+                <!-- Ghế đã chọn (Javascript sẽ chèn các badge tên ghế vào đây) -->
                 <div class="mb-4">
                     <label class="text-secondary small fw-medium">Ghế đã chọn:</label>
                     <div id="selected-seats-display" class="mt-2 p-2 bg-light rounded d-flex flex-wrap gap-1 align-items-center"
@@ -46,7 +52,7 @@
                     </div>
                 </div>
 
-                <!-- Tổng tiền -->
+                <!-- Đơn giá & Tổng tiền tạm tính -->
                 <div class="d-flex justify-content-between mb-3 border-bottom border-light pb-2">
                     <span class="text-secondary">Đơn giá:</span>
                     <span class="text-warning fw-medium" data-price-per-seat="@Model.PricePerSeat">
@@ -62,11 +68,12 @@
                     <span id="total-price" class="text-warning fw-medium fs-4">0₫</span>
                 </div>
 
-                <!-- Form giữ ghế -->
+                <!-- Form gửi Yêu cầu Giữ ghế tạm thời (15 phút) sang TicketService -->
                 <form id="booking-form" method="post" action="/booking/hold">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="showtimeId" value="@Model.ShowtimeId">
 
+                    @* Nếu chưa đăng nhập -> Cho phép nhập Email/SĐT để mua vé với tư cách Khách vãng lai (Guest) *@
                     @if (User.Identity == null || !User.Identity.IsAuthenticated)
                     {
                         <div class="mb-3">
@@ -94,7 +101,7 @@
     </div>
 </div>
 
-<!-- Sticky Checkout — Mobile only -->
+<!-- Thanh Checkout Cố định ở đáy màn hình Dành riêng cho Điện Thoại Mobile -->
 <div class="sticky-checkout" id="sticky-checkout">
     <div class="checkout-info">
         <div>

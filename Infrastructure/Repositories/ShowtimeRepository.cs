@@ -1,12 +1,14 @@
-﻿using System.Data;
+using System.Data;
 using CinemaXNet.Domain.Entities;
 using CinemaXNet.Application.Interfaces;
 using Dapper;
 
 namespace CinemaXNet.Infrastructure.Repositories;
 
+// ShowtimeRepository: Quản lý toàn bộ các thao tác đọc/ghi Lịch chiếu phim trong MySQL
 public class ShowtimeRepository(IDbConnection db) : IShowtimeRepository
 {
+    // Lấy suất chiếu theo Phim và Ngày chiếu (JOIN 3 bảng: showtimes + rooms + cinemas)
     public async Task<IEnumerable<Showtime>> GetByMovieAndDateAsync(int movieId, DateOnly date)
     {
         const string sql = @"
@@ -20,6 +22,9 @@ public class ShowtimeRepository(IDbConnection db) : IShowtimeRepository
             WHERE s.movie_id = @movieId AND s.show_date = @date
             ORDER BY s.start_time";
 
+        // Sử dụng Dapper Multi-Mapping (QueryAsync<T1, T2, T3, TReturn>):
+        // Tự động gộp 3 bảng từ 1 câu SQL JOIN thành cấu trúc Object lồng nhau (Showtime -> Room -> Cinema)
+        // Tham số `splitOn: "id,id"` chỉ định cột mốc phân tách giữa các bảng trong câu lệnh SELECT.
         var showtimes = await db.QueryAsync<Showtime, Room, Cinema, Showtime>(
             sql,
             (showtime, room, cinema) => 
@@ -34,6 +39,7 @@ public class ShowtimeRepository(IDbConnection db) : IShowtimeRepository
         return showtimes;
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức FindByIdAsync
     public async Task<Showtime?> FindByIdAsync(int id)
     {
         const string sql = @"
@@ -56,6 +62,7 @@ public class ShowtimeRepository(IDbConnection db) : IShowtimeRepository
         return result.FirstOrDefault();
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức GetByCinemaAndDateAsync
     public async Task<IEnumerable<Showtime>> GetByCinemaAndDateAsync(int cinemaId, DateOnly date)
     {
         const string sql = @"
@@ -79,6 +86,7 @@ public class ShowtimeRepository(IDbConnection db) : IShowtimeRepository
         return showtimes;
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức GetAllByDateAsync
     public async Task<IEnumerable<Showtime>> GetAllByDateAsync(DateOnly date)
     {
         const string sql = @"
@@ -110,6 +118,7 @@ public class ShowtimeRepository(IDbConnection db) : IShowtimeRepository
         return showtimes;
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức Items
     public async Task<(IEnumerable<Showtime> Items, int TotalCount)> GetPagedAsync(int page, int pageSize)
     {
         var offset = (page - 1) * pageSize;
@@ -145,11 +154,13 @@ public class ShowtimeRepository(IDbConnection db) : IShowtimeRepository
         return (showtimes, totalCount);
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức GetAllMoviesAsync
     public async Task<IEnumerable<Movie>> GetAllMoviesAsync()
     {
         return await db.QueryAsync<Movie>("SELECT id, title FROM movies ORDER BY id DESC");
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức GetAllRoomsWithCinemaAsync
     public async Task<IEnumerable<Room>> GetAllRoomsWithCinemaAsync()
     {
         var sql = @"
@@ -168,18 +179,21 @@ public class ShowtimeRepository(IDbConnection db) : IShowtimeRepository
         );
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức AddAsync
     public async Task AddAsync(int movieId, int roomId, string showDate, string startTime, string format, decimal price)
     {
         var sql = "INSERT INTO showtimes (movie_id, room_id, show_date, start_time, format, price) VALUES (@MovieId, @RoomId, @ShowDate, @StartTime, @Format, @Price)";
         await db.ExecuteAsync(sql, new { MovieId = movieId, RoomId = roomId, ShowDate = showDate, StartTime = startTime, Format = format, Price = price });
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức UpdateAsync
     public async Task UpdateAsync(int id, int movieId, int roomId, string showDate, string startTime, string format, decimal price)
     {
         var sql = "UPDATE showtimes SET movie_id = @MovieId, room_id = @RoomId, show_date = @ShowDate, start_time = @StartTime, format = @Format, price = @Price WHERE id = @Id";
         await db.ExecuteAsync(sql, new { Id = id, MovieId = movieId, RoomId = roomId, ShowDate = showDate, StartTime = startTime, Format = format, Price = price });
     }
 
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức DeleteAsync
     public async Task DeleteAsync(int id)
     {
         await db.ExecuteAsync("DELETE FROM showtimes WHERE id = @Id", new { Id = id });

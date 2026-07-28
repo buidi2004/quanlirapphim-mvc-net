@@ -1,3 +1,4 @@
+// DashboardRepository: Repository dam nhan cac thao tac truy van Database cho Dashboard
 using System.Data;
 using CinemaXNet.Application.Interfaces;
 using CinemaXNet.Application.ViewModels;
@@ -8,6 +9,7 @@ namespace CinemaXNet.Infrastructure.Repositories;
 
 public class DashboardRepository(IDbConnection db) : IDashboardRepository
 {
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức GetDashboardStatsAsync
     public async Task<DashboardStats> GetDashboardStatsAsync()
     {
         var stats = new DashboardStats();

@@ -1,4 +1,5 @@
-﻿using CinemaXNet.Domain.Exceptions;
+// AuthController: Controller xu ly cac yeu cau HTTP va dieu huong cho Auth
+using CinemaXNet.Domain.Exceptions;
 using CinemaXNet.Application.Interfaces;
 using CinemaXNet.Application.ViewModels;
 using Microsoft.AspNetCore.Authentication;
@@ -8,9 +9,10 @@ using System.Security.Claims;
 
 namespace CinemaXNet.Controllers;
 
+// AuthController: Đảm nhận chức năng Đăng nhập, Đăng ký, Quên mật khẩu, Đăng nhập qua MXH (Google/Facebook).
 public class AuthController(IUserService userService, IEmailSender emailSender) : Controller
 {
-    // GET /login
+    // Màn hình Đăng nhập (GET /login)
     [HttpGet("login")]
     public IActionResult Login(string? returnUrl = null)
     {
@@ -19,19 +21,25 @@ public class AuthController(IUserService userService, IEmailSender emailSender) 
         return View(new LoginViewModel());
     }
 
-    // POST /login
+    // Xử lý gửi Form Đăng nhập (POST /login)
     [HttpPost("login")]
-    [ValidateAntiForgeryToken]
+    [ValidateAntiForgeryToken] // Chống CSRF giả mạo form
     public async Task<IActionResult> Login(LoginViewModel vm, string? returnUrl = null)
     {
         if (!ModelState.IsValid) return View(vm);
 
         try
         {
+            // Kiểm tra mật khẩu trong DB
             var user = await userService.AuthenticateAsync(vm.Email, vm.Password);
+            
+            // Nếu đúng, tạo Cookie đăng nhập (SignInUser là hàm Helper ở cuối file)
             await SignInUser(user);
+            
+            // Nếu có URL cũ (ví dụ đang ở trang Giỏ hàng mà bị văng ra), thì đăng nhập xong chuyển về lại trang Giỏ hàng.
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                 return Redirect(returnUrl);
+                
             return Redirect("/");
         }
         catch (BusinessException ex)
@@ -69,13 +77,14 @@ public class AuthController(IUserService userService, IEmailSender emailSender) 
         }
     }
 
-    // POST /logout
+    // Xử lý Đăng xuất (POST /logout)
     [HttpPost("logout")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
+        // Xóa Cookie đăng nhập của ứng dụng
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        return RedirectToAction(nameof(Login));
+        return RedirectToAction(nameof(Login)); // Quay về trang đăng nhập
     }
 
     // GET /forgot-password
@@ -136,15 +145,16 @@ public class AuthController(IUserService userService, IEmailSender emailSender) 
         }
     }
 
-    // GET /auth/google-login
+    // Đăng nhập bằng Google
     [HttpGet("google-login")]
     public IActionResult GoogleLogin(string? returnUrl = null)
     {
+        // Gửi yêu cầu Challenge đến Middleware Google để bật Popup đăng nhập Google
         var properties = new AuthenticationProperties { RedirectUri = Url.Action("ExternalLoginCallback", new { returnUrl }) };
         return Challenge(properties, "Google");
     }
 
-    // GET /auth/facebook-login
+    // Đăng nhập bằng Facebook
     [HttpGet("facebook-login")]
     public IActionResult FacebookLogin(string? returnUrl = null)
     {

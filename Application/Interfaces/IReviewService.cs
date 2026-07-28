@@ -1,3 +1,4 @@
+// IReviewService: Interface dinh nghia cac phuong thuc Hop dong cho IReview
 ﻿namespace CinemaXNet.Application.Interfaces;
 
 public interface IReviewService

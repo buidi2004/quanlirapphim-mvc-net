@@ -1,3 +1,4 @@
+// IReportRepository: Interface dinh nghia cac phuong thuc Hop dong cho IReport
 ﻿namespace CinemaXNet.Application.Interfaces;
 
 public interface IReportRepository
