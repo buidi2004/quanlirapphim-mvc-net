@@ -1,4 +1,4 @@
-﻿@model CinemaXNet.Application.ViewModels.TicketDetailViewModel
+@model CinemaXNet.Application.ViewModels.TicketDetailViewModel
 @{
     ViewData["Title"] = "Vé Chi Tiết";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -96,8 +96,12 @@
                     <div class="ticket-back-content text-center py-4">
                         <h5 class="text-warning fw-medium mb-3"><i class="bi bi-qr-code me-2"></i>MÃ VÉ ĐIỆN TỬ</h5>
 
+                        @{
+                            // Tạo QR Code chứa dữ liệu chuẩn JSON để tương thích hoàn hảo với máy quét API
+                            var qrPayload = "{\"ticketId\":" + Model.Ticket.Id + "}";
+                        }
                         <div class="qr-container bg-white p-4 rounded-2 d-inline-block mx-auto mb-3">
-                            <div id="qr-code" data-ticket-code="@ticketCode"></div>
+                            <div id="qr-code" data-ticket-code="@qrPayload"></div>
                         </div>
 
                         <div class="ticket-code-display mb-3">

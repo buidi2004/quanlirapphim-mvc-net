@@ -1,4 +1,4 @@
-﻿@model CinemaXNet.Application.ViewModels.BookingConfirmViewModel
+@model CinemaXNet.Application.ViewModels.BookingConfirmViewModel
 @{
     var transactionId = ViewBag.TransactionId as string ?? "CXN-" + DateTime.Now.Ticks.ToString();
     ViewData["Title"] = "Đặt vé thành công!";
@@ -48,7 +48,12 @@
                 <div class="ticket-back d-flex flex-column justify-content-center align-items-center">
                     <p class="fw-medium text-warning mb-2" style="letter-spacing: 1px;">MÃ QR KIỂM VÉ</p>
                     <div class="bg-white p-2 rounded d-inline-block shadow-sm">
-                        <canvas id="qr-canvas" data-qr-text="@(transactionId)" width="130" height="130"></canvas>
+                        @{
+                            // Mặc định lấy Ticket đầu tiên nếu có, lưu thành JSON
+                            var firstTicketId = Model.TicketIds?.FirstOrDefault() ?? 0;
+                            var qrPayload = "{\"ticketId\":" + firstTicketId + "}";
+                        }
+                        <canvas id="qr-canvas" data-qr-text="@qrPayload" width="130" height="130"></canvas>
                     </div>
                     <p class="font-monospace small mt-3 mb-0 text-dark px-3 py-1 bg-light rounded border border-light">
                         @transactionId
