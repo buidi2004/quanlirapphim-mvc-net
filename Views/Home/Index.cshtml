@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewData["Title"] = "Trang chủ";
     Layout = "~/Views/Shared/_Layout.cshtml";
     var nowShowing = ViewBag.NowShowing as IEnumerable<CinemaXNet.Domain.Entities.Movie> ?? new List<CinemaXNet.Domain.Entities.Movie>();
@@ -733,17 +733,17 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <!-- #14 Đăng Ký Nhận Bản Tin -->
-<div class="mb-5 py-5 rounded-2 text-center position-relative overflow-hidden shadow-lg" data-aos="zoom-in" style="background: url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1200&auto=format&fit=crop') center/cover; border: 1px solid #333;">
-    <div class="position-absolute top-0 start-0 w-100 h-100" style="background: rgba(0,0,0,0.85);"></div>
-    <div class="position-relative z-1 p-4">
-        <h2 class="fw-medium text-primary mb-3"><i class="bi bi-envelope-paper-heart me-2"></i>Đừng Bỏ Lỡ Ưu Đãi!</h2>
-        <p class="text-dark fs-5 mb-4">Đăng ký nhận email để cập nhật lịch chiếu sớm nhất và mã giảm giá độc quyền.</p>
+<div class="mb-5 py-5 rounded-4 text-center position-relative overflow-hidden shadow-lg border border-secondary-subtle" data-aos="zoom-in" style="background: url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1200&auto=format&fit=crop') center/cover;">
+    <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(220, 53, 69, 0.5) 100%);"></div>
+    <div class="position-relative z-1 p-4 p-md-5">
+        <h2 class="fw-bold text-white mb-3 display-6"><i class="bi bi-envelope-paper-heart text-danger me-2"></i>Đừng Bỏ Lỡ Ưu Đãi!</h2>
+        <p class="text-white-50 fs-5 mb-5 mx-auto" style="max-width: 600px;">Đăng ký nhận thông báo qua email để cập nhật lịch chiếu sớm nhất và nhận ngay các mã giảm giá độc quyền dành riêng cho bạn.</p>
         <div class="row justify-content-center">
-            <div class="col-md-6">
-                <form action="#" method="get" onsubmit="alert('Đăng ký thành công! Hãy kiểm tra hộp thư thường xuyên nhé.'); return false;" class="input-group input-group-lg border border-light rounded-3 overflow-hidden shadow">
-                    <span class="input-group-text bg-white border-0 text-dark"><i class="bi bi-envelope"></i></span>
-                    <input type="email" class="form-control bg-white border-0 text-dark shadow-none" placeholder="Nhập email của bạn..." style="outline: none;" required>
-                    <button type="submit" class="btn btn-primary fw-medium px-4">ĐĂNG KÝ</button>
+            <div class="col-md-8 col-lg-6">
+                <form action="#" method="get" onsubmit="alert('Đăng ký thành công! Hãy kiểm tra hộp thư thường xuyên nhé.'); return false;" class="input-group input-group-lg rounded-pill overflow-hidden shadow-sm p-1 bg-white">
+                    <span class="input-group-text bg-transparent border-0 text-muted ps-4"><i class="bi bi-envelope fs-5"></i></span>
+                    <input type="email" class="form-control border-0 shadow-none bg-transparent" placeholder="Nhập địa chỉ email của bạn..." style="outline: none;" required>
+                    <button type="submit" class="btn btn-danger rounded-pill fw-bold px-4 px-md-5 transition-all text-white">ĐĂNG KÝ NGAY</button>
                 </form>
             </div>
         </div>
