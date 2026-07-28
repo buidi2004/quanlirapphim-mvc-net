@@ -1,4 +1,5 @@
-﻿using System.Data;
+// Program: Thanh phan ma nguon xu ly logic trong he thong CinemaX
+using System.Data;
 using CinemaXNet.Infrastructure.Data;
 using CinemaXNet.Infrastructure.Repositories;
 using CinemaXNet.Application.Interfaces;
@@ -16,18 +17,23 @@ using System.Reflection;
 using ModelContextProtocol.Server;
 using Microsoft.AspNetCore.HttpOverrides;
 
+// Program.cs: Điểm khởi đầu (Entry Point) của ứng dụng ASP.NET Core 8.0.
+// Đảm nhận 2 nhiệm vụ chính: 
+// 1. Cấu hình Container Dependency Injection (DI) để Đăng ký các Services, Repositories, Authentication.
+// 2. Thiết lập đường ống xử lý yêu cầu HTTP (Middleware Pipeline).
+
 var builder = WebApplication.CreateBuilder(args);
 
-// ── Serilog ────────────────────────────────────────────────────────────────
+// ── 1. Cấu hình Ghi Log (Logging) bằng Serilog ─────────────────────────────
 builder.Host.UseSerilog((ctx, lc) => lc
     .WriteTo.Console()
     .ReadFrom.Configuration(ctx.Configuration));
 
-// ── MVC ────────────────────────────────────────────────────────────────────
+// ── 2. Đăng ký dịch vụ MVC & SignalR Realtime ──────────────────────────────
 builder.Services.AddControllersWithViews();
-builder.Services.AddSignalR();
+builder.Services.AddSignalR(); // Đăng ký WebSocket SignalR cho SeatHub
 
-// ── Forwarded Headers (Reverse Proxy) ──────────────────────────────────────
+// ── 3. Cấu hình Proxy Nginx / Docker (Forwarded Headers) ────────────────────
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
@@ -35,35 +41,35 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownProxies.Clear();
 });
 
-// ── Session ────────────────────────────────────────────────────────────────
+// ── 4. Cấu hình Bộ nhớ tạm & Session ───────────────────────────────────────
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout        = TimeSpan.FromMinutes(30);
+    options.IdleTimeout        = TimeSpan.FromMinutes(30); // Session hết hạn sau 30 phút không thao tác
     options.Cookie.HttpOnly    = true;
     options.Cookie.IsEssential = true;
 });
 
-// ── Cookie Authentication ──────────────────────────────────────────────────
+// ── 5. Cấu hình Xác thực (Authentication: Cookie + JWT + Google + Facebook) ─
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath        = "/login";
+        options.LoginPath        = "/login";       // Chuyển hướng khi chưa đăng nhập
         options.LogoutPath       = "/logout";
-        options.AccessDeniedPath = "/errors/403";
+        options.AccessDeniedPath = "/errors/403";  // Chuyển hướng khi không đủ quyền (Forbidden)
         options.Cookie.Name      = "CinemaX.Auth";
     })
-    .AddGoogle(options =>
+    .AddGoogle(options => // Đăng nhập bằng Google OAuth
     {
         options.ClientId = builder.Configuration["Authentication:Google:ClientId"] ?? "mock-client-id";
         options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"] ?? "mock-client-secret";
     })
-    .AddFacebook(options =>
+    .AddFacebook(options => // Đăng nhập bằng Facebook OAuth
     {
         options.AppId = builder.Configuration["Authentication:Facebook:AppId"] ?? "mock-app-id";
         options.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"] ?? "mock-app-secret";
     })
-    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options => // Xác thực JWT dành cho Mobile App API
     {
         var jwtSettings = builder.Configuration.GetSection("Jwt");
         var secretKey = jwtSettings["Key"] ?? throw new InvalidOperationException("JWT Secret Key is not configured.");
@@ -82,6 +88,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddAuthorization();
 
+// Cấu hình CORS cho phép Mobile App hoặc các Domain khác gọi API
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
@@ -91,17 +98,17 @@ builder.Services.AddCors(options =>
                         .AllowCredentials());
 });
 
-// ── Database (Dapper + MySQL) ─────────────────────────────────────
+// ── 6. Đăng ký Database Connection (Dapper + MySQL) ───────────────────────
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
 builder.Services.AddScoped<IDbConnection>(_ => new MySqlConnection(connectionString));
 
-// Initialize MySQL database schema and seed data
+// Tự động khởi tạo bảng DB và dữ liệu mẫu (Seed Data) nếu DB trống
 DatabaseInitializer.Initialize(connectionString);
-Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true; // Map tự động column_name MySQL -> ColumnName C#
 Dapper.SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
 Dapper.SqlMapper.AddTypeHandler(new TimeOnlyTypeHandler());
 
-// ── Repositories ──────────────────────────────────────────────────────────
+// ── 7. Đăng ký Repositories (Data Access Layer - Scope: Per Request) ──────
 builder.Services.AddScoped<ICinemaRepository, CinemaRepository>();
 builder.Services.AddScoped<IMovieRepository, MovieRepository>();
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
@@ -125,7 +132,9 @@ builder.Services.AddScoped<IReportRepository, ReportRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<IBannerRepository, BannerRepository>();
 
-// Đăng ký Services
+// ── 8. Đăng ký Business Services (Application Layer) ──────────────────────
+builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
+builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IMovieService, MovieService>();
 builder.Services.AddScoped<ITicketService, TicketService>();
@@ -153,18 +162,17 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IBannerService, BannerService>();
 builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 
-// ── AutoMapper & MediatR ──────────────────────────────────────────────────
+// ── 9. Đăng ký AutoMapper & MediatR ───────────────────────────────────────
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
-// ── Background Service (thay cron job PHP) ────────────────────────────────
-builder.Services.AddHostedService<HoldExpiryBackgroundService>();
-builder.Services.AddHostedService<MarketingBackgroundService>();
+// ── 10. Đăng ký các Tiến trình chạy ngầm (Background Hosted Services) ──────
+builder.Services.AddHostedService<HoldExpiryBackgroundService>(); // Nhả ghế hết hạn
+builder.Services.AddHostedService<MarketingBackgroundService>();   // Gửi mail khuyến mãi
 
-// ── IHttpContextAccessor ──────────────────────────────────────────────────
 builder.Services.AddHttpContextAccessor();
 
-// ── MCP Server ────────────────────────────────────────────────────────────
+// ── 11. Đăng ký MCP Server Endpoint ────────────────────────────────────────
 builder.Services.AddMcpServer(options => 
 {
     options.ServerInfo = new() { Name = "CinemaX-MCP", Version = "1.0.0" };
@@ -174,12 +182,11 @@ builder.Services.AddMcpServer(options =>
 
 var app = builder.Build();
 
-// ── Middleware Pipeline ────────────────────────────────────────────────────
-app.UseMiddleware<GlobalExceptionMiddleware>();
+// ── 12. Cấu hình Middleware Pipeline (Thứ tự xử lý Request) ───────────────
+app.UseMiddleware<GlobalExceptionMiddleware>(); // Bắt lỗi toàn cục
 
 if (!app.Environment.IsDevelopment())
 {
-    // app.UseExceptionHandler("/error/500");
     app.UseHsts();
 }
 app.UseWhen(context => !context.Request.Path.StartsWithSegments("/api"), appBuilder =>
@@ -201,23 +208,22 @@ app.UseWhen(context => context.Request.Path.StartsWithSegments("/api"), appBuild
 
 app.UseForwardedHeaders();
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+app.UseStaticFiles(); // Cho phép đọc file tĩnh (.css, .js, .png...) trong wwwroot
 app.UseRouting();
 
 app.UseCors("AllowAll");
 
 app.UseSession();
-app.UseAuthentication();
-app.UseAuthorization();
+app.UseAuthentication(); // Xác thực người dùng (Kiểm tra xem là ai)
+app.UseAuthorization();  // Phân quyền (Kiểm tra có quyền Admin/Staff hay không)
 
+// Map SignalR Endpoint
 app.MapHub<SeatHub>("/seathub");
 
-// ── Routes ─────────────────────────────────────────────────────────────────
-// Attribute routes (defined in controllers with [Route] and [HttpGet/Post]) take priority.
-// Default MVC route as fallback:
+// ── 13. Cấu hình Route cho MVC Controller ─────────────────────────────────
 app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// Explicit friendly routes matching PHP URLs
+// Route ngắn gọn thân thiện (Friendly URLs) tương thích với PHP cũ
 app.MapControllerRoute("login",          "login",          new { controller = "Auth",      action = "Login" });
 app.MapControllerRoute("register",       "register",       new { controller = "Auth",      action = "Register" });
 app.MapControllerRoute("logout",         "logout",         new { controller = "Auth",      action = "Logout" });
@@ -231,7 +237,7 @@ app.MapControllerRoute("promotions",     "promotions",     new { controller = "P
 app.MapControllerRoute("cinemas",        "cinemas",        new { controller = "Cinema",    action = "Index" });
 app.MapControllerRoute("profile",        "profile",        new { controller = "Profile",   action = "Index" });
 
-// ── MCP Endpoint ───────────────────────────────────────────────────────────
 app.MapMcp("/api/mcp");
 
 app.Run();
+public partial class Program { }
