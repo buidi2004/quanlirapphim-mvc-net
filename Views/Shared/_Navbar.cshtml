@@ -1,5 +1,15 @@
-﻿<nav id="mainNavbar" class="navbar navbar-expand-lg sticky-top smart-navbar" style="z-index: 1050;">
+@* 
+  _Navbar.cshtml: Partial View Thanh Menu Điều Hướng Header Toàn Cục (Global Reusable Header Component)
+  Nhiệm vụ & Tính năng Tái Sử Dụng:
+  1. Tái sử dụng trên tất cả các trang web của khách hàng thông qua Master Layout (_Layout.cshtml).
+  2. Hiển thị Logo thương hiệu, Menu xổ xuống (Dropdown) phân loại Phim đang chiếu, Phim sắp chiếu và Thể loại phim.
+  3. Đường dẫn nhanh: "Đặt Vé Nhanh" (Fast Booking), "Hệ thống rạp", "Khuyến mãi", "Tin tức".
+  4. Thanh Tìm Kiếm Trực Tiếp (Live Search Bar) cho phép gõ từ khóa tìm tên phim.
+  5. Menu Tài Khoản & Quyền Đăng Nhập: Tự động đổi giao diện giữa Khách vãng lai (Nút Đăng nhập/Đăng ký) và Người dùng đã đăng nhập (Hiển thị Avatar, Tên, Cấp độ thành viên, Nút Đăng xuất, và Menu Quản trị Admin nếu là Admin).
+*@
+<nav id="mainNavbar" class="navbar navbar-expand-lg sticky-top smart-navbar" style="z-index: 1050;">
     <div class="container">
+        @* Logo Thương hiệu CinemaX *@
         <a class="navbar-brand fw-medium text-warning fs-3" href="/">
             <i class="bi bi-film"></i> CinemaX
         </a>
@@ -10,7 +20,7 @@
 
         <div class="collapse navbar-collapse" id="navMenu">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <!-- Standard Dropdown: Phim -->
+                <!-- Dropdown Menu Danh mục & Thể loại Phim -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMovies" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Phim
@@ -27,9 +37,15 @@
                     </ul>
                 </li>
                 
+                @* Nút Đặt Vé Nhanh (Fast Booking) *@
                 <li class="nav-item">
                     <a class="nav-link text-warning fw-medium" href="/booking/fast">
                         <i class="bi bi-lightning-charge-fill me-1"></i>Đặt Vé Nhanh
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/cinemas/showtimes">
+                        <i class="bi bi-calendar-event me-1"></i>Lịch chiếu
                     </a>
                 </li>
                 <li class="nav-item">
