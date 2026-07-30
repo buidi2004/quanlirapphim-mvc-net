@@ -30,6 +30,10 @@ public class AdminNewsController(INewsService newsService) : Controller
             await newsService.AddNewsAsync(title, excerpt, content, image);
             TempData["Success"] = "Đăng tin tức thành công!";
         }
+        catch (InvalidOperationException ex)
+        {
+            TempData["Error"] = ex.Message;
+        }
         catch (Exception)
         {
             TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
@@ -46,6 +50,10 @@ public class AdminNewsController(INewsService newsService) : Controller
         {
             await newsService.UpdateNewsAsync(id, title, excerpt, content, image);
             TempData["Success"] = "Cập nhật tin tức thành công!";
+        }
+        catch (InvalidOperationException ex)
+        {
+            TempData["Error"] = ex.Message;
         }
         catch (Exception)
         {

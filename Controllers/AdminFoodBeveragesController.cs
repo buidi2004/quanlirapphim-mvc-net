@@ -8,7 +8,7 @@ namespace CinemaXNet.Controllers;
 
 [Authorize(Roles = "admin,cinema_manager")]
 [Route("admin/food-beverages")]
-public class AdminFoodBeveragesController(IFoodBeverageService foodBeverageService) : Controller
+public class AdminFoodBeveragesController(IFoodBeverageService foodBeverageService, IImageUploadService imageUploadService) : Controller
 {
     [HttpGet]
     // Xử lý logic và luồng thực thi cho phương thức Index
@@ -31,20 +31,7 @@ public class AdminFoodBeveragesController(IFoodBeverageService foodBeverageServi
             string? imageUrl = null;
             if (image != null && image.Length > 0)
             {
-                var ext = Path.GetExtension(image.FileName).ToLowerInvariant();
-                var allowedExts = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
-                if (!allowedExts.Contains(ext))
-                {
-                    TempData["Error"] = "Chỉ chấp nhận file ảnh (jpg, png, gif, webp).";
-                    return RedirectToAction(nameof(Index));
-                }
-                var newName = $"{Guid.NewGuid():N}{ext}";
-                var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "food");
-                Directory.CreateDirectory(uploadDir);
-                var filePath = Path.Combine(uploadDir, newName);
-                await using var stream = System.IO.File.Create(filePath);
-                await image.CopyToAsync(stream);
-                imageUrl = "/uploads/food/" + newName;
+                imageUrl = await imageUploadService.UploadImageAsync(image, "food");
             }
 
             var foodBeverage = new FoodBeverage
@@ -57,6 +44,10 @@ public class AdminFoodBeveragesController(IFoodBeverageService foodBeverageServi
             };
             await foodBeverageService.AddAsync(foodBeverage);
             TempData["Success"] = "Thêm bắp nước thành công!";
+        }
+        catch (InvalidOperationException ex)
+        {
+            TempData["Error"] = ex.Message;
         }
         catch (Exception)
         {
@@ -75,20 +66,7 @@ public class AdminFoodBeveragesController(IFoodBeverageService foodBeverageServi
             string? imageUrl = null;
             if (image != null && image.Length > 0)
             {
-                var ext = Path.GetExtension(image.FileName).ToLowerInvariant();
-                var allowedExts = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
-                if (!allowedExts.Contains(ext))
-                {
-                    TempData["Error"] = "Chỉ chấp nhận file ảnh (jpg, png, gif, webp).";
-                    return RedirectToAction(nameof(Index));
-                }
-                var newName = $"{Guid.NewGuid():N}{ext}";
-                var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "food");
-                Directory.CreateDirectory(uploadDir);
-                var filePath = Path.Combine(uploadDir, newName);
-                await using var stream = System.IO.File.Create(filePath);
-                await image.CopyToAsync(stream);
-                imageUrl = "/uploads/food/" + newName;
+                imageUrl = await imageUploadService.UploadImageAsync(image, "food");
             }
 
             var foodBeverage = new FoodBeverage
@@ -102,6 +80,10 @@ public class AdminFoodBeveragesController(IFoodBeverageService foodBeverageServi
             };
             await foodBeverageService.UpdateAsync(foodBeverage);
             TempData["Success"] = "Cập nhật bắp nước thành công!";
+        }
+        catch (InvalidOperationException ex)
+        {
+            TempData["Error"] = ex.Message;
         }
         catch (Exception)
         {

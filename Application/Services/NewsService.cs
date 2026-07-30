@@ -44,7 +44,10 @@ public class NewsService(INewsRepository newsRepository, IImageUploadService ima
     public async Task UpdateNewsAsync(int id, string title, string excerpt, string content, IFormFile? image)
     {
         string slug = CreateSlug(title);
-        string? imageUrl = await UploadImageAsync(image);
+        // Chỉ upload ảnh mới nếu admin có chọn file — tránh gọi Cloudinary không cần thiết
+        string? imageUrl = (image != null && image.Length > 0)
+            ? await UploadImageAsync(image)
+            : null;
         await newsRepository.UpdateAsync(id, title, slug, excerpt, content, imageUrl);
     }
 
