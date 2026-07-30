@@ -25,7 +25,7 @@
 <nav id="mainNavbar" class="navbar navbar-expand-lg sticky-top smart-navbar" style="z-index: 1050; border-bottom: 1px solid var(--color-primary);">
     <div class="container">
         @* Logo Thương hiệu CinemaX *@
-        <a class="navbar-brand fw-bold fs-3 text-primary-custom" href="/">
+        <a class="navbar-brand fw-bold fs-3 text-danger" href="/">
             <i class="bi bi-film"></i> CinemaX
         </a>
 
@@ -39,11 +39,11 @@
 
             <!-- Sub-navigation (Tông 2 - Cát Khaki) dời xuống dưới, ở đây chỉ để lại Search và Auth -->
 
-            <div class="d-flex me-3 d-none d-lg-flex position-relative search-container">
+            <div class="d-flex me-3 d-none d-lg-flex position-relative search-container flex-grow-1" style="max-width: 500px;">
                 <form class="search-form-premium w-100" action="/search" method="GET">
-                    <div class="input-group input-group-sm flex-nowrap" style="width: 250px;">
-                        <input type="text" name="q" id="mainSearchInput" class="form-control border-end-0" placeholder="Tìm phim, rạp..." style="border-radius: 20px 0 0 20px;" autocomplete="off">
-                        <button type="submit" class="btn bg-white border border-start-0 text-muted" aria-label="Tìm kiếm" style="border-radius: 0 20px 20px 0;"><i class="bi bi-search"></i></button>
+                    <div class="input-group flex-nowrap w-100">
+                        <input type="text" name="q" id="mainSearchInput" class="form-control border-end-0 py-2" placeholder="Tìm phim, rạp..." style="border-radius: 20px 0 0 20px;" autocomplete="off">
+                        <button type="submit" class="btn bg-white border border-start-0 text-muted px-3" aria-label="Tìm kiếm" style="border-radius: 0 20px 20px 0;"><i class="bi bi-search"></i></button>
                     </div>
                 </form>
                 <!-- Trending Searches Dropdown -->
@@ -164,10 +164,10 @@
                 else
                 {
                     <li class="nav-item">
-                        <a class="nav-link me-3" href="/login">Đăng nhập</a>
+                        <a class="nav-link me-3 fw-medium text-dark" href="/login">Đăng nhập</a>
                     </li>
                     <li class="nav-item">
-                        <a class="btn btn-sm btn-primary fw-semibold" href="/register">Đăng ký</a>
+                        <a class="btn btn-danger fw-bold rounded-pill px-4 shadow-sm" href="/register">Đăng ký</a>
                     </li>
                 }
             </ul>
@@ -177,41 +177,49 @@
 
 <!-- Sub Navigation (Tông 2 - Cát Khaki) -->
 <div class="sub-nav-earth d-none d-lg-block shadow-sm" style="background-color: var(--color-earth-2); border-bottom: 2px solid var(--color-primary);">
-    <div class="container">
-        <ul class="nav py-1 justify-content-center fw-medium align-items-center" style="font-size: 15px;">
-            <li class="nav-item dropdown me-4">
-                <a class="nav-link dropdown-toggle text-dark px-0" href="#" id="navbarDropdownMovies" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <div class="container d-flex justify-content-between align-items-center">
+        <!-- Left Menu -->
+        <ul class="nav py-2 fw-medium align-items-center flex-grow-1" style="font-size: 15px; gap: 1.5rem;">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle text-dark px-0 hover-primary" href="#" id="navbarDropdownMovies" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="bi bi-film me-1"></i> Phim
                 </a>
                 <ul class="dropdown-menu shadow border-0 mt-2" aria-labelledby="navbarDropdownMovies">
-                    <li><h6 class="dropdown-header text-primary-custom fw-bold">Danh mục</h6></li>
+                    <li><h6 class="dropdown-header text-danger fw-bold">Danh mục</h6></li>
                     <li><a class="dropdown-item py-2" href="/movies">Phim Đang Chiếu</a></li>
                     <li><a class="dropdown-item py-2" href="/movies?status=coming_soon">Phim Sắp Chiếu</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><h6 class="dropdown-header text-primary-custom fw-bold">Thể loại</h6></li>
+                    <li><h6 class="dropdown-header text-danger fw-bold">Thể loại</h6></li>
                     <li><a class="dropdown-item py-2" href="/movies?genre=Hành động">Hành Động</a></li>
                     <li><a class="dropdown-item py-2" href="/movies?genre=Khoa học viễn tưởng">Viễn Tưởng</a></li>
                     <li><a class="dropdown-item py-2" href="/movies?genre=Kinh dị">Kinh Dị</a></li>
                 </ul>
             </li>
-            <li class="nav-item me-4">
-                <a class="nav-link text-primary-custom fw-bold px-0" href="/booking/fast">
-                    <i class="bi bi-lightning-charge-fill me-1"></i> Đặt Vé Nhanh
-                </a>
-            </li>
-            <li class="nav-item me-4">
+            <li class="nav-item">
                 <a class="nav-link text-dark px-0 hover-primary" href="/cinemas/showtimes">Lịch chiếu</a>
             </li>
-            <li class="nav-item me-4">
+            <li class="nav-item">
                 <a class="nav-link text-dark px-0 hover-primary" href="/cinemas">Hệ thống rạp</a>
             </li>
-            <li class="nav-item me-4">
+            <li class="nav-item">
                 <a class="nav-link text-dark px-0 hover-primary" href="/promotions">Ưu đãi</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link text-dark px-0 hover-primary" href="/news">Tin tức</a>
             </li>
+            <li class="nav-item ms-3">
+                <a class="btn btn-danger btn-sm rounded-pill px-4 fw-bold shadow-sm d-flex align-items-center" href="/booking/fast">
+                    <i class="bi bi-lightning-charge-fill me-1"></i> ĐẶT VÉ NHANH
+                </a>
+            </li>
         </ul>
+        
+        <!-- Right Widget: Cinema Selector / Status -->
+        <div class="d-flex align-items-center text-dark text-opacity-75" style="font-size: 14px;">
+            <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+            <span class="me-2">Rạp đang chọn:</span>
+            <a href="#" class="text-dark fw-bold text-decoration-none border-bottom border-dark border-opacity-25 pb-1 hover-primary">Toàn Quốc <i class="bi bi-chevron-down ms-1" style="font-size: 10px;"></i></a>
+        </div>
     </div>
 </div>
 <style>
