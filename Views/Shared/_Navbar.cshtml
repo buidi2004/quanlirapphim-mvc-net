@@ -215,10 +215,21 @@
         </ul>
         
         <!-- Right Widget: Cinema Selector / Status -->
-        <div class="d-flex align-items-center text-dark text-opacity-75" style="font-size: 14px;">
+        <div class="d-flex align-items-center text-dark text-opacity-75 dropdown" style="font-size: 14px;">
             <i class="bi bi-geo-alt-fill text-danger me-1"></i>
             <span class="me-2">Rạp đang chọn:</span>
-            <a href="#" class="text-dark fw-bold text-decoration-none border-bottom border-dark border-opacity-25 pb-1 hover-primary">Toàn Quốc <i class="bi bi-chevron-down ms-1" style="font-size: 10px;"></i></a>
+            <a href="#" class="text-dark fw-bold text-decoration-none border-bottom border-dark border-opacity-25 pb-1 hover-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                Toàn Quốc
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                <li><h6 class="dropdown-header text-danger fw-bold">Chọn khu vực</h6></li>
+                <li><a class="dropdown-item py-2 fw-medium bg-light" href="#"><i class="bi bi-check2 text-success me-2"></i>Toàn Quốc</a></li>
+                <li><a class="dropdown-item py-2" href="/cinemas?location=hcm">TP. Hồ Chí Minh</a></li>
+                <li><a class="dropdown-item py-2" href="/cinemas?location=hn">Hà Nội</a></li>
+                <li><a class="dropdown-item py-2" href="/cinemas?location=dn">Đà Nẵng</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item py-2 text-primary fw-medium" href="/cinemas"><i class="bi bi-search me-2"></i>Xem tất cả rạp</a></li>
+            </ul>
         </div>
     </div>
 </div>
