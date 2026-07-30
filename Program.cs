@@ -33,6 +33,11 @@ builder.Host.UseSerilog((ctx, lc) => lc
 builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR(); // Đăng ký WebSocket SignalR cho SeatHub
 
+// Đăng ký IMemoryCache cho hot-data caching (banners, movies, settings)
+builder.Services.AddMemoryCache();
+// Đăng ký Response Caching Middleware (bắt buộc để [ResponseCache] trên Controller có tác dụng)
+builder.Services.AddResponseCaching();
+
 // ── 3. Cấu hình Proxy Nginx / Docker (Forwarded Headers) ────────────────────
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
@@ -104,7 +109,15 @@ builder.Services.AddCors(options =>
 
 // ── 6. Đăng ký Database Connection (Dapper + MySQL) ───────────────────────
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
-builder.Services.AddScoped<IDbConnection>(_ => new MySqlConnection(connectionString));
+// Tăng Min/Max pool để tránh tạo connection mới mỗi request dưới load cao
+var mysqlBuilder = new MySqlConnector.MySqlConnectionStringBuilder(connectionString)
+{
+    MinimumPoolSize = 5,
+    MaximumPoolSize = 50,
+    ConnectionTimeout = 10,
+    DefaultCommandTimeout = 30,
+};
+builder.Services.AddScoped<IDbConnection>(_ => new MySqlConnection(mysqlBuilder.ConnectionString));
 
 // Tự động khởi tạo bảng DB và dữ liệu mẫu (Seed Data) nếu DB trống
 DatabaseInitializer.Initialize(connectionString);
@@ -216,6 +229,7 @@ app.UseStaticFiles(); // Cho phép đọc file tĩnh (.css, .js, .png...) trong 
 app.UseRouting();
 
 app.UseCors("AllowAll");
+app.UseResponseCaching(); // Bật Response Cache (Phải để SAU UseCors để không bị lỗi mất header CORS)
 
 app.UseSession();
 app.UseAuthentication(); // Xác thực người dùng (Kiểm tra xem là ai)
