@@ -42,7 +42,7 @@ public class RoomRepository(IDbConnection db) : IRoomRepository
     // Thực thi câu lệnh SQL thao tác CSDL cho phương thức GetAllCinemasAsync
     public async Task<IEnumerable<Cinema>> GetAllCinemasAsync()
     {
-        return await db.QueryAsync<Cinema>("SELECT id, name FROM cinemas ORDER BY name");
+        return await db.QueryAsync<Cinema>("SELECT id, name, province FROM cinemas ORDER BY name");
     }
 
     // Thực thi câu lệnh SQL thao tác CSDL cho phương thức GetByIdAsync

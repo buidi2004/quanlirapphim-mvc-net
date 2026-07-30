@@ -61,13 +61,17 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     })
     .AddGoogle(options => // Đăng nhập bằng Google OAuth
     {
-        options.ClientId = builder.Configuration["Authentication:Google:ClientId"] ?? "mock-client-id";
-        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"] ?? "mock-client-secret";
+        var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
+        var googleClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+        options.ClientId = string.IsNullOrEmpty(googleClientId) ? "not-configured" : googleClientId;
+        options.ClientSecret = string.IsNullOrEmpty(googleClientSecret) ? "not-configured" : googleClientSecret;
     })
     .AddFacebook(options => // Đăng nhập bằng Facebook OAuth
     {
-        options.AppId = builder.Configuration["Authentication:Facebook:AppId"] ?? "mock-app-id";
-        options.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"] ?? "mock-app-secret";
+        var fbAppId = builder.Configuration["Authentication:Facebook:AppId"];
+        var fbAppSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
+        options.AppId = string.IsNullOrEmpty(fbAppId) ? "not-configured" : fbAppId;
+        options.AppSecret = string.IsNullOrEmpty(fbAppSecret) ? "not-configured" : fbAppSecret;
     })
     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options => // Xác thực JWT dành cho Mobile App API
     {

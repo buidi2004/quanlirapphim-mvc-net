@@ -3,12 +3,13 @@ using CinemaXNet.Application.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 
 namespace CinemaXNet.Infrastructure.Services;
 
 // ImageUploadService: Dịch vụ lưu trữ ảnh tự động linh hoạt
-// Nếu cấu hình biến môi trường ImgBB__ApiKey trên Render -> Tự động upload ảnh lên Cloud ImgBB để lưu trữ vĩnh viễn không bị xóa.
-// Nếu không cấu hình biến môi trường -> Tự động lưu cục bộ tại wwwroot/uploads.
+// Tự động upload ảnh lên Cloudinary. Nếu không cấu hình -> Tự động lưu cục bộ.
 public class ImageUploadService(IConfiguration configuration, ILogger<ImageUploadService> logger) : IImageUploadService
 {
     private static readonly string[] AllowedImageExts = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
@@ -21,33 +22,40 @@ public class ImageUploadService(IConfiguration configuration, ILogger<ImageUploa
         if (!AllowedImageExts.Contains(ext))
             throw new InvalidOperationException("Chỉ chấp nhận file ảnh (jpg, png, gif, webp).");
 
-        // 1. Kiểm tra nếu có biến môi trường ImgBB:ApiKey / ImgBB__ApiKey (Cấu hình trên Render Dashboard)
-        var imgBbKey = configuration["ImgBB:ApiKey"] ?? configuration["ImgBB__ApiKey"];
-        if (!string.IsNullOrWhiteSpace(imgBbKey))
+        // 1. Kiểm tra cấu hình Cloudinary
+        var cloudName = configuration["Cloudinary:CloudName"] ?? configuration["Cloudinary__CloudName"];
+        var apiKey = configuration["Cloudinary:ApiKey"] ?? configuration["Cloudinary__ApiKey"];
+        var apiSecret = configuration["Cloudinary:ApiSecret"] ?? configuration["Cloudinary__ApiSecret"];
+
+        if (!string.IsNullOrWhiteSpace(cloudName) && !string.IsNullOrWhiteSpace(apiKey) && !string.IsNullOrWhiteSpace(apiSecret))
         {
             try
             {
-                using var httpClient = new HttpClient();
-                using var content = new MultipartFormDataContent();
-                using var stream = file.OpenReadStream();
-                content.Add(new StreamContent(stream), "image", file.FileName);
+                Account account = new Account(cloudName, apiKey, apiSecret);
+                Cloudinary cloudinary = new Cloudinary(account);
+                cloudinary.Api.Secure = true;
 
-                var response = await httpClient.PostAsync($"https://api.imgbb.com/1/upload?key={imgBbKey}", content);
-                if (response.IsSuccessStatusCode)
+                using var stream = file.OpenReadStream();
+                var uploadParams = new ImageUploadParams()
                 {
-                    var jsonString = await response.Content.ReadAsStringAsync();
-                    using var doc = JsonDocument.Parse(jsonString);
-                    var url = doc.RootElement.GetProperty("data").GetProperty("url").GetString();
-                    if (!string.IsNullOrEmpty(url))
-                    {
-                        logger.LogInformation("Upload ảnh lên Cloud ImgBB thành công: {Url}", url);
-                        return url;
-                    }
+                    File = new FileDescription(file.FileName, stream),
+                    Folder = folderName,
+                    UseFilename = true,
+                    UniqueFilename = true,
+                    Overwrite = false
+                };
+
+                var uploadResult = await cloudinary.UploadAsync(uploadParams);
+
+                if (uploadResult != null && uploadResult.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    logger.LogInformation("Upload ảnh lên Cloudinary thành công: {Url}", uploadResult.SecureUrl.ToString());
+                    return uploadResult.SecureUrl.ToString();
                 }
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Lỗi khi upload ảnh lên ImgBB Cloud, chuyển sang lưu cục bộ.");
+                logger.LogError(ex, "Lỗi khi upload ảnh lên Cloudinary, chuyển sang lưu cục bộ.");
             }
         }
 
@@ -59,5 +67,39 @@ public class ImageUploadService(IConfiguration configuration, ILogger<ImageUploa
         await using var localStream = System.IO.File.Create(filePath);
         await file.CopyToAsync(localStream);
         return $"/uploads/{folderName}/" + newName;
+    }
+
+    public async Task DeleteImageAsync(string? imageUrl)
+    {
+        if (string.IsNullOrWhiteSpace(imageUrl)) return;
+
+        // Nếu là URL cloud (Cloudinary / ImgBB), tạm thời không xử lý xóa trên Cloud
+        if (imageUrl.StartsWith("http://") || imageUrl.StartsWith("https://"))
+        {
+            logger.LogInformation("Skip deleting cloud image: {ImageUrl}", imageUrl);
+            return;
+        }
+
+        // Nếu là local file, xóa từ wwwroot
+        try
+        {
+            var physicalPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imageUrl.TrimStart('/'));
+
+            if (File.Exists(physicalPath))
+            {
+                File.Delete(physicalPath);
+                logger.LogInformation("Deleted local image file: {PhysicalPath}", physicalPath);
+            }
+            else
+            {
+                logger.LogWarning("Image file not found, skip deletion: {PhysicalPath}", physicalPath);
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log nhưng không throw - fail gracefully
+            logger.LogError(ex, "Error deleting image file: {ImageUrl}", imageUrl);
+        }
+        await Task.CompletedTask;
     }
 }

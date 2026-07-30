@@ -138,9 +138,13 @@
         <!-- Tab: Thịnh Hành -->
         <div class="tab-pane fade show active" id="trending-content" role="tabpanel" aria-labelledby="trending-tab">
             <div class="d-flex gap-4 overflow-x-auto pb-4 custom-scrollbar" style="scroll-snap-type: x mandatory;">
-                @{ int trendingCount = 0; }
-                @foreach (var movie in nowShowing) {
-                    if (trendingCount++ > 4) break;
+                @{ 
+                    int trendingCount = 0; 
+                    var validTrendingMovies = nowShowing.Where(m => m != null && !string.IsNullOrWhiteSpace(m.Title) && !string.IsNullOrWhiteSpace(m.PosterUrl)).ToList();
+                }
+                @foreach (var movie in validTrendingMovies) {
+                    trendingCount++;
+                    if (trendingCount > 5) break;
                 <div class="flex-shrink-0" style="width: 350px; scroll-snap-align: start;">
                     <div class="movie-card-3d h-100">
                         <div class="card bg-white border-0 shadow-lg movie-card rounded-2 overflow-hidden position-relative h-100" onclick="location.href='/movies/@movie.Id'">
@@ -161,10 +165,10 @@
                                     <span class="badge bg-danger shadow-sm" style="font-family: 'Arial Black', sans-serif; letter-spacing: 1px; font-size: 0.7rem;">@randomFormatTrending</span>
                                 </div>
                             </div>
-                            <div class="position-absolute bottom-0 w-100 p-4" style="background: linear-gradient(to top, rgba(0,0,0,0.95), transparent); z-index: 6;">
-                                <h4 class="text-white fw-medium mb-1 text-truncate">@movie.Title</h4>
-                                <div class="d-flex align-items-center mb-2">
-                                    <span class="rating-chip"><i class="bi bi-star me-1"></i>4.8/5</span>
+                            <div class="position-absolute bottom-0 w-100 p-4 pt-5" style="background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 50%, transparent 100%); z-index: 6;">
+                                <h4 class="text-white fw-medium mb-1 text-truncate" style="text-shadow: 0 2px 4px rgba(0,0,0,0.8);">@movie.Title</h4>
+                                <div class="d-flex align-items-center mb-2 text-white-50">
+                                    <span class="rating-chip text-white"><i class="bi bi-star me-1 text-warning"></i>4.8/5</span>
                                 </div>
                                 <button class="btn btn-warning btn-sm rounded-3 fw-medium w-100 mt-2" onclick="event.stopPropagation(); location.href='/movies/@movie.Id#showtimes-section'">ĐẶT VÉ</button>
                             </div>
@@ -184,7 +188,8 @@
                 <p class="text-secondary text-center fst-italic">Hiện tại không có phim nào đang chiếu.</p>
             } else {
                 <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-4">
-                    @foreach (var movie in nowShowing) {
+                    @{ var validNowShowing = nowShowing.Where(m => m != null && !string.IsNullOrWhiteSpace(m.Title)).ToList(); }
+                    @foreach (var movie in validNowShowing) {
                         <div class="col">
                             <div class="movie-card-3d h-100">
                                 <div class="card bg-white border border-light h-100 shadow movie-card hover-lift hover-glow"
@@ -249,7 +254,8 @@
                     </div>
                 </div>
                 <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-4" id="coming-soon-grid">
-                    @foreach (var movie in comingSoon) {
+                    @{ var validComingSoon = comingSoon.Where(m => m != null && !string.IsNullOrWhiteSpace(m.Title)).ToList(); }
+                    @foreach (var movie in validComingSoon) {
                         <div class="col coming-soon-item" data-month="@( (movie.Id % 5) + 8 )">
                             <div class="movie-card-3d h-100">
                                 <div class="card bg-white border border-light h-100 shadow movie-card hover-lift hover-glow"

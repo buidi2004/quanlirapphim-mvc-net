@@ -10,19 +10,25 @@ public class BannerRepository(IDbConnection db) : IBannerRepository
     // Thực thi câu lệnh SQL thao tác CSDL cho phương thức GetAllAsync
     public async Task<IEnumerable<dynamic>> GetAllAsync()
     {
-        return await db.QueryAsync<dynamic>("SELECT * FROM banners ORDER BY sort_order ASC, id DESC");
+        return await db.QueryAsync<dynamic>("SELECT * FROM banners ORDER BY sort_order ASC, id ASC");
     }
 
     // Thực thi câu lệnh SQL thao tác CSDL cho phương thức GetActiveAsync
     public async Task<IEnumerable<dynamic>> GetActiveAsync()
     {
-        return await db.QueryAsync<dynamic>("SELECT * FROM banners WHERE is_active = 1 ORDER BY sort_order ASC, id DESC");
+        return await db.QueryAsync<dynamic>("SELECT * FROM banners WHERE is_active = 1 ORDER BY sort_order ASC, id ASC");
     }
 
     // Thực thi câu lệnh SQL thao tác CSDL cho phương thức GetTotalCountAsync
     public async Task<int> GetTotalCountAsync()
     {
         return await db.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM banners");
+    }
+
+    // Thực thi câu lệnh SQL thao tác CSDL cho phương thức GetByIdAsync
+    public async Task<dynamic?> GetByIdAsync(int id)
+    {
+        return await db.QueryFirstOrDefaultAsync<dynamic>("SELECT * FROM banners WHERE id = @Id", new { Id = id });
     }
 
     // Thực thi câu lệnh SQL thao tác CSDL cho phương thức AddAsync

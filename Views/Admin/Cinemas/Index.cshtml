@@ -1,8 +1,17 @@
-﻿@model IEnumerable<CinemaXNet.Domain.Entities.Cinema>
+@model IEnumerable<CinemaXNet.Domain.Entities.Cinema>
 @{
     ViewData["Title"] = "Quản Lý Rạp Chiếu";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     var cinemas = Model?.ToList() ?? new List<CinemaXNet.Domain.Entities.Cinema>();
+    
+    var allProvinces = new[] {
+        "TP. Hồ Chí Minh", "Hà Nội", "Đà Nẵng", "Cần Thơ", "Đồng Nai", "Hải Phòng", 
+        "Quảng Ninh", "Bà Rịa-Vũng Tàu", "Bình Định", "Bình Dương", "Đắk Lắk", 
+        "Trà Vinh", "Yên Bái", "Vĩnh Long", "Kiên Giang", "Hà Tĩnh", "Phú Yên", 
+        "Đồng Tháp", "Bạc Liêu", "Hưng Yên", "Khánh Hòa", "Kon Tum", "Lạng Sơn", 
+        "Nghệ An", "Phú Thọ", "Quảng Ngãi", "Sóc Trăng", "Sơn La", "Tây Ninh", 
+        "Thái Nguyên", "Tiền Giang", "Gia Lai", "Ninh Thuận", "Bình Thuận"
+    }.OrderBy(p => p).ToList();
 }
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-secondary-subtle">
@@ -66,21 +75,64 @@
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="id" value="@c.Id" />
                                         <div class="modal-body p-4 text-start">
-                                            <div class="mb-3">
-                                                <label class="form-label text-body-emphasis fw-medium">Tên Rạp</label>
-                                                <input type="text" name="name" value="@c.Name" class="form-control bg-body text-body-emphasis border-secondary-subtle" required>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label text-body-emphasis fw-medium">Tỉnh/Thành phố</label>
-                                                <input type="text" name="province" value="@c.Province" class="form-control bg-body text-body-emphasis border-secondary-subtle" required>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label text-body-emphasis fw-medium">Địa chỉ</label>
-                                                <input type="text" name="address" value="@c.Address" class="form-control bg-body text-body-emphasis border-secondary-subtle" required>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label text-body-emphasis fw-medium">Điện thoại</label>
-                                                <input type="text" name="phone" value="@c.Phone" class="form-control bg-body text-body-emphasis border-secondary-subtle">
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label text-body-emphasis fw-medium">Tên Rạp *</label>
+                                                    <input type="text" name="name" value="@c.Name" class="form-control bg-body text-body-emphasis border-secondary-subtle" required>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label text-body-emphasis fw-medium">Đường dẫn SEO (Slug) *</label>
+                                                    <input type="text" name="slug" value="@c.Slug" class="form-control bg-body text-body-emphasis border-secondary-subtle" required placeholder="vd: cinemax-quan-1">
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <label class="form-label text-body-emphasis fw-medium">Tỉnh/Thành phố *</label>
+                                                    <select name="province" class="form-select bg-body text-body-emphasis border-secondary-subtle" required>
+                                                        <option value="">-- Chọn tỉnh --</option>
+                                                        @foreach (var p in allProvinces) {
+                                                            <option value="@p" selected="@(p == c.Province ? "selected" : null)">@p</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <label class="form-label text-body-emphasis fw-medium">Quận/Huyện *</label>
+                                                    <input type="text" name="district" value="@c.District" class="form-control bg-body text-body-emphasis border-secondary-subtle" required>
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <label class="form-label text-body-emphasis fw-medium">Địa chỉ *</label>
+                                                    <input type="text" name="address" value="@c.Address" class="form-control bg-body text-body-emphasis border-secondary-subtle" required>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label text-body-emphasis fw-medium">Điện thoại</label>
+                                                    <input type="text" name="phone" value="@c.Phone" class="form-control bg-body text-body-emphasis border-secondary-subtle">
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label text-body-emphasis fw-medium">Email</label>
+                                                    <input type="email" name="email" value="@c.Email" class="form-control bg-body text-body-emphasis border-secondary-subtle">
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label text-body-emphasis fw-medium">Vĩ độ (Latitude)</label>
+                                                    <input type="number" step="any" name="latitude" value="@c.Latitude" class="form-control bg-body text-body-emphasis border-secondary-subtle">
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label text-body-emphasis fw-medium">Kinh độ (Longitude)</label>
+                                                    <input type="number" step="any" name="longitude" value="@c.Longitude" class="form-control bg-body text-body-emphasis border-secondary-subtle">
+                                                </div>
+                                                <div class="col-12 mb-3">
+                                                    <label class="form-label text-body-emphasis fw-medium">Link Ảnh Rạp</label>
+                                                    <input type="text" name="imageUrl" value="@c.ImageUrl" class="form-control bg-body text-body-emphasis border-secondary-subtle">
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label text-body-emphasis fw-medium">Giờ mở cửa</label>
+                                                    <input type="text" name="openingHours" value="@c.OpeningHours" class="form-control bg-body text-body-emphasis border-secondary-subtle" placeholder="08:00 - 23:30">
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label text-body-emphasis fw-medium">Tiện ích (Cách nhau bởi dấu phẩy)</label>
+                                                    <input type="text" name="facilities" value="@c.Facilities" class="form-control bg-body text-body-emphasis border-secondary-subtle" placeholder="IMAX, Dolby Atmos, Bãi đỗ xe">
+                                                </div>
+                                                <div class="col-12 mb-3">
+                                                    <label class="form-label text-body-emphasis fw-medium">Mô tả</label>
+                                                    <textarea name="description" class="form-control bg-body text-body-emphasis border-secondary-subtle" rows="3">@c.Description</textarea>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="modal-footer bg-body border-top border-secondary-subtle">
@@ -132,21 +184,69 @@
             <form method="post" action="/admin/cinemas">
                 @Html.AntiForgeryToken()
                 <div class="modal-body p-4 text-start">
-                    <div class="mb-3">
-                        <label class="form-label text-body-emphasis fw-medium">Tên Rạp</label>
-                        <input type="text" name="name" class="form-control bg-body text-body-emphasis border-secondary-subtle" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label text-body-emphasis fw-medium">Tỉnh/Thành phố</label>
-                        <input type="text" name="province" class="form-control bg-body text-body-emphasis border-secondary-subtle" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label text-body-emphasis fw-medium">Địa chỉ</label>
-                        <input type="text" name="address" class="form-control bg-body text-body-emphasis border-secondary-subtle" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label text-body-emphasis fw-medium">Điện thoại</label>
-                        <input type="text" name="phone" class="form-control bg-body text-body-emphasis border-secondary-subtle">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-body-emphasis fw-medium">Tên Rạp *</label>
+                            <input type="text" name="name" class="form-control bg-body text-body-emphasis border-secondary-subtle" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-body-emphasis fw-medium">Đường dẫn SEO (Slug) *</label>
+                            <input type="text" name="slug" class="form-control bg-body text-body-emphasis border-secondary-subtle" required placeholder="vd: cinemax-quan-1">
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label text-body-emphasis fw-medium text-success"><i class="bi bi-magic me-1"></i>Số lượng phòng chiếu (tự động tạo)</label>
+                            <input type="number" name="numberOfRooms" class="form-control bg-body text-body-emphasis border-secondary-subtle border-success" value="0" min="0" max="20" placeholder="VD: 5">
+                            <div class="form-text text-success">Nếu nhập lớn hơn 0, hệ thống sẽ tự động sinh ra bấy nhiêu phòng (Phòng 1, Phòng 2...) cho rạp này.</div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label text-body-emphasis fw-medium">Tỉnh/Thành phố *</label>
+                            <select name="province" class="form-select bg-body text-body-emphasis border-secondary-subtle" required>
+                                <option value="">-- Chọn tỉnh --</option>
+                                @foreach (var p in allProvinces) {
+                                    <option value="@p">@p</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label text-body-emphasis fw-medium">Quận/Huyện *</label>
+                            <input type="text" name="district" class="form-control bg-body text-body-emphasis border-secondary-subtle" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label text-body-emphasis fw-medium">Địa chỉ *</label>
+                            <input type="text" name="address" class="form-control bg-body text-body-emphasis border-secondary-subtle" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-body-emphasis fw-medium">Điện thoại</label>
+                            <input type="text" name="phone" class="form-control bg-body text-body-emphasis border-secondary-subtle">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-body-emphasis fw-medium">Email</label>
+                            <input type="email" name="email" class="form-control bg-body text-body-emphasis border-secondary-subtle">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-body-emphasis fw-medium">Vĩ độ (Latitude)</label>
+                            <input type="number" step="any" name="latitude" class="form-control bg-body text-body-emphasis border-secondary-subtle">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-body-emphasis fw-medium">Kinh độ (Longitude)</label>
+                            <input type="number" step="any" name="longitude" class="form-control bg-body text-body-emphasis border-secondary-subtle">
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label text-body-emphasis fw-medium">Link Ảnh Rạp</label>
+                            <input type="text" name="imageUrl" class="form-control bg-body text-body-emphasis border-secondary-subtle">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-body-emphasis fw-medium">Giờ mở cửa</label>
+                            <input type="text" name="openingHours" class="form-control bg-body text-body-emphasis border-secondary-subtle" placeholder="08:00 - 23:30">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-body-emphasis fw-medium">Tiện ích (Cách nhau bởi dấu phẩy)</label>
+                            <input type="text" name="facilities" class="form-control bg-body text-body-emphasis border-secondary-subtle" placeholder="IMAX, Dolby Atmos, Bãi đỗ xe">
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label text-body-emphasis fw-medium">Mô tả</label>
+                            <textarea name="description" class="form-control bg-body text-body-emphasis border-secondary-subtle" rows="3"></textarea>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer bg-body border-top border-secondary-subtle">

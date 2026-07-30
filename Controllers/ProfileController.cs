@@ -38,11 +38,13 @@ public class ProfileController(IUserService userService, ITicketService ticketSe
             ["diamond"] = 10_000_000,
         };
         var levels       = levelThresholds.Keys.ToList();
-        var currentIdx   = levels.IndexOf(user.MemberLevel);
+        var currentLvl   = (user.MemberLevel ?? "bronze").ToLower();
+        if (!levelThresholds.ContainsKey(currentLvl)) currentLvl = "bronze";
+        var currentIdx   = levels.IndexOf(currentLvl);
         var nextIdx      = Math.Min(currentIdx + 1, levels.Count - 1);
         var nextLevel    = levels[nextIdx];
         var nextThreshold    = levelThresholds[nextLevel];
-        var currentThreshold = levelThresholds[user.MemberLevel];
+        var currentThreshold = levelThresholds[currentLvl];
         var spent            = user.TotalSpent;
         var levelProgress = nextThreshold > currentThreshold
             ? (double)Math.Min(100, (spent - currentThreshold) / (nextThreshold - currentThreshold) * 100)

@@ -12,6 +12,9 @@ services:
       - ASPNETCORE_URLS=http://+:8080
       - ConnectionStrings__DefaultConnection=Server=db;Port=3306;Database=cinemax;User=root;Password=secret;CharSet=utf8mb4;AllowUserVariables=true;
       - DOTNET_gcServer=0
+      - Cloudinary__CloudName=dnc0uzpn6
+      - Cloudinary__ApiKey=861174133585257
+      - Cloudinary__ApiSecret=_9BUACSjgXlH_bv27_t7B-h2-0E
     depends_on:
       db:
         condition: service_healthy

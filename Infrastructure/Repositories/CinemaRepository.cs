@@ -72,14 +72,23 @@ public class CinemaRepository(IDbConnection db) : ICinemaRepository
     // Thực thi câu lệnh SQL thao tác CSDL cho phương thức CreateAsync
     public async Task<int> CreateAsync(Cinema cinema)
     {
-        var sql = "INSERT INTO cinemas (name, address, province, phone) VALUES (@Name, @Address, @Province, @Phone); SELECT LAST_INSERT_ID();";
+        var sql = @"INSERT INTO cinemas 
+                    (name, slug, province, district, address, phone, email, latitude, longitude, image_url, opening_hours, description, facilities) 
+                    VALUES (@Name, @Slug, @Province, @District, @Address, @Phone, @Email, @Latitude, @Longitude, @ImageUrl, @OpeningHours, @Description, @Facilities); 
+                    SELECT LAST_INSERT_ID();";
         return await db.ExecuteScalarAsync<int>(sql, cinema);
     }
 
     // Thực thi câu lệnh SQL thao tác CSDL cho phương thức UpdateAsync
     public async Task<int> UpdateAsync(int id, Cinema cinema)
     {
-        var sql = "UPDATE cinemas SET name = @Name, address = @Address, province = @Province, phone = @Phone, updated_at = NOW() WHERE id = @Id";
+        var sql = @"UPDATE cinemas SET 
+                    name = @Name, slug = @Slug, province = @Province, district = @District, 
+                    address = @Address, phone = @Phone, email = @Email, 
+                    latitude = @Latitude, longitude = @Longitude, image_url = @ImageUrl, 
+                    opening_hours = @OpeningHours, description = @Description, facilities = @Facilities, 
+                    updated_at = NOW() 
+                    WHERE id = @Id";
         cinema.Id = id;
         return await db.ExecuteAsync(sql, cinema);
     }

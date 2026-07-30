@@ -1,4 +1,4 @@
-﻿@model IEnumerable<dynamic>
+@model IEnumerable<dynamic>
 @{
     ViewData["Title"] = "Vé Của Tôi";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -35,13 +35,13 @@ else
                             <div class="col-6 text-secondary small">
                                 <i class="bi bi-calendar3 me-1 text-dark"></i>Ngày chiếu:
                                 <span class="text-dark d-block fw-semibold mt-1">
-                                    @(((DateOnly)ticket.show_date).ToString("dd/MM/yyyy"))
+                                    @(DateOnly.Parse(ticket.show_date?.ToString() ?? "2000-01-01").ToString("dd/MM/yyyy"))
                                 </span>
                             </div>
                             <div class="col-6 text-secondary small">
                                 <i class="bi bi-clock me-1 text-dark"></i>Suất chiếu:
                                 <span class="text-dark d-block fw-semibold mt-1">
-                                    @(((TimeOnly)ticket.start_time).ToString("HH:mm"))
+                                    @(TimeOnly.Parse(ticket.start_time?.ToString() ?? "00:00").ToString("HH:mm"))
                                 </span>
                             </div>
                             <div class="col-6 text-secondary small">
@@ -50,16 +50,16 @@ else
                             </div>
                             <div class="col-6 text-secondary small">
                                 <i class="bi bi-cash-coin me-1 text-dark"></i>Giá vé:
-                                <span class="text-dark d-block fw-semibold mt-1">@(((decimal)ticket.total_price).ToString("N0"))₫</span>
+                                <span class="text-dark d-block fw-semibold mt-1">@(Convert.ToDecimal(ticket.total_price).ToString("N0"))₫</span>
                             </div>
                         </div>
                         <hr class="border-light mb-3">
                         <div class="d-flex justify-content-between align-items-center text-secondary small font-monospace mb-3">
-                            <span>Mã vé: #CX@(((int)ticket.id).ToString("D6"))</span>
-                            <span>Mua lúc: @(((DateTime)ticket.booked_at).ToString("dd/MM HH:mm"))</span>
+                            <span>Mã vé: #CX@(Convert.ToInt32(ticket.id).ToString("D6"))</span>
+                            <span>Mua lúc: @(DateTime.Parse(ticket.booked_at?.ToString() ?? "2000-01-01").ToString("dd/MM HH:mm"))</span>
                         </div>
                         <div class="mt-2 text-center">
-                            <button class="btn btn-outline-info btn-sm w-100 fw-medium shadow-sm" onclick="alert('Yêu cầu xuất hóa đơn VAT cho vé #CX@(((int)ticket.id).ToString("D6")) đã được tiếp nhận. Hóa đơn sẽ được gửi qua email của bạn trong vòng 24h.')">
+                            <button class="btn btn-outline-info btn-sm w-100 fw-medium shadow-sm" onclick="alert('Yêu cầu xuất hóa đơn VAT cho vé #CX@(Convert.ToInt32(ticket.id).ToString("D6")) đã được tiếp nhận. Hóa đơn sẽ được gửi qua email của bạn trong vòng 24h.')">
                                 <i class="bi bi-receipt me-2"></i>Yêu cầu Hóa đơn VAT
                             </button>
                         </div>

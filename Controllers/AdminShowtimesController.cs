@@ -8,7 +8,7 @@ namespace CinemaXNet.Controllers;
 
 [Authorize(Roles = "admin,cinema_manager")]
 [Route("admin/showtimes")]
-public class AdminShowtimesController(IShowtimeService showtimeService) : Controller
+public class AdminShowtimesController(IShowtimeService showtimeService, ICinemaService cinemaService) : Controller
 {
     [HttpGet]
     // Xử lý logic và luồng thực thi cho phương thức Index
@@ -20,6 +20,7 @@ public class AdminShowtimesController(IShowtimeService showtimeService) : Contro
         
         ViewBag.Movies = await showtimeService.GetAllMoviesAsync();
         ViewBag.Rooms = await showtimeService.GetAllRoomsWithCinemaAsync();
+        ViewBag.Cinemas = await cinemaService.GetAllAsync();
         ViewBag.CurrentPage = page;
         ViewBag.TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
         

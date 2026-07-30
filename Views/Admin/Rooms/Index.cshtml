@@ -1,9 +1,17 @@
-﻿@model IEnumerable<CinemaXNet.Domain.Entities.Room>
+@model IEnumerable<CinemaXNet.Domain.Entities.Room>
 @{
     ViewData["Title"] = "Quản Lý Phòng Chiếu";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     var rooms = Model?.ToList() ?? new List<CinemaXNet.Domain.Entities.Room>();
     var cinemas = ViewBag.Cinemas as IEnumerable<CinemaXNet.Domain.Entities.Cinema> ?? new List<CinemaXNet.Domain.Entities.Cinema>();
+    var allProvinces = new[] {
+        "TP. Hồ Chí Minh", "Hà Nội", "Đà Nẵng", "Cần Thơ", "Đồng Nai", "Hải Phòng", 
+        "Quảng Ninh", "Bà Rịa-Vũng Tàu", "Bình Định", "Bình Dương", "Đắk Lắk", 
+        "Trà Vinh", "Yên Bái", "Vĩnh Long", "Kiên Giang", "Hà Tĩnh", "Phú Yên", 
+        "Đồng Tháp", "Bạc Liêu", "Hưng Yên", "Khánh Hòa", "Kon Tum", "Lạng Sơn", 
+        "Nghệ An", "Phú Thọ", "Quảng Ngãi", "Sóc Trăng", "Sơn La", "Tây Ninh", 
+        "Thái Nguyên", "Tiền Giang", "Gia Lai", "Ninh Thuận", "Bình Thuận"
+    }.OrderBy(p => p).ToList();
 }
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-secondary-subtle">
@@ -71,10 +79,21 @@
                                         <input type="hidden" name="id" value="@r.Id" />
                                         <div class="modal-body p-4 text-start">
                                             <div class="mb-3">
+                                                <label class="form-label text-body-emphasis fw-medium"><i class="bi bi-geo-alt-fill text-success"></i> Tỉnh / Thành phố</label>
+                                                <select class="form-select bg-body text-body-emphasis border-secondary-subtle province-filter" data-target="cinemaSelect-edit-@r.Id">
+                                                    <option value="">-- Toàn quốc (hiện tất cả) --</option>
+                                                    @foreach (var p in allProvinces)
+                                                    {
+                                                        <option value="@p" selected="@(r.Cinema?.Province == p)">@p</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
                                                 <label class="form-label text-body-emphasis fw-medium">Rạp chiếu</label>
-                                                <select name="cinemaId" class="form-select bg-body text-body-emphasis border-secondary-subtle" required>
+                                                <select name="cinemaId" id="cinemaSelect-edit-@r.Id" class="form-select bg-body text-body-emphasis border-secondary-subtle" required>
+                                                    <option value="">-- Chọn rạp --</option>
                                                     @foreach(var c in cinemas) {
-                                                        <option value="@c.Id" selected="@(c.Id == r.CinemaId)">@c.Name</option>
+                                                        <option value="@c.Id" data-province="@(c.Province ?? "Khác")" selected="@(c.Id == r.CinemaId)">@c.Name</option>
                                                     }
                                                 </select>
                                             </div>
@@ -155,10 +174,21 @@
                 @Html.AntiForgeryToken()
                 <div class="modal-body p-4 text-start">
                     <div class="mb-3">
+                        <label class="form-label text-body-emphasis fw-medium"><i class="bi bi-geo-alt-fill text-success"></i> Tỉnh / Thành phố</label>
+                        <select class="form-select bg-body text-body-emphasis border-secondary-subtle province-filter" data-target="cinemaSelect-add">
+                            <option value="">-- Toàn quốc (hiện tất cả) --</option>
+                            @foreach (var p in allProvinces)
+                            {
+                                <option value="@p">@p</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label text-body-emphasis fw-medium">Rạp chiếu</label>
-                        <select name="cinemaId" class="form-select bg-body text-body-emphasis border-secondary-subtle" required>
+                        <select name="cinemaId" id="cinemaSelect-add" class="form-select bg-body text-body-emphasis border-secondary-subtle" required>
+                            <option value="">-- Chọn rạp --</option>
                             @foreach(var c in cinemas) {
-                                <option value="@c.Id">@c.Name</option>
+                                <option value="@c.Id" data-province="@(c.Province ?? "Khác")">@c.Name</option>
                             }
                         </select>
                     </div>
@@ -179,7 +209,74 @@
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
                     <button type="submit" class="btn btn-primary fw-medium">Thêm</button>
                 </div>
+
             </form>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const originalCinemas = {};
+
+            // Save original options
+            document.querySelectorAll('select[id^="cinemaSelect-"]').forEach(el => {
+                if (!el) return;
+                originalCinemas[el.id] = Array.from(el.querySelectorAll('option')).map(opt => ({
+                    value: opt.value, 
+                    text: opt.text, 
+                    prov: opt.getAttribute('data-province')
+                }));
+            });
+
+            function filterCinemasByProvince(provinceSelect, cinemaSelect) {
+                if (!cinemaSelect || !originalCinemas[cinemaSelect.id]) return;
+
+                const selectedProvince = provinceSelect.value;
+                const allOptions = originalCinemas[cinemaSelect.id];
+                let currentlySelected = cinemaSelect.value;
+                
+                cinemaSelect.innerHTML = '';
+                
+                let hasSelectedInNewList = false;
+                let firstValidValue = null;
+
+                allOptions.forEach(opt => {
+                    if (!opt.value) { 
+                        cinemaSelect.add(new Option(opt.text, opt.value));
+                    } else if (!selectedProvince || opt.prov === selectedProvince) {
+                        const newOpt = new Option(opt.text, opt.value);
+                        newOpt.setAttribute('data-province', opt.prov);
+                        if (opt.value === currentlySelected) {
+                            newOpt.selected = true;
+                            hasSelectedInNewList = true;
+                        }
+                        if (!firstValidValue && opt.value) firstValidValue = opt.value;
+                        cinemaSelect.add(newOpt);
+                    }
+                });
+
+                if (!hasSelectedInNewList && firstValidValue) {
+                    cinemaSelect.value = firstValidValue;
+                } else if (!hasSelectedInNewList) {
+                    cinemaSelect.value = '';
+                }
+            }
+
+            // Gắn sự kiện change cho tất cả các dropdown Tỉnh/Thành
+            document.querySelectorAll('.province-filter').forEach(select => {
+                select.addEventListener('change', function () {
+                    const targetId = this.getAttribute('data-target');
+                    const cinemaSelect = document.getElementById(targetId);
+                    if (cinemaSelect) {
+                        filterCinemasByProvince(this, cinemaSelect);
+                    }
+                });
+                
+                // Khởi tạo trạng thái ban đầu
+                setTimeout(() => select.dispatchEvent(new Event('change')), 50);
+            });
+        });
+    </script>
+}

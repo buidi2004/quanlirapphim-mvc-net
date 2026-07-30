@@ -376,12 +376,16 @@ public static class DatabaseInitializer
              'IMAX,Dolby Atmos,VIP Lounge,Parking');
         """);
 
-        // Rooms
+        // Rooms (Phân bổ phòng chiếu cho từng rạp để hiển thị đúng tỉnh thành)
+        // Tên phòng phải UNIQUE trên toàn hệ thống do ràng buộc của DB
         db.Execute("""
-            INSERT INTO rooms (name, total_rows, seats_per_row) VALUES
-                ('Phòng 1 - Standard', 6, 8),
-                ('Phòng 2 - VIP',      5, 6),
-                ('Phòng 3 - IMAX',     7, 10);
+            INSERT INTO rooms (cinema_id, name, total_rows, seats_per_row) VALUES
+                (1, 'HCM - Phòng 1 - Standard', 6, 8),
+                (1, 'HCM - Phòng 2 - VIP',      5, 6),
+                (1, 'HCM - Phòng 3 - IMAX',     7, 10),
+                (3, 'HN - Phòng 1 - Standard',  6, 8),
+                (3, 'HN - Phòng 2 - IMAX',      7, 10),
+                (5, 'ĐN - Phòng 1 - Standard',  6, 8);
         """);
 
         // Movies
@@ -409,7 +413,7 @@ public static class DatabaseInitializer
              'P');
         """);
 
-        // Showtimes
+        // Showtimes (Phân bổ suất chiếu cho nhiều rạp ở nhiều tỉnh thành khác nhau)
         var today    = DateTime.Today.ToString("yyyy-MM-dd");
         var tomorrow = DateTime.Today.AddDays(1).ToString("yyyy-MM-dd");
 
@@ -418,9 +422,14 @@ public static class DatabaseInitializer
             (1, 1, '{today}',    '14:00:00', '2D Phụ đề', 90000),
             (1, 3, '{today}',    '19:30:00', 'IMAX 3D', 140000),
             (1, 1, '{tomorrow}', '10:00:00', '2D Phụ đề', 90000),
+            (1, 4, '{today}',    '15:00:00', '2D Phụ đề', 85000),
+            (1, 5, '{today}',    '20:00:00', 'IMAX 3D', 130000),
+            (1, 6, '{today}',    '17:00:00', '2D Phụ đề', 80000),
             (2, 2, '{today}',    '16:00:00', '2D Phụ đề', 85000),
             (2, 3, '{today}',    '21:00:00', 'IMAX 2D', 140000),
-            (2, 2, '{tomorrow}', '13:30:00', '2D Phụ đề', 85000);
+            (2, 2, '{tomorrow}', '13:30:00', '2D Phụ đề', 85000),
+            (2, 4, '{today}',    '18:00:00', '2D Phụ đề', 80000),
+            (2, 6, '{tomorrow}', '14:00:00', '2D Phụ đề', 75000);
         """);
 
         // Sample promotions

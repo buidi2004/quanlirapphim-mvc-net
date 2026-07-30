@@ -1,10 +1,26 @@
-﻿@model IEnumerable<CinemaXNet.Domain.Entities.Showtime>
+@model IEnumerable<CinemaXNet.Domain.Entities.Showtime>
 @{
     ViewData["Title"] = "Quản Lý Suất Chiếu";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     var showtimes = Model?.ToList() ?? new List<CinemaXNet.Domain.Entities.Showtime>();
     var movies = ViewBag.Movies as IEnumerable<CinemaXNet.Domain.Entities.Movie> ?? new List<CinemaXNet.Domain.Entities.Movie>();
-    var rooms = ViewBag.Rooms as IEnumerable<CinemaXNet.Domain.Entities.Room> ?? new List<CinemaXNet.Domain.Entities.Room>();
+    var rooms = (ViewBag.Rooms as IEnumerable<CinemaXNet.Domain.Entities.Room> ?? new List<CinemaXNet.Domain.Entities.Room>()).ToList();
+    
+    // Lấy danh sách tỉnh thành từ dữ liệu Cinemas thay vì Rooms để đảm bảo Rạp mới tạo cũng có
+    var cinemas = ViewBag.Cinemas as IEnumerable<CinemaXNet.Domain.Entities.Cinema> ?? new List<CinemaXNet.Domain.Entities.Cinema>();
+    var provinces = cinemas
+        .Select(c => c.Name + "|" + (c.Province ?? "Khác"))
+        .Distinct()
+        .ToList();
+
+    var allProvinces = new[] {
+        "TP. Hồ Chí Minh", "Hà Nội", "Đà Nẵng", "Cần Thơ", "Đồng Nai", "Hải Phòng", 
+        "Quảng Ninh", "Bà Rịa-Vũng Tàu", "Bình Định", "Bình Dương", "Đắk Lắk", 
+        "Trà Vinh", "Yên Bái", "Vĩnh Long", "Kiên Giang", "Hà Tĩnh", "Phú Yên", 
+        "Đồng Tháp", "Bạc Liêu", "Hưng Yên", "Khánh Hòa", "Kon Tum", "Lạng Sơn", 
+        "Nghệ An", "Phú Thọ", "Quảng Ngãi", "Sóc Trăng", "Sơn La", "Tây Ninh", 
+        "Thái Nguyên", "Tiền Giang", "Gia Lai", "Ninh Thuận", "Bình Thuận"
+    }.OrderBy(p => p).ToList();
 }
 
 <!-- Custom CSS for Deep Dark Theme and Showtimes -->
@@ -28,6 +44,7 @@
     .badge-format-2d { background-color: #3b82f6; color: white; }
     .badge-format-3d { background-color: #8b5cf6; color: white; }
     .badge-format-imax { background-color: #eab308; color: black; font-weight: bold; }
+    .badge-province { background-color: #059669; color: white; font-size: 0.75rem; }
 </style>
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom border-secondary-subtle">
@@ -58,11 +75,11 @@
                 </select>
             </div>
             <div class="col-md-3">
-                <label class="form-label text-body-emphasis small fw-medium">Cụm rạp / Phòng</label>
+                <label class="form-label text-body-emphasis small fw-medium">Tỉnh / Thành phố</label>
                 <select class="form-select bg-body text-body-emphasis border-secondary-subtle">
-                    <option value="">-- Tất cả rạp --</option>
-                    @foreach (var r in rooms) {
-                        <option value="@r.Id">@r.Name (Rạp ID: @r.CinemaId)</option>
+                    <option value="">-- Toàn quốc (hiện tất cả) --</option>
+                    @foreach (var p in allProvinces) {
+                        <option value="@p">@p</option>
                     }
                 </select>
             </div>
@@ -92,12 +109,15 @@
         foreach (var group in groupedShowtimes)
         {
             var room = rooms.FirstOrDefault(r => r.Id == group.Key);
+            var cinemaName = room?.Cinema?.Name ?? "Không xác định";
+            var provinceName = room?.Cinema?.Province ?? "Không xác định";
             <div class="col-12">
                 <div class="card bg-body border border-secondary-subtle shadow-sm rounded-3">
                     <div class="card-header bg-body-tertiary border-bottom border-secondary-subtle py-3">
                         <h5 class="card-title text-body-emphasis fw-bold mb-0">
-                            <i class="bi bi-door-open-fill me-2 text-warning"></i>Phòng @(room?.Name ?? "Không xác định")
-                            <span class="fs-6 fw-normal text-secondary ms-2">(Rạp ID: @(room?.CinemaId ?? 0))</span>
+                            <i class="bi bi-door-open-fill me-2 text-warning"></i>@(room?.Name ?? "Không xác định")
+                            <span class="fs-6 fw-normal text-secondary ms-2">— @cinemaName</span>
+                            <span class="badge badge-province ms-2">@provinceName</span>
                         </h5>
                     </div>
                     <div class="card-body p-4">
@@ -127,12 +147,12 @@
                                         @(movie?.Title ?? "Phim không xác định")
                                     </div>
                                     <div class="d-flex justify-content-between align-items-center mt-3">
-                                        @if(showtime.Format == "3D") {
-                                            <span class="badge badge-format-3d">3D</span>
-                                        } else if(showtime.Format == "IMAX") {
-                                            <span class="badge badge-format-imax">IMAX</span>
+                                        @if(showtime.Format.Contains("IMAX", StringComparison.OrdinalIgnoreCase)) {
+                                            <span class="badge badge-format-imax">@showtime.Format</span>
+                                        } else if(showtime.Format.Contains("3D", StringComparison.OrdinalIgnoreCase)) {
+                                            <span class="badge badge-format-3d">@showtime.Format</span>
                                         } else {
-                                            <span class="badge badge-format-2d">2D</span>
+                                            <span class="badge badge-format-2d">@showtime.Format</span>
                                         }
                                         <span class="text-secondary small">@showtime.Price.ToString("N0") ₫</span>
                                     </div>
@@ -158,10 +178,32 @@
                                                             </select>
                                                         </div>
                                                         <div class="col-12">
+                                                            <label class="form-label text-body-emphasis fw-medium">Tỉnh / Thành phố</label>
+                                                            <select class="form-select bg-body text-body-emphasis border-secondary-subtle edit-province-select" data-target="editCinemaSelect-@showtime.Id">
+                                                                <option value="">-- Toàn quốc (hiện tất cả) --</option>
+                                                                @foreach (var p in allProvinces) {
+                                                                    var editRoom = rooms.FirstOrDefault(r => r.Id == showtime.RoomId);
+                                                                    var currentProv = editRoom?.Cinema?.Province ?? "";
+                                                                    <option value="@p" selected="@(p == currentProv ? "selected" : null)">@p</option>
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-12">
+                                                            <label class="form-label text-body-emphasis fw-medium">Rạp chiếu</label>
+                                                            <select id="editCinemaSelect-@showtime.Id" class="form-select bg-body text-body-emphasis border-secondary-subtle edit-cinema-select" data-target="editRoomSelect-@showtime.Id">
+                                                                <option value="">-- Chọn rạp --</option>
+                                                                @foreach (var c in cinemas) {
+                                                                    var editRoom = rooms.FirstOrDefault(r => r.Id == showtime.RoomId);
+                                                                    <option value="@c.Id" data-province="@(c.Province ?? "")" selected="@(c.Id == editRoom?.CinemaId ? "selected" : null)">@c.Name</option>
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-12">
                                                             <label class="form-label text-body-emphasis fw-medium">Phòng chiếu *</label>
-                                                            <select name="roomId" class="form-select bg-body text-body-emphasis border-secondary-subtle" required>
+                                                            <select name="roomId" id="editRoomSelect-@showtime.Id" class="form-select bg-body text-body-emphasis border-secondary-subtle room-select" required>
+                                                                <option value="">-- Chọn phòng --</option>
                                                                 @foreach (var r in rooms) {
-                                                                    <option value="@r.Id" selected="@(r.Id == showtime.RoomId ? "selected" : null)">@r.Name (Rạp ID: @r.CinemaId)</option>
+                                                                    <option value="@r.Id" data-cinema="@r.CinemaId" selected="@(r.Id == showtime.RoomId ? "selected" : null)">@r.Name</option>
                                                                 }
                                                             </select>
                                                         </div>
@@ -176,9 +218,12 @@
                                                         <div class="col-md-6">
                                                             <label class="form-label text-body-emphasis fw-medium">Định dạng *</label>
                                                             <select name="format" class="form-select bg-body text-body-emphasis border-secondary-subtle">
-                                                                <option value="2D" selected="@(showtime.Format == "2D" ? "selected" : null)">2D Tiêu chuẩn</option>
-                                                                <option value="3D" selected="@(showtime.Format == "3D" ? "selected" : null)">3D</option>
-                                                                <option value="IMAX" selected="@(showtime.Format == "IMAX" ? "selected" : null)">IMAX</option>
+                                                                @{
+                                                                    var editFormats = new[] { "2D Phụ đề", "2D Lồng tiếng", "3D Phụ đề", "3D Lồng tiếng", "IMAX 2D", "IMAX 3D", "4DX" };
+                                                                }
+                                                                @foreach (var f in editFormats) {
+                                                                    <option value="@f" selected="@(showtime.Format == f ? "selected" : null)">@f</option>
+                                                                }
                                                             </select>
                                                         </div>
                                                         <div class="col-md-6">
@@ -203,6 +248,25 @@
         }
     }
 </div>
+
+<!-- Pagination -->
+@{
+    var currentPage = ViewBag.CurrentPage as int? ?? 1;
+    var totalPages = ViewBag.TotalPages as int? ?? 1;
+}
+@if (totalPages > 1)
+{
+    <nav aria-label="Pagination">
+        <ul class="pagination justify-content-center">
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <li class="page-item @(i == currentPage ? "active" : "")">
+                    <a class="page-link" href="?page=@i">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}
 
 <!-- Add Modal -->
 <div class="modal fade" id="addShowtimeModal" tabindex="-1" aria-hidden="true">
@@ -229,11 +293,30 @@
                             </select>
                         </div>
                         <div class="col-12">
+                            <label class="form-label text-body-emphasis fw-medium"><i class="bi bi-geo-alt-fill text-success"></i> Tỉnh / Thành phố</label>
+                            <select class="form-select bg-body text-body-emphasis border-secondary-subtle" id="addProvinceSelect" data-target="addCinemaSelect">
+                                <option value="">-- Toàn quốc (hiện tất cả) --</option>
+                                @foreach (var p in allProvinces) {
+                                    <option value="@p">@p</option>
+                                }
+                            </select>
+                            <div class="form-text text-secondary"><i class="bi bi-info-circle me-1"></i>Chọn tỉnh để lọc danh sách rạp chiếu bên dưới.</div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label text-body-emphasis fw-medium">Rạp chiếu</label>
+                            <select id="addCinemaSelect" class="form-select bg-body text-body-emphasis border-secondary-subtle" data-target="addRoomSelect">
+                                <option value="">-- Chọn rạp --</option>
+                                @foreach (var c in cinemas) {
+                                    <option value="@c.Id" data-province="@(c.Province ?? "")">@c.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-12">
                             <label class="form-label text-body-emphasis fw-medium">Phòng chiếu *</label>
-                            <select name="roomId" class="form-select bg-body text-body-emphasis border-secondary-subtle" required>
+                            <select name="roomId" id="addRoomSelect" class="form-select bg-body text-body-emphasis border-secondary-subtle room-select" required>
                                 <option value="">-- Chọn phòng --</option>
                                 @foreach (var r in rooms) {
-                                    <option value="@r.Id">@r.Name (Thuộc rạp ID: @r.CinemaId)</option>
+                                    <option value="@r.Id" data-cinema="@r.CinemaId">@r.Name</option>
                                 }
                             </select>
                         </div>
@@ -248,12 +331,16 @@
                         <div class="col-md-6">
                             <label class="form-label text-body-emphasis fw-medium">Định dạng *</label>
                             <select name="format" class="form-select bg-body text-body-emphasis border-secondary-subtle">
-                                <option value="2D">2D Tiêu chuẩn</option>
-                                <option value="3D">3D</option>
-                                <option value="IMAX">IMAX</option>
+                                <option value="2D Phụ đề">2D Phụ đề</option>
+                                <option value="2D Lồng tiếng">2D Lồng tiếng</option>
+                                <option value="3D Phụ đề">3D Phụ đề</option>
+                                <option value="3D Lồng tiếng">3D Lồng tiếng</option>
+                                <option value="IMAX 2D">IMAX 2D</option>
+                                <option value="IMAX 3D">IMAX 3D</option>
+                                <option value="4DX">4DX</option>
                             </select>
                         </div>
-                        <div class="col-12">
+                        <div class="col-md-6">
                             <label class="form-label text-body-emphasis fw-medium">Giá vé cơ bản (VNĐ) *</label>
                             <input type="number" name="price" class="form-control bg-body text-body-emphasis border-secondary-subtle" required min="0" step="1000" value="90000">
                         </div>
@@ -267,3 +354,140 @@
         </div>
     </div>
 </div>
+
+<!-- JavaScript: Lọc rạp và phòng chiếu theo tỉnh thành -->
+<script>
+    const originalCinemas = {};
+    const originalRooms = {};
+
+    function saveOriginalOptions() {
+        document.querySelectorAll('select.edit-cinema-select, #addCinemaSelect').forEach(el => {
+            if (!el) return;
+            originalCinemas[el.id] = Array.from(el.querySelectorAll('option')).map(opt => ({
+                value: opt.value, 
+                text: opt.text, 
+                prov: opt.getAttribute('data-province')
+            }));
+        });
+        
+        document.querySelectorAll('select.room-select').forEach(el => {
+            if (!el) return;
+            originalRooms[el.id] = Array.from(el.querySelectorAll('option')).map(opt => ({
+                value: opt.value, 
+                text: opt.text, 
+                cinema: opt.getAttribute('data-cinema')
+            }));
+        });
+    }
+
+    function filterCinemasByProvince(provinceSelectEl, cinemaSelectEl) {
+        if (!cinemaSelectEl || !originalCinemas[cinemaSelectEl.id]) return;
+        
+        const selectedProvince = provinceSelectEl.value;
+        const allOptions = originalCinemas[cinemaSelectEl.id];
+        let currentlySelected = cinemaSelectEl.value;
+        
+        cinemaSelectEl.innerHTML = '';
+        
+        let hasSelectedInNewList = false;
+        let firstValidValue = null;
+
+        allOptions.forEach(opt => {
+            if (!opt.value) { // "-- Chọn rạp --"
+                cinemaSelectEl.add(new Option(opt.text, opt.value));
+            } else if (!selectedProvince || opt.prov === selectedProvince) {
+                const newOpt = new Option(opt.text, opt.value);
+                newOpt.setAttribute('data-province', opt.prov);
+                if (opt.value === currentlySelected) {
+                    newOpt.selected = true;
+                    hasSelectedInNewList = true;
+                }
+                if (!firstValidValue && opt.value) firstValidValue = opt.value;
+                cinemaSelectEl.add(newOpt);
+            }
+        });
+
+        if (!hasSelectedInNewList && firstValidValue) {
+            cinemaSelectEl.value = firstValidValue;
+        } else if (!hasSelectedInNewList) {
+            cinemaSelectEl.value = '';
+        }
+
+        cinemaSelectEl.dispatchEvent(new Event('change'));
+    }
+
+    function filterRoomsByCinema(cinemaSelectEl, roomSelectEl) {
+        if (!roomSelectEl || !originalRooms[roomSelectEl.id]) return;
+
+        const selectedCinema = cinemaSelectEl.value;
+        const allOptions = originalRooms[roomSelectEl.id];
+        let currentlySelected = roomSelectEl.value;
+        
+        roomSelectEl.innerHTML = '';
+        
+        let hasSelectedInNewList = false;
+        let firstValidValue = null;
+
+        allOptions.forEach(opt => {
+            if (!opt.value) { 
+                roomSelectEl.add(new Option(opt.text, opt.value));
+            } else if (!selectedCinema || opt.cinema === selectedCinema) {
+                const newOpt = new Option(opt.text, opt.value);
+                newOpt.setAttribute('data-cinema', opt.cinema);
+                if (opt.value === currentlySelected) {
+                    newOpt.selected = true;
+                    hasSelectedInNewList = true;
+                }
+                if (!firstValidValue && opt.value) firstValidValue = opt.value;
+                roomSelectEl.add(newOpt);
+            }
+        });
+
+        if (!hasSelectedInNewList && firstValidValue) {
+            roomSelectEl.value = firstValidValue;
+        } else if (!hasSelectedInNewList) {
+            roomSelectEl.value = '';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        saveOriginalOptions();
+
+        // Bắt sự kiện cho modal Thêm mới
+        const addProvSelect = document.getElementById('addProvinceSelect');
+        const addCinemaSelect = document.getElementById('addCinemaSelect');
+        const addRoomSelect = document.getElementById('addRoomSelect');
+        
+        if (addProvSelect) {
+            addProvSelect.addEventListener('change', function() {
+                filterCinemasByProvince(this, addCinemaSelect);
+            });
+            // Delay slightly to let standard DOM render correctly before filtering
+            setTimeout(() => addProvSelect.dispatchEvent(new Event('change')), 50);
+        }
+        if (addCinemaSelect) {
+            addCinemaSelect.addEventListener('change', function() {
+                filterRoomsByCinema(this, addRoomSelect);
+            });
+        }
+
+        // Bắt sự kiện cho modal Sửa
+        document.querySelectorAll('.edit-province-select').forEach(select => {
+            select.addEventListener('change', function() {
+                const targetId = this.getAttribute('data-target');
+                const cinemaSelect = document.getElementById(targetId);
+                if (cinemaSelect) filterCinemasByProvince(this, cinemaSelect);
+            });
+            setTimeout(() => select.dispatchEvent(new Event('change')), 50);
+        });
+        
+        document.querySelectorAll('.edit-cinema-select').forEach(select => {
+            select.addEventListener('change', function() {
+                const targetId = this.getAttribute('data-target');
+                const roomSelect = document.getElementById(targetId);
+                if (roomSelect) filterRoomsByCinema(this, roomSelect);
+            });
+        });
+    });
+</script>
+

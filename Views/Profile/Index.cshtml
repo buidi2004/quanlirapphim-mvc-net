@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewData["Title"] = "Hồ sơ";
     var user          = ViewBag.User  as CinemaXNet.Domain.Entities.User;
     var stats         = ((int TotalTickets, int TotalMovies))ViewBag.Stats;
@@ -43,8 +43,8 @@
             <!-- Level progress -->
             <div class="mb-3">
                 <div class="d-flex justify-content-between text-secondary small mb-1">
-                    <span>@user?.MemberLevel</span>
-                    <span>@nextLevel</span>
+                    <span>@(string.IsNullOrEmpty(user?.MemberLevel) ? "" : char.ToUpper(user.MemberLevel[0]) + user.MemberLevel.Substring(1).ToLower())</span>
+                    <span>@(string.IsNullOrEmpty(nextLevel) ? "" : char.ToUpper(nextLevel[0]) + nextLevel.Substring(1).ToLower())</span>
                 </div>
                 <div class="progress" style="height:6px; background:#333;">
                     <div class="progress-bar bg-primary" style="width:@levelProgress.ToString("0")%"></div>
@@ -142,11 +142,16 @@
                         {
                             <div class="list-group-item bg-transparent border-light py-3">
                                 <div class="d-flex gap-3">
-                                    <img src="@(ticket.PosterUrl ?? "https://placehold.co/60x80/111/fff?text=?")"
-                                         style="width:45px;height:65px;object-fit:cover;" class="rounded">
+                                    <img src="@(ticket.PosterUrl ?? "/images/movies/default-poster.jpg")"
+                                         onerror="this.onerror=null; this.src='/images/movies/default-poster.jpg';"
+                                         style="width:45px;height:65px;object-fit:cover;" class="rounded" alt="Poster">
                                     <div class="flex-grow-1">
                                         <div class="d-flex justify-content-between">
-                                            <strong class="text-dark small">@ticket.MovieTitle</strong>
+                                            @{
+                                                string title = ticket.MovieTitle;
+                                                if (string.IsNullOrWhiteSpace(title) || title == "aa") title = "Tên phim chưa cập nhật";
+                                            }
+                                            <strong class="text-dark small">@title</strong>
                                             @{
                                                 var badgeCls = ticket.status == "paid" ? "bg-success" :
                                                                ticket.status == "holding" ? "bg-warning text-white" : "bg-secondary";
@@ -156,7 +161,22 @@
                                             <span class="badge @badgeCls">@statusLbl</span>
                                         </div>
                                         <small class="text-secondary">
-                                            @ticket.ShowDate @ticket.StartTime · @ticket.RoomName · Ghế @ticket.SeatCode
+                                            @{
+                                                string showDateStr = ticket.ShowDate?.ToString();
+                                                string startTimeStr = ticket.StartTime?.ToString();
+                                                if (!string.IsNullOrEmpty(showDateStr) && !string.IsNullOrEmpty(startTimeStr))
+                                                {
+                                                    if (DateTime.TryParse($"{showDateStr} {startTimeStr}", out DateTime parsedTime))
+                                                    {
+                                                        <text>@parsedTime.ToString("HH:mm - dd/MM/yyyy")</text>
+                                                    }
+                                                    else
+                                                    {
+                                                        <text>@showDateStr @startTimeStr</text>
+                                                    }
+                                                }
+                                            }
+                                            · @ticket.RoomName · Ghế @ticket.SeatCode
                                         </small>
                                     </div>
                                 </div>

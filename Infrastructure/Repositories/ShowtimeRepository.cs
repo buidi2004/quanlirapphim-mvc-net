@@ -129,7 +129,7 @@ public class ShowtimeRepository(IDbConnection db) : IShowtimeRepository
             SELECT s.id, s.movie_id AS MovieId, s.room_id AS RoomId, s.show_date AS ShowDate, s.start_time AS StartTime, s.format AS Format, s.price,
                    m.id, m.title,
                    r.id, r.name,
-                   c.id, c.name
+                   c.id, c.name, c.province
             FROM showtimes s 
             JOIN movies m ON s.movie_id = m.id 
             JOIN rooms r ON s.room_id = r.id 
@@ -164,7 +164,7 @@ public class ShowtimeRepository(IDbConnection db) : IShowtimeRepository
     public async Task<IEnumerable<Room>> GetAllRoomsWithCinemaAsync()
     {
         var sql = @"
-            SELECT r.id, r.name, c.id, c.name 
+            SELECT r.id, r.name, r.cinema_id AS CinemaId, c.id, c.name, c.province 
             FROM rooms r 
             JOIN cinemas c ON r.cinema_id = c.id 
             ORDER BY c.name, r.name";

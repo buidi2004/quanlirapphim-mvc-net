@@ -6,4 +6,5 @@ namespace CinemaXNet.Application.Interfaces;
 public interface IImageUploadService
 {
     Task<string?> UploadImageAsync(IFormFile? file, string folderName);
+    Task DeleteImageAsync(string? imageUrl);
 }

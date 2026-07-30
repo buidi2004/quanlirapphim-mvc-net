@@ -341,3 +341,36 @@ h2 { font-size: 20px; font-weight: 600; }
         align-items: center;
     }
 }
+
+/* Glow effect for navbar links */
+#mainNavbar .nav-link {
+    transition: all 0.3s ease, text-shadow 0.3s ease;
+}
+#mainNavbar .nav-link:hover,
+#mainNavbar .nav-link.active,
+#mainNavbar .nav-item:hover > .nav-link {
+    text-shadow: 0 0 8px rgba(248, 68, 100, 0.6), 0 0 15px rgba(248, 68, 100, 0.4);
+    color: var(--color-primary) !important;
+}
+
+/* Fix search input focus ring in navbar */
+.search-form-premium .input-group:focus-within {
+    box-shadow: 0 0 0 0.25rem rgba(248, 68, 100, 0.25);
+    border-radius: 20px;
+}
+.search-form-premium .form-control:focus {
+    box-shadow: none !important;
+    border-color: var(--color-primary) !important;
+}
+.search-form-premium .form-control:focus + .btn {
+    border-color: var(--color-primary) !important;
+    color: var(--color-primary) !important;
+}
+
+/* Fix floating widget overflowing viewport */
+.floating-widget {
+    position: fixed;
+    right: 20px !important;
+    bottom: 20px;
+    z-index: 999;
+}

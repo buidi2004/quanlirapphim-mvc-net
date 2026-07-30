@@ -1,18 +1,29 @@
-﻿@model CinemaXNet.Domain.Entities.Cinema
+@model CinemaXNet.Domain.Entities.Cinema
 
 @{
     ViewData["Title"] = Model.Name;
 }
 
 <!-- Hero -->
-<div class="position-relative mb-5 rounded-3 overflow-hidden shadow-lg" style="height:320px;">
-    <img src="@Model.GetImageUrl()" class="w-100 h-100" style="object-fit:cover; filter:brightness(.45);" alt="@Model.Name">
-    <div class="position-absolute inset-0 d-flex flex-column justify-content-end p-4 p-md-5">
-        <span class="badge bg-warning text-white mb-2" style="width:fit-content;">@Model.Province</span>
-        <h1 class="text-white fw-medium display-6 mb-2">@Model.Name</h1>
-        <p class="text-secondary mb-0">
-            <i class="bi bi-geo-alt me-1"></i>@Model.GetFullAddress()
-        </p>
+<div class="position-relative mb-4 rounded-4 overflow-hidden shadow-sm bg-dark" style="height:250px;">
+    <img src="@Model.GetImageUrl()" class="w-100 h-100 opacity-50" style="object-fit:cover;" alt="@Model.Name" onerror="this.src='/images/cinemas/default-cinema.jpg'; this.onerror=null; this.style.display='none';">
+    <div class="position-absolute bottom-0 w-100 p-4 p-md-5" style="background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);">
+        <div class="d-flex justify-content-between align-items-end flex-wrap gap-3">
+            <div>
+                <span class="badge bg-primary text-white mb-2" style="letter-spacing: 1px;">@Model.Province</span>
+                <h1 class="text-white fw-bold mb-2" style="text-shadow: 0 2px 4px rgba(0,0,0,0.8);">@Model.Name</h1>
+                <p class="text-white-50 mb-0">
+                    <i class="bi bi-geo-alt me-2 text-primary"></i>@Model.GetFullAddress()
+                </p>
+            </div>
+            <div class="d-none d-md-block text-end pb-1">
+                @if (!string.IsNullOrEmpty(Model.Phone))
+                {
+                    <div class="text-white fw-medium fs-5 mb-1" style="text-shadow: 0 1px 3px rgba(0,0,0,0.5);"><i class="bi bi-telephone-fill text-primary me-2"></i>@Model.Phone</div>
+                }
+                <div class="text-white-50 small"><i class="bi bi-clock-history text-primary me-2"></i>@Model.OpeningHours</div>
+            </div>
+        </div>
     </div>
 </div>
 
