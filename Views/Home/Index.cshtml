@@ -46,7 +46,32 @@
         
         <!-- CỘT 1: Main Banner Slider (7/12) -->
         <div class="col-12 col-lg-7 d-flex flex-column">
-            <div id="heroCarousel" class="carousel slide overflow-hidden flex-grow-1 border-end border-dark" data-bs-ride="carousel" style="min-height: 400px;">
+            <style>
+                /* Fix: Đặt height cứng cho toàn bộ carousel và các item
+                   Tránh lỗi slide đầu bị thu nhỏ do flex parent chưa tính xong height
+                   khi Bootstrap khởi tạo carousel */
+                #heroCarousel,
+                #heroCarousel .carousel-inner,
+                #heroCarousel .carousel-item,
+                #heroCarousel .carousel-item > div {
+                    height: 460px;
+                }
+                @@media (max-width: 991.98px) {
+                    #heroCarousel,
+                    #heroCarousel .carousel-inner,
+                    #heroCarousel .carousel-item,
+                    #heroCarousel .carousel-item > div {
+                        height: 320px;
+                    }
+                }
+                #heroCarousel .carousel-item img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    display: block;
+                }
+            </style>
+            <div id="heroCarousel" class="carousel slide overflow-hidden flex-grow-1 border-end border-dark" data-bs-ride="carousel">
                 @{
                     var bannersList = ViewBag.Banners as IEnumerable<dynamic> ?? Enumerable.Empty<dynamic>();
                     var activeBanners = bannersList.ToList();
@@ -60,13 +85,13 @@
                             <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")"></button>
                         }
                     </div>
-                    <div class="carousel-inner h-100 bg-dark">
+                    <div class="carousel-inner bg-dark">
                         @for (int i = 0; i < activeBanners.Count; i++)
                         {
                             var banner = activeBanners[i];
-                            <div class="carousel-item h-100 @(i == 0 ? "active" : "")">
-                                <div class="position-relative h-100">
-                                    <img src="@(banner.image_url ?? "/images/placeholder-banner.jpg")" class="w-100 h-100" style="object-fit: cover;" alt="@banner.title">
+                            <div class="carousel-item @(i == 0 ? "active" : "")">
+                                <div class="position-relative">
+                                    <img src="@(banner.image_url ?? "/images/placeholder-banner.jpg")" alt="@banner.title">
                                     <div class="carousel-caption text-start bottom-0 pb-4 pb-md-5 ps-3 ps-md-4 w-100" style="background: linear-gradient(transparent, rgba(0,0,0,0.95)); left: 0; right: 0;">
                                         <h2 class="h3 fw-medium text-white text-shadow mb-1">@banner.title</h2>
                                         @if (!string.IsNullOrEmpty((string)banner.description))
