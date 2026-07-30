@@ -29,12 +29,24 @@
 </div>
 
 <!-- #1 Hero Section (3 Cột) -->
-<section class="mb-5 pt-2" data-aos="fade-in" data-aos-duration="1500">
-    <div class="row g-3 align-items-stretch">
+<style>
+.full-width-breakout {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    padding-left: 0;
+    padding-right: 0;
+}
+</style>
+<section class="mb-5 full-width-breakout" data-aos="fade-in" data-aos-duration="1500" style="margin-top: -1.5rem;">
+    <div class="row g-0 align-items-stretch">
         
         <!-- CỘT 1: Main Banner Slider (7/12) -->
         <div class="col-12 col-lg-7 d-flex flex-column">
-            <div id="heroCarousel" class="carousel slide shadow-sm rounded-4 overflow-hidden flex-grow-1" data-bs-ride="carousel" style="min-height: 400px;">
+            <div id="heroCarousel" class="carousel slide overflow-hidden flex-grow-1 border-end border-dark" data-bs-ride="carousel" style="min-height: 400px;">
                 @{
                     var bannersList = ViewBag.Banners as IEnumerable<dynamic> ?? Enumerable.Empty<dynamic>();
                     var activeBanners = bannersList.ToList();
@@ -82,7 +94,7 @@
 
         <!-- CỘT 2: Widget Box Office (3/12) -->
         <div class="col-12 col-md-6 col-lg-3 d-flex flex-column">
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 d-flex flex-column bg-white">
+            <div class="card border-0 overflow-hidden h-100 d-flex flex-column bg-white rounded-0 border-end border-dark">
                 <!-- Header -->
                 <div class="text-warning text-center py-2" style="background-color: #22252A; font-family: 'Space Grotesk', serif; font-style: italic; letter-spacing: 2px;">
                     BOX OFFICE
@@ -118,7 +130,7 @@
             }
             @if(featuredMovie != null) 
             {
-                <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden position-relative group w-100">
+                <div class="card border-0 overflow-hidden position-relative group w-100 rounded-0">
                     <img src="@(string.IsNullOrEmpty(featuredMovie.PosterUrl) ? "/images/movies/default.jpg" : featuredMovie.PosterUrl)" class="w-100 h-100" style="object-fit: cover; min-height: 400px;" alt="Featured">
                     <div class="position-absolute bottom-0 w-100 p-3 text-center" style="background: linear-gradient(transparent, rgba(0,0,0,0.9));">
                         <a href="/movies/@featuredMovie.Id" class="btn btn-sm btn-outline-light rounded-pill w-100 fw-medium">Xem chi tiết</a>
