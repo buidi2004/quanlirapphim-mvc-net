@@ -28,63 +28,106 @@
     </div>
 </div>
 
-<!-- #1 Hero Carousel -->
-<div id="heroCarousel" class="carousel slide mb-4 shadow-lg" data-bs-ride="carousel" data-aos="fade-in" data-aos-duration="1500">
-    @{
-        var bannersList = ViewBag.Banners as IEnumerable<dynamic> ?? Enumerable.Empty<dynamic>();
-        var activeBanners = bannersList.ToList();
-    }
-    
-    @if (activeBanners.Any())
-    {
-        <div class="carousel-indicators">
-            @for (int i = 0; i < activeBanners.Count; i++)
-            {
-                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")"></button>
-            }
-        </div>
-        <div class="carousel-inner rounded-2 overflow-hidden" style="border: 1px solid #222244;">
-            @for (int i = 0; i < activeBanners.Count; i++)
-            {
-                var banner = activeBanners[i];
-                <div class="carousel-item @(i == 0 ? "active" : "")">
-                    <div class="position-relative hero-slide">
-                        @if (i == 0)
+<!-- #1 Hero Section (3 Cột) -->
+<section class="mb-5 pt-2" data-aos="fade-in" data-aos-duration="1500">
+    <div class="row g-3 align-items-stretch">
+        
+        <!-- CỘT 1: Main Banner Slider (7/12) -->
+        <div class="col-12 col-lg-7 d-flex flex-column">
+            <div id="heroCarousel" class="carousel slide shadow-sm rounded-4 overflow-hidden flex-grow-1" data-bs-ride="carousel" style="min-height: 400px;">
+                @{
+                    var bannersList = ViewBag.Banners as IEnumerable<dynamic> ?? Enumerable.Empty<dynamic>();
+                    var activeBanners = bannersList.ToList();
+                }
+                
+                @if (activeBanners.Any())
+                {
+                    <div class="carousel-indicators">
+                        @for (int i = 0; i < activeBanners.Count; i++)
                         {
-                            <video autoplay muted loop playsinline class="w-100 h-100 position-absolute top-0 start-0" style="object-fit: cover; filter: brightness(0.5); z-index: 0;">
-                                <source src="https://cdn.coverr.co/videos/coverr-a-man-in-a-movie-theater-2882/1080p.mp4" type="video/mp4">
-                            </video>
-                            <img src="@(banner.image_url ?? "/images/movies/lat-mat-7.jpg")" class="w-100 h-100 position-relative" style="object-fit: cover; opacity: 0; z-index: 1;" alt="@banner.title">
+                            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")"></button>
                         }
-                        else
+                    </div>
+                    <div class="carousel-inner h-100 bg-dark">
+                        @for (int i = 0; i < activeBanners.Count; i++)
                         {
-                            <img src="@(banner.image_url ?? "/images/movies/lat-mat-7.jpg")" class="w-100 h-100" style="object-fit: cover; filter: brightness(0.6);" alt="@banner.title">
-                        }
-                        <div class="carousel-caption text-start bottom-0 pb-4 pb-md-5 ps-3 ps-md-4 w-100" style="background: linear-gradient(transparent, rgba(0,0,0,0.95)); left: 0; right: 0; z-index: 2;">
-                            <h1 class="display-6 display-md-4 fw-medium text-white text-shadow mb-1" data-aos="fade-up" data-aos-delay="200">@banner.title</h1>
-                            @if (!string.IsNullOrEmpty((string)banner.description))
-                            {
-                                <p class="fs-6 fs-md-5 text-light d-none d-sm-block" data-aos="fade-up" data-aos-delay="400">@banner.description</p>
-                            }
-                            @if (!string.IsNullOrEmpty((string)banner.link_url))
-                            {
-                                <div class="mt-2 mt-md-3" data-aos="fade-up" data-aos-delay="600">
-                                    <a href="@banner.link_url" class="btn btn-primary btn-sm btn-md-lg fw-medium px-3 px-md-4 rounded-3 me-2">Khám Phá Ngay</a>
+                            var banner = activeBanners[i];
+                            <div class="carousel-item h-100 @(i == 0 ? "active" : "")">
+                                <div class="position-relative h-100">
+                                    <img src="@(banner.image_url ?? "/images/movies/lat-mat-7.jpg")" class="w-100 h-100" style="object-fit: cover;" alt="@banner.title">
+                                    <div class="carousel-caption text-start bottom-0 pb-4 pb-md-5 ps-3 ps-md-4 w-100" style="background: linear-gradient(transparent, rgba(0,0,0,0.95)); left: 0; right: 0;">
+                                        <h2 class="h3 fw-medium text-white text-shadow mb-1">@banner.title</h2>
+                                        @if (!string.IsNullOrEmpty((string)banner.description))
+                                        {
+                                            <p class="fs-6 text-light d-none d-sm-block mb-2">@banner.description</p>
+                                        }
+                                        @if (!string.IsNullOrEmpty((string)banner.link_url))
+                                        {
+                                            <a href="@banner.link_url" class="btn btn-sm btn-primary fw-medium px-3 rounded-3">Khám Phá</a>
+                                        }
+                                    </div>
                                 </div>
-                            }
-                        </div>
+                            </div>
+                        }
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev" aria-label="Slide trước">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next" aria-label="Slide tiếp theo">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    </button>
+                }
+            </div>
+        </div>
+
+        <!-- CỘT 2: Widget Box Office (3/12) -->
+        <div class="col-12 col-md-6 col-lg-3 d-flex flex-column">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 d-flex flex-column bg-white">
+                <!-- Header -->
+                <div class="text-warning text-center py-2" style="background-color: #22252A; font-family: 'Space Grotesk', serif; font-style: italic; letter-spacing: 2px;">
+                    BOX OFFICE
+                </div>
+                <!-- Body -->
+                <div class="card-body p-0 flex-grow-1 overflow-auto" style="max-height: 350px;">
+                    @{ 
+                        var boxOffice = nowShowing.Take(7).ToList(); 
+                    }
+                    <div class="list-group list-group-flush small">
+                        @for(int i = 0; i < boxOffice.Count; i++) 
+                        {
+                            <div class="list-group-item d-flex align-items-center py-2 px-3 border-bottom hover-bg-light transition-all" style="min-height: 48px;">
+                                <span class="fw-bold fst-italic text-secondary me-2 text-end" style="width: 15px;">@(i+1).</span>
+                                <span class="badge p-1 rounded-1 me-2 @(boxOffice[i].AgeRating == "C18" ? "bg-danger" : boxOffice[i].AgeRating == "C16" ? "bg-warning text-dark" : boxOffice[i].AgeRating == "C13" ? "bg-success" : "bg-primary")" style="font-size: 0.65rem; min-width: 28px; text-align: center;">
+                                    @(string.IsNullOrEmpty(boxOffice[i].AgeRating) ? "P" : boxOffice[i].AgeRating)
+                                </span>
+                                <a href="/movies/@boxOffice[i].Id" class="fw-bold text-dark text-truncate flex-grow-1 text-decoration-none" title="@boxOffice[i].Title">@boxOffice[i].Title</a>
+                                <span class="text-muted ms-2" style="font-size: 0.7rem; white-space: nowrap;">@boxOffice[i].DurationMinutes Phút</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <!-- Footer -->
+                <a href="/movies" class="btn btn-primary rounded-0 py-3 fw-bold text-uppercase w-100" style="font-size: 14px;">Mua vé ngay</a>
+            </div>
+        </div>
+
+        <!-- CỘT 3: Featured Poster Banner (2/12) -->
+        <div class="col-12 col-md-6 col-lg-2 d-flex flex-column">
+            @{ 
+                var featuredMovie = nowShowing.FirstOrDefault(m => m.Title.Contains("Đất Rừng") || m.Title.Contains("Mai") || m.Title.Contains("Dune") || m.Title.Contains("Lật Mặt")) ?? nowShowing.FirstOrDefault(); 
+            }
+            @if(featuredMovie != null) 
+            {
+                <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden position-relative group w-100">
+                    <img src="@(string.IsNullOrEmpty(featuredMovie.PosterUrl) ? "/images/movies/default.jpg" : featuredMovie.PosterUrl)" class="w-100 h-100" style="object-fit: cover; min-height: 400px;" alt="Featured">
+                    <div class="position-absolute bottom-0 w-100 p-3 text-center" style="background: linear-gradient(transparent, rgba(0,0,0,0.9));">
+                        <a href="/movies/@featuredMovie.Id" class="btn btn-sm btn-outline-light rounded-pill w-100 fw-medium">Xem chi tiết</a>
                     </div>
                 </div>
             }
         </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev" aria-label="Slide trước">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next" aria-label="Slide tiếp theo">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        </button>
-    }
-</div>
+    </div>
+</section>
 
 
 
