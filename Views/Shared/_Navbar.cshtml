@@ -52,97 +52,32 @@
     </div>
 </div>
 
-<nav id="mainNavbar" class="navbar navbar-expand-lg sticky-top smart-navbar" style="z-index: 1050; border-bottom: 1px solid var(--color-primary);">
-    <div class="container">
-        @* Logo Thương hiệu CinemaX *@
-        <a class="navbar-brand py-0" href="/">
-            <img src="/images/logo.png" alt="CinemaX Logo" style="height: 45px; object-fit: contain;">
-        </a>
-
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-label="Toggle navigation">
+<nav id="mainNavbar" class="navbar navbar-expand-lg sticky-top smart-navbar" style="z-index: 1050; border-bottom: 1px solid var(--color-primary); padding: 12px 0;">
+    <div class="container position-relative d-flex justify-content-center align-items-center">
+        <!-- Nút menu mobile (nằm góc trái) -->
+        <button class="navbar-toggler position-absolute start-0 ms-3 border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="collapse navbar-collapse" id="navMenu">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            </ul>
+        @* Logo Thương hiệu CinemaX (Nằm giữa và to hơn) *@
+        <a class="navbar-brand py-0 mx-auto" href="/">
+            <img src="/images/logo.png" alt="CinemaX Logo" style="height: 65px; object-fit: contain;">
+        </a>
 
-            <!-- Sub-navigation (Tông 2 - Cát Khaki) dời xuống dưới, ở đây chỉ để lại Search và Auth -->
-
-            <div class="d-flex me-3 d-none d-lg-flex position-relative search-container flex-grow-1" style="max-width: 500px;">
-                <form class="search-form-premium w-100" action="/search" method="GET">
-                    <div class="input-group flex-nowrap w-100">
-                        <input type="text" name="q" id="mainSearchInput" class="form-control border-end-0 py-2" placeholder="Tìm phim, rạp..." style="border-radius: 20px 0 0 20px;" autocomplete="off">
-                        <button type="submit" class="btn bg-white border border-start-0 text-muted px-3" aria-label="Tìm kiếm" style="border-radius: 0 20px 20px 0;"><i class="bi bi-search"></i></button>
-                    </div>
-                </form>
-                <!-- Trending Searches Dropdown -->
-                <div id="trendingSearchDropdown" class="dropdown-menu shadow-lg border-0 w-100 mt-2 rounded-4 p-0" style="display: none; position: absolute; top: 100%; left: 0; z-index: 1060; overflow: hidden; animation: dropdownFade 0.3s ease forwards; opacity: 0; transform: translateY(-10px);">
-                    <style>
-                        @@keyframes dropdownFade {
-                            to {
-                                opacity: 1;
-                                transform: translateY(0);
-                            }
-                        }
-                    </style>
-                    <div class="bg-light px-3 py-2 border-bottom border-light">
-                        <span class="text-secondary small fw-medium"><i class="bi bi-graph-up-arrow me-1 text-danger"></i> TÌM KIẾM THỊNH HÀNH</span>
-                    </div>
-                    <ul class="list-unstyled mb-0">
-                        <li><a href="/search?q=Lật Mặt 7" class="dropdown-item py-2 d-flex justify-content-between align-items-center transition-all hover-bg-light">Lật Mặt 7 <span class="badge bg-danger rounded-pill">HOT</span></a></li>
-                        <li><a href="/search?q=Mai" class="dropdown-item py-2 d-flex justify-content-between align-items-center transition-all hover-bg-light">Phim Mai <span class="badge bg-secondary rounded-pill">1</span></a></li>
-                        <li><a href="/search?q=Dune" class="dropdown-item py-2 d-flex justify-content-between align-items-center transition-all hover-bg-light">Dune: Part Two <span class="badge bg-secondary rounded-pill">2</span></a></li>
-                        <li><a href="/search?q=Đào, Phở và Piano" class="dropdown-item py-2 d-flex justify-content-between align-items-center transition-all hover-bg-light">Đào, Phở và Piano <span class="badge bg-secondary rounded-pill">3</span></a></li>
-                    </ul>
-                </div>
-            </div>
-
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
-                <!-- Theme Toggle -->
-                <li class="nav-item me-2">
-                    <button id="themeToggleBtn" class="btn btn-sm btn-outline-secondary" title="Đổi giao diện" aria-label="Đổi giao diện">
-                        <i class="bi bi-moon-stars"></i>
-                    </button>
-                </li>
+        <div class="collapse navbar-collapse d-lg-none" id="navMenu" style="width: 100%; position: absolute; top: 100%; left: 0; background: white; z-index: 1000; border-bottom: 1px solid #ddd;">
+            <ul class="navbar-nav w-100 align-items-center py-3">
                 @if (User.Identity?.IsAuthenticated == true)
                 {
-                    <!-- Notifications -->
-                    <li class="nav-item dropdown me-2 d-flex align-items-center">
-                        <a class="nav-link position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Thông báo" aria-label="Thông báo">
-                            <i class="bi bi-bell fs-5"></i>
-                            <span class="position-absolute top-25 start-75 translate-middle p-1 bg-danger border border-light rounded-circle" style="margin-top: 5px;">
-                                <span class="visually-hidden">New alerts</span>
-                            </span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end shadow" style="width: 320px;">
-                            <li><h6 class="dropdown-header fw-medium">Thông báo mới</h6></li>
-                            <li>
-                                <a class="dropdown-item py-2 text-wrap" href="#">
-                                    <div class="d-flex align-items-start">
-                                        <div class="bg-warning text-white rounded-circle p-2 me-3 mt-1"><i class="bi bi-ticket-perforated"></i></div>
-                                        <div>
-                                            <p class="mb-0 fw-medium small">Nhắc lịch xem phim</p>
-                                            <p class="mb-0 small text-secondary" style="font-size: 0.8rem;">Dune: Part Two sẽ chiếu trong 2 giờ nữa tại Landmark 81.</p>
-                                        </div>
-                                    </div>
-                                </a>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-center small text-primary fw-medium" href="#">Xem tất cả thông báo</a></li>
-                        </ul>
-                    </li>
-
                     <!-- Mobile User Dropdown -->
-                    <li class="nav-item dropdown d-md-none">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 fw-bold" href="#" role="button"
+                    <li class="nav-item dropdown w-100 text-center">
+                        <a class="nav-link dropdown-toggle d-inline-flex align-items-center gap-2 fw-bold" href="#" role="button"
                            data-bs-toggle="dropdown" aria-expanded="false">
                             <img src="https://api.dicebear.com/7.x/initials/svg?seed=@User.Identity.Name"
                                  class="rounded-circle" width="28" height="28" style="object-fit: cover;"
                                  alt="avatar">
                             <span>@User.Identity.Name</span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow">
+                        <ul class="dropdown-menu border-0 text-center w-100 mt-2">
                             <li><a class="dropdown-item" href="/profile"><i class="bi bi-person me-2"></i>Hồ sơ</a></li>
                             <li><a class="dropdown-item" href="/my-tickets">Vé của tôi</a></li>
                             <li><hr class="dropdown-divider"></li>
@@ -162,8 +97,8 @@
                 }
                 else
                 {
-                    <li class="nav-item d-md-none">
-                        <a class="nav-link fw-bold text-danger" href="/login">
+                    <li class="nav-item w-100 text-center">
+                        <a class="nav-link fw-bold text-danger d-inline-block" href="/login">
                             <i class="bi bi-person-circle me-1"></i> Đăng nhập
                         </a>
                     </li>
@@ -237,24 +172,3 @@
 }
 </style>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('mainSearchInput');
-    const searchDropdown = document.getElementById('trendingSearchDropdown');
-
-    if (searchInput && searchDropdown) {
-        // Mở dropdown khi focus vào ô tìm kiếm
-        searchInput.addEventListener('focus', function() {
-            searchDropdown.style.display = 'block';
-        });
-
-        // Đóng dropdown khi click ra ngoài
-        document.addEventListener('click', function(event) {
-            const isClickInside = searchInput.contains(event.target) || searchDropdown.contains(event.target);
-            if (!isClickInside) {
-                searchDropdown.style.display = 'none';
-            }
-        });
-    }
-});
-</script>
