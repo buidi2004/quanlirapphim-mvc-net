@@ -27,6 +27,10 @@ public class AdminBannersController(IBannerService bannerService) : Controller
             await bannerService.AddBannerAsync(title, description, image, linkUrl, sortOrder, isActive);
             TempData["Success"] = "Thêm banner thành công!";
         }
+        catch (InvalidOperationException ex)
+        {
+            TempData["Error"] = ex.Message;
+        }
         catch (Exception)
         {
             TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
@@ -43,6 +47,10 @@ public class AdminBannersController(IBannerService bannerService) : Controller
         {
             await bannerService.UpdateBannerAsync(id, title, description, image, linkUrl, sortOrder, isActive);
             TempData["Success"] = "Cập nhật banner thành công!";
+        }
+        catch (InvalidOperationException ex)
+        {
+            TempData["Error"] = ex.Message;
         }
         catch (Exception)
         {

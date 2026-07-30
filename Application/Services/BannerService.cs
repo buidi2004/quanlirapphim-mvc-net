@@ -33,7 +33,10 @@ public class BannerService(IBannerRepository bannerRepository, IImageUploadServi
     // Xử lý logic và luồng thực thi cho phương thức UpdateBannerAsync
     public async Task UpdateBannerAsync(int id, string title, string? description, IFormFile? image, string? linkUrl, int sortOrder, bool isActive)
     {
-        string? imageUrl = await UploadImageAsync(image);
+        // Chỉ upload ảnh mới nếu admin có chọn file — tránh ghi đè null lên ảnh cũ
+        string? imageUrl = (image != null && image.Length > 0)
+            ? await UploadImageAsync(image)
+            : null;
         await bannerRepository.UpdateAsync(id, title, description, imageUrl, linkUrl, sortOrder, isActive);
     }
 

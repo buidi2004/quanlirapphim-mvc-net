@@ -66,7 +66,7 @@
                             var banner = activeBanners[i];
                             <div class="carousel-item h-100 @(i == 0 ? "active" : "")">
                                 <div class="position-relative h-100">
-                                    <img src="@(banner.image_url ?? "/images/movies/lat-mat-7.jpg")" class="w-100 h-100" style="object-fit: cover;" alt="@banner.title">
+                                    <img src="@(banner.image_url ?? "/images/placeholder-banner.jpg")" class="w-100 h-100" style="object-fit: cover;" alt="@banner.title">
                                     <div class="carousel-caption text-start bottom-0 pb-4 pb-md-5 ps-3 ps-md-4 w-100" style="background: linear-gradient(transparent, rgba(0,0,0,0.95)); left: 0; right: 0;">
                                         <h2 class="h3 fw-medium text-white text-shadow mb-1">@banner.title</h2>
                                         @if (!string.IsNullOrEmpty((string)banner.description))

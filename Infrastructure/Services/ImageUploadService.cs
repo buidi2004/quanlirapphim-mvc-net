@@ -18,6 +18,10 @@ public class ImageUploadService(IConfiguration configuration, ILogger<ImageUploa
     {
         if (file == null || file.Length == 0) return null;
 
+        const long MaxFileSizeBytes = 5 * 1024 * 1024; // 5MB
+        if (file.Length > MaxFileSizeBytes)
+            throw new InvalidOperationException("Kích thước ảnh không được vượt quá 5MB.");
+
         var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
         if (!AllowedImageExts.Contains(ext))
             throw new InvalidOperationException("Chỉ chấp nhận file ảnh (jpg, png, gif, webp).");
@@ -47,15 +51,29 @@ public class ImageUploadService(IConfiguration configuration, ILogger<ImageUploa
 
                 var uploadResult = await cloudinary.UploadAsync(uploadParams);
 
-                if (uploadResult != null && uploadResult.StatusCode == System.Net.HttpStatusCode.OK)
+                // Kiểm tra kết quả: chấp nhận cả 200 OK lẫn 201 Created
+                // SecureUrl != null là dấu hiệu đáng tin cậy nhất để biết upload thành công
+                if (uploadResult?.SecureUrl != null)
                 {
                     logger.LogInformation("Upload ảnh lên Cloudinary thành công: {Url}", uploadResult.SecureUrl.ToString());
                     return uploadResult.SecureUrl.ToString();
                 }
+
+                // Upload xong nhưng không lấy được URL → ném lỗi, không fallback local
+                var errorDetail = uploadResult?.Error?.Message ?? $"StatusCode={uploadResult?.StatusCode}";
+                logger.LogError("Cloudinary upload không trả về SecureUrl: {Detail}", errorDetail);
+                throw new InvalidOperationException($"Upload ảnh thất bại: {errorDetail}");
+            }
+            catch (InvalidOperationException)
+            {
+                // Lỗi rõ ràng từ Cloudinary → ném thẳng lên, không fallback local
+                throw;
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Lỗi khi upload ảnh lên Cloudinary, chuyển sang lưu cục bộ.");
+                // Lỗi network/timeout → ném lỗi rõ ràng thay vì âm thầm fallback local
+                logger.LogError(ex, "Lỗi khi upload ảnh lên Cloudinary.");
+                throw new InvalidOperationException("Không thể upload ảnh lên Cloudinary. Vui lòng thử lại sau.", ex);
             }
         }
 

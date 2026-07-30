@@ -13,7 +13,7 @@ namespace CinemaXNet.Controllers.Api;
 [Route("api/app")]
 // [AllowAnonymous]: Cho phép người dùng chưa đăng nhập (khách) cũng có thể gọi được các API trong class này (trừ khi bên trong hàm có kiểm tra riêng).
 [AllowAnonymous]
-public class AppApiController(IPromotionService promoService, INewsService newsService, INotificationService notificationService) : ControllerBase
+public class AppApiController(IPromotionService promoService, INewsService newsService, INotificationService notificationService, IBannerService bannerService) : ControllerBase
 {
     // API Lấy danh sách Khuyến mãi
     // Sử dụng [HttpGet] để quy định phương thức HTTP cho API này là GET. Đường dẫn đầy đủ sẽ là: GET /api/app/promotions
@@ -51,6 +51,25 @@ public class AppApiController(IPromotionService promoService, INewsService newsS
         
         // Trả kết quả thành công với HTTP 200 (Ok)
         return Ok(ApiResponse<object>.Ok(news));
+    }
+
+    // API Lấy danh sách Banner đang hoạt động (Hero Carousel)
+    // Đường dẫn: GET /api/app/banners
+    [HttpGet("banners")]
+    public async Task<IActionResult> GetBanners()
+    {
+        var banners = await bannerService.GetActiveBannersAsync();
+
+        // Map snake_case (DB) → camelCase (Mobile App)
+        var result = banners.Select(b => new {
+            id       = b.id,
+            title    = b.title,
+            imageUrl = b.image_url,
+            linkUrl  = b.link_url,
+            sortOrder = b.sort_order
+        });
+
+        return Ok(ApiResponse<object>.Ok(result));
     }
 
     // API Lấy danh sách Thông báo của người dùng
