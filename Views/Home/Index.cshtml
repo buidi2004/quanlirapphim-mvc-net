@@ -101,25 +101,16 @@
                 </div>
                 <!-- Body -->
                 <div class="card-body p-0 flex-grow-1 overflow-auto" style="max-height: 350px;">
-                    @{ 
-                        var boxOffice = nowShowing.Take(7).ToList(); 
-                    }
-                    <div class="list-group list-group-flush small">
-                        @for(int i = 0; i < boxOffice.Count; i++) 
-                        {
-                            <div class="list-group-item d-flex align-items-center py-2 px-3 border-bottom hover-bg-light transition-all" style="min-height: 48px;">
-                                <span class="fw-bold fst-italic text-secondary me-2 text-end" style="width: 15px;">@(i+1).</span>
-                                <span class="badge p-1 rounded-1 me-2 @(boxOffice[i].AgeRating == "C18" ? "bg-danger" : boxOffice[i].AgeRating == "C16" ? "bg-warning text-dark" : boxOffice[i].AgeRating == "C13" ? "bg-success" : "bg-primary")" style="font-size: 0.65rem; min-width: 28px; text-align: center;">
-                                    @(string.IsNullOrEmpty(boxOffice[i].AgeRating) ? "P" : boxOffice[i].AgeRating)
-                                </span>
-                                <a href="/movies/@boxOffice[i].Id" class="fw-bold text-dark text-truncate flex-grow-1 text-decoration-none" title="@boxOffice[i].Title">@boxOffice[i].Title</a>
-                                <span class="text-muted ms-2" style="font-size: 0.7rem; white-space: nowrap;">@boxOffice[i].DurationMinutes Phút</span>
-                            </div>
-                        }
+                    <div id="boxOfficeList" class="list-group list-group-flush small">
+                        <!-- Dữ liệu được nạp qua API /api/movies/box-office -->
+                        <div class="text-center py-4 text-muted">
+                            <div class="spinner-border spinner-border-sm" role="status"></div>
+                            <span class="ms-2">Đang tải dữ liệu...</span>
+                        </div>
                     </div>
                 </div>
                 <!-- Footer -->
-                <a href="/movies" class="btn btn-primary rounded-0 py-3 fw-bold text-uppercase w-100" style="font-size: 14px;">Mua vé ngay</a>
+                <a href="/movies" class="btn btn-danger rounded-0 py-3 fw-bold text-uppercase w-100" style="font-size: 14px;">Mua vé ngay</a>
             </div>
         </div>
 
@@ -185,6 +176,37 @@
             border-color: var(--color-primary, #F84464);
             box-shadow: 0 4px 14px rgba(248, 68, 100, 0.35) !important;
         }
+        .group:hover .group-hover-scale {
+            transform: scale(1.05);
+        }
+        .group:hover .overlay-hover {
+            opacity: 1 !important;
+        }
+        .transition-transform {
+            transition: transform 0.3s ease;
+        }
+        .transition-opacity {
+            transition: opacity 0.3s ease;
+        }
+        .opacity-0 {
+            opacity: 0;
+        }
+        .movie-carousel-item {
+            width: calc(60% - 1.5rem);
+        }
+        @@media (min-width: 768px) {
+            .movie-carousel-item {
+                width: calc((100% - 2 * 1.5rem) / 3);
+            }
+        }
+        @@media (min-width: 1024px) {
+            .movie-carousel-item {
+                width: calc((100% - 4 * 1.5rem) / 5);
+            }
+        }
+        .group-carousel:hover .group-carousel-hover-opacity-100 {
+            opacity: 1 !important;
+        }
     </style>
 
     <!-- Tabs Content -->
@@ -192,48 +214,50 @@
         
         <!-- Tab: Thịnh Hành -->
         <div class="tab-pane fade show active" id="trending-content" role="tabpanel" aria-labelledby="trending-tab">
-            <div class="d-flex gap-4 overflow-x-auto pb-4 custom-scrollbar" style="scroll-snap-type: x mandatory;">
-                @{ 
-                    int trendingCount = 0; 
-                    var validTrendingMovies = nowShowing.Where(m => m != null && !string.IsNullOrWhiteSpace(m.Title) && !string.IsNullOrWhiteSpace(m.PosterUrl)).ToList();
-                }
-                @foreach (var movie in validTrendingMovies) {
-                    trendingCount++;
-                    if (trendingCount > 5) break;
-                <div class="flex-shrink-0" style="width: 350px; scroll-snap-align: start;">
-                    <div class="movie-card-3d h-100">
-                        <div class="card bg-white border-0 shadow-lg movie-card rounded-2 overflow-hidden position-relative h-100" onclick="location.href='/movies/@movie.Id'">
-                            <div class="position-relative w-100 h-100">
-                                <img src="@(movie.PosterUrl ?? "/images/movies/lat-mat-7.jpg")" 
-                                     class="w-100 h-100" style="object-fit: cover;" alt="@movie.Title" loading="lazy" decoding="async">
-                                <div class="quick-view-overlay">
-                                    <div class="play-btn" onclick="event.stopPropagation(); window.open('@(movie.TrailerUrl ?? "https://www.youtube.com/watch?v=TcMBFSGVi1c")', '_blank')">
-                                        <i class="bi bi-play-fill"></i>
-                                    </div>
-                                    <div class="synopsis px-2">@(movie.Description ?? "Phim bom tấn hấp dẫn đang làm mưa làm gió tại rạp.")</div>
-                                </div>
-                                @{ 
-                                    string[] formatsTrending = {"IMAX", "4DX", "3D", "Dolby"};
-                                    string randomFormatTrending = formatsTrending[movie.Id % formatsTrending.Length];
+            <div class="position-relative group-carousel">
+                <button class="btn btn-light rounded-circle shadow position-absolute top-50 start-0 translate-middle z-3 opacity-0 group-carousel-hover-opacity-100 transition-opacity" style="width: 48px; height: 48px; margin-top: -30px;" onclick="scrollMovieCarousel(this, -1)">
+                    <i class="bi bi-chevron-left fs-4 text-dark fw-bold" style="margin-left:-2px;"></i>
+                </button>
+                
+                <div class="d-flex gap-4 overflow-x-auto custom-scrollbar snap-x pb-4 movie-carousel-container" style="scroll-behavior: smooth;">
+                    @{ 
+                        int trendingCount = 0; 
+                        var validTrendingMovies = nowShowing.Where(m => m != null && !string.IsNullOrWhiteSpace(m.Title) && !string.IsNullOrWhiteSpace(m.PosterUrl)).ToList();
+                    }
+                    @foreach (var movie in validTrendingMovies) {
+                        trendingCount++;
+                        if (trendingCount > 5) break;
+                        <div class="movie-carousel-item flex-shrink-0 snap-start">
+                            <div class="movie-poster-item position-relative overflow-hidden rounded-3 group bg-light shadow-sm" style="aspect-ratio: 2/3; cursor: pointer;" onclick="location.href='/movies/@movie.Id'">
+                                <img src="@(movie.PosterUrl ?? "/images/movies/lat-mat-7.jpg")" class="w-100 h-100 object-fit-cover transition-transform duration-300 group-hover-scale" alt="@movie.Title" loading="lazy" decoding="async">
+                                
+                                @if (!string.IsNullOrEmpty(movie.AgeRating)) {
+                                    <span class="badge position-absolute top-0 end-0 m-2 bg-dark text-white shadow-sm border border-secondary" style="z-index: 5;">@movie.AgeRating</span>
                                 }
-                                <div class="position-absolute top-0 end-0 m-2 d-flex flex-column gap-1" style="z-index: 6;">
-                                    <span class="badge bg-danger shadow-sm" style="font-family: 'Arial Black', sans-serif; letter-spacing: 1px; font-size: 0.7rem;">@randomFormatTrending</span>
+                                
+                                <div class="overlay-hover position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center opacity-0 transition-opacity duration-300" style="background-color: rgba(0,0,0,0.75); z-index: 10;">
+                                    <button class="btn btn-danger rounded-pill fw-bold px-4 shadow text-uppercase" onclick="event.stopPropagation(); location.href='/movies/@movie.Id#showtimes-section'">Mua vé ngay</button>
+                                </div>
+                                
+                                <div class="position-absolute top-0 start-0 m-2" style="z-index: 6;">
+                                    <span class="badge bg-danger shadow-sm" style="font-family: 'Arial Black', sans-serif; letter-spacing: 1px; font-size: 0.7rem;">TOP @trendingCount</span>
                                 </div>
                             </div>
-                            <div class="position-absolute bottom-0 w-100 p-4 pt-5" style="background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 50%, transparent 100%); z-index: 6;">
-                                <h4 class="text-white fw-medium mb-1 text-truncate" style="text-shadow: 0 2px 4px rgba(0,0,0,0.8);">@movie.Title</h4>
-                                <div class="d-flex align-items-center mb-2 text-white-50">
-                                    <span class="rating-chip text-white"><i class="bi bi-star me-1 text-warning"></i>4.8/5</span>
+                            
+                            <div class="pt-3 text-start">
+                                <h6 class="text-dark fw-bold text-truncate mb-1" title="@movie.Title">@movie.Title</h6>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted small"><i class="bi bi-clock me-1"></i>@movie.GetFormattedDuration()</span>
+                                    <span class="text-muted small"><i class="bi bi-star-fill text-warning me-1"></i>4.8</span>
                                 </div>
-                                <button class="btn btn-warning btn-sm rounded-3 fw-medium w-100 mt-2" onclick="event.stopPropagation(); location.href='/movies/@movie.Id#showtimes-section'">ĐẶT VÉ</button>
-                            </div>
-                            <div class="position-absolute top-0 start-0 m-3 fs-3 fw-medium text-shadow" style="color: rgba(255,255,255,0.8); font-family: Impact, sans-serif;">
-                                #@trendingCount
                             </div>
                         </div>
-                    </div>
+                    }
                 </div>
-                }
+                
+                <button class="btn btn-light rounded-circle shadow position-absolute top-50 end-0 translate-middle z-3 opacity-0 group-carousel-hover-opacity-100 transition-opacity" style="width: 48px; height: 48px; margin-top: -30px;" onclick="scrollMovieCarousel(this, 1)">
+                    <i class="bi bi-chevron-right fs-4 text-dark fw-bold" style="margin-left:2px;"></i>
+                </button>
             </div>
         </div>
 
@@ -242,53 +266,41 @@
             @if (!nowShowing.Any()) {
                 <p class="text-secondary text-center fst-italic">Hiện tại không có phim nào đang chiếu.</p>
             } else {
-                <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-4">
-                    @{ var validNowShowing = nowShowing.Where(m => m != null && !string.IsNullOrWhiteSpace(m.Title)).ToList(); }
-                    @foreach (var movie in validNowShowing) {
-                        <div class="col">
-                            <div class="movie-card-3d h-100">
-                                <div class="card bg-white border border-light h-100 shadow movie-card hover-lift hover-glow"
-                                     onclick="location.href='/movies/@movie.Id'">
-                                    <div class="position-relative">
-                                        <img src="@(movie.PosterUrl ?? "/images/movies/lat-mat-7.jpg")"
-                                             class="card-img-top img-fluid rounded-top"
-                                             alt="@movie.Title"
-                                             style="aspect-ratio: 2/3; object-fit: cover;" loading="lazy" decoding="async">
-                                        <div class="quick-view-overlay rounded-top">
-                                            <div class="play-btn" onclick="event.stopPropagation(); window.open('@(movie.TrailerUrl ?? "https://www.youtube.com/watch?v=TcMBFSGVi1c")', '_blank')">
-                                                <i class="bi bi-play-fill"></i>
-                                            </div>
-                                            <div class="synopsis px-2">@(movie.Description ?? "Phim bom tấn hấp dẫn đang làm mưa làm gió tại rạp.")</div>
-                                        </div>
-                                        @{ 
-                                            string[] formats = {"IMAX", "4DX", "3D", "Dolby"};
-                                            string randomFormat = formats[movie.Id % formats.Length];
-                                        }
-                                        <div class="position-absolute top-0 start-0 m-2 d-flex flex-column gap-1" style="z-index: 6;">
-                                            <span class="badge bg-primary shadow-sm" style="font-family: 'Arial Black', sans-serif; letter-spacing: 1px; font-size: 0.7rem;">@randomFormat</span>
-                                        </div>
-                                        @if (!string.IsNullOrEmpty(movie.AgeRating)) {
-                                            <span class="badge position-absolute top-0 end-0 m-2 badge-@movie.AgeRating?.ToLower()" style="z-index: 6; box-shadow: 0 2px 5px rgba(0,0,0,0.5);">
-                                                @movie.AgeRating
-                                            </span>
-                                        }
+                <div class="position-relative group-carousel">
+                    <button class="btn btn-light rounded-circle shadow position-absolute top-50 start-0 translate-middle z-3 opacity-0 group-carousel-hover-opacity-100 transition-opacity" style="width: 48px; height: 48px; margin-top: -30px;" onclick="scrollMovieCarousel(this, -1)">
+                        <i class="bi bi-chevron-left fs-4 text-dark fw-bold" style="margin-left:-2px;"></i>
+                    </button>
+                    
+                    <div class="d-flex gap-4 overflow-x-auto custom-scrollbar snap-x pb-4 movie-carousel-container" style="scroll-behavior: smooth;">
+                        @{ var validNowShowing = nowShowing.Where(m => m != null && !string.IsNullOrWhiteSpace(m.Title)).ToList(); }
+                        @foreach (var movie in validNowShowing) {
+                            <div class="movie-carousel-item flex-shrink-0 snap-start">
+                                <div class="movie-poster-item position-relative overflow-hidden rounded-3 group bg-light shadow-sm" style="aspect-ratio: 2/3; cursor: pointer;" onclick="location.href='/movies/@movie.Id'">
+                                    <img src="@(movie.PosterUrl ?? "/images/movies/lat-mat-7.jpg")" class="w-100 h-100 object-fit-cover transition-transform duration-300 group-hover-scale" alt="@movie.Title" loading="lazy" decoding="async">
+                                    
+                                    @if (!string.IsNullOrEmpty(movie.AgeRating)) {
+                                        <span class="badge position-absolute top-0 end-0 m-2 bg-dark text-white shadow-sm border border-secondary" style="z-index: 5;">@movie.AgeRating</span>
+                                    }
+                                    
+                                    <div class="overlay-hover position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center opacity-0 transition-opacity duration-300" style="background-color: rgba(0,0,0,0.75); z-index: 10;">
+                                        <button class="btn btn-danger rounded-pill fw-bold px-4 shadow text-uppercase" onclick="event.stopPropagation(); location.href='/movies/@movie.Id#showtimes-section'">Mua vé ngay</button>
                                     </div>
-                                    <div class="card-body p-3 bg-white d-flex flex-column">
-                                        <h6 class="card-title text-dark mb-2 text-truncate fw-medium">
-                                            @movie.Title
-                                        </h6>
-                                        <div class="d-flex justify-content-between align-items-center mt-auto">
-                                            <small class="text-secondary">
-                                                <i class="bi bi-clock me-1"></i>
-                                                @movie.GetFormattedDuration()
-                                            </small>
-                                            <button class="btn btn-warning btn-sm px-3 py-1 text-white font-monospace border-0 rounded-pill shadow-sm" style="font-size: 0.75rem;" onclick="event.stopPropagation(); location.href='/movies/@movie.Id#showtimes-section'">ĐẶT VÉ</button>
-                                        </div>
+                                </div>
+                                
+                                <div class="pt-3 text-start">
+                                    <h6 class="text-dark fw-bold text-truncate mb-1" title="@movie.Title">@movie.Title</h6>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-muted small"><i class="bi bi-clock me-1"></i>@movie.GetFormattedDuration()</span>
+                                        <span class="text-muted small"><i class="bi bi-star-fill text-warning me-1"></i>4.8</span>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    }
+                        }
+                    </div>
+                    
+                    <button class="btn btn-light rounded-circle shadow position-absolute top-50 end-0 translate-middle z-3 opacity-0 group-carousel-hover-opacity-100 transition-opacity" style="width: 48px; height: 48px; margin-top: -30px;" onclick="scrollMovieCarousel(this, 1)">
+                        <i class="bi bi-chevron-right fs-4 text-dark fw-bold" style="margin-left:2px;"></i>
+                    </button>
                 </div>
             }
         </div>
@@ -308,53 +320,41 @@
                         <button class="btn btn-outline-primary rounded-pill px-4 month-filter-btn" data-filter="12">Tháng 12</button>
                     </div>
                 </div>
-                <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-4" id="coming-soon-grid">
-                    @{ var validComingSoon = comingSoon.Where(m => m != null && !string.IsNullOrWhiteSpace(m.Title)).ToList(); }
-                    @foreach (var movie in validComingSoon) {
-                        <div class="col coming-soon-item" data-month="@( (movie.Id % 5) + 8 )">
-                            <div class="movie-card-3d h-100">
-                                <div class="card bg-white border border-light h-100 shadow movie-card hover-lift hover-glow"
-                                     onclick="location.href='/movies/@movie.Id'">
-                                    <div class="position-relative">
-                                        <img src="@(movie.PosterUrl ?? "/images/movies/lat-mat-7.jpg")"
-                                             class="card-img-top img-fluid rounded-top"
-                                             alt="@movie.Title"
-                                             style="aspect-ratio: 2/3; object-fit: cover;" loading="lazy" decoding="async">
-                                        <div class="quick-view-overlay rounded-top">
-                                            <div class="play-btn" onclick="event.stopPropagation(); window.open('@(movie.TrailerUrl ?? "https://www.youtube.com/watch?v=TcMBFSGVi1c")', '_blank')">
-                                                <i class="bi bi-play-fill"></i>
-                                            </div>
-                                            <div class="synopsis px-2">@(movie.Description ?? "Phim bom tấn sắp ra mắt tại các hệ thống rạp.")</div>
-                                        </div>
-                                        @{ 
-                                            string[] formatsComingSoon = {"IMAX", "4DX", "3D", "Dolby"};
-                                            string randomFormatComingSoon = formatsComingSoon[movie.Id % formatsComingSoon.Length];
-                                        }
-                                        <div class="position-absolute top-0 start-0 m-2 d-flex flex-column gap-1" style="z-index: 6;">
-                                            <span class="badge bg-primary shadow-sm" style="font-family: 'Arial Black', sans-serif; letter-spacing: 1px; font-size: 0.7rem;">@randomFormatComingSoon</span>
-                                        </div>
-                                        @if (!string.IsNullOrEmpty(movie.AgeRating)) {
-                                            <span class="badge position-absolute top-0 end-0 m-2 badge-@movie.AgeRating?.ToLower()" style="z-index: 6; box-shadow: 0 2px 5px rgba(0,0,0,0.5);">
-                                                @movie.AgeRating
-                                            </span>
-                                        }
+                <div class="position-relative group-carousel">
+                    <button class="btn btn-light rounded-circle shadow position-absolute top-50 start-0 translate-middle z-3 opacity-0 group-carousel-hover-opacity-100 transition-opacity" style="width: 48px; height: 48px; margin-top: -30px;" onclick="scrollMovieCarousel(this, -1)">
+                        <i class="bi bi-chevron-left fs-4 text-dark fw-bold" style="margin-left:-2px;"></i>
+                    </button>
+                    
+                    <div class="d-flex gap-4 overflow-x-auto custom-scrollbar snap-x pb-4 movie-carousel-container" id="coming-soon-grid" style="scroll-behavior: smooth;">
+                        @{ var validComingSoon = comingSoon.Where(m => m != null && !string.IsNullOrWhiteSpace(m.Title)).ToList(); }
+                        @foreach (var movie in validComingSoon) {
+                            <div class="movie-carousel-item flex-shrink-0 snap-start coming-soon-item" data-month="@( (movie.Id % 5) + 8 )">
+                                <div class="movie-poster-item position-relative overflow-hidden rounded-3 group bg-light shadow-sm" style="aspect-ratio: 2/3; cursor: pointer;" onclick="location.href='/movies/@movie.Id'">
+                                    <img src="@(movie.PosterUrl ?? "/images/movies/lat-mat-7.jpg")" class="w-100 h-100 object-fit-cover transition-transform duration-300 group-hover-scale" alt="@movie.Title" loading="lazy" decoding="async">
+                                    
+                                    @if (!string.IsNullOrEmpty(movie.AgeRating)) {
+                                        <span class="badge position-absolute top-0 end-0 m-2 bg-dark text-white shadow-sm border border-secondary" style="z-index: 5;">@movie.AgeRating</span>
+                                    }
+                                    
+                                    <div class="overlay-hover position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center opacity-0 transition-opacity duration-300" style="background-color: rgba(0,0,0,0.75); z-index: 10;">
+                                        <button class="btn btn-danger rounded-pill fw-bold px-4 shadow text-uppercase" onclick="event.stopPropagation(); location.href='/movies/@movie.Id'">Xem chi tiết</button>
                                     </div>
-                                    <div class="card-body p-3 bg-white d-flex flex-column">
-                                        <h6 class="card-title text-dark mb-2 text-truncate fw-medium">
-                                            @movie.Title
-                                        </h6>
-                                        <div class="d-flex justify-content-between align-items-center mt-auto">
-                                            <small class="text-secondary">
-                                                <i class="bi bi-clock me-1"></i>
-                                                @movie.GetFormattedDuration()
-                                            </small>
-                                            <span class="badge bg-info text-dark font-monospace" style="font-size: 0.75rem;">SẮP CHIẾU</span>
-                                        </div>
+                                </div>
+                                
+                                <div class="pt-3 text-start">
+                                    <h6 class="text-dark fw-bold text-truncate mb-1" title="@movie.Title">@movie.Title</h6>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-muted small"><i class="bi bi-clock me-1"></i>@movie.GetFormattedDuration()</span>
+                                        <span class="badge bg-secondary text-white font-monospace" style="font-size: 0.65rem;">SẮP CHIẾU</span>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    }
+                        }
+                    </div>
+                    
+                    <button class="btn btn-light rounded-circle shadow position-absolute top-50 end-0 translate-middle z-3 opacity-0 group-carousel-hover-opacity-100 transition-opacity" style="width: 48px; height: 48px; margin-top: -30px;" onclick="scrollMovieCarousel(this, 1)">
+                        <i class="bi bi-chevron-right fs-4 text-dark fw-bold" style="margin-left:2px;"></i>
+                    </button>
                 </div>
             }
         </div>
@@ -789,6 +789,35 @@ document.addEventListener('DOMContentLoaded', function() {
                 { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
             );
         });
+
+        // Tối ưu hóa: Load dữ liệu Box Office qua API
+        fetch('/api/movies/box-office')
+            .then(res => res.json())
+            .then(res => {
+                if(res.statusCode === 200 && res.data) {
+                    const boxOfficeList = document.getElementById('boxOfficeList');
+                    boxOfficeList.innerHTML = ''; // Xóa trạng thái loading
+                    
+                    res.data.forEach((movie, index) => {
+                        let badgeColor = 'bg-primary';
+                        if(movie.ageRating === 'C18') badgeColor = 'bg-danger';
+                        else if(movie.ageRating === 'C16') badgeColor = 'bg-warning text-dark';
+                        else if(movie.ageRating === 'C13') badgeColor = 'bg-success';
+                        
+                        boxOfficeList.innerHTML += `
+                            <div class="list-group-item d-flex align-items-center py-2 px-3 border-bottom hover-bg-light transition-all" style="min-height: 48px;">
+                                <span class="fw-bold fst-italic text-secondary me-2 text-end" style="width: 15px;">${index + 1}.</span>
+                                <span class="badge p-1 rounded-1 me-2 ${badgeColor}" style="font-size: 0.65rem; min-width: 28px; text-align: center;">
+                                    ${movie.ageRating}
+                                </span>
+                                <a href="/movies/${movie.id}" class="fw-bold text-dark text-truncate flex-grow-1 text-decoration-none" title="${movie.title}">${movie.title}</a>
+                                <span class="text-muted ms-2" style="font-size: 0.7rem; white-space: nowrap;">${movie.duration} Phút</span>
+                            </div>
+                        `;
+                    });
+                }
+            })
+            .catch(err => console.error("Lỗi tải Box Office:", err));
     }
 });
 </script>
@@ -958,7 +987,14 @@ document.addEventListener('scroll', function() {
     if(img) img.style.transform = 'scale(' + scale + ')';
 });
 </script>
-
+<script>
+function scrollMovieCarousel(btn, direction) {
+    const container = btn.parentElement.querySelector('.movie-carousel-container');
+    if (!container) return;
+    const scrollAmount = container.clientWidth * 0.8;
+    container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+}
+</script>
 
 
 

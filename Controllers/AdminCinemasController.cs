@@ -31,8 +31,7 @@ public class AdminCinemasController(ICinemaService cinemaService, IRoomService r
             var finalSlug = string.IsNullOrWhiteSpace(slug) ? Guid.NewGuid().ToString("N").Substring(0, 8) : slug;
             
             // Validate unique slug
-            var existingCinema = await cinemaService.GetBySlugAsync(finalSlug);
-            if (existingCinema != null)
+            if (await cinemaService.CheckSlugExistsAsync(finalSlug))
             {
                 TempData["Error"] = $"Đường dẫn (Slug) '{finalSlug}' đã tồn tại trong hệ thống. Vui lòng chọn một Slug khác.";
                 return RedirectToAction(nameof(Index));
@@ -92,8 +91,7 @@ public class AdminCinemasController(ICinemaService cinemaService, IRoomService r
             var finalSlug = string.IsNullOrWhiteSpace(slug) ? Guid.NewGuid().ToString("N").Substring(0, 8) : slug;
 
             // Validate unique slug (exclude current cinema)
-            var existingCinema = await cinemaService.GetBySlugAsync(finalSlug);
-            if (existingCinema != null && existingCinema.Id != id)
+            if (await cinemaService.CheckSlugExistsAsync(finalSlug, id))
             {
                 TempData["Error"] = $"Đường dẫn (Slug) '{finalSlug}' đã tồn tại trong hệ thống. Vui lòng chọn một Slug khác.";
                 return RedirectToAction(nameof(Index));

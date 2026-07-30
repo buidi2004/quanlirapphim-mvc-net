@@ -200,6 +200,15 @@ public class AuthController(IUserService userService, IEmailSender emailSender) 
         return Redirect("/");
     }
 
+    // API kiểm tra Email / Username cho Unified Auth Flow
+    [HttpGet("/api/auth/check-email")]
+    public async Task<IActionResult> CheckEmail(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email)) return BadRequest();
+        var user = await userService.FindByEmailOrUsernameAsync(email);
+        return Json(new { exists = user != null });
+    }
+
     // ── Helpers ────────────────────────────────────────────────────────────
     private async Task SignInUser(CinemaXNet.Domain.Entities.User user)
     {

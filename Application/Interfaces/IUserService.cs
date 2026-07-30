@@ -23,4 +23,5 @@ public interface IUserService
     Task UpdateRoleAsync(int userId, string role);
     Task DeleteAccountAsync(int userId);
     Task<User?> FindByEmailAsync(string email);
+    Task<User?> FindByEmailOrUsernameAsync(string identifier);
 }

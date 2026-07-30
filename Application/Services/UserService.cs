@@ -124,10 +124,20 @@ public class UserService(IUserRepository userRepo, IEmailSender emailSender) : I
     // Xử lý logic và luồng thực thi cho phương thức UpdateRoleAsync
     public async Task UpdateRoleAsync(int userId, string role) => await userRepo.UpdateRoleAsync(userId, role);
 
-    public async Task DeleteAccountAsync(int userId) => await userRepo.DeleteAsync(userId);
+    public async Task DeleteAccountAsync(int userId)
+    {
+        await userRepo.DeleteAsync(userId);
+    }
+    
+    public async Task<User?> FindByEmailAsync(string email)
+    {
+        return await userRepo.FindByEmailAsync(email);
+    }
 
-    // Xử lý logic và luồng thực thi cho phương thức FindByEmailAsync
-    public Task<User?> FindByEmailAsync(string email) => userRepo.FindByEmailAsync(email);
+    public async Task<User?> FindByEmailOrUsernameAsync(string identifier)
+    {
+        return await userRepo.FindByEmailAsync(identifier) ?? await userRepo.FindByUsernameAsync(identifier);
+    }
 
     public Task RecalculateMemberTierAsync(int userId, System.Data.IDbTransaction? transaction = null) => 
         userRepo.RecalculateMemberTierAsync(userId, transaction);

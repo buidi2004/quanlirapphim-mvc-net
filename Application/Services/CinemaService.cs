@@ -22,6 +22,14 @@ public class CinemaService(ICinemaRepository cinemaRepo, IShowtimeRepository sho
         return cinema ?? throw new NotFoundException($"Không tìm thấy rạp '{slug}'");
     }
 
+    public async Task<bool> CheckSlugExistsAsync(string slug, int? excludeId = null)
+    {
+        var cinema = await cinemaRepo.FindBySlugAsync(slug);
+        if (cinema == null) return false;
+        if (excludeId.HasValue && cinema.Id == excludeId.Value) return false;
+        return true;
+    }
+
     // Xử lý logic và luồng thực thi cho phương thức FindNearestAsync
     public Task<IEnumerable<Cinema>> FindNearestAsync(double lat, double lng, int limit = 3) =>
         cinemaRepo.FindNearestAsync(lat, lng, limit);

@@ -1,65 +1,224 @@
 @model CinemaXNet.Application.ViewModels.LoginViewModel
 @{
-    ViewData["Title"] = "Đăng nhập";
+    ViewData["Title"] = "Đăng nhập hoặc Đăng ký";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="row justify-content-center py-5">
-    <div class="col-md-6 col-lg-5 col-xl-4">
-        <div class="card bg-white border border-light p-4 rounded shadow-lg">
-            <h2 class="text-center text-warning fw-medium mb-4">ĐĂNG NHẬP</h2>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-10">
+            <!-- Thẻ xác thực 2 cột (Split-Screen Authentication Card) -->
+            <div class="card border-0 shadow-lg overflow-hidden rounded-4">
+                <div class="row g-0">
+                    <!-- Cột trái: Form xác thực (Tỷ lệ 50%) -->
+                    <div class="col-md-6 p-4 p-md-5 bg-white d-flex flex-column justify-content-center">
+                        <h3 class="fw-bold mb-1">Đăng nhập hoặc Đăng ký</h3>
+                        <p id="auth-subtitle" class="text-muted mb-4 small">Vui lòng nhập Email của bạn để tiếp tục</p>
 
-                @if (!string.IsNullOrEmpty(Model.GeneralError))
-                {
-                    <div class="alert alert-danger border-0 p-2 text-center mb-3" style="background-color: rgba(220, 53, 69, 0.2); color: #f8d7da;">
-                        <small>@Model.GeneralError</small>
+                        <!-- Khối thông báo lỗi (ẩn mặc định) -->
+                        <div id="error-message" class="alert alert-danger border-0 p-2 text-center mb-3 d-none" style="background-color: rgba(220, 53, 69, 0.2); color: #f8d7da;">
+                            <small id="error-text"></small>
+                        </div>
+
+                        <!-- BƯỚC 1: NHẬP EMAIL -->
+                        <div id="step-1-identify">
+                            <div class="mb-4">
+                                <label class="fw-semibold text-muted text-uppercase mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Email / Số điện thoại</label>
+                                <input type="email" id="txtIdentifier" class="form-control bg-transparent border-0 border-bottom rounded-0 px-0 shadow-none" placeholder="Nhập Email của bạn" required style="font-size: 1.1rem; border-color: #ddd;">
+                            </div>
+                            <button type="button" id="btnContinue" class="btn btn-light w-100 fw-bold py-3 text-uppercase text-muted" disabled style="transition: all 0.3s ease;">
+                                Tiếp tục
+                            </button>
+                            
+                            <div class="text-center mt-3">
+                                <span class="text-muted small">Chưa có tài khoản?</span>
+                                <a href="/register" class="text-danger fw-bold text-decoration-none small ms-1">Đăng ký ngay</a>
+                            </div>
+                        </div>
+
+                        <!-- BƯỚC 2A: ĐĂNG NHẬP (Nếu đã có tài khoản) -->
+                        <form id="step-2-login" method="post" action="/login@(ViewBag.ReturnUrl != null ? "?returnUrl=" + Uri.EscapeDataString(ViewBag.ReturnUrl) : "")" class="d-none">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="Email" id="loginEmail">
+                            
+                            <div class="mb-2 d-flex justify-content-between align-items-center">
+                                <span class="fw-medium text-dark"><i class="bi bi-person-circle me-2"></i><span id="displayLoginEmail"></span></span>
+                                <button type="button" class="btn btn-link btn-sm text-decoration-none p-0 text-primary fw-medium" id="btnBackToStep1A">Thay đổi</button>
+                            </div>
+                            
+                            <div class="mb-4 mt-3">
+                                <label class="fw-semibold text-muted text-uppercase mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Mật khẩu</label>
+                                <input type="password" name="Password" class="form-control bg-transparent border-0 border-bottom rounded-0 px-0 shadow-none" placeholder="Nhập mật khẩu" required style="font-size: 1.1rem; border-color: #ddd;">
+                            </div>
+                            <button type="submit" class="btn btn-danger w-100 fw-bold py-3 text-uppercase" style="background-color: #E31A22;">
+                                ĐĂNG NHẬP
+                            </button>
+                            <div class="mt-3 text-end">
+                                <a href="/forgot-password" class="text-decoration-none small text-muted">Quên mật khẩu?</a>
+                            </div>
+                        </form>
+
+                        <!-- BƯỚC 2B: ĐĂNG KÝ (Nếu chưa có tài khoản) -->
+                        <form id="step-2-register" method="post" action="/register" class="d-none">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="Email" id="registerEmail">
+                            
+                            <div class="mb-2 d-flex justify-content-between align-items-center">
+                                <span class="fw-medium text-dark"><i class="bi bi-envelope-plus me-2"></i><span id="displayRegisterEmail"></span></span>
+                                <button type="button" class="btn btn-link btn-sm text-decoration-none p-0 text-primary fw-medium" id="btnBackToStep1B">Thay đổi</button>
+                            </div>
+                            
+                            <div class="mb-3 mt-3">
+                                <label class="fw-semibold text-muted text-uppercase mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Họ và tên</label>
+                                <input type="text" name="Username" class="form-control bg-transparent border-0 border-bottom rounded-0 px-0 shadow-none" placeholder="Nhập họ và tên của bạn" required style="font-size: 1.1rem; border-color: #ddd;">
+                            </div>
+                            <div class="mb-4">
+                                <label class="fw-semibold text-muted text-uppercase mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Tạo mật khẩu</label>
+                                <input type="password" name="Password" class="form-control bg-transparent border-0 border-bottom rounded-0 px-0 shadow-none" placeholder="Tạo mật khẩu an toàn" required style="font-size: 1.1rem; border-color: #ddd;">
+                            </div>
+                            <button type="submit" class="btn btn-danger w-100 fw-bold py-3 text-uppercase" style="background-color: #E31A22;">
+                                TẠO TÀI KHOẢN
+                            </button>
+                        </form>
+
+                        <div class="d-flex align-items-center my-4">
+                            <hr class="flex-grow-1 border-secondary opacity-25">
+                            <span class="mx-3 text-muted small">HOẶC</span>
+                            <hr class="flex-grow-1 border-secondary opacity-25">
+                        </div>
+
+                        <div class="d-grid gap-3">
+                            <a href="/google-login" class="btn btn-outline-dark fw-medium py-2 rounded-3 d-flex align-items-center justify-content-center">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" style="width: 20px;" class="me-2"> 
+                                Tiếp tục với Google
+                            </a>
+                            <a href="/facebook-login" class="btn fw-medium py-2 rounded-3 d-flex align-items-center justify-content-center text-white" style="background-color: #1877F2;">
+                                <i class="bi bi-facebook fs-5 me-2"></i> 
+                                Tiếp tục với Facebook
+                            </a>
+                        </div>
                     </div>
-                }
 
-                <form method="post" action="/login@(ViewBag.ReturnUrl != null ? "?returnUrl=" + Uri.EscapeDataString(ViewBag.ReturnUrl) : "")">
-                    @Html.AntiForgeryToken()
-
-                    <div class="mb-3">
-                        <label class="form-label text-dark">Email / Tên đăng nhập</label>
-                        <input type="text" name="Email"
-                               class="form-control bg-white bg-opacity-50 text-dark border-light @(ViewData.ModelState["Email"]?.Errors.Count > 0 ? "is-invalid" : "")"
-                               placeholder="admin hoặc name@example.com"
-                               value="@Model.Email" required>
-                        <span asp-validation-for="Email" class="invalid-feedback text-primary"></span>
+                    <!-- Cột phải: Banner Marketing (Tỷ lệ 50%) -->
+                    <div class="col-md-6 d-none d-md-block bg-dark position-relative">
+                        <img src="/images/movies/dune-2.jpg" alt="Promotion Banner" class="w-100 h-100 object-fit-cover" style="object-fit: cover;" onerror="this.style.display='none';">
+                        <div class="position-absolute bottom-0 start-0 w-100 p-4 pb-5" style="background: linear-gradient(transparent, rgba(0,0,0,0.9));">
+                            <span class="badge bg-danger mb-2 px-2 py-1">Ưu đãi Thành Viên</span>
+                            <h2 class="text-white fw-bold mb-2 h3">Nhận ngay x2 L-Point</h2>
+                            <p class="text-light mb-0 opacity-75">Khi đăng nhập và mua vé trực tuyến trong tháng này.</p>
+                        </div>
                     </div>
-
-                    <div class="mb-4">
-                        <label class="form-label text-dark">Mật khẩu</label>
-                        <input type="password" name="Password"
-                               class="form-control bg-white bg-opacity-50 text-dark border-light @(ViewData.ModelState["Password"]?.Errors.Count > 0 ? "is-invalid" : "")"
-                               placeholder="Mật khẩu" required>
-                        <span asp-validation-for="Password" class="invalid-feedback text-primary"></span>
-                    </div>
-
-                <button type="submit" class="btn btn-primary w-100 fw-medium py-2 shadow mb-3">
-                    ĐĂNG NHẬP
-                </button>
-
-                    <div class="d-flex align-items-center mb-3">
-                        <hr class="flex-grow-1 border-light">
-                        <span class="mx-2 text-dark small opacity-75">HOẶC</span>
-                        <hr class="flex-grow-1 border-light">
-                    </div>
-
-                    <div class="d-grid gap-2 mb-4">
-                        <a href="/google-login" class="btn btn-outline-dark fw-semibold rounded-pill">
-                            <i class="bi bi-google text-danger me-2"></i> Đăng nhập bằng Google
-                        </a>
-                        <a href="/facebook-login" class="btn btn-outline-dark fw-semibold rounded-pill">
-                            <i class="bi bi-facebook text-primary me-2"></i> Đăng nhập bằng Facebook
-                        </a>
-                    </div>
-
-                    <p class="text-center text-dark small mb-0 opacity-75">
-                        Chưa có tài khoản? <a href="/register" class="text-primary text-decoration-none fw-bold">Đăng ký ngay</a>
-                    </p>
-                </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const txtIdentifier = document.getElementById('txtIdentifier');
+            const btnContinue = document.getElementById('btnContinue');
+            
+            const step1 = document.getElementById('step-1-identify');
+            const step2Login = document.getElementById('step-2-login');
+            const step2Register = document.getElementById('step-2-register');
+            
+            const errorBox = document.getElementById('error-message');
+            const errorText = document.getElementById('error-text');
+            
+            // Xử lý Input Email/Phone (Active/Disabled Button CTA)
+            txtIdentifier.addEventListener('input', function() {
+                const val = this.value.trim();
+                // Simple validation regex for UI feedback (Email or Username)
+                const isValid = /^([^\s@@]+@@[^\s@@]+\.[^\s@@]+)|([a-zA-Z0-9_]{3,})$/.test(val);
+                
+                if (isValid) {
+                    btnContinue.removeAttribute('disabled');
+                    btnContinue.classList.remove('btn-light', 'text-muted');
+                    btnContinue.classList.add('text-white');
+                    btnContinue.style.backgroundColor = '#E31A22';
+                } else {
+                    btnContinue.setAttribute('disabled', 'true');
+                    btnContinue.classList.add('btn-light', 'text-muted');
+                    btnContinue.classList.remove('text-white');
+                    btnContinue.style.backgroundColor = '';
+                }
+            });
+            
+            // CSS Focus for Underline Input
+            const inputs = document.querySelectorAll('.form-control.border-bottom');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.style.borderColor = '#E31A22';
+                    this.style.boxShadow = 'none';
+                });
+                input.addEventListener('blur', function() {
+                    this.style.borderColor = '#ddd';
+                });
+            });
+
+            // Gọi API kiểm tra Email
+            btnContinue.addEventListener('click', async function() {
+                const email = txtIdentifier.value.trim();
+                btnContinue.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>ĐANG XỬ LÝ...';
+                
+                try {
+                    const response = await fetch(`/api/auth/check-email?email=${encodeURIComponent(email)}`);
+                    const data = await response.json();
+                    
+                    step1.classList.add('d-none');
+                    errorBox.classList.add('d-none');
+                    
+                    if (data.exists) {
+                        // User đã tồn tại -> Hiện form đăng nhập
+                        document.getElementById('auth-subtitle').textContent = "Vui lòng nhập mật khẩu để đăng nhập.";
+                        document.getElementById('loginEmail').value = email;
+                        document.getElementById('displayLoginEmail').textContent = email;
+                        step2Login.classList.remove('d-none');
+                    } else {
+                        // User chưa tồn tại -> Hiện form đăng ký
+                        document.getElementById('auth-subtitle').textContent = "Email chưa đăng ký. Vui lòng tạo mật khẩu để hoàn tất tạo tài khoản.";
+                        document.getElementById('registerEmail').value = email;
+                        document.getElementById('displayRegisterEmail').textContent = email;
+                        step2Register.classList.remove('d-none');
+                    }
+                } catch (error) {
+                    errorBox.classList.remove('d-none');
+                    errorText.textContent = "Không thể kết nối đến máy chủ. Vui lòng thử lại.";
+                } finally {
+                    btnContinue.innerHTML = 'TIẾP TỤC';
+                }
+            });
+
+            // Nút "Thay đổi" quay lại Bước 1
+            document.getElementById('btnBackToStep1A').addEventListener('click', backToStep1);
+            document.getElementById('btnBackToStep1B').addEventListener('click', backToStep1);
+            
+            function backToStep1() {
+                step2Login.classList.add('d-none');
+                step2Register.classList.add('d-none');
+                step1.classList.remove('d-none');
+                document.getElementById('auth-subtitle').textContent = "Vui lòng nhập Email của bạn để tiếp tục";
+                txtIdentifier.focus();
+            }
+            
+            // Bắt sự kiện Enter trên input email
+            txtIdentifier.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter' && !btnContinue.hasAttribute('disabled')) {
+                    e.preventDefault();
+                    btnContinue.click();
+                }
+            });
+            
+            // Xử lý lỗi từ server (nếu post fail)
+            @if (!string.IsNullOrEmpty(Model.GeneralError))
+            {
+                <text>
+                errorBox.classList.remove('d-none');
+                errorText.textContent = "@Html.Raw(Model.GeneralError)";
+                </text>
+            }
+        });
+    </script>
+}

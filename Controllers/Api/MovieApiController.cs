@@ -23,6 +23,24 @@ public class MovieApiController(IMovieService movieService, IReviewRepository re
         return Ok(PagedResponse<MovieSummaryDto>.Ok(dtos, movies.PageIndex, movies.TotalPages, movies.HasPreviousPage, movies.HasNextPage));
     }
 
+    // GET /api/movies/box-office
+    [HttpGet("box-office")]
+    [ResponseCache(Duration = 300)] // Cache for 5 mins
+    public async Task<IActionResult> GetBoxOffice()
+    {
+        var nowShowing = await movieService.GetNowShowingAsync();
+        var boxOffice = nowShowing.Take(7).Select(m => new
+        {
+            id = m.Id,
+            title = m.Title,
+            ageRating = string.IsNullOrEmpty(m.AgeRating) ? "P" : m.AgeRating,
+            duration = m.DurationMinutes,
+            releaseDate = m.CreatedAt.ToString("yyyy-MM-dd") // Mock release date for now
+        });
+        
+        return Ok(new { statusCode = 200, data = boxOffice });
+    }
+
 
     [HttpGet("{id}")]
     // Xử lý logic và luồng thực thi cho phương thức GetMovieDetail
