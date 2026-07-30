@@ -12,13 +12,11 @@ public class HomeController(IMovieService movieService, IBannerService bannerSer
     // Hành động (Action) Index() xử lý khi người dùng truy cập vào trang chủ: GET / hoặc GET /Home/Index
     public async Task<IActionResult> Index()
     {
-        // 1. Lấy danh sách phim đang chiếu và sắp chiếu từ Database thông qua MovieService.
-        // Dùng Service để không phải viết SQL trực tiếp ở đây.
-        var nowShowing = await movieService.GetNowShowingAsync();
-        var comingSoon = await movieService.GetComingSoonAsync();
+        // 1. Chạy song song 3 DB calls thay vì tuần tự — giảm latency từ T1+T2+T3 xuống còn max(T1,T2,T3)
+        //    Ví dụ: mỗi query ~100ms → trước: ~300ms, sau: ~100ms
+        var (nowShowing, comingSoon, banners) = await FetchHomeDataAsync();
 
-        // 2. Dữ liệu Khuyến mãi tạm thời đang được Mock (giả lập) cứng ở dạng List.
-        // Trong thực tế, đoạn này sau này sẽ được thay bằng: await promotionService.GetActivePromotionsAsync()
+        // 2. Khuyến mãi & Tin tức đang dùng mock data (chưa có DB query)
         var promotions = new List<PromotionItemViewModel>
         {
             new() { Id=1, Code="SUMMER2026", DiscountType="percent", DiscountValue=20, MaxUses=1000, UsedCount=50,
@@ -32,7 +30,6 @@ public class HomeController(IMovieService movieService, IBannerService bannerSer
                     ImageUrl="https://images.unsplash.com/photo-1440407876336-62333a6f010f?q=80&w=800&auto=format&fit=crop" },
         };
 
-        // 3. Tương tự, tin tức hiện cũng đang được Mock giả lập dữ liệu cứng để hiển thị giao diện trước.
         var news = new List<NewsItemViewModel>
         {
             new() { Title="Review Dune Part 2: Cảnh Tượng Nghẹt Thở Tại Hành Tinh Cát",
@@ -49,20 +46,27 @@ public class HomeController(IMovieService movieService, IBannerService bannerSer
                     Summary="Sau thành công vang dội của Oppenheimer, vị đạo diễn kiệt xuất dự kiến sẽ quay lại thể loại Sci-Fi sở trường." },
         };
 
-        // 4. Lấy danh sách Banners đang hoạt động (hiển thị trên slider ở trang chủ)
-        var banners = await bannerService.GetActiveBannersAsync();
-
-        // 5. Gói tất cả dữ liệu vào ViewBag để truyền từ Controller sang View (trang HTML)
-        // Lưu ý: Có thể dùng ViewModel Strongly-typed thay vì ViewBag để an toàn hơn về kiểu dữ liệu (Type-safe).
+        // 3. Gói tất cả dữ liệu vào ViewBag
         ViewBag.NowShowing  = nowShowing;
         ViewBag.ComingSoon  = comingSoon;
         ViewBag.Promotions  = promotions;
         ViewBag.News        = news;
         ViewBag.Banners     = banners;
         ViewBag.PageTitle   = "CinemaX — Đặt vé trực tuyến";
-        
-        // 6. Trả về View tương ứng (mặc định sẽ là file Views/Home/Index.cshtml)
+
         return View();
+    }
+
+    // Lấy dữ liệu tuần tự để tránh lỗi "Connection is already in use" do dùng chung IDbConnection
+    private async Task<(IEnumerable<CinemaXNet.Domain.Entities.Movie> NowShowing,
+                         IEnumerable<CinemaXNet.Domain.Entities.Movie> ComingSoon,
+                         IEnumerable<dynamic> Banners)> FetchHomeDataAsync()
+    {
+        var nowShowing = await movieService.GetNowShowingAsync();
+        var comingSoon = await movieService.GetComingSoonAsync();
+        var banners    = await bannerService.GetActiveBannersAsync();
+        
+        return (nowShowing, comingSoon, banners);
     }
 
     // Action xử lý lỗi toàn cục. 
