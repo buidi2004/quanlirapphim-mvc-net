@@ -28,10 +28,20 @@ public class AdminCinemasController(ICinemaService cinemaService, IRoomService r
     {
         try
         {
+            var finalSlug = string.IsNullOrWhiteSpace(slug) ? Guid.NewGuid().ToString("N").Substring(0, 8) : slug;
+            
+            // Validate unique slug
+            var existingCinema = await cinemaService.GetBySlugAsync(finalSlug);
+            if (existingCinema != null)
+            {
+                TempData["Error"] = $"Đường dẫn (Slug) '{finalSlug}' đã tồn tại trong hệ thống. Vui lòng chọn một Slug khác.";
+                return RedirectToAction(nameof(Index));
+            }
+
             var cinema = new Cinema 
             { 
                 Name = name, 
-                Slug = string.IsNullOrWhiteSpace(slug) ? Guid.NewGuid().ToString("N").Substring(0, 8) : slug,
+                Slug = finalSlug,
                 Province = province, 
                 District = string.IsNullOrWhiteSpace(district) ? "" : district,
                 Address = address, 
@@ -79,10 +89,20 @@ public class AdminCinemasController(ICinemaService cinemaService, IRoomService r
     {
         try
         {
+            var finalSlug = string.IsNullOrWhiteSpace(slug) ? Guid.NewGuid().ToString("N").Substring(0, 8) : slug;
+
+            // Validate unique slug (exclude current cinema)
+            var existingCinema = await cinemaService.GetBySlugAsync(finalSlug);
+            if (existingCinema != null && existingCinema.Id != id)
+            {
+                TempData["Error"] = $"Đường dẫn (Slug) '{finalSlug}' đã tồn tại trong hệ thống. Vui lòng chọn một Slug khác.";
+                return RedirectToAction(nameof(Index));
+            }
+
             var cinema = new Cinema 
             { 
                 Name = name, 
-                Slug = string.IsNullOrWhiteSpace(slug) ? Guid.NewGuid().ToString("N").Substring(0, 8) : slug,
+                Slug = finalSlug,
                 Province = province, 
                 District = string.IsNullOrWhiteSpace(district) ? "" : district,
                 Address = address, 
