@@ -4,12 +4,13 @@ using CinemaXNet.Domain.Entities;
 using CinemaXNet.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace CinemaXNet.Controllers;
 
 [Authorize(Roles = "admin,cinema_manager")]
 [Route("admin/cinemas")]
-public class AdminCinemasController(ICinemaService cinemaService, IRoomService roomService) : Controller
+public class AdminCinemasController(ICinemaService cinemaService, IRoomService roomService, ILogger<AdminCinemasController> logger) : Controller
 {
     [HttpGet]
     // Xử lý logic và luồng thực thi cho phương thức Index
@@ -30,7 +31,7 @@ public class AdminCinemasController(ICinemaService cinemaService, IRoomService r
             var cinema = new Cinema 
             { 
                 Name = name, 
-                Slug = string.IsNullOrWhiteSpace(slug) ? "" : slug,
+                Slug = string.IsNullOrWhiteSpace(slug) ? Guid.NewGuid().ToString("N").Substring(0, 8) : slug,
                 Province = province, 
                 District = string.IsNullOrWhiteSpace(district) ? "" : district,
                 Address = address, 
@@ -53,7 +54,7 @@ public class AdminCinemasController(ICinemaService cinemaService, IRoomService r
                     var room = new Room
                     {
                         CinemaId = cinemaId,
-                        Name = $"Phòng {i} - Standard",
+                        Name = $"P{i} - {name} ({Guid.NewGuid().ToString("N").Substring(0, 4)})",
                         TotalRows = 6,
                         SeatsPerRow = 8
                     };
@@ -63,9 +64,10 @@ public class AdminCinemasController(ICinemaService cinemaService, IRoomService r
             
             TempData["Success"] = "Thêm rạp thành công!";
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
+            logger.LogError(ex, "Lỗi khi thêm Rạp: ");
+            TempData["Error"] = "Đã xảy ra lỗi hệ thống: " + ex.Message;
         }
         return RedirectToAction(nameof(Index));
     }
@@ -80,7 +82,7 @@ public class AdminCinemasController(ICinemaService cinemaService, IRoomService r
             var cinema = new Cinema 
             { 
                 Name = name, 
-                Slug = string.IsNullOrWhiteSpace(slug) ? "" : slug,
+                Slug = string.IsNullOrWhiteSpace(slug) ? Guid.NewGuid().ToString("N").Substring(0, 8) : slug,
                 Province = province, 
                 District = string.IsNullOrWhiteSpace(district) ? "" : district,
                 Address = address, 
@@ -96,9 +98,10 @@ public class AdminCinemasController(ICinemaService cinemaService, IRoomService r
             await cinemaService.UpdateAsync(id, cinema);
             TempData["Success"] = "Cập nhật rạp thành công!";
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
+            logger.LogError(ex, "Lỗi khi cập nhật Rạp: ");
+            TempData["Error"] = "Đã xảy ra lỗi hệ thống: " + ex.Message;
         }
         return RedirectToAction(nameof(Index));
     }
@@ -113,9 +116,10 @@ public class AdminCinemasController(ICinemaService cinemaService, IRoomService r
             await cinemaService.DeleteAsync(id);
             TempData["Success"] = "Xóa rạp thành công!";
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            TempData["Error"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
+            logger.LogError(ex, "Lỗi khi xóa Rạp: ");
+            TempData["Error"] = "Đã xảy ra lỗi hệ thống (có thể do ràng buộc dữ liệu khóa ngoại). Vui lòng thử lại sau.";
         }
         return RedirectToAction(nameof(Index));
     }
