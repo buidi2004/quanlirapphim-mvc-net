@@ -1,7 +1,9 @@
 :root {
-  /* BookMyShow Style Tokens */
-  --color-primary: #F84464;
-  --color-primary-dark: #D8324F;
+  /* Earth Tone Style Tokens */
+  --color-primary: #C2B59B;
+  --color-primary-dark: #A3967C;
+  --color-earth-1: #ECE7DA;
+  --color-earth-2: #D6CAA8;
   --color-bg-light: #F5F5F5;
   --color-bg-white: #FFFFFF;
   --color-text-primary: #1F2533;
@@ -12,8 +14,8 @@
   --font-family-base: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   
   /* Bootstrap overrides */
-  --bs-primary: #F84464;
-  --bs-primary-rgb: 248, 68, 100;
+  --bs-primary: #C2B59B;
+  --bs-primary-rgb: 194, 181, 155;
   --bs-body-bg: #F5F5F5;
   --bs-body-color: #1F2533;
   --bs-font-sans-serif: var(--font-family-base);

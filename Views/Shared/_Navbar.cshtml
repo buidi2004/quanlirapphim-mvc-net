@@ -7,10 +7,25 @@
   4. Thanh Tìm Kiếm Trực Tiếp (Live Search Bar) cho phép gõ từ khóa tìm tên phim.
   5. Menu Tài Khoản & Quyền Đăng Nhập: Tự động đổi giao diện giữa Khách vãng lai (Nút Đăng nhập/Đăng ký) và Người dùng đã đăng nhập (Hiển thị Avatar, Tên, Cấp độ thành viên, Nút Đăng xuất, và Menu Quản trị Admin nếu là Admin).
 *@
-<nav id="mainNavbar" class="navbar navbar-expand-lg sticky-top smart-navbar" style="z-index: 1050;">
+<!-- Top Bar (Tông 1 - Kem nhạt) -->
+<div class="top-bar-earth text-dark d-none d-md-block" style="background-color: var(--color-earth-1); font-size: 13px; padding: 6px 0;">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <i class="bi bi-telephone-fill me-1"></i> Hotline: 1900 1234
+            <span class="mx-2">|</span>
+            <i class="bi bi-envelope-fill me-1"></i> support@cinemax.vn
+        </div>
+        <div>
+            <a href="#" class="text-dark text-decoration-none me-3"><i class="bi bi-question-circle me-1"></i> Hỗ trợ</a>
+            <a href="#" class="text-dark text-decoration-none"><i class="bi bi-translate me-1"></i> VN | EN</a>
+        </div>
+    </div>
+</div>
+
+<nav id="mainNavbar" class="navbar navbar-expand-lg sticky-top smart-navbar" style="z-index: 1050; border-bottom: 1px solid var(--color-primary);">
     <div class="container">
         @* Logo Thương hiệu CinemaX *@
-        <a class="navbar-brand fw-medium text-warning fs-3" href="/">
+        <a class="navbar-brand fw-bold fs-3 text-primary-custom" href="/">
             <i class="bi bi-film"></i> CinemaX
         </a>
 
@@ -20,50 +35,9 @@
 
         <div class="collapse navbar-collapse" id="navMenu">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <!-- Dropdown Menu Danh mục & Thể loại Phim -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMovies" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Phim
-                    </a>
-                    <ul class="dropdown-menu shadow border-0" aria-labelledby="navbarDropdownMovies" style="min-width: 200px;">
-                        <li><h6 class="dropdown-header text-warning fw-medium">Danh mục</h6></li>
-                        <li><a class="dropdown-item py-2" href="/movies">Phim Đang Chiếu</a></li>
-                        <li><a class="dropdown-item py-2" href="/movies?status=coming_soon">Phim Sắp Chiếu</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><h6 class="dropdown-header text-warning fw-medium">Thể loại</h6></li>
-                        <li><a class="dropdown-item py-2" href="/movies?genre=Hành động">Hành Động</a></li>
-                        <li><a class="dropdown-item py-2" href="/movies?genre=Khoa học viễn tưởng">Viễn Tưởng</a></li>
-                        <li><a class="dropdown-item py-2" href="/movies?genre=Kinh dị">Kinh Dị</a></li>
-                    </ul>
-                </li>
-                
-                @* Nút Đặt Vé Nhanh (Fast Booking) *@
-                <li class="nav-item">
-                    <a class="nav-link text-warning fw-medium" href="/booking/fast">
-                        <i class="bi bi-lightning-charge-fill me-1"></i>Đặt Vé Nhanh
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/cinemas/showtimes">
-                        <i class="bi bi-calendar-event me-1"></i>Lịch chiếu
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/cinemas">
-                        <i class="bi bi-geo-alt me-1"></i>Hệ thống rạp
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/promotions">
-                        <i class="bi bi-tag me-1"></i>Ưu đãi
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/news">
-                        <i class="bi bi-newspaper me-1"></i>Tin tức
-                    </a>
-                </li>
             </ul>
+
+            <!-- Sub-navigation (Tông 2 - Cát Khaki) dời xuống dưới, ở đây chỉ để lại Search và Auth -->
 
             <div class="d-flex me-3 d-none d-lg-flex position-relative search-container">
                 <form class="search-form-premium w-100" action="/search" method="GET">
@@ -200,3 +174,48 @@
         </div>
     </div>
 </nav>
+
+<!-- Sub Navigation (Tông 2 - Cát Khaki) -->
+<div class="sub-nav-earth d-none d-lg-block shadow-sm" style="background-color: var(--color-earth-2); border-bottom: 2px solid var(--color-primary);">
+    <div class="container">
+        <ul class="nav py-1 justify-content-center fw-medium align-items-center" style="font-size: 15px;">
+            <li class="nav-item dropdown me-4">
+                <a class="nav-link dropdown-toggle text-dark px-0" href="#" id="navbarDropdownMovies" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-film me-1"></i> Phim
+                </a>
+                <ul class="dropdown-menu shadow border-0 mt-2" aria-labelledby="navbarDropdownMovies">
+                    <li><h6 class="dropdown-header text-primary-custom fw-bold">Danh mục</h6></li>
+                    <li><a class="dropdown-item py-2" href="/movies">Phim Đang Chiếu</a></li>
+                    <li><a class="dropdown-item py-2" href="/movies?status=coming_soon">Phim Sắp Chiếu</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><h6 class="dropdown-header text-primary-custom fw-bold">Thể loại</h6></li>
+                    <li><a class="dropdown-item py-2" href="/movies?genre=Hành động">Hành Động</a></li>
+                    <li><a class="dropdown-item py-2" href="/movies?genre=Khoa học viễn tưởng">Viễn Tưởng</a></li>
+                    <li><a class="dropdown-item py-2" href="/movies?genre=Kinh dị">Kinh Dị</a></li>
+                </ul>
+            </li>
+            <li class="nav-item me-4">
+                <a class="nav-link text-primary-custom fw-bold px-0" href="/booking/fast">
+                    <i class="bi bi-lightning-charge-fill me-1"></i> Đặt Vé Nhanh
+                </a>
+            </li>
+            <li class="nav-item me-4">
+                <a class="nav-link text-dark px-0 hover-primary" href="/cinemas/showtimes">Lịch chiếu</a>
+            </li>
+            <li class="nav-item me-4">
+                <a class="nav-link text-dark px-0 hover-primary" href="/cinemas">Hệ thống rạp</a>
+            </li>
+            <li class="nav-item me-4">
+                <a class="nav-link text-dark px-0 hover-primary" href="/promotions">Ưu đãi</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark px-0 hover-primary" href="/news">Tin tức</a>
+            </li>
+        </ul>
+    </div>
+</div>
+<style>
+.hover-primary:hover {
+    color: var(--color-primary) !important;
+}
+</style>
