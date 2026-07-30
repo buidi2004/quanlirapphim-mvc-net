@@ -376,3 +376,45 @@ h2 { font-size: 20px; font-weight: 600; }
     bottom: 20px;
     z-index: 999;
 }
+
+/* =========================================
+   MOBILE UI OPTIMIZATIONS 
+   ========================================= */
+@media (max-width: 767.98px) {
+    body {
+        padding-bottom: 72px !important; /* Prevent footer from being hidden by bottom nav */
+    }
+}
+.mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1050;
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 0;
+    padding-bottom: env(safe-area-inset-bottom, 8px); /* For iPhone X+ notch area */
+}
+.mobile-bottom-nav .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: var(--color-text-secondary);
+    font-size: 0.75rem;
+    padding: 4px 12px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+.mobile-bottom-nav .nav-item i {
+    font-size: 1.4rem;
+    margin-bottom: 2px;
+}
+.mobile-bottom-nav .nav-item.active {
+    color: var(--color-primary);
+    font-weight: 600;
+}
+.mobile-bottom-nav .nav-item:active {
+    background-color: rgba(248, 68, 100, 0.1);
+}
